@@ -1,0 +1,28 @@
+{
+  "files": {
+    "main.css": "/reflexer-labs/geb-frontend/static/css/main.46a6af4c.chunk.css",
+    "main.js": "/reflexer-labs/geb-frontend/static/js/main.201e25f8.chunk.js",
+    "main.js.map": "/reflexer-labs/geb-frontend/static/js/main.201e25f8.chunk.js.map",
+    "runtime-main.js": "/reflexer-labs/geb-frontend/static/js/runtime-main.b7c8900f.js",
+    "runtime-main.js.map": "/reflexer-labs/geb-frontend/static/js/runtime-main.b7c8900f.js.map",
+    "static/js/2.739ba9da.chunk.js": "/reflexer-labs/geb-frontend/static/js/2.739ba9da.chunk.js",
+    "static/js/2.739ba9da.chunk.js.map": "/reflexer-labs/geb-frontend/static/js/2.739ba9da.chunk.js.map",
+    "index.html": "/reflexer-labs/geb-frontend/index.html",
+    "precache-manifest.a47c668a1d9391f5c6a536395509a770.js": "/reflexer-labs/geb-frontend/precache-manifest.a47c668a1d9391f5c6a536395509a770.js",
+    "service-worker.js": "/reflexer-labs/geb-frontend/service-worker.js",
+    "static/css/main.46a6af4c.chunk.css.map": "/reflexer-labs/geb-frontend/static/css/main.46a6af4c.chunk.css.map",
+    "static/js/2.739ba9da.chunk.js.LICENSE.txt": "/reflexer-labs/geb-frontend/static/js/2.739ba9da.chunk.js.LICENSE.txt",
+    "static/media/arrow.svg": "/reflexer-labs/geb-frontend/static/media/arrow.646c953e.svg",
+    "static/media/brand.svg": "/reflexer-labs/geb-frontend/static/media/brand.04153b4f.svg",
+    "static/media/dark-arrow.svg": "/reflexer-labs/geb-frontend/static/media/dark-arrow.637d5d9b.svg",
+    "static/media/error.svg": "/reflexer-labs/geb-frontend/static/media/error.a713326e.svg",
+    "static/media/reflexer-icon.svg": "/reflexer-labs/geb-frontend/static/media/reflexer-icon.4a6a071a.svg",
+    "static/media/uniswap-icon.svg": "/reflexer-labs/geb-frontend/static/media/uniswap-icon.b587924a.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.b7c8900f.js",
+    "static/js/2.739ba9da.chunk.js",
+    "static/css/main.46a6af4c.chunk.css",
+    "static/js/main.201e25f8.chunk.js"
+  ]
+}
