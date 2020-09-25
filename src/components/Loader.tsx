@@ -1,0 +1,50 @@
+import React from 'react';
+import styled, { keyframes } from 'styled-components';
+import LoadingIcon from './Icons/LoadingIcon';
+
+interface Props {
+  text?: string;
+  width?: string;
+  fontSize?: string;
+  hideSpinner?: boolean | null | undefined;
+}
+const Loader = ({ text, width, fontSize, hideSpinner }: Props) => {
+  return (
+    <Container>
+      {hideSpinner ? null : (
+        <LoadingIcon
+          style={{ width: width || '14px', height: width || '14px' }}
+        />
+      )}
+      <span style={{ fontSize: fontSize }}>{text}</span>
+    </Container>
+  );
+};
+
+export default Loader;
+
+const rotating = keyframes`
+ from {
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+  `;
+
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+  grid-gap: 10px;
+  svg {
+    stroke: ${(props) => props.theme.inputBorderColor};
+    animation: ${rotating} 1.5s linear infinite;
+  }
+  span {
+    font-size: ${(props) => props.theme.textFontSize};
+  }
+`;
