@@ -28,6 +28,14 @@ const ReviewTransaction = () => {
       timeout: 3000,
     });
     walletActions.setStage(0);
+    walletActions.setUniSwapPool({
+      depositedETH: '',
+      borrowedRAI: '',
+    });
+    walletActions.setCreateSafeDefault({
+      depositedETH: '',
+      borrowedRAI: '',
+    });
   };
 
   return (
@@ -70,7 +78,6 @@ const ReviewTransaction = () => {
         </Result>
 
         <UniSwapCheckContainer>
-          <Box />
           <Text>{t('confirm_text')}</Text>
         </UniSwapCheckContainer>
       </Body>
@@ -94,7 +101,6 @@ const Body = styled.div`
 
 const UniSwapCheckContainer = styled.div`
   display: flex;
-  grid-gap: 12px;
   margin-top: 20px;
 `;
 
@@ -150,10 +156,4 @@ const Value = styled.div`
   letter-spacing: -0.09px;
   line-height: 21px;
   font-weight: 600;
-`;
-
-const Box = styled.div`
-  background: ${(props) => props.theme.borderColor};
-  width: 24px;
-  height: 24px;
 `;

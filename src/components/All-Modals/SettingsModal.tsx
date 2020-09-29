@@ -12,6 +12,7 @@ const SettingsModal = () => {
       maxWidth="350px"
       isModalOpen={popupsState.isSettingsModalOpen}
       closeModal={() => popupsActions.setIsSettingModalOpen(false)}
+      backDropClose
     >
       <SettingsContent />
     </Modal>

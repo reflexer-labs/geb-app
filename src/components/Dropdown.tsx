@@ -123,6 +123,8 @@ const DropdownBtn = styled.button`
 `;
 
 const CaretIcon = styled.img`
+  height: 6px;
+  width: 11px;
   margin-left: auto;
   display: inline-block;
   vertical-align: middle;

@@ -3,7 +3,6 @@ import i18next from 'i18next';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { I18nextProvider } from 'react-i18next';
-import Navbar from './components/Navbar';
 import ErrorBoundary from './ErrorBoundary';
 import { useStoreState } from './store';
 import { darkTheme } from './utils/themes/dark';
@@ -34,7 +33,6 @@ function App() {
         <Router basename={''}>
           <ErrorBoundary>
             <Shared />
-            <Navbar />
             <OnBoarding />
           </ErrorBoundary>
         </Router>

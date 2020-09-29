@@ -17,7 +17,7 @@ const TransactionOverview = ({ title, description, isChecked }: Props) => {
         <LogoIcon src={ReflexerIcon} />
         {isChecked ? (
           <>
-            <img src={ArrowIcon} alt="" />
+            <img className="sep" src={ArrowIcon} alt="" />
             <LogoIcon src={UniSwapIcon} />{' '}
           </>
         ) : null}
@@ -32,8 +32,12 @@ export default TransactionOverview;
 
 const IconsHolder = styled.div`
   display: flex;
-  grid-gap: 33px;
+
   justify-content: center;
+
+  .sep {
+    margin: 0 33px;
+  }
 `;
 
 const Title = styled.div`

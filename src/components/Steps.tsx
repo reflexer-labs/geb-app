@@ -9,11 +9,12 @@ const Steps = () => {
   const {
     popupsModel: popupsActions,
     walletModel: walletActions,
+    connectWalletModel: connectWalletActions,
   } = useStoreActions((state) => state);
 
   const { step } = walletState;
 
-  const handleConnectWallet = () => popupsActions.setIsConnectModalOpen(true);
+  const handleConnectWallet = () => connectWalletActions.connectWallet();
 
   const handleCreateAccount = () => {
     // TODO: create Reflexer Acccount
@@ -86,7 +87,6 @@ const StepsBars = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  grid-gap: 8px;
 `;
 
 const StepBar = styled.div`
@@ -96,5 +96,9 @@ const StepBar = styled.div`
   background: ${(props) => props.theme.placeholderColor};
   &.active {
     background: ${(props) => props.theme.defaultGradient};
+  }
+  margin-right: 8px;
+  &:last-child {
+    margin-right: 0;
   }
 `;

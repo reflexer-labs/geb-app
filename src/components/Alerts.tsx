@@ -6,12 +6,13 @@ interface Props {
   text: string;
   isFloated?: boolean;
   topPosition?: string;
+  margin?: string;
 }
 
-const Alerts = ({ type, text, isFloated, topPosition }: Props) => {
+const Alerts = ({ type, text, isFloated, topPosition, margin }: Props) => {
   return (
     <Container
-      style={{ top: isFloated && topPosition ? topPosition : '' }}
+      style={{ top: isFloated && topPosition ? topPosition : '', margin }}
       className={`${type} ${isFloated ? 'floated' : ''}`}
     >
       {text}

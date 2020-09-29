@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Alerts from '../components/Alerts';
-import ConnectedWalletModal from '../components/modals/ConnectedWalletModal';
-import CreateAccountModal from '../components/modals/CreateAccountModal';
-import SettingsModal from '../components/modals/SettingsModal';
+import ConnectedWalletModal from '../components/All-Modals/ConnectedWalletModal';
+import CreateAccountModal from '../components/All-Modals/CreateAccountModal';
+import ScreenLoader from '../components/All-Modals/ScreenLoader';
+import SettingsModal from '../components/All-Modals/SettingsModal';
+import Navbar from '../components/Navbar';
 import SideMenu from '../components/SideMenu';
 import SideToast from '../components/SideToast';
 import { getChainData } from '../services/Web3Helpers';
@@ -42,7 +44,7 @@ const Shared = () => {
   useEffect(() => {
     handleConnect();
     // eslint-disable-next-line
-  }, []);
+  }, [isLightTheme]);
 
   useEffect(() => {
     if (walletPayload.chainId && walletPayload.chainId !== DEFAULT_NETWORK_ID) {
@@ -57,19 +59,22 @@ const Shared = () => {
   return (
     <>
       {popupsState.showSideMenu ? <SideMenu /> : null}
-      {networkWarning ? (
-        <Alerts
-          isFloated
-          text={networkWarning}
-          topPosition={'80px'}
-          type={'danger'}
-        />
-      ) : null}
+
       <SideToast {...sideToastPayload} />
 
       <SettingsModal />
       <CreateAccountModal />
       <ConnectedWalletModal />
+      <ScreenLoader />
+      <Navbar />
+
+      {networkWarning ? (
+        <Alerts
+          text={networkWarning}
+          margin={'20px auto 0 auto'}
+          type={'danger'}
+        />
+      ) : null}
     </>
   );
 };

@@ -60,42 +60,48 @@ const connectWalletModel: ConnectWalletModel = {
     }
     actions.setWalletPayload({ ...INITIAL_STATE });
   }),
-  getAccountAssets: thunk(async (actions, payload, { getState }) => {
-    const { address, chainId } = getState().walletPayload;
-    actions.setWalletPayload({ fetching: true });
-    try {
-      // get account balances
-      const assets = await api.apiGetAccountAssets(address, chainId);
-      const fiatPrice = await api.fetchFiatPrice();
-      const balance = {
-        ethBN: new BigNumber(0),
-        ethFiat: new BigNumber(0),
-      };
-      if (assets.length > 0) {
-        const eth = assets.find(
-          (item: IAssetData) => item.symbol.toLowerCase() === 'eth'
-        );
-        if (eth && eth.balance) {
-          balance.ethBN = getBalanceBN(eth.balance);
-          balance.ethFiat = getBalanceFiat(eth.balance, fiatPrice);
-        }
-      }
+  getAccountAssets: thunk(
+    async (actions, payload, { getState, getStoreActions }) => {
+      const { address, chainId } = getState().walletPayload;
+      const storeActions: any = getStoreActions();
+      actions.setWalletPayload({ fetching: true });
+      storeActions.popupsModel.setIsScreenModalOpen(true);
 
-      actions.setWalletPayload({
-        fetching: false,
-        assets,
-        fiatPrice,
-        ...balance,
-      });
-    } catch (error) {
-      console.error(error); // tslint:disable-line
-      actions.setWalletPayload({ fetching: false });
+      try {
+        // get account balances
+        const assets = await api.apiGetAccountAssets(address, chainId);
+        const fiatPrice = await api.fetchFiatPrice();
+        const balance = {
+          ethBN: new BigNumber(0),
+          ethFiat: new BigNumber(0),
+        };
+        if (assets.length > 0) {
+          const eth = assets.find(
+            (item: IAssetData) => item.symbol.toLowerCase() === 'eth'
+          );
+          if (eth && eth.balance) {
+            balance.ethBN = getBalanceBN(eth.balance);
+            balance.ethFiat = getBalanceFiat(eth.balance, fiatPrice);
+          }
+        }
+
+        actions.setWalletPayload({
+          fetching: false,
+          assets,
+          fiatPrice,
+          ...balance,
+        });
+        storeActions.popupsModel.setIsScreenModalOpen(false);
+      } catch (error) {
+        console.error(error); // tslint:disable-line
+        actions.setWalletPayload({ fetching: false });
+        storeActions.popupsModel.setIsScreenModalOpen(false);
+      }
     }
-  }),
+  ),
   connectWallet: thunk(
     async (actions, payload, { getState, getStoreActions }) => {
       const { walletPayload } = getState();
-
       const storeActions: any = getStoreActions();
 
       let initedWeb3Modal = walletPayload.web3Modal;
@@ -104,6 +110,10 @@ const connectWalletModel: ConnectWalletModel = {
       }
 
       const provider = await initedWeb3Modal.connect();
+
+      if (walletPayload.connected) {
+        actions.resetApp();
+      }
 
       const providerInfo = getProviderInfo(provider);
 
@@ -132,7 +142,7 @@ const connectWalletModel: ConnectWalletModel = {
         providerInfo,
       });
       await actions.getAccountAssets();
-      storeActions.walletModel.setStep(1);
+      storeActions.walletModel.setStep(2);
     }
   ),
 

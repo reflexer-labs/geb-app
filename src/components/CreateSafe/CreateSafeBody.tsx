@@ -5,7 +5,7 @@ import { useStoreActions, useStoreState } from '../../store';
 import { CreateSafeType } from '../../utils/interfaces';
 import Button from '../Button';
 import CheckBox from '../CheckBox';
-import Input from '../Input';
+import DecimalInput from '../DecimalInput';
 
 interface Props {
   isChecked?: boolean;
@@ -13,7 +13,7 @@ interface Props {
 
 const CreateSafeBody = ({ isChecked }: Props) => {
   const { t } = useTranslation();
-  const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || true);
+  const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || false);
   const [defaultSafe, setDefaultSafe] = useState<CreateSafeType>({
     depositedETH: '',
     borrowedRAI: '',
@@ -47,11 +47,25 @@ const CreateSafeBody = ({ isChecked }: Props) => {
   };
 
   const handleCancel = () => {
-    if (isChecked) {
-      walletActions.setStage(0);
-    } else {
-      popupsActions.setIsCreateAccountModalOpen(false);
-    }
+    walletActions.setIsUniSwapPoolChecked(false);
+    walletActions.setStage(0);
+    popupsActions.setIsCreateAccountModalOpen(false);
+    walletActions.setUniSwapPool({
+      depositedETH: '',
+      borrowedRAI: '',
+    });
+    walletActions.setCreateSafeDefault({
+      depositedETH: '',
+      borrowedRAI: '',
+    });
+    setUniSwapVal({
+      depositedETH: '',
+      borrowedRAI: '',
+    });
+    setDefaultSafe({
+      depositedETH: '',
+      borrowedRAI: '',
+    });
   };
 
   useEffect(() => {
@@ -63,18 +77,18 @@ const CreateSafeBody = ({ isChecked }: Props) => {
     <>
       <Body>
         <DoubleInput>
-          <Input
+          <DecimalInput
             label={'Deposit ETH (Avail 0.00)'}
-            value={defaultSafe ? defaultSafe.depositedETH : ''}
+            value={defaultSafe.depositedETH}
             onChange={(val: string) =>
               setDefaultSafe({ ...defaultSafe, depositedETH: val })
             }
             disableMax
             disabled={isChecked}
           />
-          <Input
+          <DecimalInput
             label={'Borrow RAI (Avail 0.00)'}
-            value={defaultSafe ? defaultSafe.borrowedRAI : ''}
+            value={defaultSafe.borrowedRAI}
             onChange={(val: string) =>
               setDefaultSafe({ ...defaultSafe, borrowedRAI: val })
             }
@@ -85,15 +99,15 @@ const CreateSafeBody = ({ isChecked }: Props) => {
 
         {isChecked ? (
           <DoubleInput>
-            <Input
-              label={'Deposit ETH (Avail 0.00)'}
+            <DecimalInput
+              label={'ETH on Uniswap (Avail 0.00)'}
               value={uniSwapVal ? uniSwapVal.depositedETH : ''}
               onChange={(val: string) =>
                 setUniSwapVal({ ...uniSwapVal, depositedETH: val })
               }
             />
-            <Input
-              label={'Borrow RAI (Avail 0.00)'}
+            <DecimalInput
+              label={'RAI on Uniswap (Avail 0.00)'}
               value={uniSwapVal ? uniSwapVal.borrowedRAI : ''}
               onChange={(val: string) =>
                 setUniSwapVal({ ...uniSwapVal, borrowedRAI: val })
@@ -157,10 +171,14 @@ const DoubleInput = styled.div`
   display: flex;
   margin-bottom: 20px;
   > div {
-    flex: 0 0 50%;
     &:last-child {
-      flex: 0 0 calc(50% + 65px);
-      margin-left: -65px;
+      flex: 0 0 calc(57% + 10px);
+      margin-left: -10px;
+    }
+    &:first-child {
+      flex: 0 0 44%;
+      input {
+      }
     }
   }
 

@@ -11,9 +11,10 @@ interface Props {
   disableMax?: boolean;
   handleMaxClick?: () => void;
   disabled?: boolean;
+  maxLength?: number;
 }
 
-const Input = ({
+const DecimalInput = ({
   label,
   placeholder,
   icon,
@@ -22,8 +23,24 @@ const Input = ({
   disableMax,
   handleMaxClick,
   disabled,
+  maxLength,
 }: Props) => {
   const { t } = useTranslation();
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (/^-?\d*[.,]?\d*$/.test(val) && /^\d*(\.\d{0,4})?$/.test(val)) {
+      if (val.startsWith('0') && val.charAt(1) !== '.') {
+        const returnedVal = val.replace(/(\d)(?=(\d))/, '$1.');
+        onChange(returnedVal);
+      } else if (val.length === 6 && Number(val) === 0) {
+        onChange('');
+      } else {
+        onChange(val);
+      }
+    }
+  };
+
   return (
     <Container>
       <Label>{label}</Label>
@@ -32,10 +49,12 @@ const Input = ({
         <CustomInput
           placeholder={placeholder || '0.00'}
           type={'text'}
-          defaultValue={value || ''}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            onChange(e.target.value)
-          }
+          inputMode="decimal"
+          value={value || ''}
+          pattern="^[0-9]*[.,]?[0-9]*$"
+          maxLength={maxLength || 12}
+          minLength={1}
+          onChange={handleChange}
           disabled={disabled}
         />
 
@@ -47,7 +66,7 @@ const Input = ({
   );
 };
 
-export default Input;
+export default DecimalInput;
 
 const Container = styled.div``;
 

@@ -4,7 +4,6 @@ import UniLogin from '@unilogin/provider';
 import Torus from '@toruslabs/torus-embed';
 import Fortmatic from 'fortmatic';
 import WalletConnectProvider from '@walletconnect/web3-provider';
-import Authereum from 'authereum';
 import { getChainData } from './Web3Helpers';
 import { ThemeColors } from '../utils/interfaces';
 import { lightTheme } from '../utils/themes/light';
@@ -24,9 +23,6 @@ const providerOptions = {
     options: {
       key: process.env.REACT_APP_FORTMATIC_KEY,
     },
-  },
-  authereum: {
-    package: Authereum,
   },
   unilogin: {
     package: UniLogin,

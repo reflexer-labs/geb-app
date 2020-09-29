@@ -26,7 +26,6 @@ export default NavLinks;
 
 const Nav = styled.div`
   display: flex;
-  grid-gap: 20px;
   align-items: center;
   .settings-btn {
     display: none;
@@ -36,7 +35,6 @@ const Nav = styled.div`
       display: block;
     }
     flex-direction: column;
-    grid-gap: 0;
     a,
     div {
       flex: 0 0 100%;
@@ -45,6 +43,7 @@ const Nav = styled.div`
       padding: 20px 18px;
       display: block;
       text-align: left;
+      margin: 0;
       border-bottom: 1px solid ${(props) => props.theme.borderColor};
       &:first-child {
         border-top: 1px solid ${(props) => props.theme.borderColor};
@@ -63,6 +62,10 @@ const NavBarLink = styled(NavLink)`
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     color: ${(props) => props.theme.inputBorderColor};
+  }
+  margin-right: 20px;
+  &:last-child {
+    margin-right: 0;
   }
 `;
 

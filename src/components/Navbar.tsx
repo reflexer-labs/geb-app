@@ -31,14 +31,16 @@ const Navbar = () => {
           <NavLinks />
         </HideMobile>
         <RightSide>
-          <Button
-            onClick={handleWalletConnect}
-            text={
-              walletPayload.connected
-                ? helper.returnWalletAddres(walletPayload.address)
-                : 'connect_wallet'
-            }
-          />
+          <BtnContainer>
+            <Button
+              onClick={handleWalletConnect}
+              text={
+                walletPayload.connected
+                  ? helper.returnWalletAddres(walletPayload.address)
+                  : 'connect_wallet'
+              }
+            />
+          </BtnContainer>
 
           <HideMobile>
             <SettingsPopup />
@@ -71,8 +73,8 @@ const Container = styled.div`
 
 const MenuBtn = styled.div`
   margin-right: -20px;
-  width: 68px;
-  height: 68px;
+  width: 60px;
+  height: 60px;
   align-items: center;
   justify-content: center;
   display: none;
@@ -89,14 +91,20 @@ const MenuBtn = styled.div`
     display: flex;
   }
 `;
+const BtnContainer = styled.div`
+  margin-right: 20px;
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
 
 const RectContainer = styled.div``;
 
 const Rect = styled.div`
-  width: 20px;
+  width: 15px;
   border-radius: 12px;
   height: 3px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   background: ${(props) => props.theme.lightText};
   transition: all 0.3s ease;
   &:last-child {
@@ -106,7 +114,6 @@ const Rect = styled.div`
 
 const RightSide = styled.div`
   display: flex;
-  grid-gap: 20px;
   align-items: center;
 `;
 

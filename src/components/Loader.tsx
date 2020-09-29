@@ -39,10 +39,11 @@ const rotating = keyframes`
 const Container = styled.div`
   display: flex;
   align-items: center;
-  grid-gap: 10px;
+
   svg {
     stroke: ${(props) => props.theme.inputBorderColor};
     animation: ${rotating} 1.5s linear infinite;
+    margin-right: 10px;
   }
   span {
     font-size: ${(props) => props.theme.textFontSize};

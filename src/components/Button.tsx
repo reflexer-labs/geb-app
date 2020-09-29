@@ -11,6 +11,7 @@ interface Props {
   withArrow?: boolean;
   disabled?: boolean;
   dimmedWithArrow?: boolean;
+  isBordered?: boolean;
 }
 
 const Button = ({
@@ -20,6 +21,7 @@ const Button = ({
   withArrow,
   disabled,
   dimmedWithArrow,
+  isBordered,
 }: Props) => {
   const returnType = () => {
     if (dimmed) {
@@ -40,6 +42,12 @@ const Button = ({
         <ArrowBtn disabled={disabled} onClick={onClick}>
           {t(text)} <img src={ArrowImg} alt={''} />
         </ArrowBtn>
+      );
+    } else if (isBordered) {
+      return (
+        <BorderedBtn disabled={disabled} onClick={onClick}>
+          <Inner>{t(text)}</Inner>
+        </BorderedBtn>
       );
     } else {
       return (
@@ -85,7 +93,9 @@ const DimmedBtn = styled.button`
   margin: 0;
   display: flex;
   align-items: center;
-  grid-gap: 3px;
+  img {
+    margin-right: 3px;
+  }
 `;
 
 const ArrowBtn = styled.button`
@@ -110,4 +120,21 @@ const ArrowBtn = styled.button`
     cursor: not-allowed;
     opacity: 0.5;
   }
+`;
+
+const BorderedBtn = styled.button`
+  background: ${(props) => props.theme.defaultGradient};
+  padding: 2px;
+  border-radius: 25px;
+  box-shadow: none;
+  outline: none;
+  border: 0;
+  cursor: pointer;
+`;
+
+const Inner = styled.div`
+  background: ${(props) => props.theme.modalBg};
+  color: ${(props) => props.theme.inputBorderColor};
+  border-radius: 25px;
+  padding: 4px 6px;
 `;

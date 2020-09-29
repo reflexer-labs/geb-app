@@ -10,8 +10,11 @@ const ConnectedWalletModal = () => {
     <Modal
       title={'account_details'}
       maxWidth="400px"
+      borderRadius={'20px'}
       isModalOpen={popupsState.isConnectedWalletModalOpen}
       closeModal={() => popupsActions.setIsConnectedWalletModalOpen(false)}
+      showXButton
+      backDropClose
     >
       <ConnectedWalletInfo />
     </Modal>

@@ -94,11 +94,11 @@ const Expand = styled.div`
   font-size: ${(props) => props.theme.smallFontSize};
   display: flex;
   align-items: center;
-  grid-gap: 10px;
   svg {
     color: ${(props) => props.theme.lightText};
     width: 13px;
     height: 13px;
+    margin-right: 10px;
   }
   a {
     color: inherit;

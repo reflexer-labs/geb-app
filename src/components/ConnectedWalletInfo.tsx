@@ -21,15 +21,10 @@ const ConnectedWalletInfo = () => {
 
   const { walletPayload, chainData } = connectWalletState;
 
-  const handleDisconnect = () => {
-    connectWalletActions.resetApp();
+  const handleChange = () => {
     popupsActions.setIsConnectedWalletModalOpen(false);
-    popupsActions.setSideToastPayload({
-      showPopup: true,
-      text: 'provider_disconnected',
-      hideSpinner: true,
-      timeout: 3000,
-    });
+    connectWalletActions.setNetworkWarning('');
+    connectWalletActions.connectWallet();
   };
 
   const generateLink = (address: string) => {
@@ -44,51 +39,46 @@ const ConnectedWalletInfo = () => {
 
   return (
     <>
-      <Connection>
-        {t('connected_with')}{' '}
-        {walletPayload.providerInfo ? walletPayload.providerInfo.name : 'N/A'}
-        <Button text={'disconnect'} onClick={handleDisconnect} />
-      </Connection>
+      <DataContainer>
+        <Connection>
+          {t('connected_with')}{' '}
+          {walletPayload.providerInfo ? walletPayload.providerInfo.name : 'N/A'}
+          <Button text={'Change'} onClick={handleChange} />
+        </Connection>
 
-      <Address>
-        {walletPayload.providerInfo && walletPayload.providerInfo.logo ? (
-          <img src={walletPayload.providerInfo.logo} alt="" />
+        <Address>
+          {walletPayload.providerInfo && walletPayload.providerInfo.logo ? (
+            <img src={walletPayload.providerInfo.logo} alt="" />
+          ) : null}
+
+          {walletPayload.address
+            ? helper.returnWalletAddres(walletPayload.address)
+            : 'N/A'}
+        </Address>
+        {walletPayload.address ? (
+          <WalletData>
+            {copied ? (
+              <CopyBtn className="greenish">{t('copied')}</CopyBtn>
+            ) : (
+              <CopyToClipboard
+                text={walletPayload.address}
+                onCopy={() => {
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 500);
+                }}
+              >
+                <CopyBtn>
+                  <CopyIcon /> {t('copy_address')}
+                </CopyBtn>
+              </CopyToClipboard>
+            )}
+            <LinkBtn href={generateLink(walletPayload.address)} target="_blank">
+              <ExpandIcon /> {t('view_etherscan')}
+            </LinkBtn>
+          </WalletData>
         ) : null}
-
-        {walletPayload.address
-          ? helper.returnWalletAddres(walletPayload.address)
-          : 'N/A'}
-      </Address>
-      <Balance>
-        <Label>{t('eth_balance')}</Label>{' '}
-        <Data>
-          {walletPayload.ethBN.toFixed(3)}{' '}
-          {`($${walletPayload.ethFiat.toFixed(2)})`}
-        </Data>
-      </Balance>
-
-      {walletPayload.address ? (
-        <WalletData>
-          {copied ? (
-            <CopyBtn className="greenish">{t('copied')}</CopyBtn>
-          ) : (
-            <CopyToClipboard
-              text={walletPayload.address}
-              onCopy={() => {
-                setCopied(true);
-                setTimeout(() => setCopied(false), 500);
-              }}
-            >
-              <CopyBtn>
-                <CopyIcon /> {t('copy_address')}
-              </CopyBtn>
-            </CopyToClipboard>
-          )}
-          <LinkBtn href={generateLink(walletPayload.address)} target="_blank">
-            <ExpandIcon /> {t('view_etherscan')}
-          </LinkBtn>
-        </WalletData>
-      ) : null}
+      </DataContainer>
+      <TransactionsContainer>{t('transaction_msg')}</TransactionsContainer>
     </>
   );
 };
@@ -111,11 +101,11 @@ const Connection = styled.div`
 
 const Address = styled.div`
   display: flex;
-  grid-gap: 10px;
   margin: 20px 0;
   align-items: center;
   img {
     width: 20px;
+    margin-right: 10px;
   }
   font-size: ${(props) => props.theme.titleFontSize};
 `;
@@ -123,7 +113,6 @@ const Address = styled.div`
 const WalletData = styled.div`
   display: flex;
   align-items: center;
-  grid-gap: 20px;
   align-items: center;
 `;
 
@@ -134,11 +123,11 @@ const CopyBtn = styled.div`
   cursor: pointer;
   display: flex;
   align-items: center;
-  grid-gap: 5px;
   svg {
     color: ${(props) => props.theme.lightText};
     width: 15px;
     height: 15px;
+    margin-right: 5px;
   }
   &:hover {
     text-decoration: underline;
@@ -155,6 +144,8 @@ const CopyBtn = styled.div`
     -webkit-text-fill-color: transparent;
     color: ${(props) => props.theme.inputBorderColor};
   }
+
+  margin-right: 20px;
 `;
 
 const LinkBtn = styled.a`
@@ -163,11 +154,11 @@ const LinkBtn = styled.a`
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  grid-gap: 5px;
   svg {
     color: ${(props) => props.theme.lightText};
     width: 15px;
     height: 15px;
+    margin-right: 5px;
   }
 
   &:hover {
@@ -179,20 +170,16 @@ const LinkBtn = styled.a`
   }
 `;
 
-const Balance = styled.div`
-  border-radius: ${(props) => props.theme.buttonBorderRadius};
+const DataContainer = styled.div`
+  border-radius: 20px;
+  padding: 15px;
   border: 1px solid ${(props) => props.theme.borderColor};
-  background: ${(props) => props.theme.hoverEffect};
-  padding: 10px 20px;
-  text-align: center;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 `;
 
-const Label = styled.div`
-  color: ${(props) => props.theme.lightText};
+const TransactionsContainer = styled.div`
+  background-color: rgb(247, 248, 250);
+  padding: 20px;
+  margin: 20px -20px -20px -20px;
+  border-radius: 0 0 25px 25px;
+  font-size: ${(props) => props.theme.textFontSize};
 `;
-
-const Data = styled.div``;
