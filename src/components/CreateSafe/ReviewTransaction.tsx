@@ -5,8 +5,13 @@ import { useStoreActions, useStoreState } from '../../store';
 import CreateSafeContent from './CreateSafeContent';
 import Button from '../Button';
 import TransactionOverview from './TransactionOverview';
+import { SUPPORTED_WALLETS } from '../../utils/constants';
+import { injected } from '../../connectors';
+import { useActiveWeb3React } from '../../hooks';
 
 const ReviewTransaction = () => {
+  const isMetamask = window?.ethereum?.isMetaMask;
+  const { connector } = useActiveWeb3React();
   const { t } = useTranslation();
 
   const {
@@ -38,13 +43,33 @@ const ReviewTransaction = () => {
     });
   };
 
+  const returnConnectorName = () => {
+    return Object.keys(SUPPORTED_WALLETS)
+      .map((key) => {
+        const option = SUPPORTED_WALLETS[key];
+        if (option.connector === connector) {
+          if (option.connector === injected) {
+            if (isMetamask && option.name !== 'MetaMask') {
+              return null;
+            }
+            if (!isMetamask && option.name === 'MetaMask') {
+              return null;
+            }
+          }
+          return option.name;
+        }
+        return null;
+      })
+      .filter((x: string | null) => x !== null)[0];
+  };
+
   return (
     <CreateSafeContent>
       <Body>
         <TransactionOverview
           isChecked={walletState.isUniSwapPoolChecked}
           title={t('confirm_transaction_details')}
-          description={t('confirm_details_text')}
+          description={t('confirm_details_text') + returnConnectorName()}
         />
         <Result>
           <Block>

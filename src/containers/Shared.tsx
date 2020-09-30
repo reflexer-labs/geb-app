@@ -12,15 +12,15 @@ import { useStoreState, useStoreActions } from '../store';
 import { DEFAULT_NETWORK_ID } from '../utils/constants';
 import ApplicationUpdater from '../services/ApplicationUpdater';
 import BalanceUpdater from '../services/BalanceUpdater';
-import helper from '../utils/helper';
+import { capitalizeName } from '../utils/helper';
 import WalletModal from '../components/WalletModal';
 import { ChainId } from '@uniswap/sdk';
-import { ETHERSCAN_PREFIXES } from '../utils';
+import { ETHERSCAN_PREFIXES } from '../utils/constants';
 import { useActiveWeb3React } from '../hooks';
 
 const Shared = () => {
   const { t } = useTranslation();
-  const { chainId, active } = useActiveWeb3React();
+  const { chainId, account } = useActiveWeb3React();
   const {
     popupsModel: popupsState,
     connectWalletModel: connectWallet,
@@ -32,11 +32,13 @@ const Shared = () => {
   const { sideToastPayload } = popupsState;
   const { networkWarning } = connectWallet;
 
-  const networkChecker = (chainId: ChainId) => {
-    if (chainId && chainId !== DEFAULT_NETWORK_ID) {
-      const chainName = ETHERSCAN_PREFIXES[chainId];
+  const networkChecker = (id: ChainId) => {
+    if (chainId && chainId !== id) {
+      const chainName = ETHERSCAN_PREFIXES[id];
       connectWalletActions.setNetworkWarning(
-        `${t('wrong_network')} ${helper.capitalizeName(chainName)}`
+        `${t('wrong_network')} ${capitalizeName(
+          chainName === '' ? 'Mainnet' : chainName
+        )}`
       );
     } else {
       connectWalletActions.setNetworkWarning('');
@@ -45,15 +47,15 @@ const Shared = () => {
 
   useEffect(() => {
     if (chainId) {
-      networkChecker(chainId);
+      networkChecker(DEFAULT_NETWORK_ID);
     }
-    if (active) {
+    if (account) {
       walletActions.setStep(1);
     } else {
       walletActions.setStep(0);
     }
     // eslint-disable-next-line
-  }, [chainId, active]);
+  }, [chainId, account]);
 
   return (
     <>

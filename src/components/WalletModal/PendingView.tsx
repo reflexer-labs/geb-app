@@ -63,7 +63,9 @@ export default function PendingView({
               color={option.color}
               header={option.name}
               subheader={option.description}
-              icon={process.env.PUBLIC_URL + '/img/connectors/metamask.png'}
+              icon={
+                process.env.PUBLIC_URL + `/img/connectors/${option.iconName}`
+              }
             />
           );
         }
@@ -91,7 +93,7 @@ const LoadingMessage = styled.div<{ error?: boolean }>`
   border-radius: 12px;
   margin-bottom: 20px;
   color: ${(props) => props.theme.darkText};
-  border: 1px solid ${(props) => props.theme.borderColor};
+  border: 1px solid ${({ theme, error }) => (error ? 'red' : theme.borderColor)};
 
   & > * {
     padding: 1rem;
@@ -101,6 +103,7 @@ const LoadingMessage = styled.div<{ error?: boolean }>`
 const ErrorGroup = styled.div`
   align-items: center;
   display: flex;
+  color: red;
 `;
 
 const ErrorButton = styled.div`

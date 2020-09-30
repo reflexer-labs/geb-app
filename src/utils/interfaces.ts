@@ -1,5 +1,4 @@
 import { AbstractConnector } from '@web3-react/abstract-connector';
-import BigNumber from 'bignumber.js';
 
 export interface Theme {
   bodyBg: string;
@@ -73,8 +72,7 @@ export interface IBlockNumber {
 }
 
 export interface IEthBalance {
-  [chainId: number]: BigNumber | null;
-  fiatBalance?: string | null;
+  [chainId: number]: number;
 }
 
 export interface WalletInfo {
