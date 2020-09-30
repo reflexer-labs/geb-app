@@ -1,7 +1,38 @@
-const returnWalletAddres = (walletAddress: string) =>
+import { ChainId } from '@uniswap/sdk';
+import { ETHERSCAN_PREFIXES } from './constants';
+
+export const returnWalletAddres = (walletAddress: string) =>
   `${walletAddress.slice(0, 4 + 2)}...${walletAddress.slice(-4)}`;
 
-const capitalizeName = (name: string) =>
+export const capitalizeName = (name: string) =>
   name.charAt(0).toUpperCase() + name.slice(1);
 
-export default { returnWalletAddres, capitalizeName };
+export const getEtherscanLink = (
+  chainId: ChainId,
+  data: string,
+  type: 'transaction' | 'token' | 'address' | 'block'
+): string => {
+  const prefix = `https://${
+    ETHERSCAN_PREFIXES[chainId] || ETHERSCAN_PREFIXES[1]
+  }etherscan.io`;
+
+  switch (type) {
+    case 'transaction': {
+      return `${prefix}/tx/${data}`;
+    }
+    case 'token': {
+      return `${prefix}/token/${data}`;
+    }
+    case 'block': {
+      return `${prefix}/block/${data}`;
+    }
+    case 'address':
+    default: {
+      return `${prefix}/address/${data}`;
+    }
+  }
+};
+
+export const amountToFiat = (balance: number, fiatPrice: number) => {
+  return (balance * fiatPrice).toFixed(4);
+};

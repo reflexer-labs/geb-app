@@ -1,10 +1,5 @@
-import {
-  fortmatic,
-  injected,
-  portis,
-  walletconnect,
-  walletlink,
-} from '../connectors';
+import { ChainId } from '@uniswap/sdk';
+import { injected, walletconnect, walletlink } from '../connectors';
 import { WalletInfo } from './interfaces';
 
 export const DEFAULT_NETWORK_ID = process.env.REACT_APP_NETWORK_ID
@@ -57,22 +52,12 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     mobile: true,
     mobileOnly: true,
   },
-  FORTMATIC: {
-    connector: fortmatic,
-    name: 'Fortmatic',
-    iconName: 'fortmaticIcon.png',
-    description: 'Login using Fortmatic hosted wallet',
-    href: null,
-    color: '#6748FF',
-    mobile: true,
-  },
-  Portis: {
-    connector: portis,
-    name: 'Portis',
-    iconName: 'portisIcon.png',
-    description: 'Login using Portis hosted wallet',
-    href: null,
-    color: '#4A6C9B',
-    mobile: true,
-  },
+};
+
+export const ETHERSCAN_PREFIXES: { [chainId in ChainId]: string } = {
+  1: '',
+  3: 'ropsten.',
+  4: 'rinkeby.',
+  5: 'goerli.',
+  42: 'kovan.',
 };

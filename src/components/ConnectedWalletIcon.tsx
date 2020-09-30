@@ -1,14 +1,7 @@
 import { useWeb3React } from '@web3-react/core';
 import React from 'react';
 import styled from 'styled-components';
-import {
-  fortmatic,
-  injected,
-  portis,
-  walletconnect,
-  walletlink,
-} from '../connectors';
-import Button from './Button';
+import { injected, walletconnect, walletlink } from '../connectors';
 import Identicon from './Icons/Identicon';
 
 interface Props {
@@ -46,32 +39,6 @@ const ConnectedWalletIcon = ({ size }: Props) => {
             alt={'coinbase wallet logo'}
           />
         </IconWrapper>
-      );
-    } else if (connector === fortmatic) {
-      return (
-        <IconWrapper size={size || 16}>
-          <img
-            src={process.env.PUBLIC_URL + `/img/connectors/fortmaticIcon.png`}
-            alt={'fortmatic logo'}
-          />
-        </IconWrapper>
-      );
-    } else if (connector === portis) {
-      return (
-        <>
-          <IconWrapper size={size || 16}>
-            <img
-              src={process.env.PUBLIC_URL + `/img/connectors/portisIcon.png`}
-              alt={'portis logo'}
-            />
-            <Button
-              onClick={() => {
-                portis.portis.showPortis();
-              }}
-              text={'show_portis'}
-            />
-          </IconWrapper>
-        </>
       );
     }
     return null;

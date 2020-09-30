@@ -23,7 +23,7 @@
   "confirm_transaction": "Confirm Transaction",
   "back": "Back",
   "confirm_transaction_details": "Confirm Transaction Details",
-  "confirm_details_text": "Please review the details of your transaction. Once confirmed, click the Confirm Transaction button to submit and sign the transaction on {wallet.type}",
+  "confirm_details_text": "Please review the details of your transaction. Once confirmed, click the Confirm Transaction button to submit and sign the transaction on ",
   "confirm_text": "Please click “Confirm Transaction” to finalize",
   "submitting_transaction": "Submitting transaction...",
   "view_etherscan": "View on Etherscan",

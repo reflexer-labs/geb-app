@@ -4,7 +4,7 @@ import { useStoreActions } from '../store';
 import Brand from './Brand';
 import Button from './Button';
 import SettingsPopup from './SettingsPopup';
-import helper from '../utils/helper';
+import { returnWalletAddres } from '../utils/helper';
 import NavLinks from './NavLinks';
 import { useWeb3React } from '@web3-react/core';
 
@@ -32,7 +32,7 @@ const Navbar = () => {
               onClick={handleWalletConnect}
               text={
                 active && account
-                  ? helper.returnWalletAddres(account)
+                  ? returnWalletAddres(account)
                   : 'connect_wallet'
               }
             />

@@ -1,27 +1,31 @@
-import BigNumber from 'bignumber.js';
+import { ethers } from 'ethers';
 import { useCallback, useEffect, useState } from 'react';
 import { useActiveWeb3React } from '../hooks';
 import useDebounce from '../hooks/useDebounce';
-import store from '../store';
+import store, { useStoreState } from '../store';
 
 export default function ApplicationUpdater(): null {
   const { library, chainId, account } = useActiveWeb3React();
+  const { connectWalletModel: connectedWalletState } = useStoreState(
+    (state) => state
+  );
+  const { blockNumber } = connectedWalletState;
 
   const [state, setState] = useState<{
     chainId: number | undefined;
-    balance: BigNumber | null;
+    balance: number;
   }>({
     chainId,
-    balance: null,
+    balance: 0,
   });
 
   const fetchEthBalanceCallBack = useCallback(
-    (res: any) => {
+    (result: any) => {
       setState((state) => {
         if (chainId === state.chainId) {
           return {
             chainId,
-            balance: new BigNumber(res._hex),
+            balance: Number(ethers.utils.formatEther(result)),
           };
         }
         return state;
@@ -33,7 +37,7 @@ export default function ApplicationUpdater(): null {
   // attach/detach listeners
   useEffect(() => {
     if (!library || !chainId || !account) return undefined;
-    setState({ chainId, balance: null });
+    setState({ chainId, balance: 0 });
 
     library
       .getBalance(account)
@@ -41,7 +45,7 @@ export default function ApplicationUpdater(): null {
       .catch((error) =>
         console.error(`Failed to fetch balance for chainId: ${chainId}`, error)
       );
-  }, [chainId, library, fetchEthBalanceCallBack, account]);
+  }, [chainId, library, fetchEthBalanceCallBack, account, blockNumber]);
 
   const debouncedState = useDebounce(state, 100);
 

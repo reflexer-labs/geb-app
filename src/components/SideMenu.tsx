@@ -1,14 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
-import helper from '../utils/helper';
+import { amountToFiat, returnWalletAddres } from '../utils/helper';
 import Button from './Button';
 import NavLinks from './NavLinks';
 import { useTranslation } from 'react-i18next';
 import { useWeb3React } from '@web3-react/core';
 import ConnectedWalletIcon from './ConnectedWalletIcon';
-import { amountToFiat } from '../services/Web3Helpers';
-import BigNumber from 'bignumber.js';
 
 const SideMenu = () => {
   const { t } = useTranslation();
@@ -23,12 +21,11 @@ const SideMenu = () => {
 
   const renderBalance = () => {
     if (chainId) {
-      const balance =
-        connectWalletState.ethBalance[chainId] || new BigNumber(0);
-      const fiat = amountToFiat(balance, connectWalletState.fiatPrice);
-      return fiat.shiftedBy(-18).toFixed(4);
+      const balance = connectWalletState.ethBalance[chainId] || 0;
+      const fiat = connectWalletState.fiatPrice;
+      return amountToFiat(balance, fiat);
     }
-    return new BigNumber(0).toFixed(4);
+    return 0;
   };
   return (
     <Container>
@@ -44,8 +41,8 @@ const SideMenu = () => {
           >
             <ConnectedWalletIcon size={40} />
             <AccountData>
-              <Address>{helper.returnWalletAddres(account)}</Address>
-              <Balance>{`$${renderBalance()}`}</Balance>
+              <Address>{returnWalletAddres(account)}</Address>
+              <Balance>{`$ ${renderBalance()}`}</Balance>
             </AccountData>
           </Account>
         ) : (

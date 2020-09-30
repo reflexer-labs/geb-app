@@ -3,13 +3,13 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useStoreActions } from '../store';
-import helper from '../utils/helper';
+import { returnWalletAddres } from '../utils/helper';
 import Button from './Button';
 import CopyIcon from './Icons/CopyIcon';
 import ExpandIcon from './Icons/ExpandIcon';
 import { useWeb3React } from '@web3-react/core';
 import { injected, walletlink } from '../connectors';
-import { getEtherscanLink } from '../utils';
+import { getEtherscanLink } from '../utils/helper';
 import ConnectedWalletIcon from './ConnectedWalletIcon';
 import { SUPPORTED_WALLETS } from '../utils/constants';
 
@@ -63,7 +63,7 @@ const ConnectedWalletInfo = () => {
 
         <Address>
           <ConnectedWalletIcon />
-          {account && active ? helper.returnWalletAddres(account) : 'N/A'}
+          {account && active ? returnWalletAddres(account) : 'N/A'}
         </Address>
         {account && active ? (
           <WalletData>

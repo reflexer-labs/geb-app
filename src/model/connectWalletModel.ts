@@ -1,6 +1,5 @@
 import { action, Action, Thunk, thunk } from 'easy-peasy';
 import api from '../services/api';
-import BigNumber from 'bignumber.js';
 import { IBlockNumber, IEthBalance } from '../utils/interfaces';
 
 export interface ConnectWalletModel {
@@ -17,7 +16,7 @@ export interface ConnectWalletModel {
   >;
   updateEthBalance: Action<
     ConnectWalletModel,
-    { chainId: number; balance: BigNumber | null }
+    { chainId: number; balance: number }
   >;
 }
 
