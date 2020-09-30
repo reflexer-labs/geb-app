@@ -20,7 +20,7 @@ import { useActiveWeb3React } from '../hooks';
 
 const Shared = () => {
   const { t } = useTranslation();
-  const { chainId, active, library } = useActiveWeb3React();
+  const { chainId, active } = useActiveWeb3React();
   const {
     popupsModel: popupsState,
     connectWalletModel: connectWallet,
@@ -54,11 +54,6 @@ const Shared = () => {
     }
     // eslint-disable-next-line
   }, [chainId, active]);
-
-  useEffect(() => {
-    if (!library) return undefined;
-    library.on('logs', console.log);
-  }, [library]);
 
   return (
     <>
