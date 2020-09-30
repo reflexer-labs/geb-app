@@ -1,26 +1,22 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useStoreActions, useStoreState } from '../store';
+import { useStoreActions } from '../store';
 import Brand from './Brand';
 import Button from './Button';
 import SettingsPopup from './SettingsPopup';
 import helper from '../utils/helper';
 import NavLinks from './NavLinks';
+import { useWeb3React } from '@web3-react/core';
 
 const Navbar = () => {
-  const { connectWalletModel: connectWallet } = useStoreState((state) => state);
-  const {
-    popupsModel: popupsActions,
-    connectWalletModel: connectWalletActions,
-  } = useStoreActions((state) => state);
-
-  const { walletPayload } = connectWallet;
+  const { popupsModel: popupsActions } = useStoreActions((state) => state);
+  const { active, account } = useWeb3React();
 
   const handleWalletConnect = () => {
-    if (walletPayload.connected) {
+    if (active && account) {
       return popupsActions.setIsConnectedWalletModalOpen(true);
     }
-    return connectWalletActions.connectWallet();
+    return popupsActions.setIsConnectorsWalletOpen(true);
   };
 
   return (
@@ -35,8 +31,8 @@ const Navbar = () => {
             <Button
               onClick={handleWalletConnect}
               text={
-                walletPayload.connected
-                  ? helper.returnWalletAddres(walletPayload.address)
+                active && account
+                  ? helper.returnWalletAddres(account)
                   : 'connect_wallet'
               }
             />

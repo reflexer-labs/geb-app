@@ -1,8 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import ArrowImg from '../static/images/arrow.svg';
-import DimmedArrow from '../static/images/dark-arrow.svg';
 
 interface Props {
   text: string;
@@ -34,13 +32,15 @@ const Button = ({
     if (dimmedWithArrow) {
       return (
         <DimmedBtn disabled={disabled} onClick={onClick}>
-          <img src={DimmedArrow} alt={''} /> {t(text)}
+          <img src={process.env.PUBLIC_URL + '/img/dark-arrow.svg'} alt={''} />{' '}
+          {t(text)}
         </DimmedBtn>
       );
     } else if (withArrow) {
       return (
         <ArrowBtn disabled={disabled} onClick={onClick}>
-          {t(text)} <img src={ArrowImg} alt={''} />
+          {t(text)}{' '}
+          <img src={process.env.PUBLIC_URL + '/img/arrow.svg'} alt={''} />
         </ArrowBtn>
       );
     } else if (isBordered) {

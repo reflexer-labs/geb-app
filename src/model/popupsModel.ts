@@ -6,6 +6,7 @@ export interface PopupsModel {
   isConnectModalOpen: boolean;
   isCreateAccountModalOpen: boolean;
   isConnectedWalletModalOpen: boolean;
+  isConnectorsWalletOpen: boolean;
   showSideMenu: boolean;
   isScreenModalOpen: boolean;
   sideToastPayload: ToastPayload;
@@ -17,6 +18,7 @@ export interface PopupsModel {
   setShowSideMenu: Action<PopupsModel, boolean>;
   setSideToastPayload: Action<PopupsModel, ToastPayload>;
   setIsScreenModalOpen: Action<PopupsModel, boolean>;
+  setIsConnectorsWalletOpen: Action<PopupsModel, boolean>;
 }
 
 const popupsModel: PopupsModel = {
@@ -25,6 +27,7 @@ const popupsModel: PopupsModel = {
   isCreateAccountModalOpen: false,
   isConnectedWalletModalOpen: false,
   isScreenModalOpen: false,
+  isConnectorsWalletOpen: false,
   showSideMenu: false,
   sideToastPayload: {
     text: '',
@@ -59,6 +62,9 @@ const popupsModel: PopupsModel = {
   }),
   setIsScreenModalOpen: action((state, payload) => {
     state.isScreenModalOpen = payload;
+  }),
+  setIsConnectorsWalletOpen: action((state, payload) => {
+    state.isConnectorsWalletOpen = payload;
   }),
 };
 

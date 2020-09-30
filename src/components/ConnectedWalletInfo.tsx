@@ -2,66 +2,76 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import { useStoreActions, useStoreState } from '../store';
+import { useStoreActions } from '../store';
 import helper from '../utils/helper';
 import Button from './Button';
 import CopyIcon from './Icons/CopyIcon';
 import ExpandIcon from './Icons/ExpandIcon';
+import { useWeb3React } from '@web3-react/core';
+import { injected, walletlink } from '../connectors';
+import { getEtherscanLink } from '../utils';
+import ConnectedWalletIcon from './ConnectedWalletIcon';
+import { SUPPORTED_WALLETS } from '../utils/constants';
 
 const ConnectedWalletInfo = () => {
   const { t } = useTranslation();
-  const [copied, setCopied] = useState(false);
-  const { connectWalletModel: connectWalletState } = useStoreState(
-    (state) => state
-  );
-  const {
-    connectWalletModel: connectWalletActions,
-    popupsModel: popupsActions,
-  } = useStoreActions((state) => state);
+  const { ethereum } = window;
 
-  const { walletPayload, chainData } = connectWalletState;
+  const { active, account, connector, chainId } = useWeb3React();
+
+  const [copied, setCopied] = useState(false);
+
+  const {
+    popupsModel: popupsActions,
+    walletModel: walletActions,
+  } = useStoreActions((state) => state);
 
   const handleChange = () => {
     popupsActions.setIsConnectedWalletModalOpen(false);
-    connectWalletActions.setNetworkWarning('');
-    connectWalletActions.connectWallet();
+    popupsActions.setIsConnectorsWalletOpen(true);
   };
 
-  const generateLink = (address: string) => {
-    if (chainData) {
-      if (chainData.network === 'mainnet') {
-        return `https://etherscan.io/address/${address}`;
-      }
-      return `https://${chainData.network}.etherscan.io/address/${address}`;
-    }
-    return `https://etherscan.io`;
+  const handleDisconnect = () => {
+    popupsActions.setIsConnectedWalletModalOpen(false);
+    (connector as any).close();
+    walletActions.setStep(0);
+  };
+
+  const formatConnectorName = () => {
+    const isMetaMask = !!(ethereum && ethereum.isMetaMask);
+    const name = Object.keys(SUPPORTED_WALLETS)
+      .filter(
+        (k) =>
+          SUPPORTED_WALLETS[k].connector === connector &&
+          (connector !== injected || isMetaMask === (k === 'METAMASK'))
+      )
+      .map((k) => SUPPORTED_WALLETS[k].name)[0];
+    return name;
   };
 
   return (
     <>
       <DataContainer>
         <Connection>
-          {t('connected_with')}{' '}
-          {walletPayload.providerInfo ? walletPayload.providerInfo.name : 'N/A'}
-          <Button text={'Change'} onClick={handleChange} />
+          {t('connected_with')} {connector ? formatConnectorName() : 'N/A'}
+          {connector !== injected && connector !== walletlink ? (
+            <Button text={'disconnect'} onClick={handleDisconnect} />
+          ) : (
+            <Button text={'change'} onClick={handleChange} />
+          )}
         </Connection>
 
         <Address>
-          {walletPayload.providerInfo && walletPayload.providerInfo.logo ? (
-            <img src={walletPayload.providerInfo.logo} alt="" />
-          ) : null}
-
-          {walletPayload.address
-            ? helper.returnWalletAddres(walletPayload.address)
-            : 'N/A'}
+          <ConnectedWalletIcon />
+          {account && active ? helper.returnWalletAddres(account) : 'N/A'}
         </Address>
-        {walletPayload.address ? (
+        {account && active ? (
           <WalletData>
             {copied ? (
               <CopyBtn className="greenish">{t('copied')}</CopyBtn>
             ) : (
               <CopyToClipboard
-                text={walletPayload.address}
+                text={account}
                 onCopy={() => {
                   setCopied(true);
                   setTimeout(() => setCopied(false), 500);
@@ -72,9 +82,14 @@ const ConnectedWalletInfo = () => {
                 </CopyBtn>
               </CopyToClipboard>
             )}
-            <LinkBtn href={generateLink(walletPayload.address)} target="_blank">
-              <ExpandIcon /> {t('view_etherscan')}
-            </LinkBtn>
+            {chainId && account ? (
+              <LinkBtn
+                href={getEtherscanLink(chainId, account, 'address')}
+                target="_blank"
+              >
+                <ExpandIcon /> {t('view_etherscan')}
+              </LinkBtn>
+            ) : null}
           </WalletData>
         ) : null}
       </DataContainer>

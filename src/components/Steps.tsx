@@ -9,12 +9,12 @@ const Steps = () => {
   const {
     popupsModel: popupsActions,
     walletModel: walletActions,
-    connectWalletModel: connectWalletActions,
   } = useStoreActions((state) => state);
 
   const { step } = walletState;
 
-  const handleConnectWallet = () => connectWalletActions.connectWallet();
+  const handleConnectWallet = () =>
+    popupsActions.setIsConnectorsWalletOpen(true);
 
   const handleCreateAccount = () => {
     // TODO: create Reflexer Acccount

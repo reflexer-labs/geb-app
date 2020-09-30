@@ -1,14 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 import Steps from '../../components/Steps';
-import PlaceHolder from '../../static/images/placeholder.png';
 
 const Accounts = () => {
   return (
     <Container>
       <Content>
         <ImgContainer>
-          <img src={PlaceHolder} alt="placeholder" />{' '}
+          <img
+            src={process.env.PUBLIC_URL + '/img/placeholder.png'}
+            alt="placeholder"
+          />{' '}
         </ImgContainer>
         <Steps />
       </Content>

@@ -1,13 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import BrandLogo from '../static/images/brand.svg';
 
 const Brand = () => {
   return (
     <Container>
       <Link to="/">
-        <img src={BrandLogo} alt="reflexer labds" />
+        <img
+          src={process.env.PUBLIC_URL + '/img/brand.svg'}
+          alt="reflexer labds"
+        />
       </Link>
     </Container>
   );

@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import Caret from '../static/images/caret.png';
 
 interface Props {
   itemSelected: string;
@@ -72,7 +71,10 @@ const Dropdown = (props: Props) => {
             <span>{extraWord}</span> {selectedItem}
           </span>
 
-          <CaretIcon src={Caret} className={isOpen ? 'up' : ''} />
+          <CaretIcon
+            src={process.env.PUBLIC_URL + '/img/caret.png'}
+            className={isOpen ? 'up' : ''}
+          />
         </DropdownBtn>
         <DropdownMenu
           style={{

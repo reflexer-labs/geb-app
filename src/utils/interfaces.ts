@@ -1,3 +1,6 @@
+import { AbstractConnector } from '@web3-react/abstract-connector';
+import BigNumber from 'bignumber.js';
+
 export interface Theme {
   bodyBg: string;
   placeholderColor: string;
@@ -63,4 +66,25 @@ export interface ToastPayload {
   isTransaction?: boolean | null;
   timeout?: number | null;
   autoHide?: boolean;
+}
+
+export interface IBlockNumber {
+  [chainId: number]: number;
+}
+
+export interface IEthBalance {
+  [chainId: number]: BigNumber | null;
+  fiatBalance?: string | null;
+}
+
+export interface WalletInfo {
+  connector?: AbstractConnector;
+  name: string;
+  iconName: string;
+  description: string;
+  href: string | null;
+  color: string;
+  primary?: true;
+  mobile?: true;
+  mobileOnly?: true;
 }

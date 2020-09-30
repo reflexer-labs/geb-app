@@ -1,8 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import ReflexerIcon from '../../static/images/reflexer-icon.svg';
-import ArrowIcon from '../../static/images/arrow.svg';
-import UniSwapIcon from '../../static/images/uniswap-icon.svg';
 
 interface Props {
   title: string;
@@ -14,11 +11,15 @@ const TransactionOverview = ({ title, description, isChecked }: Props) => {
   return (
     <>
       <IconsHolder>
-        <LogoIcon src={ReflexerIcon} />
+        <LogoIcon src={process.env.PUBLIC_URL + '/img/reflexer-icon.svg'} />
         {isChecked ? (
           <>
-            <img className="sep" src={ArrowIcon} alt="" />
-            <LogoIcon src={UniSwapIcon} />{' '}
+            <img
+              className="sep"
+              src={process.env.PUBLIC_URL + '/img/arrow.svg'}
+              alt=""
+            />
+            <LogoIcon src={process.env.PUBLIC_URL + '/img/uniswap-icon.svg'} />{' '}
           </>
         ) : null}
       </IconsHolder>
