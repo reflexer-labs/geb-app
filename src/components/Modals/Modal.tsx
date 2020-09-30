@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSTransition } from 'react-transition-group';
 import styled from 'styled-components';
@@ -34,8 +34,10 @@ const Modal = ({
   backDropClose,
 }: Props) => {
   const { t } = useTranslation();
-
+  const nodeRef = React.useRef(null);
   const { settingsModel: settingsActions } = useStoreActions((state) => state);
+
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -43,6 +45,7 @@ const Modal = ({
     } else {
       settingsActions.setBodyOverFlow(false);
     }
+    setIsOpen(isModalOpen);
     // eslint-disable-next-line
   }, [isModalOpen]);
 
@@ -52,14 +55,17 @@ const Modal = ({
     }
   };
 
-  return isModalOpen ? (
+  return isOpen ? (
     <CSSTransition
-      in={isModalOpen}
+      in={isOpen}
       timeout={300}
+      appear={isOpen}
+      nodeRef={nodeRef}
       classNames="fade"
-      appear={isModalOpen}
+      unmountOnExit
+      mountOnEnter
     >
-      <Container>
+      <Container ref={nodeRef}>
         <InnerContent>
           <BackDrop onClick={handleBackdrop} />
           <ChildrenHolder

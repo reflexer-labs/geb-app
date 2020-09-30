@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import ErrorImg from './static/images/error.svg';
 
 interface State {
   error: string | null;
@@ -27,7 +26,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       return (
         <Container>
           <Content>
-            <img src={ErrorImg} alt="" />
+            <img src={process.env.PUBLIC_URL + '/img/error.svg'} alt="" />
             <h2>Something went wrong.</h2>
             <Details>
               {this.state.error && this.state.error.toString()}

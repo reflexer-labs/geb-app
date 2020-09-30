@@ -2,23 +2,34 @@ import React from 'react';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
 import helper from '../utils/helper';
-import Blockie from './Blockie';
 import Button from './Button';
 import NavLinks from './NavLinks';
-import LogoIcon from '../static/images/LogoIcon.png';
 import { useTranslation } from 'react-i18next';
+import { useWeb3React } from '@web3-react/core';
+import ConnectedWalletIcon from './ConnectedWalletIcon';
+import { amountToFiat } from '../services/Web3Helpers';
+import BigNumber from 'bignumber.js';
 
 const SideMenu = () => {
   const { t } = useTranslation();
-  const {
-    popupsModel: popupsActions,
-    connectWalletModel: connectWalletActions,
-  } = useStoreActions((state) => state);
+  const { active, account, chainId } = useWeb3React();
+  const { popupsModel: popupsActions } = useStoreActions((state) => state);
   const { connectWalletModel: connectWalletState } = useStoreState(
     (state) => state
   );
 
-  const handleWalletConnect = () => connectWalletActions.connectWallet();
+  const handleWalletConnect = () =>
+    popupsActions.setIsConnectorsWalletOpen(true);
+
+  const renderBalance = () => {
+    if (chainId) {
+      const balance =
+        connectWalletState.ethBalance[chainId] || new BigNumber(0);
+      const fiat = amountToFiat(balance, connectWalletState.fiatPrice);
+      return fiat.shiftedBy(-18).toFixed(4);
+    }
+    return new BigNumber(0).toFixed(4);
+  };
   return (
     <Container>
       <BtnContainer>
@@ -27,28 +38,19 @@ const SideMenu = () => {
         </CloseBtn>
       </BtnContainer>
       <AccountBalance>
-        {connectWalletState.walletPayload.connected ? (
+        {active && account ? (
           <Account
             onClick={() => popupsActions.setIsConnectedWalletModalOpen(true)}
           >
-            <SBlockie
-              size={50}
-              address={connectWalletState.walletPayload.address}
-            />
+            <ConnectedWalletIcon size={40} />
             <AccountData>
-              <Address>
-                {helper.returnWalletAddres(
-                  connectWalletState.walletPayload.address
-                )}
-              </Address>
-              <Balance>{`$${connectWalletState.walletPayload.ethFiat.toFixed(
-                3
-              )}`}</Balance>
+              <Address>{helper.returnWalletAddres(account)}</Address>
+              <Balance>{`$${renderBalance()}`}</Balance>
             </AccountData>
           </Account>
         ) : (
           <ConnectBtnContainer>
-            <Icon src={LogoIcon} />
+            <Icon src={process.env.PUBLIC_URL + '/img/LogoIcon.png'} />
             <Title>{t('welcome_reflexer')}</Title>
             <Text>{t('connect_text')}</Text>
             <Button onClick={handleWalletConnect} text={'connect_wallet'} />
@@ -111,11 +113,6 @@ const Balance = styled.div`
   line-height: 27px;
   font-weight: 600;
   letter-spacing: -0.69px;
-`;
-
-const SBlockie = styled(Blockie)`
-  margin-right: 10px;
-  border-radius: 50%;
 `;
 
 const AccountData = styled.div`

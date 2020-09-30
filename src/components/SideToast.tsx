@@ -15,6 +15,7 @@ const SideToast = ({
   timeout,
   autoHide,
 }: ToastPayload) => {
+  const nodeRef = React.useRef(null);
   const { t } = useTranslation();
   const [show, setShow] = useState(showPopup);
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
@@ -33,12 +34,13 @@ const SideToast = ({
     <CSSTransition
       in={show}
       appear={show}
+      nodeRef={nodeRef}
       timeout={300}
       classNames={'fade'}
       unmountOnExit
       mountOnEnter
     >
-      <Container>
+      <Container ref={nodeRef}>
         <Loader hideSpinner={hideSpinner} text={t(text)} />
         {isTransaction ? (
           <Expand>

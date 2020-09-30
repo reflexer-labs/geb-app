@@ -39,5 +39,11 @@
   "eth_balance": "Eth Balance",
   "transaction_msg": "Your transactions will appear here...",
   "welcome_reflexer": "Welcome to Reflexer",
-  "connect_text": "Connect an Ethereum wallet to manage your RAI positions"
+  "connect_text": "Connect an Ethereum wallet to manage your RAI positions",
+  "try_again": "Try Again",
+  "initializing": "Initializing...",
+  "error_connecting": "Error connecting.",
+  "not_supported": "Please connect to the appropriate Ethereum network.",
+  "error_try_refresh": "Error connecting. Try refreshing the page.",
+  "show_portis": "Show Portis"
 }

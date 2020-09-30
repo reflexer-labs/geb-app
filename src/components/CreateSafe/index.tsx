@@ -12,6 +12,8 @@ interface Props {
 }
 
 const CreateSafeContainer = ({ width, maxWidth }: Props) => {
+  const nodeRef = React.useRef(null);
+
   const [stageNo, setStageNo] = useState(0);
   const { walletModel: walletState } = useStoreState((state) => state);
   const { stage, isUniSwapPoolChecked } = walletState;
@@ -34,14 +36,13 @@ const CreateSafeContainer = ({ width, maxWidth }: Props) => {
   return (
     <SwitchTransition mode={'out-in'}>
       <CSSTransition
-        addEndListener={(node, done) => {
-          node.addEventListener('transitionend', done, false);
-        }}
+        nodeRef={nodeRef}
         key={stageNo}
         timeout={250}
         classNames="fade"
       >
         <Fade
+          ref={nodeRef}
           style={{
             width: width || '100%',
             maxWidth: maxWidth || '720px',
