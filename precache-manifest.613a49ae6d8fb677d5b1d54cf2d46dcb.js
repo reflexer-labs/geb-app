@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "957c6c2564e21b13442983c470838e28",
+    "revision": "74c90269274e8054a7f533fbbe9cb787",
     "url": "/geb-frontend/index.html"
   },
   {
