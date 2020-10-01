@@ -21,7 +21,9 @@ const ReviewTransaction = () => {
   const { walletModel: walletState } = useStoreState((state) => state);
 
   const handleCancel = () => {
-    walletActions.setStage(1);
+    walletState.isUniSwapPoolChecked
+      ? walletActions.setStage(1)
+      : walletActions.setStage(0);
   };
 
   const handleConfirm = () => {
@@ -56,7 +58,7 @@ const ReviewTransaction = () => {
               return null;
             }
           }
-          return option.name;
+          return option.name !== 'Injected' ? option.name : null;
         }
         return null;
       })
@@ -69,7 +71,10 @@ const ReviewTransaction = () => {
         <TransactionOverview
           isChecked={walletState.isUniSwapPoolChecked}
           title={t('confirm_transaction_details')}
-          description={t('confirm_details_text') + returnConnectorName()}
+          description={
+            t('confirm_details_text') +
+            (returnConnectorName() ? 'on ' + returnConnectorName() : '')
+          }
         />
         <Result>
           <Block>
