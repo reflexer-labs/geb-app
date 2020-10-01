@@ -47,25 +47,29 @@ const CreateSafeBody = ({ isChecked }: Props) => {
   };
 
   const handleCancel = () => {
-    walletActions.setIsUniSwapPoolChecked(false);
-    walletActions.setStage(0);
-    popupsActions.setIsCreateAccountModalOpen(false);
-    walletActions.setUniSwapPool({
-      depositedETH: '',
-      borrowedRAI: '',
-    });
-    walletActions.setCreateSafeDefault({
-      depositedETH: '',
-      borrowedRAI: '',
-    });
-    setUniSwapVal({
-      depositedETH: '',
-      borrowedRAI: '',
-    });
-    setDefaultSafe({
-      depositedETH: '',
-      borrowedRAI: '',
-    });
+    if (isChecked) {
+      walletActions.setStage(0);
+    } else {
+      walletActions.setIsUniSwapPoolChecked(false);
+      walletActions.setStage(0);
+      popupsActions.setIsCreateAccountModalOpen(false);
+      walletActions.setUniSwapPool({
+        depositedETH: '',
+        borrowedRAI: '',
+      });
+      walletActions.setCreateSafeDefault({
+        depositedETH: '',
+        borrowedRAI: '',
+      });
+      setUniSwapVal({
+        depositedETH: '',
+        borrowedRAI: '',
+      });
+      setDefaultSafe({
+        depositedETH: '',
+        borrowedRAI: '',
+      });
+    }
   };
 
   useEffect(() => {

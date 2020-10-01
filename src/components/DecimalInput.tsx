@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -11,7 +11,6 @@ interface Props {
   disableMax?: boolean;
   handleMaxClick?: () => void;
   disabled?: boolean;
-  maxLength?: number;
 }
 
 const DecimalInput = ({
@@ -23,13 +22,15 @@ const DecimalInput = ({
   disableMax,
   handleMaxClick,
   disabled,
-  maxLength,
 }: Props) => {
   const { t } = useTranslation();
+
+  const [length, setLength] = useState(16);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     if (/^-?\d*[.,]?\d*$/.test(val) && /^\d*(\.\d{0,4})?$/.test(val)) {
+      val.includes('.') ? setLength(17) : setLength(16);
       if (val.startsWith('0') && val.charAt(1) !== '.') {
         const returnedVal = val.replace(/(\d)(?=(\d))/, '$1.');
         onChange(returnedVal);
@@ -52,7 +53,7 @@ const DecimalInput = ({
           inputMode="decimal"
           value={value || ''}
           pattern="^[0-9]*[.,]?[0-9]*$"
-          maxLength={maxLength || 12}
+          maxLength={length}
           minLength={1}
           onChange={handleChange}
           disabled={disabled}
