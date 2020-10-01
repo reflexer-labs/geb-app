@@ -17,6 +17,7 @@ const ReviewTransaction = () => {
   const {
     walletModel: walletActions,
     popupsModel: popupsActions,
+    safeModel: safeActions,
   } = useStoreActions((state) => state);
   const { walletModel: walletState } = useStoreState((state) => state);
 
@@ -27,13 +28,13 @@ const ReviewTransaction = () => {
   };
 
   const handleConfirm = () => {
+    safeActions.setIsSafeCreated(true);
     popupsActions.setIsCreateAccountModalOpen(false);
-    popupsActions.setSideToastPayload({
-      text: 'submitting_transaction',
-      showPopup: true,
-      isTransaction: true,
-      timeout: 3000,
+    popupsActions.setIsLoadingModalOpen({
+      isOpen: true,
+      text: t('fetching_account_info'),
     });
+    safeActions.fetchAccountData();
     walletActions.setStage(0);
     walletActions.setUniSwapPool({
       depositedETH: '',
@@ -137,8 +138,8 @@ const UniSwapCheckContainer = styled.div`
 const Text = styled.div`
   line-height: 18px;
   letter-spacing: -0.18px;
-  color: ${(props) => props.theme.lightText};
-  font-size: ${(props) => props.theme.smallFontSize};
+  color: ${(props) => props.theme.colors.secondary};
+  font-size: ${(props) => props.theme.font.extraSmall};
   margin-top: 2px;
 `;
 
@@ -149,15 +150,15 @@ const Footer = styled.div`
 `;
 
 const Result = styled.div`
-  border-radius: ${(props) => props.theme.buttonBorderRadius};
-  border: 1px solid ${(props) => props.theme.borderColor};
-  background: ${(props) => props.theme.hoverEffect};
+  border-radius: ${(props) => props.theme.global.borderRadius};
+  border: 1px solid ${(props) => props.theme.colors.border};
+  background: ${(props) => props.theme.colors.foreground};
 `;
 
 const Block = styled.div`
   border-bottom: 1px solid;
   padding: 16px 20px;
-  border-bottom: 1px solid ${(props) => props.theme.borderColor};
+  border-bottom: 1px solid ${(props) => props.theme.colors.border};
   &:last-child {
     border-bottom: 0;
   }
@@ -174,15 +175,15 @@ const Item = styled.div`
 `;
 
 const Label = styled.div`
-  font-size: ${(props) => props.theme.textFontSize};
-  color: ${(props) => props.theme.lightText};
+  font-size: ${(props) => props.theme.font.small};
+  color: ${(props) => props.theme.colors.secondary};
   letter-spacing: -0.09px;
   line-height: 21px;
 `;
 
 const Value = styled.div`
-  font-size: ${(props) => props.theme.textFontSize};
-  color: ${(props) => props.theme.darkText};
+  font-size: ${(props) => props.theme.font.small};
+  color: ${(props) => props.theme.colors.primary};
   letter-spacing: -0.09px;
   line-height: 21px;
   font-weight: 600;

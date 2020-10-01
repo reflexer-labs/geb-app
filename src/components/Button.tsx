@@ -69,13 +69,17 @@ const Container = styled.button`
   min-width: 134px;
   border: none;
   box-shadow: none;
-  padding: ${(props) => props.theme.buttonPadding};
-  line-height: ${(props) => props.theme.buttonLineHeight};
-  font-size: ${(props) => props.theme.textFontSize};
+  padding: ${(props) => props.theme.global.buttonPadding};
+  line-height: 24px;
+  font-size: ${(props) => props.theme.font.small};
   font-weight: 600;
-  color: ${(props) => props.theme.neutral};
-  background: ${(props) => props.theme.defaultGradient};
-  border-radius: ${(props) => props.theme.buttonBorderRadius};
+  color: ${(props) => props.theme.colors.neutral};
+  background: ${(props) => props.theme.colors.gradient};
+  border-radius: ${(props) => props.theme.global.borderRadius};
+  transition: all 0.3s ease;
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 
 const DimmedBtn = styled.button`
@@ -85,8 +89,8 @@ const DimmedBtn = styled.button`
   outline: none;
   background: transparent;
   border-radius: 0;
-  color: ${(props) => props.theme.lightText};
-  font-size: ${(props) => props.theme.textFontSize};
+  color: ${(props) => props.theme.colors.secondary};
+  font-size: ${(props) => props.theme.font.small};
   font-weight: 600;
   line-height: 24px;
   padding: 0;
@@ -95,6 +99,10 @@ const DimmedBtn = styled.button`
   align-items: center;
   img {
     margin-right: 3px;
+  }
+  transition: all 0.3s ease;
+  &:hover {
+    opacity: 0.8;
   }
 `;
 
@@ -107,23 +115,30 @@ const ArrowBtn = styled.button`
   outline: none;
   padding: 0;
   margin: 0;
-  background: ${(props) => props.theme.defaultGradient};
+  background: ${(props) => props.theme.colors.gradient};
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: ${(props) => props.theme.inputBorderColor};
-  font-size: ${(props) => props.theme.textFontSize};
+  color: ${(props) => props.theme.colors.inputBorderColor};
+  font-size: ${(props) => props.theme.font.small};
   font-weight: 600;
   line-height: 24px;
   letter-spacing: -0.18px;
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
+    &:hover {
+      opacity: 0.5;
+    }
+  }
+  transition: all 0.3s ease;
+  &:hover {
+    opacity: 0.8;
   }
 `;
 
 const BorderedBtn = styled.button`
-  background: ${(props) => props.theme.defaultGradient};
+  background: ${(props) => props.theme.colors.gradient};
   padding: 2px;
   border-radius: 25px;
   box-shadow: none;
@@ -133,8 +148,12 @@ const BorderedBtn = styled.button`
 `;
 
 const Inner = styled.div`
-  background: ${(props) => props.theme.modalBg};
-  color: ${(props) => props.theme.inputBorderColor};
+  background: ${(props) => props.theme.colors.background};
+  color: ${(props) => props.theme.colors.inputBorderColor};
   border-radius: 25px;
   padding: 4px 6px;
+  transition: all 0.3s ease;
+  &:hover {
+    opacity: 0.8;
+  }
 `;

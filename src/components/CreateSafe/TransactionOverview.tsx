@@ -45,15 +45,15 @@ const Title = styled.div`
   line-height: 24px;
   font-weight: 600;
   text-align: center;
-  color: ${(props) => props.theme.darkText};
+  color: ${(props) => props.theme.colors.primary};
   letter-spacing: -0.18px;
   margin-top: 20px;
 `;
 const Description = styled.div`
   line-height: 21px;
   letter-spacing: -0.09px;
-  font-size: ${(props) => props.theme.textFontSize};
-  color: ${(props) => props.theme.lightText};
+  font-size: ${(props) => props.theme.font.small};
+  color: ${(props) => props.theme.colors.secondary};
   text-align: center;
   margin-top: 4px;
   margin-bottom: 20px;

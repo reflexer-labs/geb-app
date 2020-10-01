@@ -1,26 +1,26 @@
 import React from 'react';
-import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { useStoreState } from '../../store';
-import Accounts from './Accounts';
 import GridContainer from '../../components/GridContainer';
 import PageHeader from '../../components/PageHeader';
-import SafeList from './SafeList';
+import SafeStats from '../../components/SafeStats';
+import { useStoreState } from '../../store';
 
-const OnBoarding = () => {
+const SafeDetails = () => {
   const { t } = useTranslation();
   const { safeModel: safeState } = useStoreState((state) => state);
 
   return (
-    <Container>
+    <>
       <GridContainer>
         <PageHeader title={t('accounts')} text={t('accounts_header_text')} />
-        {safeState.safeCreated ? <SafeList /> : <Accounts />}
+        {safeState.singleSafe ? (
+          <>
+            <SafeStats {...safeState.singleSafe} />{' '}
+          </>
+        ) : null}
       </GridContainer>
-    </Container>
+    </>
   );
 };
 
-export default OnBoarding;
-
-const Container = styled.div``;
+export default SafeDetails;

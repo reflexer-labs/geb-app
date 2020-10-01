@@ -44,24 +44,24 @@ const Nav = styled.div`
       display: block;
       text-align: left;
       margin: 0;
-      border-bottom: 1px solid ${(props) => props.theme.borderColor};
+      border-bottom: 1px solid ${(props) => props.theme.colors.border};
       &:first-child {
-        border-top: 1px solid ${(props) => props.theme.borderColor};
+        border-top: 1px solid ${(props) => props.theme.colors.border};
       }
     }
   }
 `;
 
 const NavBarLink = styled(NavLink)`
-  color: ${(props) => props.theme.lightText};
+  color: ${(props) => props.theme.colors.secondary};
   font-weight: 600;
   transition: all 0.3s ease;
   &:hover {
-    background: ${(props) => props.theme.defaultGradient};
+    background: ${(props) => props.theme.colors.gradient};
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    color: ${(props) => props.theme.inputBorderColor};
+    color: ${(props) => props.theme.colors.inputBorderColor};
   }
   margin-right: 20px;
   &:last-child {
@@ -76,17 +76,17 @@ const NavBarBtn = styled.div`
   outline: none;
   cursor: pointer;
   border: 0;
-  color: ${(props) => props.theme.lightText};
+  color: ${(props) => props.theme.colors.secondary};
   padding: 9px 10px;
   margin: 0;
   line-height: normal;
   text-align: left;
   transition: all 0.3s ease;
   &:hover {
-    background: ${(props) => props.theme.defaultGradient};
+    background: ${(props) => props.theme.colors.gradient};
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    color: ${(props) => props.theme.inputBorderColor};
+    color: ${(props) => props.theme.colors.inputBorderColor};
   }
 `;

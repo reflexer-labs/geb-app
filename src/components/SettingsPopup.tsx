@@ -44,9 +44,9 @@ const InnerContent = styled.div`
 `;
 
 const Menu = styled.div`
-  background: ${(props) => props.theme.modalBg};
-  border-radius: ${(props) => props.theme.buttonBorderRadius};
-  border: 1px solid ${(props) => props.theme.borderColor};
+  background: ${(props) => props.theme.colors.background};
+  border-radius: ${(props) => props.theme.global.borderRadius};
+  border: 1px solid ${(props) => props.theme.colors.border};
   padding: 20px;
   display: none;
   position: absolute;
@@ -59,29 +59,29 @@ const Menu = styled.div`
 `;
 
 const SettingsButton = styled.button`
-  background: ${(props) => props.theme.borderColor};
+  background: ${(props) => props.theme.colors.border};
   box-shadow: none;
   outline: none;
   cursor: pointer;
   border: 0;
-  color: ${(props) => props.theme.lightText};
+  color: ${(props) => props.theme.colors.secondary};
   padding: 9px 10px;
   margin: 0;
   line-height: normal;
-  border-radius: ${(props) => props.theme.buttonBorderRadius};
+  border-radius: ${(props) => props.theme.global.borderRadius};
   transition: all 0.3s ease;
   position: relative;
   svg {
     width: 20px;
     height: 20px;
     display: block;
-    color: ${(props) => props.theme.lightText};
+    color: ${(props) => props.theme.colors.secondary};
   }
 
   &:hover {
-    background: ${(props) => props.theme.lightText};
+    background: ${(props) => props.theme.colors.secondary};
     svg {
-      color: ${(props) => props.theme.borderColor};
+      color: ${(props) => props.theme.colors.border};
     }
   }
 `;

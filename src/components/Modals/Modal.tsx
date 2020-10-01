@@ -18,6 +18,8 @@ interface Props {
   showXButton?: boolean;
   borderRadius?: string;
   backDropClose?: boolean;
+  hideHeader?: boolean;
+  hideFooter?: boolean;
 }
 const Modal = ({
   title,
@@ -32,6 +34,7 @@ const Modal = ({
   showXButton,
   borderRadius,
   backDropClose,
+  hideHeader,
 }: Props) => {
   const { t } = useTranslation();
   const nodeRef = React.useRef(null);
@@ -81,12 +84,14 @@ const Modal = ({
                   borderRadius,
                 }}
               >
-                <HeaderContainer>
-                  {<Header>{title ? t(title) : null}</Header>}
-                  {showXButton ? (
-                    <CloseBtn onClick={closeModal}>&times;</CloseBtn>
-                  ) : null}
-                </HeaderContainer>
+                {hideHeader ? null : (
+                  <HeaderContainer>
+                    {<Header>{title ? t(title) : null}</Header>}
+                    {showXButton ? (
+                      <CloseBtn onClick={closeModal}>&times;</CloseBtn>
+                    ) : null}
+                  </HeaderContainer>
+                )}
                 <Body>{children}</Body>
 
                 {showXButton && !submitBtnText ? null : (
@@ -143,16 +148,16 @@ const InnerContent = styled.div`
 `;
 
 const ModalContent = styled.div`
-  background: ${(props) => props.theme.modalBg};
-  border-radius: ${(props) => props.theme.buttonBorderRadius};
-  border: 1px solid ${(props) => props.theme.borderColor};
+  background: ${(props) => props.theme.colors.background};
+  border-radius: ${(props) => props.theme.global.borderRadius};
+  border: 1px solid ${(props) => props.theme.colors.border};
 `;
 
 const Header = styled.div`
   padding: 20px;
-  font-size: ${(props) => props.theme.modalFontSize};
+  font-size: ${(props) => props.theme.font.large};
   font-weight: 600;
-  color: ${(props) => props.theme.darkText};
+  color: ${(props) => props.theme.colors.primary};
   letter-spacing: -0.47px;
 `;
 
@@ -169,7 +174,7 @@ const Footer = styled.div`
 const HeaderContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid ${(props) => props.theme.borderColor};
+  border-bottom: 1px solid ${(props) => props.theme.colors.border};
 `;
 
 const CloseBtn = styled.button`
@@ -188,7 +193,7 @@ const CloseBtn = styled.button`
 `;
 
 const BackDrop = styled.div`
-  background: ${(props) => props.theme.modalOverlay};
+  background: ${(props) => props.theme.colors.overlay};
   position: absolute;
   top: 0;
   left: 0;

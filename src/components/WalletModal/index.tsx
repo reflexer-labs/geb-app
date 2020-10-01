@@ -275,7 +275,7 @@ const CloseIcon = styled.div`
   top: 14px;
   font-size: 30px;
   z-index: 2;
-  color: ${(props) => props.theme.darkText};
+  color: ${(props) => props.theme.colors.primary};
   &:hover {
     cursor: pointer;
     opacity: 0.6;
@@ -286,7 +286,7 @@ const Wrapper = styled.div`
   margin: 0;
   padding: 0;
   width: 100%;
-  background: ${(props) => props.theme.modalBg};
+  background: ${(props) => props.theme.colors.background};
   border-radius: 20px;
 `;
 
@@ -328,7 +328,7 @@ const OptionGrid = styled.div`
 `;
 
 const HoverText = styled.div`
-  color: ${(props) => props.theme.darkText};
+  color: ${(props) => props.theme.colors.primary};
   position: relative;
   top: 10px;
   :hover {

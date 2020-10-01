@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect } from 'react';
 import i18next from 'i18next';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { I18nextProvider } from 'react-i18next';
 import ErrorBoundary from './ErrorBoundary';
@@ -13,6 +13,7 @@ import { initI18n } from './utils/i18n';
 import GlobalStyle from './GlobalStyle';
 import Shared from './containers/Shared';
 import Web3ReactManager from './components/Web3ReactManager';
+import SafeDetails from './containers/OnBoarding/SafeDetails';
 
 declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}
@@ -32,11 +33,14 @@ function App() {
       <ThemeProvider theme={isLightTheme ? lightTheme : darkTheme}>
         <GlobalStyle bodyOverflow={bodyOverflow} />
         <ErrorBoundary>
-          <Router basename={''}>
+          <Router basename={'geb-frontend'}>
             <Shared />
             <Suspense fallback={null}>
               <Web3ReactManager>
-                <Route component={OnBoarding} />
+                <Switch>
+                  <Route exact component={SafeDetails} path={'/:id'} />
+                  <Route exact component={OnBoarding} path={'/'} />
+                </Switch>
               </Web3ReactManager>
             </Suspense>
           </Router>

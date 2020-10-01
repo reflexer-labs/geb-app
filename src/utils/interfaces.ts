@@ -1,26 +1,14 @@
 import { AbstractConnector } from '@web3-react/abstract-connector';
 
-export interface Theme {
-  bodyBg: string;
-  placeholderColor: string;
-  darkText: string;
-  lightText: string;
-  defaultGradient: string;
-  titleFontSize: string;
-  textFontSize: string;
-  defaultTextSize: string;
-  buttonPadding: string;
-  buttonLineHeight: string;
+interface IColors {
+  primary: string;
+  secondary: string;
+  gradient: string;
   neutral: string;
-  buttonBorderRadius: string;
-  borderColor: string;
-  gridMaxWidth: string;
-  modalBg: string;
-  modalFontSize: string;
-  modalOverlay: string;
-  hoverEffect: string;
-  smallFontSize: string;
-  inputBorderColor: string;
+  background: string;
+  overlay: string;
+  border: string;
+  foreground: string;
   dangerColor: string;
   dangerBackground: string;
   dangerBorder: string;
@@ -33,16 +21,31 @@ export interface Theme {
   warningColor: string;
   warningBackground: string;
   warningBorder: string;
-  connectModal: ThemeColors;
+  placeholder: string;
+  inputBorderColor: string;
 }
 
-export interface ThemeColors {
-  background: string;
-  main: string;
-  secondary: string;
-  border: string;
-  hover: string;
+interface IFonts {
+  extraSmall: string;
+  small: string;
+  default: string;
+  medium: string;
+  large: string;
+  extraLarge: string;
 }
+
+interface IGlobal {
+  gridMaxWidth: string;
+  borderRadius: string;
+  extraCurvedRadius: string;
+  buttonPadding: string;
+}
+export interface Theme {
+  colors: IColors;
+  font: IFonts;
+  global: IGlobal;
+}
+
 export interface LangOption {
   name: string;
   code: string;
@@ -85,4 +88,19 @@ export interface WalletInfo {
   primary?: true;
   mobile?: true;
   mobileOnly?: true;
+}
+
+export interface ISafe {
+  id: string;
+  img: string;
+  date: string;
+  riskState: string;
+  depositedEth: string;
+  borrowedRAI: string;
+  liquidationPrice: string;
+}
+
+export interface LoadingPayload {
+  isOpen: boolean;
+  text: string;
 }

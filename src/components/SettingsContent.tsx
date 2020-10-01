@@ -67,5 +67,5 @@ const SwitchContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-top: 20px;
-  font-size: ${(props) => props.theme.textFontSize};
+  font-size: ${(props) => props.theme.font.small};
 `;

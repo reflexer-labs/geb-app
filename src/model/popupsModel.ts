@@ -1,5 +1,5 @@
 import { action, Action } from 'easy-peasy';
-import { ToastPayload } from '../utils/interfaces';
+import { LoadingPayload, ToastPayload } from '../utils/interfaces';
 
 export interface PopupsModel {
   isSettingsModalOpen: boolean;
@@ -9,6 +9,7 @@ export interface PopupsModel {
   isConnectorsWalletOpen: boolean;
   showSideMenu: boolean;
   isScreenModalOpen: boolean;
+  isLoadingModalOpen: LoadingPayload;
   sideToastPayload: ToastPayload;
   setIsSettingModalOpen: Action<PopupsModel, boolean>;
   setIsConnectModalOpen: Action<PopupsModel, boolean>;
@@ -19,6 +20,7 @@ export interface PopupsModel {
   setSideToastPayload: Action<PopupsModel, ToastPayload>;
   setIsScreenModalOpen: Action<PopupsModel, boolean>;
   setIsConnectorsWalletOpen: Action<PopupsModel, boolean>;
+  setIsLoadingModalOpen: Action<PopupsModel, LoadingPayload>;
 }
 
 const popupsModel: PopupsModel = {
@@ -29,6 +31,10 @@ const popupsModel: PopupsModel = {
   isScreenModalOpen: false,
   isConnectorsWalletOpen: false,
   showSideMenu: false,
+  isLoadingModalOpen: {
+    isOpen: false,
+    text: '',
+  },
   sideToastPayload: {
     text: '',
     showPopup: false,
@@ -65,6 +71,9 @@ const popupsModel: PopupsModel = {
   }),
   setIsConnectorsWalletOpen: action((state, payload) => {
     state.isConnectorsWalletOpen = payload;
+  }),
+  setIsLoadingModalOpen: action((state, payload) => {
+    state.isLoadingModalOpen = payload;
   }),
 };
 
