@@ -35,7 +35,7 @@ const SafeBlock = ({ ...props }) => {
           </Item>
         </Block>
         <BtnContainer>
-          <Link to="/dashboard">
+          <Link to={`/${props.id}`}>
             {t('manage_safe')}{' '}
             <img src={process.env.PUBLIC_URL + '/img/arrow.svg'} alt={''} />
           </Link>

@@ -33,6 +33,7 @@ const Container = styled.div`
 `;
 
 const Title = styled.h3`
+  display: flex;
   font-weight: 600;
   font-size: 18px;
   line-height: 22px;
@@ -55,5 +56,6 @@ const SubTitleText = styled.div`
   color: ${(props) => props.theme.colors.primary};
   span {
     color: ${(props) => props.theme.colors.secondary};
+    margin: 0 8px;
   }
 `;

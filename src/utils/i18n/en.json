@@ -55,5 +55,6 @@
   "deposit": "Deposit",
   "withdraw": "Withdraw",
   "repay": "Repay",
-  "borrow": "Borrow"
+  "borrow": "Borrow",
+  "history": "History"
 }

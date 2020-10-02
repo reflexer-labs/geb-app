@@ -18,6 +18,7 @@ import { ChainId } from '@uniswap/sdk';
 import { ETHERSCAN_PREFIXES } from '../utils/constants';
 import { useActiveWeb3React } from '../hooks';
 import LoadingModal from '../components/Modals/LoadingModal';
+import SafeOperationsModal from '../components/Modals/SafeOperationsModal';
 
 const Shared = () => {
   const { t } = useTranslation();
@@ -68,6 +69,7 @@ const Shared = () => {
       <BalanceUpdater />
       <SettingsModal />
       <LoadingModal />
+      <SafeOperationsModal />
       <CreateAccountModal />
       <ConnectedWalletModal />
       <ScreenLoader />

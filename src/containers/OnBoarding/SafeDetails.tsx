@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import GridContainer from '../../components/GridContainer';
 import PageHeader from '../../components/PageHeader';
+import SafeHistory from '../../components/SafeHistory';
 import SafeStats from '../../components/SafeStats';
 import { useStoreState } from '../../store';
 
@@ -12,10 +13,15 @@ const SafeDetails = () => {
   return (
     <>
       <GridContainer>
-        <PageHeader title={t('accounts')} text={t('accounts_header_text')} />
+        <PageHeader
+          title={t('accounts')}
+          subtitle={`Safe #${safeState.singleSafe && safeState.singleSafe.id}`}
+          text={t('accounts_header_text')}
+        />
         {safeState.singleSafe ? (
           <>
-            <SafeStats {...safeState.singleSafe} />{' '}
+            <SafeStats />
+            <SafeHistory />
           </>
         ) : null}
       </GridContainer>

@@ -26,14 +26,17 @@ export interface SafeModel {
   list: Array<ISafe>;
   safeCreated: boolean;
   singleSafe: ISafe | null;
+  operation: number;
   fetchAccountData: Thunk<SafeModel>;
   setIsSafeCreated: Action<SafeModel, boolean>;
   setList: Action<SafeModel, Array<ISafe>>;
   setSingleSafe: Action<SafeModel, ISafe>;
+  setOperation: Action<SafeModel, number>;
 }
 const safeModel: SafeModel = {
   list: [],
   safeCreated: false,
+  operation: 0,
   singleSafe: INITIAL_STATE[0],
   fetchAccountData: thunk(async (actions, payload, { getStoreActions }) => {
     const storeActions: any = getStoreActions();
@@ -53,6 +56,9 @@ const safeModel: SafeModel = {
   }),
   setSingleSafe: action((state, payload) => {
     state.singleSafe = payload;
+  }),
+  setOperation: action((state, payload) => {
+    state.operation = payload;
   }),
 };
 

@@ -104,3 +104,8 @@ export interface LoadingPayload {
   isOpen: boolean;
   text: string;
 }
+
+export interface IOperation {
+  isOpen: boolean;
+  type: string;
+}
