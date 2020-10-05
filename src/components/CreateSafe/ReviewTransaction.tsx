@@ -168,7 +168,7 @@ const Item = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   &:last-child {
     margin-bottom: 0;
   }

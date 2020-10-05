@@ -16,7 +16,6 @@ export default GridContainer;
 
 const Container = styled.div`
   background: ${(props) => props.theme.colors.foreground};
-  min-height: calc(100vh - 69px);
   padding-bottom: 20px;
   @media (max-width: ${(props) => props.theme.global.gridMaxWidth}) {
     padding: 0 20px 20px 20px;

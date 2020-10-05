@@ -32,7 +32,7 @@ const Title = styled.div`
   font-size: ${(props) => props.theme.font.medium};
   font-weight: 600;
   color: ${(props) => props.theme.colors.primary};
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 `;
 
 const Text = styled.div`

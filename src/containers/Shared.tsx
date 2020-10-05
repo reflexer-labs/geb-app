@@ -78,7 +78,7 @@ const Shared = () => {
       {networkWarning ? (
         <Alerts
           text={networkWarning}
-          margin={'20px auto 0 auto'}
+          margin={'10px auto 0 auto'}
           type={'danger'}
         />
       ) : null}

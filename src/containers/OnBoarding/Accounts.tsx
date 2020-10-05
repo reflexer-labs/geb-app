@@ -24,7 +24,7 @@ const Container = styled.div`
   background: ${(props) => props.theme.colors.neutral};
   border-radius: ${(props) => props.theme.global.borderRadius};
   border: 1px solid ${(props) => props.theme.colors.border};
-  padding: 60px 20px;
+  padding: 30px 20px;
 `;
 
 const Content = styled.div`

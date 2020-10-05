@@ -25,6 +25,7 @@
     "jazzicon": "^1.5.0",
     "react": "^16.13.1",
     "react-copy-to-clipboard": "^5.0.2",
+    "react-custom-scrollbars": "^4.2.1",
     "react-device-detect": "^1.13.1",
     "react-dom": "^16.13.1",
     "react-feather": "^2.0.8",
@@ -63,6 +64,7 @@
   },
   "devDependencies": {
     "@types/react-copy-to-clipboard": "^4.3.0",
+    "@types/react-custom-scrollbars": "^4.0.7",
     "@types/react-router-dom": "^5.1.5",
     "@types/react-transition-group": "^4.4.0",
     "@types/styled-components": "^5.1.3",

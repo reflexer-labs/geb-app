@@ -48,10 +48,10 @@ const SafeBlock = ({ ...props }) => {
 export default SafeBlock;
 
 const BlockContainer = styled.div`
-  padding: 20px;
+  padding: 20px 20px 13px 20px;
   border-radius: ${(props) => props.theme.global.borderRadius};
   border: 1px solid ${(props) => props.theme.colors.border};
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   background: ${(props) => props.theme.colors.background};
 `;
 
@@ -65,6 +65,8 @@ const SafeInfo = styled.div`
   align-items: center;
   img {
     border-radius: ${(props) => props.theme.global.borderRadius};
+    width: 40px;
+    height: 40px;
   }
 `;
 
@@ -73,7 +75,7 @@ const SafeData = styled.div`
 `;
 
 const SafeTitle = styled.div`
-  font-size: ${(props) => props.theme.font.medium};
+  font-size: ${(props) => props.theme.font.default};
   color: ${(props) => props.theme.colors.primary};
   letter-spacing: -0.33px;
   line-height: 22px;
@@ -107,7 +109,7 @@ const SafeState = styled.div`
 `;
 
 const Block = styled.div`
-  margin-top: 20px;
+  margin-top: 10px;
   &:last-child {
     border-bottom: 0;
   }
@@ -117,7 +119,7 @@ const Item = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 3px;
   &:last-child {
     margin-bottom: 0;
   }
@@ -140,7 +142,7 @@ const Value = styled.div`
 
 const BtnContainer = styled.div`
   display: flex;
-  margin-top: 20px;
+  margin-top: 10px;
   justify-content: flex-end;
   a {
     display: flex;

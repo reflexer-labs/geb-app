@@ -80,7 +80,7 @@ const Steps = () => {
 export default Steps;
 
 const StepsContainer = styled.div`
-  margin-top: 40px;
+  margin-top: 20px;
 `;
 
 const StepsBars = styled.div`

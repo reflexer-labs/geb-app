@@ -20,38 +20,34 @@ const Navbar = () => {
   };
 
   return (
-    <>
-      <Container>
-        <Brand />
+    <Container>
+      <Brand />
+      <HideMobile>
+        <NavLinks />
+      </HideMobile>
+      <RightSide>
+        <BtnContainer>
+          <Button
+            onClick={handleWalletConnect}
+            text={
+              active && account ? returnWalletAddres(account) : 'connect_wallet'
+            }
+          />
+        </BtnContainer>
+
         <HideMobile>
-          <NavLinks />
+          <SettingsPopup />
         </HideMobile>
-        <RightSide>
-          <BtnContainer>
-            <Button
-              onClick={handleWalletConnect}
-              text={
-                active && account
-                  ? returnWalletAddres(account)
-                  : 'connect_wallet'
-              }
-            />
-          </BtnContainer>
 
-          <HideMobile>
-            <SettingsPopup />
-          </HideMobile>
-
-          <MenuBtn onClick={() => popupsActions.setShowSideMenu(true)}>
-            <RectContainer>
-              <Rect />
-              <Rect />
-              <Rect />
-            </RectContainer>
-          </MenuBtn>
-        </RightSide>
-      </Container>
-    </>
+        <MenuBtn onClick={() => popupsActions.setShowSideMenu(true)}>
+          <RectContainer>
+            <Rect />
+            <Rect />
+            <Rect />
+          </RectContainer>
+        </MenuBtn>
+      </RightSide>
+    </Container>
   );
 };
 
@@ -64,7 +60,8 @@ const Container = styled.div`
   justify-content: space-between;
   box-shadow: 0px 1px 0px #eef3f9;
   padding: 0 20px;
-  border-bottom: 1px solid #eef3f9;
+  border-bottom: 1px solid ${(props) => props.theme.colors.border};
+  background: ${(props) => props.theme.colors.background};
 `;
 
 const MenuBtn = styled.div`

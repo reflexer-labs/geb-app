@@ -27,9 +27,7 @@ const PageHeader = ({ title, text, subtitle }: Props) => {
 export default PageHeader;
 
 const Container = styled.div`
-  padding: 20px 0;
-  border-bottom: 1px solid ${(props) => props.theme.colors.border};
-  margin-bottom: 20px;
+  padding: 20px 0 15px;
 `;
 
 const Title = styled.h3`
@@ -40,7 +38,7 @@ const Title = styled.h3`
   letter-spacing: -0.33px;
   color: ${(props) => props.theme.colors.primary};
   margin-top: 0;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   &.hasSub {
     color: ${(props) => props.theme.colors.secondary};
   }

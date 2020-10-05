@@ -1,6 +1,11 @@
 import React, { Suspense, useEffect } from 'react';
 import i18next from 'i18next';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Redirect,
+  Route,
+  Switch,
+} from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { I18nextProvider } from 'react-i18next';
 import ErrorBoundary from './ErrorBoundary';
@@ -38,8 +43,9 @@ function App() {
             <Suspense fallback={null}>
               <Web3ReactManager>
                 <Switch>
-                  <Route exact component={SafeDetails} path={'/:id'} />
+                  <Route component={SafeDetails} path={'/:id'} />
                   <Route exact component={OnBoarding} path={'/'} />
+                  <Redirect from="*" to="/" />
                 </Switch>
               </Web3ReactManager>
             </Suspense>

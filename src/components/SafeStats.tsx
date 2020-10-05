@@ -105,7 +105,7 @@ export default SafeStats;
 
 const StatsGrid = styled.div`
   display: flex;
-  margin: 0 -10px;
+  margin: 0 -7.5px;
   flex-wrap: wrap;
   @media (max-width: 768px) {
     margin: 0;
@@ -113,9 +113,9 @@ const StatsGrid = styled.div`
 `;
 
 const StatItem = styled.div`
-  padding: 0 10px;
+  padding: 0 7.5px;
   flex: 0 0 25%;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   &.w50 {
     flex: 0 0 50%;
   }
@@ -153,12 +153,12 @@ const StateInner = styled.div`
 
 const Value = styled.div`
   color: ${(props) => props.theme.colors.primary};
-  font-size: ${(props) => props.theme.font.extraLarge};
+  font-size: ${(props) => props.theme.font.large};
   line-height: 27px;
   letter-spacing: -0.69px;
   font-weight: 600;
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.font.large};
+    font-size: ${(props) => props.theme.font.medium};
   }
 `;
 const Label = styled.div`
@@ -174,6 +174,6 @@ const Label = styled.div`
 
 const Actions = styled.div`
   display: flex;
-  margin-top: 2rem;
+  margin-top: 1rem;
   justify-content: space-between;
 `;

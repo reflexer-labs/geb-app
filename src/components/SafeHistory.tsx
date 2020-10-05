@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Scrollbars } from 'react-custom-scrollbars';
 import styled from 'styled-components';
 import useWindowSize from '../hooks/useWindowSize';
 
@@ -24,64 +25,78 @@ const SafeHistory = () => {
         <Thead>Amount</Thead>
         <Thead>Receipt</Thead>
       </Header>
-      <List>
-        <Row ref={ref}>
-          <Col>
-            <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
-            Repaid RAI
-          </Col>
-          <Col>Feb 12 2020</Col>
-          <Col>20.00</Col>
-          <Col>
-            <ExternalLink href="">
-              0x1234....4321{' '}
-              <img src={process.env.PUBLIC_URL + '/img/arrow-up.svg'} alt="" />
-            </ExternalLink>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
-            Withdrew RAI
-          </Col>
-          <Col>Feb 2 2020</Col>
-          <Col>50.00</Col>
-          <Col>
-            <ExternalLink href="">
-              0x1234....4321{' '}
-              <img src={process.env.PUBLIC_URL + '/img/arrow-up.svg'} alt="" />
-            </ExternalLink>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
-            Deposited ETH
-          </Col>
-          <Col>Feb 1 2020</Col>
-          <Col>100.00</Col>
-          <Col>
-            <ExternalLink href="">
-              0x1234....4321{' '}
-              <img src={process.env.PUBLIC_URL + '/img/arrow-up.svg'} alt="" />
-            </ExternalLink>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
-            Opened Safe
-          </Col>
-          <Col>Feb 1 2020</Col>
-          <Col>0.00</Col>
-          <Col>
-            <ExternalLink href="">
-              0x1234....4321{' '}
-              <img src={process.env.PUBLIC_URL + '/img/arrow-up.svg'} alt="" />
-            </ExternalLink>
-          </Col>
-        </Row>
-      </List>
+      <Scrollbars autoHide style={{ width: '100%', height: '162px' }}>
+        <List>
+          <Row ref={ref}>
+            <Col>
+              <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
+              Repaid RAI
+            </Col>
+            <Col>Feb 12 2020</Col>
+            <Col>20.00</Col>
+            <Col>
+              <ExternalLink href="">
+                0x1234....4321{' '}
+                <img
+                  src={process.env.PUBLIC_URL + '/img/arrow-up.svg'}
+                  alt=""
+                />
+              </ExternalLink>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
+              Withdrew RAI
+            </Col>
+            <Col>Feb 2 2020</Col>
+            <Col>50.00</Col>
+            <Col>
+              <ExternalLink href="">
+                0x1234....4321{' '}
+                <img
+                  src={process.env.PUBLIC_URL + '/img/arrow-up.svg'}
+                  alt=""
+                />
+              </ExternalLink>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
+              Deposited ETH
+            </Col>
+            <Col>Feb 1 2020</Col>
+            <Col>100.00</Col>
+            <Col>
+              <ExternalLink href="">
+                0x1234....4321{' '}
+                <img
+                  src={process.env.PUBLIC_URL + '/img/arrow-up.svg'}
+                  alt=""
+                />
+              </ExternalLink>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
+              Opened Safe
+            </Col>
+            <Col>Feb 1 2020</Col>
+            <Col>0.00</Col>
+            <Col>
+              <ExternalLink href="">
+                0x1234....4321{' '}
+                <img
+                  src={process.env.PUBLIC_URL + '/img/arrow-up.svg'}
+                  alt=""
+                />
+              </ExternalLink>
+            </Col>
+          </Row>
+        </List>
+      </Scrollbars>
     </Container>
   );
 };
@@ -96,21 +111,18 @@ const Container = styled.div`
 
 const Title = styled.div`
   color: ${(props) => props.theme.colors.primary};
-  font-size: ${(props) => props.theme.font.large};
+  font-size: ${(props) => props.theme.font.medium};
   line-height: 25px;
   letter-spacing: -0.47px;
   font-weight: 600;
-  padding: 20px;
+  padding: 15px 20px;
 `;
 
-const List = styled.div`
-  max-height: 162px;
-  overflow-y: auto;
-`;
+const List = styled.div``;
 
 const Header = styled.div`
   display: flex;
-  padding: 12px 20px;
+  padding: 12px 30px 12px 20px;
   border-top: 1px solid ${(props) => props.theme.colors.border};
 `;
 const Thead = styled.div`
