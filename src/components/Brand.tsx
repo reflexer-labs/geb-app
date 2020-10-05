@@ -18,9 +18,9 @@ const Brand = () => {
 export default Brand;
 
 const Container = styled.div`
-  @media (min-width: 768px) {
+  ${({ theme }) => theme.mediaWidth.upToMedium`
     min-width: 194px;
-  }
+  `}
   a {
     color: inherit;
     text-decoration: none;

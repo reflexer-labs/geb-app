@@ -142,9 +142,9 @@ const InnerContent = styled.div`
   min-height: 100vh;
   position: relative;
 
-  @media (max-width: 768px) {
+  ${({ theme }) => theme.mediaWidth.upToMedium`
     padding: 50px 20px;
-  }
+  `}
 `;
 
 const ModalContent = styled.div`

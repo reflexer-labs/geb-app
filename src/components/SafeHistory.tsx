@@ -139,7 +139,7 @@ const Thead = styled.div`
     font-size: ${(props) => props.theme.font.extraSmall};
   }
   font-weight: normal;
-  @media (max-width: 768px) {
+  ${({ theme }) => theme.mediaWidth.upToMedium`
     &:nth-child(2),
     &:nth-child(3) {
       display: none;
@@ -148,7 +148,7 @@ const Thead = styled.div`
     &:nth-child(1) {
       flex: 0 0 50%;
     }
-  }
+  `}
 `;
 
 const Row = styled.div`
@@ -177,7 +177,7 @@ const Col = styled.div`
     height: 37px;
   }
 
-  @media (max-width: 768px) {
+  ${({ theme }) => theme.mediaWidth.upToMedium`
     &:nth-child(2),
     &:nth-child(3) {
       display: none;
@@ -186,7 +186,7 @@ const Col = styled.div`
     &:nth-child(1) {
       flex: 0 0 50%;
     }
-  }
+  `}
 `;
 
 const ExternalLink = styled.a`

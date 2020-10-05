@@ -107,9 +107,9 @@ const StatsGrid = styled.div`
   display: flex;
   margin: 0 -7.5px;
   flex-wrap: wrap;
-  @media (max-width: 768px) {
+  ${({ theme }) => theme.mediaWidth.upToMedium`
     margin: 0;
-  }
+  `}
 `;
 
 const StatItem = styled.div`
@@ -119,8 +119,7 @@ const StatItem = styled.div`
   &.w50 {
     flex: 0 0 50%;
   }
-
-  @media (max-width: 768px) {
+  ${({ theme }) => theme.mediaWidth.upToMedium`
     flex: 0 0 50%;
     padding: 0;
     &:nth-child(1),
@@ -141,7 +140,7 @@ const StatItem = styled.div`
     &.w50 {
       flex: 0 0 100%;
     }
-  }
+  `}
 `;
 const StateInner = styled.div`
   border: 1px solid ${(props) => props.theme.colors.border};
@@ -157,9 +156,9 @@ const Value = styled.div`
   line-height: 27px;
   letter-spacing: -0.69px;
   font-weight: 600;
-  @media (max-width: 768px) {
+  ${({ theme }) => theme.mediaWidth.upToMedium`
     font-size: ${(props) => props.theme.font.medium};
-  }
+ `}
 `;
 const Label = styled.div`
   color: ${(props) => props.theme.colors.secondary};
@@ -167,9 +166,9 @@ const Label = styled.div`
   line-height: 21px;
   letter-spacing: -0.09px;
   margin-top: 8px;
-  @media (max-width: 768px) {
+  ${({ theme }) => theme.mediaWidth.upToMedium`
     font-size: ${(props) => props.theme.font.extraSmall};
-  }
+  `}
 `;
 
 const Actions = styled.div`

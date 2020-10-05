@@ -1,4 +1,5 @@
 import { ChainId } from '@uniswap/sdk';
+import { css } from 'styled-components';
 import { injected, walletconnect, walletlink } from '../connectors';
 import { WalletInfo } from './interfaces';
 
@@ -61,3 +62,21 @@ export const ETHERSCAN_PREFIXES: { [chainId in ChainId]: string } = {
   5: 'goerli.',
   42: 'kovan.',
 };
+
+const MEDIA_WIDTHS = {
+  upToExtraSmall: 576,
+  upToSmall: 768,
+  upToMedium: 992,
+  upToLarge: 1280,
+};
+
+export const mediaWidthTemplates: {
+  [width in keyof typeof MEDIA_WIDTHS]: typeof css;
+} = Object.keys(MEDIA_WIDTHS).reduce((accumulator, size) => {
+  (accumulator as any)[size] = (a: any, b: any, c: any) => css`
+    @media (max-width: ${(MEDIA_WIDTHS as any)[size]}px) {
+      ${css(a, b, c)}
+    }
+  `;
+  return accumulator;
+}, {}) as any;

@@ -186,7 +186,7 @@ const DoubleInput = styled.div`
     }
   }
 
-  @media (max-width: 768px) {
+  ${({ theme }) => theme.mediaWidth.upToMedium`
     flex-direction: column;
     > div {
       flex: 0 0 100%;
@@ -196,7 +196,7 @@ const DoubleInput = styled.div`
         margin-top: 20px;
       }
     }
-  }
+  `}
 `;
 
 const Result = styled.div`

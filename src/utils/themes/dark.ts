@@ -1,3 +1,4 @@
+import { mediaWidthTemplates } from '../constants';
 import { Theme } from '../interfaces';
 
 const darkTheme: Theme = {
@@ -39,6 +40,7 @@ const darkTheme: Theme = {
     extraCurvedRadius: '20px',
     buttonPadding: '8px 16px',
   },
+  mediaWidth: mediaWidthTemplates,
 };
 
 export { darkTheme };

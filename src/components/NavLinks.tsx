@@ -30,7 +30,7 @@ const Nav = styled.div`
   .settings-btn {
     display: none;
   }
-  @media (max-width: 768px) {
+  ${({ theme }) => theme.mediaWidth.upToMedium`
     .settings-btn {
       display: block;
     }
@@ -49,7 +49,7 @@ const Nav = styled.div`
         border-top: 1px solid ${(props) => props.theme.colors.border};
       }
     }
-  }
+  `}
 `;
 
 const NavBarLink = styled(NavLink)`

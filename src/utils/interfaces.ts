@@ -1,4 +1,5 @@
 import { AbstractConnector } from '@web3-react/abstract-connector';
+import { DefaultTheme, ThemedCssFunction } from 'styled-components';
 
 interface IColors {
   primary: string;
@@ -40,10 +41,19 @@ interface IGlobal {
   extraCurvedRadius: string;
   buttonPadding: string;
 }
+
+interface IMediaWidth {
+  upToExtraSmall: ThemedCssFunction<DefaultTheme>;
+  upToSmall: ThemedCssFunction<DefaultTheme>;
+  upToMedium: ThemedCssFunction<DefaultTheme>;
+  upToLarge: ThemedCssFunction<DefaultTheme>;
+}
+
 export interface Theme {
   colors: IColors;
   font: IFonts;
   global: IGlobal;
+  mediaWidth: IMediaWidth;
 }
 
 export interface LangOption {

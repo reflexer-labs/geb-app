@@ -80,15 +80,15 @@ const MenuBtn = styled.div`
       }
     }
   }
-  @media (max-width: 768px) {
+  ${({ theme }) => theme.mediaWidth.upToMedium`
     display: flex;
-  }
+  `}
 `;
 const BtnContainer = styled.div`
   margin-right: 20px;
-  @media (max-width: 768px) {
+  ${({ theme }) => theme.mediaWidth.upToMedium`
     display: none;
-  }
+  `}
 `;
 
 const RectContainer = styled.div``;
@@ -111,7 +111,7 @@ const RightSide = styled.div`
 `;
 
 const HideMobile = styled.div`
-  @media (max-width: 768px) {
+  ${({ theme }) => theme.mediaWidth.upToMedium`
     display: none;
-  }
+  `}
 `;
