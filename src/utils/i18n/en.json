@@ -45,5 +45,16 @@
   "error_connecting": "Error connecting.",
   "not_supported": "Please connect to the appropriate Ethereum network.",
   "error_try_refresh": "Error connecting. Try refreshing the page.",
-  "show_portis": "Show Portis"
+  "show_portis": "Show Portis",
+  "accounts": "Accounts",
+  "accounts_header_text": "Manage your Safe account",
+  "created": "Created",
+  "risk": "Risk:",
+  "manage_safe": "Manage Safe",
+  "fetching_account_info": "Creating/fetching safe data...",
+  "deposit": "Deposit",
+  "withdraw": "Withdraw",
+  "repay": "Repay",
+  "borrow": "Borrow",
+  "history": "History"
 }

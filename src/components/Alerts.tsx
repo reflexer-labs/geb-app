@@ -27,29 +27,29 @@ const Container = styled.div`
   max-width: 1454px;
   margin: 0 auto;
   text-align: center;
-  font-size: ${(props) => props.theme.textFontSize};
-  border-radius: ${(props) => props.theme.buttonBorderRadius};
+  font-size: ${(props) => props.theme.font.small};
+  border-radius: ${(props) => props.theme.global.borderRadius};
   line-height: 21px;
   letter-spacing: -0.09px;
   &.alert {
-    border: 1px solid ${(props) => props.theme.alertBorder};
-    background: ${(props) => props.theme.alertBackground};
-    color: ${(props) => props.theme.alertColor};
+    border: 1px solid ${(props) => props.theme.colors.alertBorder};
+    background: ${(props) => props.theme.colors.alertBackground};
+    color: ${(props) => props.theme.colors.alertColor};
   }
   &.success {
-    border: 1px solid ${(props) => props.theme.successBorder};
-    background: ${(props) => props.theme.successBackground};
-    color: ${(props) => props.theme.successColor};
+    border: 1px solid ${(props) => props.theme.colors.successBorder};
+    background: ${(props) => props.theme.colors.successBackground};
+    color: ${(props) => props.theme.colors.successColor};
   }
   &.danger {
-    border: 1px solid ${(props) => props.theme.dangerColor};
-    background: ${(props) => props.theme.dangerBackground};
-    color: ${(props) => props.theme.dangerColor};
+    border: 1px solid ${(props) => props.theme.colors.dangerColor};
+    background: ${(props) => props.theme.colors.dangerBackground};
+    color: ${(props) => props.theme.colors.dangerColor};
   }
   &.warning {
-    border: 1px solid ${(props) => props.theme.warningBorder};
-    background: ${(props) => props.theme.warningBackground};
-    color: ${(props) => props.theme.warningColor};
+    border: 1px solid ${(props) => props.theme.colors.warningBorder};
+    background: ${(props) => props.theme.colors.warningBackground};
+    color: ${(props) => props.theme.colors.warningColor};
   }
 
   &.floated {

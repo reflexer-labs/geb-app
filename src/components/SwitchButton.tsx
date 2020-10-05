@@ -40,10 +40,10 @@ const Input = styled.input`
   width: 0;
   height: 0;
   &:checked + .slider {
-    background: ${(props) => props.theme.defaultGradient};
+    background: ${(props) => props.theme.colors.gradient};
   }
   &:focus + .slider {
-    box-shadow: 0 0 1px ${(props) => props.theme.defaultGradient};
+    box-shadow: 0 0 1px ${(props) => props.theme.colors.gradient};
   }
   &:checked + .slider:before {
     -webkit-transform: translateX(34px);
@@ -59,7 +59,7 @@ const Slider = styled.span`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: ${(props) => props.theme.lightText};
+  background-color: ${(props) => props.theme.colors.secondary};
   -webkit-transition: 0.4s;
   transition: 0.4s;
   border-radius: 4px;
@@ -81,10 +81,10 @@ const State = styled.span`
   position: absolute;
   top: 8px;
   right: 8px;
-  font-size: ${(props) => props.theme.smallFontSize};
+  font-size: ${(props) => props.theme.font.extraSmall};
   &.on {
     right: 0;
     left: 8px;
-    color: ${(props) => props.theme.neutral};
+    color: ${(props) => props.theme.colors.neutral};
   }
 `;

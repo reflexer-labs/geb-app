@@ -1,49 +1,30 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { useStoreActions, useStoreState } from '../../store';
-import CreateSafeContent from './CreateSafeContent';
+import { useStoreActions } from '../../store';
 import Button from '../Button';
-import TransactionOverview from './TransactionOverview';
+import TransactionOverview from '../CreateSafe/TransactionOverview';
 import { SUPPORTED_WALLETS } from '../../utils/constants';
 import { injected } from '../../connectors';
 import { useActiveWeb3React } from '../../hooks';
 
-const ReviewTransaction = () => {
+const SafeTransaction = () => {
   const isMetamask = window?.ethereum?.isMetaMask;
   const { connector } = useActiveWeb3React();
   const { t } = useTranslation();
 
   const {
-    walletModel: walletActions,
     popupsModel: popupsActions,
     safeModel: safeActions,
   } = useStoreActions((state) => state);
-  const { walletModel: walletState } = useStoreState((state) => state);
 
-  const handleCancel = () => {
-    walletState.isUniSwapPoolChecked
-      ? walletActions.setStage(1)
-      : walletActions.setStage(0);
+  const handleBack = () => {
+    safeActions.setOperation(0);
   };
 
   const handleConfirm = () => {
-    safeActions.setIsSafeCreated(true);
-    popupsActions.setIsCreateAccountModalOpen(false);
-    popupsActions.setIsLoadingModalOpen({
-      isOpen: true,
-      text: t('fetching_account_info'),
-    });
-    safeActions.fetchAccountData();
-    walletActions.setStage(0);
-    walletActions.setUniSwapPool({
-      depositedETH: '',
-      borrowedRAI: '',
-    });
-    walletActions.setCreateSafeDefault({
-      depositedETH: '',
-      borrowedRAI: '',
-    });
+    popupsActions.setSafeOperationPayload({ isOpen: false, type: '' });
+    safeActions.setOperation(0);
   };
 
   const returnConnectorName = () => {
@@ -67,10 +48,9 @@ const ReviewTransaction = () => {
   };
 
   return (
-    <CreateSafeContent>
+    <>
       <Body>
         <TransactionOverview
-          isChecked={walletState.isUniSwapPoolChecked}
           title={t('confirm_transaction_details')}
           description={
             t('confirm_details_text') +
@@ -80,32 +60,18 @@ const ReviewTransaction = () => {
         <Result>
           <Block>
             <Item>
-              <Label>{'ETH Deposited'}</Label> <Value>{'0.00'}</Value>
+              <Label>{'Total ETH Deposited'}</Label> <Value>{'0.00'}</Value>
             </Item>
             <Item>
-              <Label>{'RAI Borrowed'}</Label> <Value>{'0.00'}</Value>
+              <Label>{'Total ETH Deposited'}</Label> <Value>{'0.00'}</Value>
             </Item>
             <Item>
-              <Label>{'Collateral Ratio'}</Label> <Value>{'0.00%'}</Value>
+              <Label>{'New Collateral Ratio'}</Label> <Value>{'0.00%'}</Value>
             </Item>
             <Item>
-              <Label>{'Liquidation Price'}</Label> <Value>{'$0.00'}</Value>
+              <Label>{'New Liquidation Price'}</Label> <Value>{'$0.00'}</Value>
             </Item>
           </Block>
-
-          {walletState.isUniSwapPoolChecked ? (
-            <Block>
-              <Item>
-                <Label>{'RAI per ETH'}</Label> <Value>{'$0.00'}</Value>
-              </Item>
-              <Item>
-                <Label>{'ETH per RAI'}</Label> <Value>{'$0.00'}</Value>
-              </Item>
-              <Item>
-                <Label>{'Share of Pool'}</Label> <Value>{'0.00%'}</Value>
-              </Item>
-            </Block>
-          ) : null}
         </Result>
 
         <UniSwapCheckContainer>
@@ -113,18 +79,18 @@ const ReviewTransaction = () => {
         </UniSwapCheckContainer>
       </Body>
       <Footer>
-        <Button dimmedWithArrow text={t('back')} onClick={handleCancel} />
+        <Button dimmedWithArrow text={t('back')} onClick={handleBack} />
         <Button
           withArrow
           text={t('confirm_transaction')}
           onClick={handleConfirm}
         />
       </Footer>
-    </CreateSafeContent>
+    </>
   );
 };
 
-export default ReviewTransaction;
+export default SafeTransaction;
 
 const Body = styled.div`
   padding: 20px;
@@ -168,7 +134,7 @@ const Item = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   &:last-child {
     margin-bottom: 0;
   }

@@ -21,10 +21,10 @@ const Accounts = () => {
 export default Accounts;
 
 const Container = styled.div`
-  background: ${(props) => props.theme.neutral};
-  border-radius: ${(props) => props.theme.buttonBorderRadius};
-  border: 1px solid ${(props) => props.theme.borderColor};
-  padding: 60px 20px;
+  background: ${(props) => props.theme.colors.neutral};
+  border-radius: ${(props) => props.theme.global.borderRadius};
+  border: 1px solid ${(props) => props.theme.colors.border};
+  padding: 30px 20px;
 `;
 
 const Content = styled.div`

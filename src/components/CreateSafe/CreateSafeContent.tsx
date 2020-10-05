@@ -27,16 +27,16 @@ const CreateSafeContent = ({ width, maxWidth, children }: Props) => {
 export default CreateSafeContent;
 
 const ModalContent = styled.div`
-  background: ${(props) => props.theme.modalBg};
-  border-radius: ${(props) => props.theme.buttonBorderRadius};
-  border: 1px solid ${(props) => props.theme.borderColor};
+  background: ${(props) => props.theme.colors.background};
+  border-radius: ${(props) => props.theme.global.borderRadius};
+  border: 1px solid ${(props) => props.theme.colors.border};
 `;
 
 const Header = styled.div`
   padding: 20px;
-  font-size: ${(props) => props.theme.modalFontSize};
+  font-size: ${(props) => props.theme.font.large};
   font-weight: 600;
-  color: ${(props) => props.theme.darkText};
-  border-bottom: 1px solid ${(props) => props.theme.borderColor};
+  color: ${(props) => props.theme.colors.primary};
+  border-bottom: 1px solid ${(props) => props.theme.colors.border};
   letter-spacing: -0.47px;
 `;

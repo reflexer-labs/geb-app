@@ -80,7 +80,7 @@ const Steps = () => {
 export default Steps;
 
 const StepsContainer = styled.div`
-  margin-top: 40px;
+  margin-top: 20px;
 `;
 
 const StepsBars = styled.div`
@@ -93,9 +93,9 @@ const StepBar = styled.div`
   width: 68px;
   height: 4px;
   border-radius: 10px;
-  background: ${(props) => props.theme.placeholderColor};
+  background: ${(props) => props.theme.colors.placeholder};
   &.active {
-    background: ${(props) => props.theme.defaultGradient};
+    background: ${(props) => props.theme.colors.gradient};
   }
   margin-right: 8px;
   &:last-child {

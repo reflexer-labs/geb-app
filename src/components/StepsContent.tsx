@@ -29,15 +29,15 @@ const Container = styled.div`
 `;
 
 const Title = styled.div`
-  font-size: ${(props) => props.theme.titleFontSize};
+  font-size: ${(props) => props.theme.font.medium};
   font-weight: 600;
-  color: ${(props) => props.theme.darkText};
-  margin-bottom: 20px;
+  color: ${(props) => props.theme.colors.primary};
+  margin-bottom: 10px;
 `;
 
 const Text = styled.div`
-  font-size: ${(props) => props.theme.textFontSize};
-  color: ${(props) => props.theme.lightText};
+  font-size: ${(props) => props.theme.font.small};
+  color: ${(props) => props.theme.colors.secondary};
   margin-bottom: 20px;
   line-height: 21px;
 `;

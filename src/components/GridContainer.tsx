@@ -15,15 +15,14 @@ const GridContainer = ({ children }: Props) => {
 export default GridContainer;
 
 const Container = styled.div`
-  background: ${(props) => props.theme.bodyBg};
-  min-height: calc(100vh - 69px);
+  background: ${(props) => props.theme.colors.foreground};
   padding-bottom: 20px;
-  @media (max-width: 1500px) {
+  @media (max-width: ${(props) => props.theme.global.gridMaxWidth}) {
     padding: 0 20px 20px 20px;
   }
 `;
 const InnerContent = styled.div`
-  max-width: 1454px;
+  max-width: ${(props) => props.theme.global.gridMaxWidth};
   width: 100%;
   margin: 0 auto;
 `;

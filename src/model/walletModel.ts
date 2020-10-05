@@ -5,6 +5,7 @@ export interface WalletModel {
   isUniSwapPoolChecked: boolean;
   stage: number;
   step: number;
+
   createSafeDefault: CreateSafeType;
   uniSwapPool: CreateSafeType;
   setStep: Action<WalletModel, number>;

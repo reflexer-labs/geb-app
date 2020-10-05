@@ -6,6 +6,7 @@ interface Props {
 
 const GlobalStyle = createGlobalStyle`
         body {
+          background:${(props) => props.theme.colors.foreground};
             overflow: ${(props: Props) =>
               props.bodyOverflow ? 'hidden' : 'visible'};
 

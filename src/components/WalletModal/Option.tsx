@@ -61,7 +61,7 @@ export default function Option({
 const ExternalLink = styled.a``;
 
 const InfoCard = styled.button<{ active?: boolean }>`
-  background-color: ${(props) => props.theme.modalBg};
+  background-color: ${(props) => props.theme.colors.background};
   padding: 1rem;
   outline: none;
   border: 1px solid;
@@ -69,9 +69,9 @@ const InfoCard = styled.button<{ active?: boolean }>`
   width: 100% !important;
   &:focus {
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
-    background: ${(props) => props.theme.placeholderColor};
+    background: ${(props) => props.theme.colors.placeholder};
   }
-  border-color: ${(props) => props.theme.borderColor};
+  border-color: ${(props) => props.theme.colors.border};
 `;
 
 const OptionCard = styled(InfoCard as any)`
@@ -91,12 +91,12 @@ const OptionCardLeft = styled.div`
 const OptionCardClickable = styled(OptionCard as any)<{ clickable?: boolean }>`
   margin-top: 0;
   background: ${({ clickable, theme }) =>
-    clickable ? '' : theme.placeholderColor};
+    clickable ? '' : theme.colors.placeholder};
   &:hover {
     cursor: ${({ clickable }) => (clickable ? 'pointer' : '')};
     border: ${({ clickable, theme }) =>
       clickable ? `1px solid ${theme.primary1}` : ``};
-    background: ${(props) => props.theme.placeholderColor};
+    background: ${(props) => props.theme.colors.placeholder};
   }
   opacity: ${({ disabled }) => (disabled ? '0.5' : '1')};
 `;
@@ -122,7 +122,7 @@ const CircleWrapper = styled.div`
 `;
 
 const HeaderText = styled.div`
-  color: ${(props) => props.theme.darkText};
+  color: ${(props) => props.theme.colors.primary};
   font-size: 1rem;
   font-weight: 500;
   display: flex;
@@ -130,7 +130,7 @@ const HeaderText = styled.div`
 `;
 
 const SubHeader = styled.div`
-  color: ${(props) => props.theme.darkText};
+  color: ${(props) => props.theme.colors.primary};
   margin-top: 10px;
   font-size: 12px;
 `;

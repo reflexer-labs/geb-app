@@ -60,14 +60,14 @@ const StyledCheckbox = styled.div`
   border-radius: 2.5px;
   transition: all 150ms;
   padding: 1px;
-  background: ${(props) => props.theme.defaultGradient};
+  background: ${(props) => props.theme.colors.gradient};
   div {
-    background: ${(props) => props.theme.modalBg};
+    background: ${(props) => props.theme.colors.background};
     border-radius: 2.5px;
   }
   &.checked {
     div {
-      background: ${(props) => props.theme.defaultGradient};
+      background: ${(props) => props.theme.colors.gradient};
     }
     svg {
       visibility: visible;

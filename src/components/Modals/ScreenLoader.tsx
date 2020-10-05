@@ -29,5 +29,5 @@ export default ScreenLoader;
 const LoaderContainer = styled.div`
   padding: 1rem;
   border-radius: 12px;
-  border: 1px solid ${(props) => props.theme.borderColor};
+  border: 1px solid ${(props) => props.theme.colors.border};
 `;

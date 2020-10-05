@@ -1,5 +1,5 @@
 import { action, Action } from 'easy-peasy';
-import { ToastPayload } from '../utils/interfaces';
+import { IOperation, LoadingPayload, ToastPayload } from '../utils/interfaces';
 
 export interface PopupsModel {
   isSettingsModalOpen: boolean;
@@ -9,6 +9,8 @@ export interface PopupsModel {
   isConnectorsWalletOpen: boolean;
   showSideMenu: boolean;
   isScreenModalOpen: boolean;
+  safeOperationPayload: IOperation;
+  isLoadingModalOpen: LoadingPayload;
   sideToastPayload: ToastPayload;
   setIsSettingModalOpen: Action<PopupsModel, boolean>;
   setIsConnectModalOpen: Action<PopupsModel, boolean>;
@@ -19,6 +21,8 @@ export interface PopupsModel {
   setSideToastPayload: Action<PopupsModel, ToastPayload>;
   setIsScreenModalOpen: Action<PopupsModel, boolean>;
   setIsConnectorsWalletOpen: Action<PopupsModel, boolean>;
+  setIsLoadingModalOpen: Action<PopupsModel, LoadingPayload>;
+  setSafeOperationPayload: Action<PopupsModel, IOperation>;
 }
 
 const popupsModel: PopupsModel = {
@@ -27,8 +31,16 @@ const popupsModel: PopupsModel = {
   isCreateAccountModalOpen: false,
   isConnectedWalletModalOpen: false,
   isScreenModalOpen: false,
+  safeOperationPayload: {
+    isOpen: false,
+    type: '',
+  },
   isConnectorsWalletOpen: false,
   showSideMenu: false,
+  isLoadingModalOpen: {
+    isOpen: false,
+    text: '',
+  },
   sideToastPayload: {
     text: '',
     showPopup: false,
@@ -65,6 +77,12 @@ const popupsModel: PopupsModel = {
   }),
   setIsConnectorsWalletOpen: action((state, payload) => {
     state.isConnectorsWalletOpen = payload;
+  }),
+  setIsLoadingModalOpen: action((state, payload) => {
+    state.isLoadingModalOpen = payload;
+  }),
+  setSafeOperationPayload: action((state, payload) => {
+    state.safeOperationPayload = payload;
   }),
 };
 

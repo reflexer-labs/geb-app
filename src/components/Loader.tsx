@@ -41,11 +41,11 @@ const Container = styled.div`
   align-items: center;
 
   svg {
-    stroke: ${(props) => props.theme.inputBorderColor};
+    stroke: ${(props) => props.theme.colors.inputBorderColor};
     animation: ${rotating} 1.5s linear infinite;
     margin-right: 10px;
   }
   span {
-    font-size: ${(props) => props.theme.textFontSize};
+    font-size: ${(props) => props.theme.font.small};
   }
 `;

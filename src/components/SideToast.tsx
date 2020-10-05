@@ -65,8 +65,8 @@ const Container = styled.div`
   position: fixed;
   top: 80px;
   right: 20px;
-  background: ${(props) => props.theme.modalBg};
-  border: 1px solid ${(props) => props.theme.borderColor};
+  background: ${(props) => props.theme.colors.background};
+  border: 1px solid ${(props) => props.theme.colors.border};
 
   &.fade-enter {
     opacity: 0;
@@ -92,12 +92,12 @@ const Container = styled.div`
 
 const Expand = styled.div`
   margin-top: 10px;
-  color: ${(props) => props.theme.lightText};
-  font-size: ${(props) => props.theme.smallFontSize};
+  color: ${(props) => props.theme.colors.secondary};
+  font-size: ${(props) => props.theme.font.extraSmall};
   display: flex;
   align-items: center;
   svg {
-    color: ${(props) => props.theme.lightText};
+    color: ${(props) => props.theme.colors.secondary};
     width: 13px;
     height: 13px;
     margin-right: 10px;

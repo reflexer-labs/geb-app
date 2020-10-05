@@ -104,11 +104,11 @@ const Connection = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: ${(props) => props.theme.textFontSize};
+  font-size: ${(props) => props.theme.font.small};
   button {
     width: auto;
     min-width: auto;
-    font-size: ${(props) => props.theme.smallFontSize};
+    font-size: ${(props) => props.theme.font.extraSmall};
     padding-top: 2px;
     padding-bottom: 2px;
   }
@@ -122,7 +122,7 @@ const Address = styled.div`
     width: 20px;
     margin-right: 10px;
   }
-  font-size: ${(props) => props.theme.titleFontSize};
+  font-size: ${(props) => props.theme.font.large};
 `;
 
 const WalletData = styled.div`
@@ -132,45 +132,45 @@ const WalletData = styled.div`
 `;
 
 const CopyBtn = styled.div`
-  color: ${(props) => props.theme.lightText};
-  font-size: ${(props) => props.theme.textFontSize};
+  color: ${(props) => props.theme.colors.secondary};
+  font-size: ${(props) => props.theme.font.small};
   transition: all 0.3s ease;
   cursor: pointer;
   display: flex;
   align-items: center;
   svg {
-    color: ${(props) => props.theme.lightText};
+    color: ${(props) => props.theme.colors.secondary};
     width: 15px;
     height: 15px;
     margin-right: 5px;
   }
   &:hover {
     text-decoration: underline;
-    color: ${(props) => props.theme.darkText};
+    color: ${(props) => props.theme.colors.primary};
     svg {
-      color: ${(props) => props.theme.darkText};
+      color: ${(props) => props.theme.colors.primary};
     }
   }
 
   &.greenish {
-    background: ${(props) => props.theme.defaultGradient};
+    background: ${(props) => props.theme.colors.gradient};
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    color: ${(props) => props.theme.inputBorderColor};
+    color: ${(props) => props.theme.colors.inputBorderColor};
   }
 
   margin-right: 20px;
 `;
 
 const LinkBtn = styled.a`
-  color: ${(props) => props.theme.lightText};
-  font-size: ${(props) => props.theme.textFontSize};
+  color: ${(props) => props.theme.colors.secondary};
+  font-size: ${(props) => props.theme.font.small};
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   svg {
-    color: ${(props) => props.theme.lightText};
+    color: ${(props) => props.theme.colors.secondary};
     width: 15px;
     height: 15px;
     margin-right: 5px;
@@ -178,9 +178,9 @@ const LinkBtn = styled.a`
 
   &:hover {
     text-decoration: underline;
-    color: ${(props) => props.theme.darkText};
+    color: ${(props) => props.theme.colors.primary};
     svg {
-      color: ${(props) => props.theme.darkText};
+      color: ${(props) => props.theme.colors.primary};
     }
   }
 `;
@@ -188,7 +188,7 @@ const LinkBtn = styled.a`
 const DataContainer = styled.div`
   border-radius: 20px;
   padding: 15px;
-  border: 1px solid ${(props) => props.theme.borderColor};
+  border: 1px solid ${(props) => props.theme.colors.border};
 `;
 
 const TransactionsContainer = styled.div`
@@ -196,5 +196,5 @@ const TransactionsContainer = styled.div`
   padding: 20px;
   margin: 20px -20px -20px -20px;
   border-radius: 0 0 25px 25px;
-  font-size: ${(props) => props.theme.textFontSize};
+  font-size: ${(props) => props.theme.font.small};
 `;

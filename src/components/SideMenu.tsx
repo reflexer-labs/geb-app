@@ -67,7 +67,7 @@ const Container = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background: ${(props) => props.theme.modalBg};
+  background: ${(props) => props.theme.colors.background};
   z-index: 997;
 `;
 
@@ -86,17 +86,17 @@ const CloseBtn = styled.button`
   box-shadow: none;
   outline: none;
   cursor: pointer;
-  color: ${(props) => props.theme.darkText};
+  color: ${(props) => props.theme.colors.primary};
   font-size: 40px;
   padding: 20px;
   line-height: 21px;
   transition: all 0.3s ease;
   &:hover {
-    background: ${(props) => props.theme.defaultGradient};
+    background: ${(props) => props.theme.colors.gradient};
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    color: ${(props) => props.theme.inputBorderColor};
+    color: ${(props) => props.theme.colors.inputBorderColor};
   }
 `;
 
@@ -105,7 +105,7 @@ const AccountBalance = styled.div`
 `;
 
 const Balance = styled.div`
-  color: ${(props) => props.theme.darkText};
+  color: ${(props) => props.theme.colors.primary};
   font-size: 16px;
   line-height: 27px;
   font-weight: 600;
@@ -117,7 +117,7 @@ const AccountData = styled.div`
 `;
 
 const Address = styled.div`
-  color: ${(props) => props.theme.darkText};
+  color: ${(props) => props.theme.colors.primary};
   font-size: 18px;
   line-height: 27px;
   font-weight: 600;

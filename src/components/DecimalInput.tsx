@@ -73,8 +73,8 @@ const Container = styled.div``;
 
 const Label = styled.div`
   line-height: 21px;
-  color: ${(props) => props.theme.lightText};
-  font-size: ${(props) => props.theme.textFontSize};
+  color: ${(props) => props.theme.colors.secondary};
+  font-size: ${(props) => props.theme.font.small};
   letter-spacing: -0.09px;
   margin-bottom: 4px;
   text-transform: capitalize;
@@ -83,15 +83,15 @@ const Label = styled.div`
 const Content = styled.div`
   display: flex;
   align-items: center;
-  border: 1px solid ${(props) => props.theme.borderColor};
-  border-radius: ${(props) => props.theme.buttonBorderRadius};
+  border: 1px solid ${(props) => props.theme.colors.border};
+  border-radius: ${(props) => props.theme.global.borderRadius};
   transition: all 0.3s ease;
   &:hover {
-    background: ${(props) => props.theme.hoverEffect};
+    background: ${(props) => props.theme.colors.foreground};
   }
   &.disabled {
     cursor: not-allowed;
-    background: ${(props) => props.theme.hoverEffect};
+    background: ${(props) => props.theme.colors.foreground};
   }
 `;
 
@@ -102,33 +102,33 @@ const Icon = styled.img`
 `;
 
 const CustomInput = styled.input`
-  font-size: ${(props) => props.theme.defaultTextSize};
+  font-size: ${(props) => props.theme.font.default};
   transition: all 0.3s ease;
   width: 100%;
   border: none;
   border-radius: 0;
   padding: 20px;
-  background: ${(props) => props.theme.modalBg};
-  color: ${(props) => props.theme.darkText};
+  background: ${(props) => props.theme.colors.background};
+  color: ${(props) => props.theme.colors.primary};
   line-height: 24px;
   outline: none;
   &:disabled {
     cursor: not-allowed;
-    background: ${(props) => props.theme.hoverEffect};
+    background: ${(props) => props.theme.colors.foreground};
   }
 `;
 
 const MaxBtn = styled.div`
   cursor: pointer;
   transition: all 0.3s ease;
-  background: ${(props) => props.theme.lightText};
+  background: ${(props) => props.theme.colors.secondary};
   padding: 6px;
   font-weight: 600;
-  color: ${(props) => props.theme.neutral};
-  font-size: ${(props) => props.theme.smallFontSize};
-  border-radius: ${(props) => props.theme.buttonBorderRadius};
+  color: ${(props) => props.theme.colors.neutral};
+  font-size: ${(props) => props.theme.font.extraSmall};
+  border-radius: ${(props) => props.theme.global.borderRadius};
   margin-right: 20px;
   &:hover {
-    background: ${(props) => props.theme.defaultGradient};
+    background: ${(props) => props.theme.colors.gradient};
   }
 `;
