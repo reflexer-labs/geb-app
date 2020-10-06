@@ -2,10 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { useStoreActions } from '../store';
 import Brand from './Brand';
-import Button from './Button';
-import SettingsPopup from './SettingsPopup';
-import { returnWalletAddres } from '../utils/helper';
-import NavLinks from './NavLinks';
+// import Button from './Button';
+// import SettingsPopup from './SettingsPopup';
+// import { returnWalletAddres } from '../utils/helper';
+// import NavLinks from './NavLinks';
 import { useWeb3React } from '@web3-react/core';
 import NotificationPopup from './NotificationPopup';
 
@@ -13,12 +13,12 @@ const Navbar = () => {
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
   const { active, account } = useWeb3React();
 
-  const handleWalletConnect = () => {
+  /*const handleWalletConnect = () => {
     if (active && account) {
       return popupsActions.setIsConnectedWalletModalOpen(true);
     }
     return popupsActions.setIsConnectorsWalletOpen(true);
-  };
+  };*/
 
   return (
     <Container>
@@ -31,10 +31,10 @@ const Navbar = () => {
         ) : null}
       </Left>
       <HideMobile>
-        <NavLinks />
+        {/*<NavLinks />*/}
       </HideMobile>
       <RightSide>
-        <BtnContainer>
+        {/*<BtnContainer>
           <Button
             onClick={handleWalletConnect}
             text={
@@ -45,7 +45,7 @@ const Navbar = () => {
 
         <HideMobile>
           <SettingsPopup />
-        </HideMobile>
+        </HideMobile>*/}
 
         <MenuBtn onClick={() => popupsActions.setShowSideMenu(true)}>
           <RectContainer>
@@ -92,12 +92,13 @@ const MenuBtn = styled.div`
     display: flex;
   `}
 `;
-const BtnContainer = styled.div`
+
+/*const BtnContainer = styled.div`
   margin-right: 20px;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     display: none;
   `}
-`;
+`;*/
 
 const RectContainer = styled.div``;
 

@@ -22,6 +22,7 @@ import SafeDetails from './containers/OnBoarding/SafeDetails';
 import EmergencyShutdown from './containers/EmergencyShutdown';
 import Voting from './containers/Voting';
 import VoteDetails from './containers/Voting/VoteDetails';
+import Statistics from './containers/Statistics';
 
 declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}
@@ -49,8 +50,9 @@ function App() {
                   <Route exact component={VoteDetails} path={'/voting/:id'} />
                   <Route exact component={Voting} path={'/voting'} />
                   <Route exact component={EmergencyShutdown} path={'/esm'} />
-                  <Route exact component={SafeDetails} path={'/:id'} />
-                  <Route exact component={OnBoarding} path={'/'} />
+                  <Route component={SafeDetails} path={'/safe/:id'} />
+                  <Route exact component={Statistics} path={'/'} />
+                  <Route exact component={OnBoarding} path={'/onboarding'} />
                   <Redirect from="*" to="/" />
                 </Switch>
               </Web3ReactManager>

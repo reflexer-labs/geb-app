@@ -9,6 +9,9 @@ export const DEFAULT_NETWORK_ID = process.env.REACT_APP_NETWORK_ID
 
 export const NetworkContextName = 'NETWORK';
 
+// TODO: Make it configurable based on the network
+export const GRAPH_API_URL = 'https://api.thegraph.com/subgraphs/name/reflexer-labs/rai-kovan';
+
 export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
   INJECTED: {
     connector: injected,

@@ -36,3 +36,7 @@ export const getEtherscanLink = (
 export const amountToFiat = (balance: number, fiatPrice: number) => {
   return (balance * fiatPrice).toFixed(4);
 };
+
+export const formatNumber = (value: string, digits = 4) => {
+  return parseFloat(Number(value).toFixed(digits));
+};

@@ -4,6 +4,7 @@ import walletModel, { WalletModel } from './walletModel';
 import connectWalletModel, { ConnectWalletModel } from './connectWalletModel';
 import safeModel, { SafeModel } from './safeModel';
 import votingModel, { VotingModel } from './votingModel';
+import statisticsModel, { StatisticsModel } from './statisticsModel';
 
 export interface StoreModel {
   settingsModel: SettingsModel;
@@ -12,6 +13,7 @@ export interface StoreModel {
   connectWalletModel: ConnectWalletModel;
   safeModel: SafeModel;
   votingModel: VotingModel;
+  statisticsModel: StatisticsModel;
 }
 
 const model: StoreModel = {
@@ -21,6 +23,7 @@ const model: StoreModel = {
   connectWalletModel,
   safeModel,
   votingModel,
+  statisticsModel,
 };
 
 export default model;
