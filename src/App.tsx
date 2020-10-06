@@ -20,6 +20,7 @@ import Shared from './containers/Shared';
 import Web3ReactManager from './components/Web3ReactManager';
 import SafeDetails from './containers/OnBoarding/SafeDetails';
 import EmergencyShutdown from './containers/EmergencyShutdown';
+import Statistics from './containers/Statistics';
 
 declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}
@@ -45,8 +46,9 @@ function App() {
               <Web3ReactManager>
                 <Switch>
                   <Route exact component={EmergencyShutdown} path={'/esm'} />
-                  <Route exact component={SafeDetails} path={'/:id'} />
-                  <Route exact component={OnBoarding} path={'/'} />
+                  <Route component={SafeDetails} path={'/safe/:id'} />
+                  <Route exact component={Statistics} path={'/'} />
+                  <Route exact component={OnBoarding} path={'/onboarding'} />
                   <Redirect from="*" to="/" />
                 </Switch>
               </Web3ReactManager>

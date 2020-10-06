@@ -3,6 +3,7 @@ import popupsModel, { PopupsModel } from './popupsModel';
 import walletModel, { WalletModel } from './walletModel';
 import connectWalletModel, { ConnectWalletModel } from './connectWalletModel';
 import safeModel, { SafeModel } from './safeModel';
+import statisticsModel, { StatisticsModel } from './statisticsModel';
 
 export interface StoreModel {
   settingsModel: SettingsModel;
@@ -10,6 +11,7 @@ export interface StoreModel {
   walletModel: WalletModel;
   connectWalletModel: ConnectWalletModel;
   safeModel: SafeModel;
+  statisticsModel: StatisticsModel;
 }
 
 const model: StoreModel = {
@@ -18,6 +20,7 @@ const model: StoreModel = {
   walletModel,
   connectWalletModel,
   safeModel,
+  statisticsModel,
 };
 
 export default model;

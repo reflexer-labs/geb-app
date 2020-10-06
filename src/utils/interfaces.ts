@@ -125,3 +125,11 @@ export interface IAlert {
   type: string;
   text: string;
 }
+
+export interface IStats {
+  accountingEngine: { surplusBuffer: string; };
+  collateralType: { debtCeiling: string; stabilityFee: string; totalCollateral: string; };
+  redemptionRates: Array<{ value: string; }>;
+  redemptionPrices: Array<{ value: string; }>;
+  systemState: { globalDebt: string; globalDebtCeiling: string; safeCount: string; unmanagedSafeCount: string; };
+}

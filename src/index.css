@@ -13,3 +13,12 @@ body {
 a {
   text-decoration: none;
 }
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #EEF3F9;
+  margin-bottom: 1.5rem;
+  padding: 0;
+}

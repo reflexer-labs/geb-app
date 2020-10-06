@@ -68,5 +68,8 @@
   "no_history": "No historical transactions.",
   "new_safe": "New Safe",
   "request_features": "Request features",
-  "talk_to_us": "Talk to us"
+  "talk_to_us": "Talk to us",
+  "statistics": "Statistics",
+  "statistics_header_text": "Overview of the Reflexer ecosystem",
+  "fetching_statistics": "Fetching statistics..."
 }
