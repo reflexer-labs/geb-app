@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "69bf54256f127c9be24fc561c856f367",
+    "revision": "47f407e55faf300b568053ec84bcf87e",
     "url": "/geb-frontend/index.html"
   },
   {
-    "revision": "a89221daa6022b015df9",
+    "revision": "e888b5c79e1141929281",
     "url": "/geb-frontend/static/css/main.46a6af4c.chunk.css"
   },
   {
@@ -44,8 +44,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/geb-frontend/static/js/7.78f572b2.chunk.js"
   },
   {
-    "revision": "a89221daa6022b015df9",
-    "url": "/geb-frontend/static/js/main.5082c85c.chunk.js"
+    "revision": "e888b5c79e1141929281",
+    "url": "/geb-frontend/static/js/main.8567a4b1.chunk.js"
   },
   {
     "revision": "c9d0010c5c15bb0dcb79",
