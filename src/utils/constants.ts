@@ -8,15 +8,11 @@ const {
   REACT_APP_NETWORK_ID
 } = process.env;
 
-export const DEFAULT_NETWORK_ID = REACT_APP_NETWORK_ID
-  ? parseInt(REACT_APP_NETWORK_ID)
-  : 1;
+export const DEFAULT_NETWORK_ID = parseInt(REACT_APP_NETWORK_ID ?? '1');
+export const GRAPH_API_URL = REACT_APP_GRAPH_API_URL ??
+  'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai';
 
 export const NetworkContextName = 'NETWORK';
-
-export const GRAPH_API_URL = REACT_APP_GRAPH_API_URL ?
-  REACT_APP_GRAPH_API_URL
-  : 'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai';
 
 export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
   INJECTED: {

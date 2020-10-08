@@ -40,7 +40,7 @@ function App() {
       <ThemeProvider theme={isLightTheme ? lightTheme : darkTheme}>
         <GlobalStyle bodyOverflow={bodyOverflow} />
         <ErrorBoundary>
-          <Router basename={'geb-frontend'}>
+          <Router>
             <Shared />
             <Suspense fallback={null}>
               <Web3ReactManager>

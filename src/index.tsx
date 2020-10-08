@@ -2,11 +2,19 @@ import React from 'react';
 import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core';
 import ReactDOM from 'react-dom';
 import { StoreProvider } from 'easy-peasy';
-import './index.css';
+
+// App
 import App from './App';
+
+// Redux
 import store from './store';
+
+// Utils
 import { NetworkContextName } from './utils/constants';
 import getLibrary from './utils/getLibrary';
+
+// Styles
+import './index.css';
 
 const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName);
 
