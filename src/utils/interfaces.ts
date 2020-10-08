@@ -125,3 +125,12 @@ export interface IAlert {
   type: string;
   text: string;
 }
+
+export interface IVotingTx {
+  id: string;
+  date: string;
+  title: string;
+  text?: string;
+  endsIn: string;
+  isCompleted: boolean;
+}

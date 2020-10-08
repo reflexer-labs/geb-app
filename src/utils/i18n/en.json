@@ -68,5 +68,7 @@
   "no_history": "No historical transactions.",
   "new_safe": "New Safe",
   "request_features": "Request features",
-  "talk_to_us": "Talk to us"
+  "talk_to_us": "Talk to us",
+  "voting_header_text": "Protest against scheduled governance transactions",
+  "delay_transaction": "Delay Transaction"
 }
