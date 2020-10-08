@@ -34,12 +34,8 @@ const NavLinks = () => {
         {t('ESM')}
       </NavBarLink>
 
-      <SepBlock>
-        <NavBarLink
-          className="disableDesktop"
-          to=""
-          onClick={(e) => handleLinkClick(e, false)}
-        >
+      <SepBlock className="disableDesktop">
+        <NavBarLink to="" onClick={(e) => handleLinkClick(e, false)}>
           {t('request_features')}
         </NavBarLink>
 
@@ -52,11 +48,7 @@ const NavLinks = () => {
           {t('settings')}
         </NavBarBtn>
 
-        <NavBarLink
-          className="disableDesktop"
-          to=""
-          onClick={(e) => handleLinkClick(e, true)}
-        >
+        <NavBarLink to="" onClick={(e) => handleLinkClick(e, true)}>
           {t('talk_to_us')}
         </NavBarLink>
       </SepBlock>
@@ -112,11 +104,6 @@ const NavBarLink = styled(NavLink)`
   &:last-child {
     margin-right: 0;
   }
-  @media (min-width: 768px) {
-    &.disableDesktop {
-      display: none;
-    }
-  }
 `;
 
 const NavBarBtn = styled.div`
@@ -153,5 +140,11 @@ const SepBlock = styled.div`
     padding-top: 10px;
     padding-bottom: 10px;
     color: ${(props) => props.theme.colors.secondary} !important;
+  }
+
+  @media (min-width: 768px) {
+    &.disableDesktop {
+      display: none;
+    }
   }
 `;
