@@ -3,14 +3,20 @@ import { css } from 'styled-components';
 import { injected, walletconnect, walletlink } from '../connectors';
 import { WalletInfo } from './interfaces';
 
-export const DEFAULT_NETWORK_ID = process.env.REACT_APP_NETWORK_ID
-  ? parseInt(process.env.REACT_APP_NETWORK_ID)
+const {
+  REACT_APP_GRAPH_API_URL,
+  REACT_APP_NETWORK_ID
+} = process.env;
+
+export const DEFAULT_NETWORK_ID = REACT_APP_NETWORK_ID
+  ? parseInt(REACT_APP_NETWORK_ID)
   : 1;
 
 export const NetworkContextName = 'NETWORK';
 
-// TODO: Make it configurable based on the network
-export const GRAPH_API_URL = 'https://api.thegraph.com/subgraphs/name/reflexer-labs/rai-kovan';
+export const GRAPH_API_URL = REACT_APP_GRAPH_API_URL ?
+  REACT_APP_GRAPH_API_URL
+  : 'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai';
 
 export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
   INJECTED: {

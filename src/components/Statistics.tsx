@@ -26,9 +26,10 @@ const Statistics = () => {
   }, [popupsActions, statisticsActions, t])
 
   const { stats } = statisticsState
-  const borrowRate = stats ? formatNumber(stats.redemptionPrices[0].value) : 0
+  const dsmPrice = stats ? formatNumber(stats.fsmUpdates[0].value) : 0
   const globalDebtCeiling = stats ? formatNumber(stats.systemState.globalDebtCeiling) : 0
   const outstandingPrai = stats ? formatNumber(stats.systemState.globalDebt) : 0
+  const redemptionPrice = stats ? formatNumber(stats.redemptionPrices[0].value) : 0
   const redemptionRate = stats ? new BigNumber(stats.redemptionRates[0].value).minus(1).div(100).toFixed() : 0
   const safesOpen = stats ? Number(stats.systemState.safeCount) + Number(stats.systemState.unmanagedSafeCount) : 0
   const totalEthLocked = stats ? formatNumber(stats.collateralType.totalCollateral) : 0
@@ -59,7 +60,7 @@ const Statistics = () => {
 
         <StatItem>
           <StateInner>
-            <Value>{borrowRate}</Value>
+            <Value>NA</Value>
             <Label>{'Annual Borrow Rate'}</Label>
           </StateInner>
         </StatItem>
@@ -94,14 +95,14 @@ const Statistics = () => {
 
         <StatItem>
           <StateInner>
-            <Value>NA</Value>
+            <Value>{dsmPrice}</Value>
             <Label>{'PRAI Market Price (DSM)'}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem>
           <StateInner>
-            <Value>NA</Value>
+            <Value>{redemptionPrice}</Value>
             <Label>{'PRAI Redemption Price'}</Label>
           </StateInner>
         </StatItem>
