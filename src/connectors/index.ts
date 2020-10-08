@@ -19,17 +19,13 @@ import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 import { NetworkConnector } from './NetworkConnector';
 
-const NETWORK_URL = process.env.REACT_APP_NETWORK_URL;
+const {
+  REACT_APP_CHAIN_ID,
+  REACT_APP_NETWORK_URL
+} = process.env;
 
-export const NETWORK_CHAIN_ID: number = parseInt(
-  process.env.REACT_APP_CHAIN_ID ?? '1'
-);
-
-if (typeof NETWORK_URL === 'undefined') {
-  throw new Error(
-    `REACT_APP_NETWORK_URL must be a defined environment variable`
-  );
-}
+export const NETWORK_URL = REACT_APP_NETWORK_URL ?? 'https://kovan.infura.io/v3/645c2c65dd8f4be18a50a0bf011bab85';
+export const NETWORK_CHAIN_ID = parseInt(REACT_APP_CHAIN_ID ?? '1');
 
 export const network = new NetworkConnector({
   urls: { [NETWORK_CHAIN_ID]: NETWORK_URL },
