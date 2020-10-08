@@ -14,8 +14,7 @@ const SafeDetails = () => {
     <>
       <GridContainer>
         <PageHeader
-          title={t('accounts')}
-          subtitle={`Safe #${safeState.singleSafe && safeState.singleSafe.id}`}
+          breadcrumbs={{ '/': t('accounts'), '': `#${safeState.list[0].id}` }}
           text={t('accounts_header_text')}
         />
         {safeState.singleSafe ? (

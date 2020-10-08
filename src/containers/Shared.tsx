@@ -19,31 +19,29 @@ import { ETHERSCAN_PREFIXES } from '../utils/constants';
 import { useActiveWeb3React } from '../hooks';
 import LoadingModal from '../components/Modals/LoadingModal';
 import SafeOperationsModal from '../components/Modals/SafeOperationsModal';
+import ESMOperationModal from '../components/Modals/ESMOperationModal';
 
 const Shared = () => {
   const { t } = useTranslation();
   const { chainId, account } = useActiveWeb3React();
+  const { popupsModel: popupsState } = useStoreState((state) => state);
   const {
-    popupsModel: popupsState,
-    connectWalletModel: connectWallet,
-  } = useStoreState((state) => state);
-  const {
-    connectWalletModel: connectWalletActions,
+    popupsModel: popupsActions,
     walletModel: walletActions,
   } = useStoreActions((state) => state);
-  const { sideToastPayload } = popupsState;
-  const { networkWarning } = connectWallet;
+  const { sideToastPayload, alertPayload } = popupsState;
 
   const networkChecker = (id: ChainId) => {
     if (chainId && chainId !== id) {
       const chainName = ETHERSCAN_PREFIXES[id];
-      connectWalletActions.setNetworkWarning(
-        `${t('wrong_network')} ${capitalizeName(
+      popupsActions.setAlertPayload({
+        type: 'danger',
+        text: `${t('wrong_network')} ${capitalizeName(
           chainName === '' ? 'Mainnet' : chainName
-        )}`
-      );
+        )}`,
+      });
     } else {
-      connectWalletActions.setNetworkWarning('');
+      popupsActions.setAlertPayload(null);
     }
   };
 
@@ -61,7 +59,7 @@ const Shared = () => {
 
   return (
     <>
-      {popupsState.showSideMenu ? <SideMenu /> : null}
+      <SideMenu />
 
       <SideToast {...sideToastPayload} />
       <WalletModal />
@@ -69,17 +67,18 @@ const Shared = () => {
       <BalanceUpdater />
       <SettingsModal />
       <LoadingModal />
+      <ESMOperationModal />
       <SafeOperationsModal />
       <CreateAccountModal />
       <ConnectedWalletModal />
       <ScreenLoader />
       <Navbar />
 
-      {networkWarning ? (
+      {alertPayload ? (
         <Alerts
-          text={networkWarning}
+          text={alertPayload.text}
           margin={'10px auto 0 auto'}
-          type={'danger'}
+          type={alertPayload.type}
         />
       ) : null}
     </>

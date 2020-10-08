@@ -1,5 +1,10 @@
 import { action, Action } from 'easy-peasy';
-import { IOperation, LoadingPayload, ToastPayload } from '../utils/interfaces';
+import {
+  IAlert,
+  IOperation,
+  LoadingPayload,
+  ToastPayload,
+} from '../utils/interfaces';
 
 export interface PopupsModel {
   isSettingsModalOpen: boolean;
@@ -9,6 +14,8 @@ export interface PopupsModel {
   isConnectorsWalletOpen: boolean;
   showSideMenu: boolean;
   isScreenModalOpen: boolean;
+  alertPayload: IAlert | null;
+  ESMOperationPayload: IOperation;
   safeOperationPayload: IOperation;
   isLoadingModalOpen: LoadingPayload;
   sideToastPayload: ToastPayload;
@@ -23,6 +30,8 @@ export interface PopupsModel {
   setIsConnectorsWalletOpen: Action<PopupsModel, boolean>;
   setIsLoadingModalOpen: Action<PopupsModel, LoadingPayload>;
   setSafeOperationPayload: Action<PopupsModel, IOperation>;
+  setAlertPayload: Action<PopupsModel, IAlert | null>;
+  setESMOperationPayload: Action<PopupsModel, IOperation>;
 }
 
 const popupsModel: PopupsModel = {
@@ -32,6 +41,14 @@ const popupsModel: PopupsModel = {
   isConnectedWalletModalOpen: false,
   isScreenModalOpen: false,
   safeOperationPayload: {
+    isOpen: false,
+    type: '',
+  },
+  alertPayload: {
+    type: '',
+    text: '',
+  },
+  ESMOperationPayload: {
     isOpen: false,
     type: '',
   },
@@ -83,6 +100,12 @@ const popupsModel: PopupsModel = {
   }),
   setSafeOperationPayload: action((state, payload) => {
     state.safeOperationPayload = payload;
+  }),
+  setAlertPayload: action((state, payload) => {
+    state.alertPayload = payload;
+  }),
+  setESMOperationPayload: action((state, payload) => {
+    state.ESMOperationPayload = payload;
   }),
 };
 

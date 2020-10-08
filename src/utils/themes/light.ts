@@ -39,6 +39,7 @@ const lightTheme: Theme = {
     borderRadius: '4px',
     extraCurvedRadius: '20px',
     buttonPadding: '8px 16px',
+    modalWidth: '720px',
   },
   mediaWidth: mediaWidthTemplates,
 };

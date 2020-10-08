@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 interface Props {
-  text: string;
+  text?: string;
   onClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void;
   dimmed?: boolean;
   withArrow?: boolean;
   disabled?: boolean;
   dimmedWithArrow?: boolean;
   isBordered?: boolean;
+  arrowPlacement?: string;
+  children?: ReactNode;
 }
 
 const Button = ({
@@ -20,39 +22,53 @@ const Button = ({
   disabled,
   dimmedWithArrow,
   isBordered,
+  arrowPlacement = 'left',
+  children,
 }: Props) => {
   const returnType = () => {
     if (dimmed) {
       return (
         <DimmedBtn disabled={disabled} onClick={onClick}>
-          {t(text)}
+          {text && t(text)}
         </DimmedBtn>
       );
     }
     if (dimmedWithArrow) {
       return (
         <DimmedBtn disabled={disabled} onClick={onClick}>
-          <img src={process.env.PUBLIC_URL + '/img/dark-arrow.svg'} alt={''} />{' '}
-          {t(text)}
+          {arrowPlacement === 'left' ? (
+            <img
+              src={process.env.PUBLIC_URL + '/img/dark-arrow.svg'}
+              alt={''}
+            />
+          ) : null}
+          {text && t(text)}
+          {arrowPlacement === 'right' ? (
+            <img
+              className="rotate"
+              src={process.env.PUBLIC_URL + '/img/dark-arrow.svg'}
+              alt={''}
+            />
+          ) : null}
         </DimmedBtn>
       );
     } else if (withArrow) {
       return (
         <ArrowBtn disabled={disabled} onClick={onClick}>
-          {t(text)}{' '}
+          {text && t(text)}{' '}
           <img src={process.env.PUBLIC_URL + '/img/arrow.svg'} alt={''} />
         </ArrowBtn>
       );
     } else if (isBordered) {
       return (
         <BorderedBtn disabled={disabled} onClick={onClick}>
-          <Inner>{t(text)}</Inner>
+          <Inner> {text && t(text)}</Inner>
         </BorderedBtn>
       );
     } else {
       return (
         <Container disabled={disabled} onClick={onClick}>
-          {t(text)}
+          {text && t(text)} {children ? children : null}
         </Container>
       );
     }
@@ -80,6 +96,9 @@ const Container = styled.button`
   &:hover {
     opacity: 0.8;
   }
+  &:disabled {
+    cursor: not-allowed;
+  }
 `;
 
 const DimmedBtn = styled.button`
@@ -99,10 +118,18 @@ const DimmedBtn = styled.button`
   align-items: center;
   img {
     margin-right: 3px;
+    &.rotate {
+      transform: rotate(180deg);
+      margin-right: 0;
+      margin-left: 3px;
+    }
   }
   transition: all 0.3s ease;
   &:hover {
     opacity: 0.8;
+  }
+  &:disabled {
+    cursor: not-allowed;
   }
 `;
 
@@ -145,6 +172,9 @@ const BorderedBtn = styled.button`
   outline: none;
   border: 0;
   cursor: pointer;
+  &:disabled {
+    cursor: not-allowed;
+  }
 `;
 
 const Inner = styled.div`

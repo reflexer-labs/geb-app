@@ -40,6 +40,7 @@ interface IGlobal {
   borderRadius: string;
   extraCurvedRadius: string;
   buttonPadding: string;
+  modalWidth: string;
 }
 
 interface IMediaWidth {
@@ -118,4 +119,9 @@ export interface LoadingPayload {
 export interface IOperation {
   isOpen: boolean;
   type: string;
+}
+
+export interface IAlert {
+  type: string;
+  text: string;
 }

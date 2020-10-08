@@ -29,9 +29,14 @@ const SettingsPopup = () => {
         <SettingsButton onClick={() => setIsOpen(!isOpen)}>
           <SettingsIcon />
         </SettingsButton>
-        <Menu className={isOpen ? 'isOpen' : ''}>
-          <SettingsContent />
-        </Menu>
+        {isOpen ? (
+          <>
+            <CaretImg src={process.env.PUBLIC_URL + '/img/caret-up.svg'} />
+            <Menu>
+              <SettingsContent />
+            </Menu>
+          </>
+        ) : null}
       </InnerContent>
     </>
   );
@@ -48,14 +53,17 @@ const Menu = styled.div`
   border-radius: ${(props) => props.theme.global.borderRadius};
   border: 1px solid ${(props) => props.theme.colors.border};
   padding: 20px;
-  display: none;
   position: absolute;
-  top: 70px;
+  top: 65px;
   right: 0;
   width: 300px;
-  &.isOpen {
-    display: block;
-  }
+`;
+
+const CaretImg = styled.img`
+  position: absolute;
+  top: 57px;
+  right: 5px;
+  z-index: 1;
 `;
 
 const SettingsButton = styled.button`

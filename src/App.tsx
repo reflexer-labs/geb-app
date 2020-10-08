@@ -13,12 +13,13 @@ import { useStoreState } from './store';
 import { darkTheme } from './utils/themes/dark';
 import { lightTheme } from './utils/themes/light';
 import { Theme } from './utils/interfaces';
-import OnBoarding from './containers/OnBoarding/OnBoarding';
+import OnBoarding from './containers/OnBoarding';
 import { initI18n } from './utils/i18n';
 import GlobalStyle from './GlobalStyle';
 import Shared from './containers/Shared';
 import Web3ReactManager from './components/Web3ReactManager';
 import SafeDetails from './containers/OnBoarding/SafeDetails';
+import EmergencyShutdown from './containers/EmergencyShutdown';
 
 declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}
@@ -43,7 +44,8 @@ function App() {
             <Suspense fallback={null}>
               <Web3ReactManager>
                 <Switch>
-                  <Route component={SafeDetails} path={'/:id'} />
+                  <Route exact component={EmergencyShutdown} path={'/esm'} />
+                  <Route exact component={SafeDetails} path={'/:id'} />
                   <Route exact component={OnBoarding} path={'/'} />
                   <Redirect from="*" to="/" />
                 </Switch>

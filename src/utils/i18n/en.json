@@ -56,5 +56,17 @@
   "withdraw": "Withdraw",
   "repay": "Repay",
   "borrow": "Borrow",
-  "history": "History"
+  "history": "History",
+  "esm_text": "Trigger settlement or redeem collateral",
+  "emergency_shutdown": "Emergency Shutdown",
+  "start_shutdown": "Start Shutdown",
+  "redeem": "Redeem",
+  "date": "Date",
+  "claim": "Claim",
+  "burn_and_trigger": "Burn and Trigger Shutdown",
+  "burn": "Burn",
+  "no_history": "No historical transactions.",
+  "new_safe": "New Safe",
+  "request_features": "Request features",
+  "talk_to_us": "Talk to us"
 }

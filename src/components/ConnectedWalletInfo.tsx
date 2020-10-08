@@ -62,7 +62,7 @@ const ConnectedWalletInfo = () => {
         </Connection>
 
         <Address>
-          <ConnectedWalletIcon />
+          <ConnectedWalletIcon size={20} />
           {account && active ? returnWalletAddres(account) : 'N/A'}
         </Address>
         {account && active ? (

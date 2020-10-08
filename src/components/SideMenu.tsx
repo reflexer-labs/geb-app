@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
 import { amountToFiat, returnWalletAddres } from '../utils/helper';
@@ -7,14 +7,18 @@ import NavLinks from './NavLinks';
 import { useTranslation } from 'react-i18next';
 import { useWeb3React } from '@web3-react/core';
 import ConnectedWalletIcon from './ConnectedWalletIcon';
+import { CSSTransition } from 'react-transition-group';
 
 const SideMenu = () => {
   const { t } = useTranslation();
+  const nodeRef = React.useRef(null);
   const { active, account, chainId } = useWeb3React();
+  const [isOpen, setIsOpen] = useState(false);
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
-  const { connectWalletModel: connectWalletState } = useStoreState(
-    (state) => state
-  );
+  const {
+    connectWalletModel: connectWalletState,
+    popupsModel: popupsState,
+  } = useStoreState((state) => state);
 
   const handleWalletConnect = () =>
     popupsActions.setIsConnectorsWalletOpen(true);
@@ -27,36 +31,58 @@ const SideMenu = () => {
     }
     return 0;
   };
-  return (
-    <Container>
-      <BtnContainer>
-        <CloseBtn onClick={() => popupsActions.setShowSideMenu(false)}>
-          &times;
-        </CloseBtn>
-      </BtnContainer>
-      <AccountBalance>
-        {active && account ? (
-          <Account
-            onClick={() => popupsActions.setIsConnectedWalletModalOpen(true)}
-          >
-            <ConnectedWalletIcon size={40} />
-            <AccountData>
-              <Address>{returnWalletAddres(account)}</Address>
-              <Balance>{`$ ${renderBalance()}`}</Balance>
-            </AccountData>
-          </Account>
-        ) : (
-          <ConnectBtnContainer>
-            <Icon src={process.env.PUBLIC_URL + '/img/LogoIcon.png'} />
-            <Title>{t('welcome_reflexer')}</Title>
-            <Text>{t('connect_text')}</Text>
-            <Button onClick={handleWalletConnect} text={'connect_wallet'} />
-          </ConnectBtnContainer>
-        )}
-      </AccountBalance>
-      <NavLinks />
-    </Container>
-  );
+
+  useEffect(() => {
+    setIsOpen(popupsState.showSideMenu);
+  }, [popupsState.showSideMenu]);
+
+  return isOpen ? (
+    <CSSTransition
+      in={isOpen}
+      timeout={300}
+      appear={isOpen}
+      nodeRef={nodeRef}
+      classNames="fade"
+      unmountOnExit
+      mountOnEnter
+    >
+      <Container ref={nodeRef}>
+        <Inner>
+          <Overlay onClick={() => popupsActions.setShowSideMenu(false)} />
+
+          <InnerContainer>
+            <AccountBalance>
+              {active && account ? (
+                <Account
+                  onClick={() => {
+                    popupsActions.setIsConnectedWalletModalOpen(true);
+                    popupsActions.setShowSideMenu(false);
+                  }}
+                >
+                  <ConnectedWalletIcon size={40} />
+                  <AccountData>
+                    <Address>{returnWalletAddres(account)}</Address>
+                    <Balance>{`$ ${renderBalance()}`}</Balance>
+                  </AccountData>
+                </Account>
+              ) : (
+                <ConnectBtnContainer>
+                  <Icon src={process.env.PUBLIC_URL + '/img/LogoIcon.png'} />
+                  <Title>{t('welcome_reflexer')}</Title>
+                  <Text>{t('connect_text')}</Text>
+                  <Button
+                    onClick={handleWalletConnect}
+                    text={'connect_wallet'}
+                  />
+                </ConnectBtnContainer>
+              )}
+            </AccountBalance>
+            <NavLinks />
+          </InnerContainer>
+        </Inner>
+      </Container>
+    </CSSTransition>
+  ) : null;
 };
 
 export default SideMenu;
@@ -67,12 +93,40 @@ const Container = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background: ${(props) => props.theme.colors.background};
   z-index: 997;
+  overflow-y: auto;
+
+  &.fade-appear {
+    opacity: 0;
+  }
+  &.fade-appear-active {
+    opacity: 1;
+    transition: all 300ms;
+  }
 `;
 
-const BtnContainer = styled.div`
-  text-align: right;
+const Inner = styled.div`
+  position: relative;
+`;
+
+const Overlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100vh;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+`;
+
+const InnerContainer = styled.div`
+  min-height: 100vh;
+  width: calc(100% - 50px);
+  background: ${(props) => props.theme.colors.background};
+  padding-bottom: 1rem;
+  position: relative;
+  z-index: 2;
+  margin-left: auto;
 `;
 
 const ConnectBtnContainer = styled.div`
@@ -80,28 +134,9 @@ const ConnectBtnContainer = styled.div`
   width: 100%;
 `;
 
-const CloseBtn = styled.button`
-  background: none;
-  border: 0;
-  box-shadow: none;
-  outline: none;
-  cursor: pointer;
-  color: ${(props) => props.theme.colors.primary};
-  font-size: 40px;
-  padding: 20px;
-  line-height: 21px;
-  transition: all 0.3s ease;
-  &:hover {
-    background: ${(props) => props.theme.colors.gradient};
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: ${(props) => props.theme.colors.inputBorderColor};
-  }
-`;
-
 const AccountBalance = styled.div`
-  padding: 50px 20px;
+  padding: 30px 20px 20px 25px;
+  margin-bottom: 15px;
 `;
 
 const Balance = styled.div`
@@ -126,12 +161,12 @@ const Address = styled.div`
 
 const Account = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   cursor: pointer;
 `;
 
 const Icon = styled.img`
-  max-width: 80px;
+  max-width: 60px;
 `;
 
 const Title = styled.div`
@@ -142,5 +177,5 @@ const Title = styled.div`
 const Text = styled.div`
   font-size: 14px;
   margin-top: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 `;

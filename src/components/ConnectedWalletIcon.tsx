@@ -10,7 +10,6 @@ interface Props {
 
 const ConnectedWalletIcon = ({ size }: Props) => {
   const { connector } = useWeb3React();
-
   function getStatusIcon() {
     if (connector === injected) {
       return (
