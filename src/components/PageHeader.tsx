@@ -1,23 +1,25 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
+interface IBC {
+  [route: string]: string;
+}
 interface Props {
-  title: string;
   text?: string;
-  subtitle?: string;
+  breadcrumbs: IBC;
 }
 
-const PageHeader = ({ title, text, subtitle }: Props) => {
+const PageHeader = ({ text, breadcrumbs }: Props) => {
   return (
     <Container>
-      <Title className={subtitle ? 'hasSub' : ''}>
-        {title}
-        {subtitle ? (
-          <SubTitleText>
+      <Title>
+        {Object.keys(breadcrumbs).map((bc: string, i: number) => (
+          <TitleBlock key={i + bc}>
+            <Link to={bc}>{breadcrumbs[bc]}</Link>
             <span>/</span>
-            {subtitle}
-          </SubTitleText>
-        ) : null}
+          </TitleBlock>
+        ))}
       </Title>
       {text ? <Text>{text}</Text> : null}
     </Container>
@@ -27,7 +29,9 @@ const PageHeader = ({ title, text, subtitle }: Props) => {
 export default PageHeader;
 
 const Container = styled.div`
-  padding: 20px 0 15px;
+  padding: 20px 0 10px;
+  border-bottom: 1px solid ${(props) => props.theme.colors.border};
+  margin-bottom: 15px;
 `;
 
 const Title = styled.h3`
@@ -36,12 +40,10 @@ const Title = styled.h3`
   font-size: 18px;
   line-height: 22px;
   letter-spacing: -0.33px;
-  color: ${(props) => props.theme.colors.primary};
+  color: ${(props) => props.theme.colors.secondary};
   margin-top: 0;
   margin-bottom: 5px;
-  &.hasSub {
-    color: ${(props) => props.theme.colors.secondary};
-  }
+  align-items: center;
 `;
 
 const Text = styled.div`
@@ -50,10 +52,22 @@ const Text = styled.div`
   color: ${(props) => props.theme.colors.secondary};
 `;
 
-const SubTitleText = styled.div`
-  color: ${(props) => props.theme.colors.primary};
+const TitleBlock = styled.div`
+  a {
+    color: inherit;
+  }
   span {
-    color: ${(props) => props.theme.colors.secondary};
-    margin: 0 8px;
+    margin: 0 5px;
+  }
+
+  &:last-child {
+    color: ${(props) => props.theme.colors.primary};
+    a {
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    span {
+      display: none;
+    }
   }
 `;

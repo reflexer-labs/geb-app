@@ -126,6 +126,7 @@ const Container = styled.div`
   height: 100%;
   z-index: 999;
   overflow-y: auto;
+  overflow-x: hidden;
   &.fade-appear {
     opacity: 0;
   }
@@ -142,7 +143,7 @@ const InnerContent = styled.div`
   min-height: 100vh;
   position: relative;
 
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
     padding: 50px 20px;
   `}
 `;

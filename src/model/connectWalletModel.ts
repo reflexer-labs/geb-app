@@ -6,9 +6,7 @@ export interface ConnectWalletModel {
   blockNumber: IBlockNumber;
   fiatPrice: number;
   ethBalance: IEthBalance;
-  networkWarning: string;
   fetchFiatPrice: Thunk<ConnectWalletModel>;
-  setNetworkWarning: Action<ConnectWalletModel, string>;
   setFiatPrice: Action<ConnectWalletModel, number>;
   updateBlockNumber: Action<
     ConnectWalletModel,
@@ -24,13 +22,9 @@ const connectWalletModel: ConnectWalletModel = {
   blockNumber: {},
   ethBalance: {},
   fiatPrice: 0,
-  networkWarning: '',
   fetchFiatPrice: thunk(async (actions, payload) => {
     const fiatPrice = await api.fetchFiatPrice();
     actions.setFiatPrice(fiatPrice);
-  }),
-  setNetworkWarning: action((state, payload) => {
-    state.networkWarning = payload;
   }),
   setFiatPrice: action((state, payload) => {
     state.fiatPrice = payload;

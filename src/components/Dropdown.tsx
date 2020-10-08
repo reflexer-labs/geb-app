@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import Scrollbars from 'react-custom-scrollbars';
 import styled from 'styled-components';
 
 interface Props {
@@ -71,23 +72,33 @@ const Dropdown = (props: Props) => {
             <span>{extraWord}</span> {selectedItem}
           </span>
 
-          <CaretIcon
-            src={process.env.PUBLIC_URL + '/img/caret.png'}
-            className={isOpen ? 'up' : ''}
-          />
+          {items.length > 0 ? (
+            <CaretIcon
+              src={process.env.PUBLIC_URL + '/img/caret.png'}
+              className={isOpen ? 'up' : ''}
+            />
+          ) : null}
         </DropdownBtn>
-        <DropdownMenu
-          style={{
-            display: isOpen ? 'block' : 'none',
-            minWidth: minWidth || '100%',
-          }}
-        >
-          {items.map((item: string, index: number) => (
-            <DropDownItem key={index} onClick={() => handleItemClick(item)}>
-              {item}
-            </DropDownItem>
-          ))}
-        </DropdownMenu>
+        {items.length > 0 ? (
+          <DropdownMenu
+            style={{
+              display: isOpen ? 'block' : 'none',
+              minWidth: minWidth || '100%',
+            }}
+          >
+            <Scrollbars
+              style={{ width: '100%' }}
+              autoHeight
+              autoHeightMax={185}
+            >
+              {items.map((item: string, index: number) => (
+                <DropDownItem key={index} onClick={() => handleItemClick(item)}>
+                  {item}
+                </DropDownItem>
+              ))}
+            </Scrollbars>
+          </DropdownMenu>
+        ) : null}
       </InnerContainer>
     </Container>
   );
@@ -143,8 +154,6 @@ const DropdownMenu = styled.div`
   border: 1px solid ${(props) => props.theme.colors.border};
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.02);
   text-align: left;
-  max-height: 350px;
-  overflow-y: auto;
 `;
 
 const DropDownItem = styled.div`

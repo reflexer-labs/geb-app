@@ -186,7 +186,7 @@ const DoubleInput = styled.div`
     }
   }
 
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
     flex-direction: column;
     > div {
       flex: 0 0 100%;

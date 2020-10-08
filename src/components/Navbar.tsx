@@ -7,6 +7,7 @@ import SettingsPopup from './SettingsPopup';
 import { returnWalletAddres } from '../utils/helper';
 import NavLinks from './NavLinks';
 import { useWeb3React } from '@web3-react/core';
+import NotificationPopup from './NotificationPopup';
 
 const Navbar = () => {
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
@@ -21,7 +22,14 @@ const Navbar = () => {
 
   return (
     <Container>
-      <Brand />
+      <Left>
+        <Brand />
+        {active && account ? (
+          <NotificationContainer>
+            <NotificationPopup />
+          </NotificationContainer>
+        ) : null}
+      </Left>
       <HideMobile>
         <NavLinks />
       </HideMobile>
@@ -80,13 +88,13 @@ const MenuBtn = styled.div`
       }
     }
   }
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
     display: flex;
   `}
 `;
 const BtnContainer = styled.div`
   margin-right: 20px;
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
     display: none;
   `}
 `;
@@ -111,7 +119,17 @@ const RightSide = styled.div`
 `;
 
 const HideMobile = styled.div`
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
     display: none;
   `}
+`;
+
+const Left = styled.div`
+  min-width: 194px;
+  display: flex;
+  align-items: center;
+`;
+
+const NotificationContainer = styled.div`
+  margin-left: 34px;
 `;

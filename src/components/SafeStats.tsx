@@ -107,7 +107,7 @@ const StatsGrid = styled.div`
   display: flex;
   margin: 0 -7.5px;
   flex-wrap: wrap;
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
     margin: 0;
   `}
 `;
@@ -119,7 +119,7 @@ const StatItem = styled.div`
   &.w50 {
     flex: 0 0 50%;
   }
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
     flex: 0 0 50%;
     padding: 0;
     &:nth-child(1),
@@ -156,7 +156,7 @@ const Value = styled.div`
   line-height: 27px;
   letter-spacing: -0.69px;
   font-weight: 600;
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
     font-size: ${(props) => props.theme.font.medium};
  `}
 `;
@@ -166,7 +166,7 @@ const Label = styled.div`
   line-height: 21px;
   letter-spacing: -0.09px;
   margin-top: 8px;
-  ${({ theme }) => theme.mediaWidth.upToMedium`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
     font-size: ${(props) => props.theme.font.extraSmall};
   `}
 `;
