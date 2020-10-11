@@ -2,13 +2,18 @@ import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
-const Brand = () => {
+interface Props {
+  height?: number;
+}
+
+const Brand = ({ height = 25.49 }: Props) => {
   return (
     <Container>
       <Link to="/">
-        <img
+        <Logo
           src={process.env.PUBLIC_URL + '/img/brand.svg'}
-          alt="reflexer labds"
+          height={height}
+          alt="Reflexer Labs"
         />
       </Link>
     </Container>
@@ -21,9 +26,9 @@ const Container = styled.div`
   a {
     color: inherit;
     text-decoration: none;
-    img {
-      width: 105.14px;
-      height: 25.49px;
-    }
   }
+`;
+
+const Logo = styled.img`
+  height: ${(props) => `${props.height}px`};
 `;

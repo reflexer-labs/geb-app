@@ -20,6 +20,7 @@ import { useActiveWeb3React } from '../hooks';
 import LoadingModal from '../components/Modals/LoadingModal';
 import SafeOperationsModal from '../components/Modals/SafeOperationsModal';
 import ESMOperationModal from '../components/Modals/ESMOperationModal';
+import Footer from '../components/Footer';
 
 const Shared = () => {
   const { t } = useTranslation();
@@ -73,6 +74,7 @@ const Shared = () => {
       <ConnectedWalletModal />
       <ScreenLoader />
       <Navbar />
+      <Footer />
 
       {alertPayload ? (
         <Alerts

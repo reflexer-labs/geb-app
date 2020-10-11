@@ -22,3 +22,29 @@ hr {
   margin-bottom: 1.5rem;
   padding: 0;
 }
+
+/* Helpers */
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-uppercase {
+  text-transform: uppercase;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+.text-strike {
+  text-decoration: line-through;
+}
