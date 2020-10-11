@@ -50,11 +50,16 @@ interface IMediaWidth {
   upToLarge: ThemedCssFunction<DefaultTheme>;
 }
 
+interface IValue {
+  value: string;
+}
+
 export interface Theme {
   colors: IColors;
   font: IFonts;
   global: IGlobal;
   mediaWidth: IMediaWidth;
+  space: Array<number>;
 }
 
 export interface LangOption {
@@ -139,8 +144,16 @@ export interface IVotingTx {
 export interface IStats {
   accountingEngine: { surplusBuffer: string; };
   collateralType: { debtCeiling: string; stabilityFee: string; totalCollateral: string; };
-  fsmUpdates: Array<{ value: string; }>;
-  redemptionRates: Array<{ value: string; }>;
-  redemptionPrices: Array<{ value: string; }>;
-  systemState: { globalDebt: string; globalDebtCeiling: string; safeCount: string; unmanagedSafeCount: string; };
+  fsmUpdates: Array<IValue>;
+  systemState: {
+    currentCoinFsmUpdate: IValue;
+    currentRedemptionPrice: IValue;
+    currentRedemptionRate: { annualizedRate: string; perSecondRate: string; };
+    erc20CoinTotalSupply: string;
+    globalDebt: string;
+    globalDebtCeiling: string;
+    safeCount: string;
+    unmanagedSafeCount: string;
+  };
+  uniswapPairs: Array<{ reserve1: string; }>;
 }

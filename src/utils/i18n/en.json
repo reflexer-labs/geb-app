@@ -79,5 +79,7 @@
   "review": "Review",
   "statistics": "Statistics",
   "statistics_header_text": "Overview of the Reflexer ecosystem",
-  "fetching_statistics": "Fetching statistics..."
+  "fetching_statistics": "Fetching statistics...",
+  "submit": "Submit",
+  "invalid_email": "Please enter a valid email address"
 }

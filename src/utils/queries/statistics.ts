@@ -1,15 +1,27 @@
-// TODO: Create contract addresses constant/move to env file for better management
-const FEED_SECURITY_MODULE_PRAI_ADDRESS = '0x6572e442f6c49a23337523b3d962c358cde246c0';
-
 export default `{
-  collateralType(id: "ETH-A"){
-    # total TVL
-    totalCollateral
+  collateralType(id: "ETH-A") {
     # Ether debt ceiling
     debtCeiling
+    # Total Value Locked
+    totalCollateral
     stabilityFee
   }
   systemState(id: "current") {
+    # RAI DSM price, Uniswap RAI pool
+    currentCoinFsmUpdate {
+      value
+    }
+    # Redemption rate
+    currentRedemptionRate {
+      annualizedRate
+      perSecondRate
+    }
+    # RAI redemption price
+    currentRedemptionPrice {
+      value
+    }
+    # RAI ERC20 supply
+    erc20CoinTotalSupply
     # Outstanding RAI
     globalDebt
     # Global debt ceiling
@@ -19,20 +31,11 @@ export default `{
     # Number of unmanaged safes
     unmanagedSafeCount
   }
-  # Redemption rate
-  redemptionRates(first: 1, orderBy: timestamp, orderDirection: desc) {
-    value
-  }
-  # RAI redemption price
-  redemptionPrices(first: 1, orderBy: timestamp, orderDirection: desc) {
-    value
-  }
   # System surplus
   accountingEngine(id: "current") {
     surplusBuffer
   }
-  #RAI DSM price, Uniswap RAI pool
-  fsmUpdates(where: { fsmAddress: "${FEED_SECURITY_MODULE_PRAI_ADDRESS}" }, first: 1, orderDirection: desc, orderBy: createdAt) {
-    value
+  uniswapPairs(where: { medianizerSymbol: "PRAIUSD" }) {
+    reserve1
   }
 }`
