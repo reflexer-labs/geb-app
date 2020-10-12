@@ -10,7 +10,6 @@ import Button from './Button';
 import { isValidEmail } from '../utils/validations';
 import { MAILCHIMP_URL } from '../utils/constants';
 
-
 const Footer = () => {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
@@ -64,17 +63,18 @@ const Footer = () => {
     <Container>
       <Company>
         <Brand height={40.23} />
-        <EmailInput
-          disabled={isDisabled}
-          isSubmitting={isSubmitting}
-          label={'Updates'}
-          value={email}
-          handleEmailClick={onClickSubmit}
-          onChange={onChangeInput}
-          error={error}
-          mt={3}
-        />
-        {showSuccess && <Success>{t('subscription_success')}</Success>}
+        <Subscribe>
+          <EmailInput
+            disabled={isDisabled}
+            isSubmitting={isSubmitting}
+            label={'Updates'}
+            value={email}
+            handleEmailClick={onClickSubmit}
+            onChange={onChangeInput}
+            error={error}
+          />
+          {showSuccess && <Success>{t('subscription_success')}</Success>}
+        </Subscribe>
       </Company>
       <Column className="text-right">
         <Header>Community</Header>
@@ -108,6 +108,10 @@ const Container = styled.div`
   padding: 40px 80px 100px;
   width: 100vw;
 `;
+
+const Subscribe = styled.div`
+  margin-top: 20px;
+`
 
 const Company = styled.div`
   flex-basis: 65%;

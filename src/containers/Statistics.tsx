@@ -11,7 +11,7 @@ const StatisticsContainer = () => {
     <>
       <GridContainer>
         <PageHeader
-          title={t('statistics')}
+          breadcrumbs={{ '/': t('statistics') }}
           text={t('statistics_header_text')}
         />
         <hr />

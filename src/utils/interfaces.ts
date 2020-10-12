@@ -59,7 +59,6 @@ export interface Theme {
   font: IFonts;
   global: IGlobal;
   mediaWidth: IMediaWidth;
-  space: Array<number>;
 }
 
 export interface LangOption {
