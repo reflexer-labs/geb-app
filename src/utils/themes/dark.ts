@@ -42,7 +42,6 @@ const darkTheme: Theme = {
     modalWidth: '720px',
   },
   mediaWidth: mediaWidthTemplates,
-  space: [0, 4, 8, 16, 32]
 };
 
 export { darkTheme };

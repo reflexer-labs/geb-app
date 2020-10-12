@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { space, SpaceProps } from 'styled-system';
 
 interface Props {
   text?: string;
@@ -163,6 +162,9 @@ const ArrowBtn = styled.button`
   &:hover {
     opacity: 0.8;
   }
+  img {
+    margin-left: 3px;
+  }
 `;
 
 const BorderedBtn = styled.button`
@@ -187,8 +189,4 @@ const Inner = styled.div`
   &:hover {
     opacity: 0.8;
   }
-`;
-
-const ArrowImg = styled.img<SpaceProps>`
- ${space}
 `;

@@ -2,10 +2,9 @@ import React, { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Button from './Button';
-import { space, SpaceProps } from 'styled-system';
 import Loader from './Loader';
 
-interface Props extends SpaceProps {
+interface Props {
   label: string;
   error?: string;
   icon?: string;
@@ -26,7 +25,6 @@ const EmailInput = ({
   disabled,
   handleEmailClick,
   error,
-  mt,
   isSubmitting
 }: Props) => {
   const { t } = useTranslation();
@@ -37,7 +35,7 @@ const EmailInput = ({
   };
 
   return (
-    <Container mt={mt}>
+    <Container>
       <Label>{label}</Label>
       <Content>
         {icon ? <Icon src={icon} /> : null}
@@ -64,9 +62,8 @@ const EmailInput = ({
 
 export default EmailInput;
 
-const Container = styled.div<SpaceProps>`
+const Container = styled.div`
   max-width: 300px;
-  ${space}
 `;
 
 const Label = styled.div`
