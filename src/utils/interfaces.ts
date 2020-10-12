@@ -133,4 +133,5 @@ export interface IVotingTx {
   text?: string;
   endsIn: string;
   isCompleted: boolean;
+  isAbandoned: boolean;
 }

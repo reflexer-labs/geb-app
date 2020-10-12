@@ -71,7 +71,7 @@ const SafeStats = () => {
         <StatItem className="w50">
           <StateInner>
             <Value>12,5000 RAI</Value>
-            <Label>{'ETH Deposited'}</Label>
+            <Label>{'RAI Borrowed'}</Label>
             <Actions>
               <Button
                 dimmed

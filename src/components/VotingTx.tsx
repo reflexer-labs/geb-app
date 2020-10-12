@@ -11,6 +11,26 @@ interface Props {
 
 const VotingTx = ({ tx }: Props) => {
   const { t } = useTranslation();
+
+  const returnAlert = () => {
+    if (tx.isCompleted && tx.isAbandoned) {
+      return (
+        <AlertLabel text={'Abandoned'} type={'dimmed'} padding={'4px 16px'} />
+      );
+    } else if (tx.isCompleted) {
+      return (
+        <AlertLabel text={'Completed'} type={'gradient'} padding={'4px 16px'} />
+      );
+    } else {
+      return (
+        <AlertLabel
+          text={'Scheduled for ' + tx.endsIn}
+          type={'danger'}
+          padding={'4px 16px'}
+        />
+      );
+    }
+  };
   return (
     <Container>
       <Head>
@@ -18,13 +38,7 @@ const VotingTx = ({ tx }: Props) => {
           <Title>{tx.title}</Title>
           <Date>{tx.date}</Date>
         </TitleContainer>
-        <AlertContainer>
-          <AlertLabel
-            text={tx.isCompleted ? 'Completed' : 'Scheduled for ' + tx.endsIn}
-            type={'danger'}
-            padding={'4px 16px'}
-          />
-        </AlertContainer>
+        <AlertContainer>{returnAlert()}</AlertContainer>
       </Head>
 
       {tx.text ? <Desc>{tx.text}</Desc> : null}
@@ -79,11 +93,16 @@ const Head = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+   flex-direction: column;
+   justify-content: flex-start;
+  `}
 `;
 
 const AlertContainer = styled.div`
   ${({ theme }) => theme.mediaWidth.upToExtraSmall`
     margin:10px 0 5px 0;
+    width:fit-content;
   `}
 `;
 

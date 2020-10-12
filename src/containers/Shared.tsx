@@ -20,6 +20,7 @@ import { useActiveWeb3React } from '../hooks';
 import LoadingModal from '../components/Modals/LoadingModal';
 import SafeOperationsModal from '../components/Modals/SafeOperationsModal';
 import ESMOperationModal from '../components/Modals/ESMOperationModal';
+import VotingOperationModal from '../components/Modals/VotingOperationModal';
 
 const Shared = () => {
   const { t } = useTranslation();
@@ -67,6 +68,7 @@ const Shared = () => {
       <BalanceUpdater />
       <SettingsModal />
       <LoadingModal />
+      <VotingOperationModal />
       <ESMOperationModal />
       <SafeOperationsModal />
       <CreateAccountModal />

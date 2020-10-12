@@ -72,6 +72,7 @@ export default NotificationPopup;
 
 const InnerContent = styled.div`
   position: relative;
+  z-index: 99;
 `;
 
 const Menu = styled.div`

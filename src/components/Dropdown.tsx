@@ -154,6 +154,7 @@ const DropdownMenu = styled.div`
   border: 1px solid ${(props) => props.theme.colors.border};
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.02);
   text-align: left;
+  z-index: 5;
 `;
 
 const DropDownItem = styled.div`

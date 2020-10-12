@@ -48,6 +48,18 @@ const Container = styled.div`
     color: ${(props) => props.theme.colors.warningColor};
   }
 
+  &.dimmed {
+    border: 1px solid #959595;
+    background: ${(props) => props.theme.colors.secondary};
+    color: ${(props) => props.theme.colors.neutral};
+  }
+
+  &.gradient {
+    border: 1px solid ${(props) => props.theme.colors.inputBorderColor};
+    background: ${(props) => props.theme.colors.gradient};
+    color: ${(props) => props.theme.colors.neutral};
+  }
+
   &.floated {
     position: fixed;
     width: 100%;
