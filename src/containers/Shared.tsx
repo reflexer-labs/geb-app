@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Alerts from '../components/Alerts';
 import ConnectedWalletModal from '../components/Modals/ConnectedWalletModal';
@@ -22,10 +22,20 @@ import SafeOperationsModal from '../components/Modals/SafeOperationsModal';
 import ESMOperationModal from '../components/Modals/ESMOperationModal';
 import VotingOperationModal from '../components/Modals/VotingOperationModal';
 import Footer from '../components/Footer';
+import styled from 'styled-components';
+import useWindowSize from '../hooks/useWindowSize';
 
-const Shared = () => {
+interface Props {
+  children: ReactNode;
+}
+
+const Shared = ({ children }: Props) => {
   const { t } = useTranslation();
+  const footerRef = React.useRef<HTMLDivElement>(null);
+  const navbarRef = React.useRef<HTMLDivElement>(null);
   const { chainId, account } = useActiveWeb3React();
+  const [contentHeight, setContentHeight] = useState('auto');
+  const windowSize = useWindowSize();
   const { popupsModel: popupsState } = useStoreState((state) => state);
   const {
     popupsModel: popupsActions,
@@ -59,10 +69,26 @@ const Shared = () => {
     // eslint-disable-next-line
   }, [chainId, account]);
 
-  return (
-    <>
-      <SideMenu />
+  useEffect(() => {
+    if (
+      windowSize.height &&
+      navbarRef &&
+      navbarRef.current &&
+      footerRef &&
+      footerRef.current
+    ) {
+      const footerHeight = footerRef.current.clientHeight;
+      const navbarHeight = navbarRef.current.clientHeight;
+      const height =
+        windowSize.height - (footerHeight + navbarHeight) - 20 + 'px';
+      setContentHeight(height);
+      console.log(height);
+    }
+  }, [navbarRef, footerRef, windowSize.height]);
 
+  return (
+    <Container>
+      <SideMenu />
       <SideToast {...sideToastPayload} />
       <WalletModal />
       <ApplicationUpdater />
@@ -75,9 +101,9 @@ const Shared = () => {
       <CreateAccountModal />
       <ConnectedWalletModal />
       <ScreenLoader />
-      <Navbar />
-      <Footer />
-
+      <EmptyDiv ref={navbarRef}>
+        <Navbar />
+      </EmptyDiv>
       {alertPayload ? (
         <Alerts
           text={alertPayload.text}
@@ -85,8 +111,21 @@ const Shared = () => {
           type={alertPayload.type}
         />
       ) : null}
-    </>
+       <Content minHeight={contentHeight}>{children}</Content>
+      <EmptyDiv ref={footerRef}>
+        <Footer slapToBottom />
+      </EmptyDiv>
+    </Container>
   );
 };
 
 export default Shared;
+
+const Container = styled.div`
+  min-height: 100vh;
+`;
+
+const Content = styled.div<{ minHeight: string }>`
+  min-height: ${({ minHeight }) => minHeight};
+`;
+const EmptyDiv = styled.div``;

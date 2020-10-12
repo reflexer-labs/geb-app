@@ -43,20 +43,21 @@ function App() {
         <GlobalStyle bodyOverflow={bodyOverflow} />
         <ErrorBoundary>
           <Router>
-            <Shared />
-            <Suspense fallback={null}>
-              <Web3ReactManager>
-                <Switch>
-                  <Route exact component={VoteDetails} path={'/voting/:id'} />
-                  <Route exact component={Voting} path={'/voting'} />
-                  <Route exact component={EmergencyShutdown} path={'/esm'} />
-                  <Route component={SafeDetails} path={'/safe/:id'} />
-                  <Route exact component={Statistics} path={'/'} />
-                  <Route exact component={OnBoarding} path={'/onboarding'} />
-                  <Redirect from="*" to="/" />
-                </Switch>
-              </Web3ReactManager>
-            </Suspense>
+            <Shared>
+              <Suspense fallback={null}>
+                <Web3ReactManager>
+                  <Switch>
+                    <Route exact component={EmergencyShutdown} path={'/esm'} />
+                    <Route component={SafeDetails} path={'/safe/:id'} />
+                    <Route exact component={Statistics} path={'/'} />
+                    <Route exact component={OnBoarding} path={'/onboarding'} />
+                    <Route exact component={VoteDetails} path={'/voting/:id'} />
+                    <Route exact component={Voting} path={'/voting'} />
+                    <Redirect from="*" to="/" />
+                  </Switch>
+                </Web3ReactManager>
+              </Suspense>
+            </Shared>
           </Router>
         </ErrorBoundary>
       </ThemeProvider>
