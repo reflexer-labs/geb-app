@@ -27,7 +27,7 @@ const Statistics = () => {
 
   const { stats } = statisticsState
   const annualizedRedemptionRate = stats ? new BigNumber(stats.systemState.currentRedemptionRate.annualizedRate).minus(1).div(100).toFixed() : 0
-  const dsmPrice = stats ? formatNumber(stats.systemState.currentCoinFsmUpdate.value) : 0
+  const dsmPrice = stats ? formatNumber(stats.systemState.currentCoinFsmUpdate?.value) : 0
   const erc20CoinTotalSupply = stats ? formatNumber(stats.systemState.erc20CoinTotalSupply) : 0
   const globalDebtCeiling = stats ? formatNumber(stats.systemState.globalDebtCeiling) : 0
   const outstandingPrai = stats ? formatNumber(stats.systemState.globalDebt) : 0
@@ -35,6 +35,7 @@ const Statistics = () => {
   const praiUniswapSupply = stats ? formatNumber(stats.uniswapPairs[0].reserve1) : 0
   const redemptionPrice = stats ? formatNumber(stats.systemState.currentRedemptionPrice.value) : 0
   const safesOpen = stats ? Number(stats.systemState.safeCount) + Number(stats.systemState.unmanagedSafeCount) : 0
+  const systemSurplus = stats ? stats.accountingEngine?.surplusBuffer : 0
   const totalEthLocked = stats ? formatNumber(stats.collateralType.totalCollateral) : 0
 
   return (
@@ -84,7 +85,7 @@ const Statistics = () => {
 
         <StatItem>
           <StateInner>
-            <Value>{stats?.accountingEngine?.surplusBuffer}</Value>
+            <Value>{systemSurplus}</Value>
             <Label>{'System Surplus'}</Label>
           </StateInner>
         </StatItem>

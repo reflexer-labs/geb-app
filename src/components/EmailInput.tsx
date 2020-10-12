@@ -1,18 +1,20 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { isValidEmail } from '../utils/validations';
 import Button from './Button';
 import { space, SpaceProps } from 'styled-system';
+import Loader from './Loader';
 
 interface Props extends SpaceProps {
   label: string;
+  error?: string;
   icon?: string;
   placeholder?: string;
   value: string;
   onChange: (val: string) => void;
   handleEmailClick?: () => void;
-  disabled?: boolean;
+  disabled: boolean;
+  isSubmitting: boolean;
 }
 
 const EmailInput = ({
@@ -23,20 +25,15 @@ const EmailInput = ({
   onChange,
   disabled,
   handleEmailClick,
-  mt
+  error,
+  mt,
+  isSubmitting
 }: Props) => {
   const { t } = useTranslation();
-  const [error, setError] = useState(null)
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     onChange(val);
-
-    if (val && !isValidEmail(val)) {
-      setError(t('invalid_email'));
-    } else {
-      setError(null)
-    }
   };
 
   return (
@@ -49,15 +46,18 @@ const EmailInput = ({
           type={'text'}
           value={value || ''}
           onChange={handleChange}
-          disabled={disabled}
         />
-        <Button
-          withArrow
-          text={t('submit')}
-          onClick={handleEmailClick}
-        />
+        {isSubmitting ? <Loader /> :(
+          <Button
+            withArrow
+            disabled={disabled}
+            text={t('submit')}
+            onClick={handleEmailClick}
+          />
+        )}
+
       </Content>
-      {error && <Error>{error}</Error>}
+      {error && <Error dangerouslySetInnerHTML={{ __html: error }} />}
     </Container>
   );
 };

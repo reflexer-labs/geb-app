@@ -1,23 +1,80 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import jsonp from 'jsonp';
+import qs from 'query-string';
 import Brand from './Brand';
 import EmailInput from './EmailInput';
-import { Link } from 'react-router-dom';
 import Button from './Button';
+import { isValidEmail } from '../utils/validations';
+import { MAILCHIMP_URL } from '../utils/constants';
+
 
 const Footer = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const onChangeInput = (val: string) => {
+    setEmail(val)
+    if (val && !isValidEmail(val)) {
+      setError(t('invalid_email'));
+    } else {
+      setError('')
+    }
+  }
+
+  const onClickSubmit = () => {
+    const formData = {
+      EMAIL: email,
+    };
+
+    setIsSubmitting(true);
+
+    jsonp(
+      `${MAILCHIMP_URL}&${qs.stringify(formData)}`,
+      {
+        param: 'c'
+      },
+      (err, data) => {
+        if (err) {
+          setError(err.message);
+        } else if (data.result !== 'success') {
+          setError(data.msg);
+        } else {
+          setEmail('');
+          setShowSuccess(true);
+
+          setTimeout(() => {
+            setShowSuccess(false);
+          }, 5000);
+        }
+
+        setIsSubmitting(false);
+      }
+    )
+  }
+
+  const isDisabled = !isValidEmail(email)
 
   return (
     <Container>
       <Company>
         <Brand height={40.23} />
         <EmailInput
+          disabled={isDisabled}
+          isSubmitting={isSubmitting}
           label={'Updates'}
           value={email}
-          onChange={(val: string) => setEmail(val)}
+          handleEmailClick={onClickSubmit}
+          onChange={onChangeInput}
+          error={error}
           mt={3}
         />
+        {showSuccess && <Success>{t('subscription_success')}</Success>}
       </Company>
       <Column className="text-right">
         <Header>Community</Header>
@@ -94,4 +151,9 @@ const Copyright = styled.div`
     padding: 4px 8px;
     pointer-events: none;
   }
+`;
+
+const Success = styled.p`
+  color: ${(props) => props.theme.colors.successColor};
+  font-size: ${(props) => props.theme.font.extraSmall};
 `;

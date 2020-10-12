@@ -73,5 +73,6 @@
   "statistics_header_text": "Overview of the Reflexer ecosystem",
   "fetching_statistics": "Fetching statistics...",
   "submit": "Submit",
-  "invalid_email": "Please enter a valid email address"
+  "invalid_email": "Please enter a valid email address",
+  "subscription_success": "Subscribed successfully!"
 }
