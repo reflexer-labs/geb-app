@@ -14,7 +14,6 @@ const StatisticsContainer = () => {
           breadcrumbs={{ '/': t('statistics') }}
           text={t('statistics_header_text')}
         />
-        <hr />
         <Statistics />
       </GridContainer>
     </>
