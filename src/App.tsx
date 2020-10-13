@@ -22,6 +22,7 @@ import SafeDetails from './containers/OnBoarding/SafeDetails';
 import EmergencyShutdown from './containers/EmergencyShutdown';
 import Voting from './containers/Voting';
 import VoteDetails from './containers/Voting/VoteDetails';
+import Incentives from './containers/Incentives';
 
 declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}
@@ -46,6 +47,7 @@ function App() {
             <Suspense fallback={null}>
               <Web3ReactManager>
                 <Switch>
+                  <Route exact component={Incentives} path={'/incentives'} />
                   <Route exact component={VoteDetails} path={'/voting/:id'} />
                   <Route exact component={Voting} path={'/voting'} />
                   <Route exact component={EmergencyShutdown} path={'/esm'} />

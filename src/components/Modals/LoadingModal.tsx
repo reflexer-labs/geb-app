@@ -1,7 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { useStoreState } from '../../store';
-import Loader from '../Loader';
 import Modal from './Modal';
 
 const LoadingModal = () => {
@@ -12,11 +11,15 @@ const LoadingModal = () => {
       width={'350px'}
       isModalOpen={popupsState.isLoadingModalOpen.isOpen}
       borderRadius={'20px'}
-      hideHeader
+      handleModalContent
       showXButton
+      backDropColor={'rgba(255,255,255)'}
     >
       <LoaderContainer>
-        <Loader text={popupsState.isLoadingModalOpen.text} />
+        <img src={process.env.PUBLIC_URL + '/logo192.png'} alt={''} />
+        {popupsState.isLoadingModalOpen.text ? (
+          <Text>{popupsState.isLoadingModalOpen.text}</Text>
+        ) : null}
       </LoaderContainer>
     </Modal>
   );
@@ -24,8 +27,30 @@ const LoadingModal = () => {
 
 export default LoadingModal;
 
+const zoom = keyframes`
+    0% {
+        transform: scale(1,1);
+    }
+    50% {
+        transform: scale(1.2,1.2);
+    }
+    100% {
+        transform: scale(1,1);
+    }
+`;
+
 const LoaderContainer = styled.div`
-  border: 1px solid ${(props) => props.theme.colors.border};
-  padding: 20px;
-  border-radius: 10px;
+  text-align: center;
+  img {
+    display: block;
+    width: 50px;
+    margin: 0 auto;
+    animation: ${zoom} 1.5s ease-in-out infinite;
+    animation-fill-mode: both;
+  }
+`;
+
+const Text = styled.div`
+  font-size: ${(props) => props.theme.font.small};
+  margin-top: 20px;
 `;

@@ -20,7 +20,7 @@ const NavLinks = () => {
   };
   return (
     <Nav>
-      <NavBarLink to="" onClick={(e) => handleLinkClick(e, true)}>
+      <NavBarLink to="/incentives" onClick={(e) => handleLinkClick(e, false)}>
         <DollarSign size="18" /> {t('incentives')}
       </NavBarLink>
       <NavBarLink to="/voting" onClick={(e) => handleLinkClick(e, false)}>

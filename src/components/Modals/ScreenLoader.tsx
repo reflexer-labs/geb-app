@@ -16,6 +16,7 @@ const ScreenLoader = () => {
       borderRadius={'20px'}
       closeModal={() => popupsActions.setIsScreenModalOpen(false)}
       showXButton
+      backDropColor={'rgba(255,255,255'}
     >
       <LoaderContainer>
         <Loader text={t('Initializing...')} />
