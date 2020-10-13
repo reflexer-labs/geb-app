@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import BigNumber from 'bignumber.js';
 
 // Redux
 import { useStoreActions, useStoreState } from '../store';
 
 // Utils
-import { formatNumber } from '../utils/helper';
+import { formatNumber, getRatePercentage } from '../utils/helper';
 
 const Statistics = () => {
   const { t } = useTranslation();
@@ -26,11 +25,11 @@ const Statistics = () => {
   }, [popupsActions, statisticsActions, t]);
 
   const { stats } = statisticsState;
+  const annualizedBorrowRate = stats
+    ? getRatePercentage(stats.collateralType.totalAnnualizedStabilityFee)
+    : 0;
   const annualizedRedemptionRate = stats
-    ? new BigNumber(stats.systemState.currentRedemptionRate.annualizedRate)
-        .minus(1)
-        .div(100)
-        .toFixed()
+    ? getRatePercentage(stats.systemState.currentRedemptionRate.annualizedRate)
     : 0;
   const dsmPrice =
     stats && stats.systemState.currentCoinFsmUpdate
@@ -44,12 +43,6 @@ const Statistics = () => {
     : 0;
   const outstandingPrai = stats
     ? formatNumber(stats.systemState.globalDebt)
-    : 0;
-  const perSecondRedemptionRate = stats
-    ? new BigNumber(stats.systemState.currentRedemptionRate.perSecondRate)
-        .minus(1)
-        .div(100)
-        .toFixed()
     : 0;
   const praiUniswapSupply = stats
     ? formatNumber(stats.uniswapPairs[0].reserve1)
@@ -87,14 +80,14 @@ const Statistics = () => {
 
         <StatItem className="w50Mobile">
           <StateInner>
-            <Value>{`${perSecondRedemptionRate}%`}</Value>
-            <Label>{'Per-Second Redemption Rate'}</Label>
+            <Value>{`${annualizedRedemptionRate}%`}</Value>
+            <Label>{'Annual Redemption Rate'}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem className="w50Mobile">
           <StateInner>
-            <Value>{`${annualizedRedemptionRate}%`}</Value>
+            <Value>{`${annualizedBorrowRate}%`}</Value>
             <Label>{'Annual Borrow Rate'}</Label>
           </StateInner>
         </StatItem>
