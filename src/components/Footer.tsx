@@ -9,22 +9,27 @@ import EmailInput from './EmailInput';
 import Button from './Button';
 import { isValidEmail } from '../utils/validations';
 import { MAILCHIMP_URL } from '../utils/constants';
+import { Plus } from 'react-feather';
 
-const Footer = () => {
+interface Props {
+  slapToBottom?: boolean;
+}
+const Footer = ({ slapToBottom }: Props) => {
   const { t } = useTranslation();
+  const [selectedGroup, setSelectedGroup] = useState(0);
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const onChangeInput = (val: string) => {
-    setEmail(val)
+    setEmail(val);
     if (val && !isValidEmail(val)) {
       setError(t('invalid_email'));
     } else {
-      setError('')
+      setError('');
     }
-  }
+  };
 
   const onClickSubmit = () => {
     const formData = {
@@ -36,7 +41,7 @@ const Footer = () => {
     jsonp(
       `${MAILCHIMP_URL}&${qs.stringify(formData)}`,
       {
-        param: 'c'
+        param: 'c',
       },
       (err, data) => {
         if (err) {
@@ -54,44 +59,79 @@ const Footer = () => {
 
         setIsSubmitting(false);
       }
-    )
-  }
+    );
+  };
 
-  const isDisabled = !isValidEmail(email)
+  const isDisabled = !isValidEmail(email);
 
+  const handleClick = (group: number) => {
+    if (group === selectedGroup) {
+      setSelectedGroup(0);
+    } else {
+      setSelectedGroup(group);
+    }
+  };
   return (
-    <Container>
-      <Company>
-        <Brand height={40.23} />
-        <Subscribe>
-          <EmailInput
-            disabled={isDisabled}
-            isSubmitting={isSubmitting}
-            label={'Updates'}
-            value={email}
-            handleEmailClick={onClickSubmit}
-            onChange={onChangeInput}
-            error={error}
-          />
-          {showSuccess && <Success>{t('subscription_success')}</Success>}
-        </Subscribe>
-      </Company>
-      <Column className="text-right">
-        <Header>Community</Header>
-        <LinkBtn to={'https://discord.gg/83t3xKT'}>Discord</LinkBtn>
-        <LinkBtn to={'https://twitter.com/MetaCoinProject'}>Twitter</LinkBtn>
-        <LinkBtn to={'https://t.me/joinchat/Dp-hCVfCrf1zfCP5q2VI9w'}>Telegram</LinkBtn>
-        <LinkBtn to={'https://medium.com/reflexer-labs'}>Medium</LinkBtn>
-      </Column>
-      <Column className="text-right">
-        <Header>Resources</Header>
-        <LinkBtn to={'https://github.com/reflexer-labs/whitepapers/blob/master/English/rai-english.pdf'}>Whitepaper</LinkBtn>
-        <LinkBtn to={'https://medium.com/reflexer-labs/stability-without-pegs-8c6a1cbc7fbd'}>tldr; Reflex Bonds</LinkBtn>
-        <LinkBtn to={'https://github.com/reflexer-labs'}>GitHub</LinkBtn>
-      </Column>
-      <Copyright>
+    <Container className={slapToBottom ? 'fixBottom' : ''}>
+      <UpperSection>
+        <Company className="col40">
+          <Brand height={40.23} />
+          <Subscribe>
+            <EmailInput
+              disabled={isDisabled}
+              isSubmitting={isSubmitting}
+              label={'Updates'}
+              value={email}
+              handleEmailClick={onClickSubmit}
+              onChange={onChangeInput}
+              error={error}
+            />
+            {showSuccess && <Success>{t('subscription_success')}</Success>}
+          </Subscribe>
+        </Company>
+        <Column className="col20"></Column>
+        <Column className={`col20 ${selectedGroup === 1 ? 'active' : ''}`}>
+          <Header onClick={() => handleClick(1)}>
+            Community <Plus size={16} />
+          </Header>
+          <LinksContainer>
+            <LinkBtn to={'https://discord.gg/83t3xKT'}>Discord</LinkBtn>
+            <LinkBtn to={'https://twitter.com/MetaCoinProject'}>
+              Twitter
+            </LinkBtn>
+            <LinkBtn to={'https://t.me/joinchat/Dp-hCVfCrf1zfCP5q2VI9w'}>
+              Telegram
+            </LinkBtn>
+            <LinkBtn to={'https://medium.com/reflexer-labs'}>Medium</LinkBtn>
+          </LinksContainer>
+        </Column>
+        <Column className={`col20 ${selectedGroup === 2 ? 'active' : ''}`}>
+          <Header onClick={() => handleClick(2)}>
+            Resources <Plus size={16} />
+          </Header>
+          <LinksContainer>
+            <LinkBtn
+              to={
+                'https://github.com/reflexer-labs/whitepapers/blob/master/English/rai-english.pdf'
+              }
+            >
+              Whitepaper
+            </LinkBtn>
+            <LinkBtn
+              to={
+                'https://medium.com/reflexer-labs/stability-without-pegs-8c6a1cbc7fbd'
+              }
+            >
+              TL;DR Reflex Index
+            </LinkBtn>
+            <LinkBtn to={'https://github.com/reflexer-labs'}>GitHub</LinkBtn>
+          </LinksContainer>
+        </Column>
+      </UpperSection>
+      <LowerSection>
+        <Button text={`Deployed Commit - master`} />
         <Button text="© Reflexer Labs 2020" />
-      </Copyright>
+      </LowerSection>
     </Container>
   );
 };
@@ -100,22 +140,66 @@ export default Footer;
 
 const Container = styled.div`
   background: white;
+  padding: 40px 80px 20px;
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    padding: 30px 30px;
+  `}
+`;
+
+const LinksContainer = styled.div``;
+
+const UpperSection = styled.div`
   display: flex;
   justify-content: space-between;
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-  padding: 40px 80px 100px;
-  width: 100vw;
+
+  .col40 {
+    flex: 0 0 55%;
+  }
+  .col20 {
+    flex: 0 0 15%;
+    text-align: right;
+  }
+  ${({ theme }) => theme.mediaWidth.upToLarge`
+     .col40 {
+    flex: 0 0 40%;
+  }
+  .col20 {
+    flex: 0 0 20%;
+  }
+  `}
+
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    justify-content: flex-start;
+    flex-direction: column;
+
+     .col40 {
+    flex: 0 0 100%;
+    margin-bottom:10px;
+  }
+  .col20 {
+    flex: 0 0 100%;
+    text-align: left;
+    margin-top:10px;
+    ${LinksContainer}{
+    display:none;
+    }
+
+  &.active {
+    ${LinksContainer}{
+    display:block;
+   }
+  }
+    
+  }
+ 
+  `}
 `;
 
 const Subscribe = styled.div`
   margin-top: 20px;
-`
-
-const Company = styled.div`
-  flex-basis: 65%;
 `;
+
+const Company = styled.div``;
 
 const Column = styled.div``;
 
@@ -126,6 +210,20 @@ const Header = styled.h4`
   letter-spacing: -0.18px;
   color: ${(props) => props.theme.colors.primary};
   margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  svg {
+    display: none;
+  }
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    svg {
+       display: block;
+    }
+    justify-content: flex-start;
+    cursor:pointer;
+  
+  `}
 `;
 
 const LinkBtn = styled(Link)`
@@ -136,6 +234,9 @@ const LinkBtn = styled(Link)`
   transition: all 0.3s ease;
   display: block;
   margin: 8px 0;
+  &:last-child {
+    margin-bottom: 0;
+  }
 
   &:hover {
     text-decoration: underline;
@@ -146,15 +247,24 @@ const LinkBtn = styled(Link)`
   }
 `;
 
-const Copyright = styled.div`
-  position: absolute;
-  bottom: 16px;
-  right: 80px;
-  
+const LowerSection = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 60px;
   button {
     padding: 4px 8px;
     pointer-events: none;
   }
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+   margin-top: 30px;
+   flex-direction:column;
+   justify-content: flex-start;
+   width:fit-content;
+   button {
+     margin-top:15px;
+   }
+  
+  `}
 `;
 
 const Success = styled.p`
