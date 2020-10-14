@@ -96,7 +96,7 @@ const Icon = styled.img`
 const CustomInput = styled.input`
   font-size: ${(props) => props.theme.font.small};
   transition: all 0.3s ease;
-  width: 100%;
+  width: calc(100% - 67px);
   padding-right: 10px;
   border: none;
   border-radius: 0;

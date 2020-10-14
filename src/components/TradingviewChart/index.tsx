@@ -5,6 +5,7 @@ import utc from 'dayjs/plugin/utc';
 import styled from 'styled-components';
 import usePrevious from '../../hooks/usePrevious';
 import { formattedNum } from '../../utils/helper';
+import { Play } from 'react-feather';
 
 dayjs.extend(utc);
 
@@ -24,7 +25,6 @@ const TradingViewChart = ({
   type = CHART_TYPES.BAR,
   data,
   base,
-  baseChange,
   field,
   title,
   width,
@@ -109,7 +109,7 @@ const TradingViewChart = ({
           },
         },
         localization: {
-          priceFormatter: (val: any) => formattedNum(val, true),
+          priceFormatter: (val: any) => formattedNum(val, false),
         },
       });
 
@@ -158,7 +158,8 @@ const TradingViewChart = ({
             type === CHART_TYPES.BAR && !useWeekly ? '(24hr)' : ''
           }</div>` +
           `<div style="font-size: 22px; margin: 4px 0px; color:${textColor}" >` +
-          formattedNum(base ?? 0, false);
+          formattedNum(base ?? 0, false) +
+          (type === CHART_TYPES.BAR ? '%' : '');
       };
       setLastBarText();
 
@@ -194,7 +195,8 @@ const TradingViewChart = ({
           toolTip.innerHTML =
             `<div style="font-size: 16px; margin: 4px 0px; color: ${textColor};">${title}</div>` +
             `<div style="font-size: 22px; margin: 4px 0px; color: ${textColor}">` +
-            formattedNum(price, true) +
+            formattedNum(price, false) +
+            (type === CHART_TYPES.BAR ? '%' : '') +
             '</div>' +
             '<div>' +
             dateStr +
@@ -208,7 +210,6 @@ const TradingViewChart = ({
     }
   }, [
     base,
-    baseChange,
     chartCreated,
     darkMode,
     data,
@@ -232,8 +233,34 @@ const TradingViewChart = ({
   return (
     <Wrapper>
       <div ref={ref} id={'test-id' + type} />
+      <IconWrapper>
+        <Play
+          onClick={() => {
+            chartCreated && chartCreated.timeScale().fitContent();
+          }}
+        />
+      </IconWrapper>
     </Wrapper>
   );
 };
 
 export default TradingViewChart;
+
+const IconWrapper = styled.div`
+  position: absolute;
+  right: 5px;
+  border-radius: 3px;
+  height: 16px;
+  width: 16px;
+  padding: 0px;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.colors.primary};
+
+  :hover {
+    cursor: pointer;
+    opacity: 0.7;
+  }
+`;

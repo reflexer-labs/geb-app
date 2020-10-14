@@ -282,11 +282,11 @@ const Label = styled.div`
 const ChartsContainer = styled.div`
   margin-top: 20px;
   display: flex;
-  margin: 0 -7.5px;
+  margin: 0 -7.5px 30px -7.5px;
 
   ${({ theme }) => theme.mediaWidth.upToMedium`
   flex-direction: column;
-  margin:0;
+  margin:0 0 30px 0;
   `}
 `;
 

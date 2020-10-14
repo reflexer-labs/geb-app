@@ -141,10 +141,7 @@ export default Footer;
 
 const Container = styled.div`
   background: white;
-  padding: 20px 80px 20px;
-  ${({ theme }) => theme.mediaWidth.upToMedium`
-    padding: 30px 30px;
-  `}
+  padding: 20px;
 `;
 
 const LinksContainer = styled.div``;
