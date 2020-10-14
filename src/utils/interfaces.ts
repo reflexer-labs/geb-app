@@ -144,14 +144,16 @@ export interface IStats {
   accountingEngine: { surplusBuffer: string };
   collateralType: {
     debtCeiling: string;
-    stabilityFee: string;
+    totalAnnualizedStabilityFee: string;
     totalCollateral: string;
   };
   fsmUpdates: Array<IValue>;
+  internalCoinBalance: { balance: string };
+  internalDebtBalance: { balance: string };
   systemState: {
     currentCoinFsmUpdate: IValue;
     currentRedemptionPrice: IValue;
-    currentRedemptionRate: { annualizedRate: string; perSecondRate: string };
+    currentRedemptionRate: { annualizedRate: string };
     erc20CoinTotalSupply: string;
     globalDebt: string;
     globalDebtCeiling: string;

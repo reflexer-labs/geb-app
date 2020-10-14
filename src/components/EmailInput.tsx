@@ -25,7 +25,11 @@ const EmailInput = ({
   disabled,
   handleEmailClick,
   error,
+<<<<<<< HEAD
   isSubmitting,
+=======
+  isSubmitting
+>>>>>>> 5d00a3ff2cad1c987e443e13150519f2089f512a
 }: Props) => {
   const { t } = useTranslation();
 
@@ -45,9 +49,13 @@ const EmailInput = ({
           value={value || ''}
           onChange={handleChange}
         />
+<<<<<<< HEAD
         {isSubmitting ? (
           <Loader />
         ) : (
+=======
+        {isSubmitting ? <Loader /> :(
+>>>>>>> 5d00a3ff2cad1c987e443e13150519f2089f512a
           <Button
             withArrow
             disabled={disabled}
@@ -55,6 +63,10 @@ const EmailInput = ({
             onClick={handleEmailClick}
           />
         )}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5d00a3ff2cad1c987e443e13150519f2089f512a
       </Content>
       {error && <Error dangerouslySetInnerHTML={{ __html: error }} />}
     </Container>
@@ -96,7 +108,10 @@ const CustomInput = styled.input`
   font-size: ${(props) => props.theme.font.small};
   transition: all 0.3s ease;
   width: 100%;
+<<<<<<< HEAD
   padding-right: 10px;
+=======
+>>>>>>> 5d00a3ff2cad1c987e443e13150519f2089f512a
   border: none;
   border-radius: 0;
   background: ${(props) => props.theme.colors.foreground};
@@ -111,4 +126,8 @@ const CustomInput = styled.input`
 const Error = styled.p`
   color: ${(props) => props.theme.colors.dangerColor};
   font-size: ${(props) => props.theme.font.extraSmall};
+<<<<<<< HEAD
 `;
+=======
+`;
+>>>>>>> 5d00a3ff2cad1c987e443e13150519f2089f512a

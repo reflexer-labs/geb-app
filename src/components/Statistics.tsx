@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import BigNumber from 'bignumber.js';
 
 // Redux
 import { useStoreActions, useStoreState } from '../store';
 
 // Utils
-import { formatNumber } from '../utils/helper';
+import { formatNumber, getRatePercentage } from '../utils/helper';
+import _ from '../utils/lodash';
 
 const Statistics = () => {
   const { t } = useTranslation();
@@ -36,49 +36,23 @@ const Statistics = () => {
     fetchStatistics();
     // eslint-disable-next-line
   }, []);
+  
 
   const { stats } = statisticsState;
-  const annualizedRedemptionRate = stats
-    ? new BigNumber(stats.systemState.currentRedemptionRate.annualizedRate)
-        .minus(1)
-        .div(100)
-        .toFixed()
-    : 0;
-  const dsmPrice =
-    stats && stats.systemState.currentCoinFsmUpdate
-      ? formatNumber(stats.systemState.currentCoinFsmUpdate.value)
-      : 0;
-  const erc20CoinTotalSupply = stats
-    ? formatNumber(stats.systemState.erc20CoinTotalSupply)
-    : 0;
-  const globalDebtCeiling = stats
-    ? formatNumber(stats.systemState.globalDebtCeiling)
-    : 0;
-  const outstandingPrai = stats
-    ? formatNumber(stats.systemState.globalDebt)
-    : 0;
-  const perSecondRedemptionRate = stats
-    ? new BigNumber(stats.systemState.currentRedemptionRate.perSecondRate)
-        .minus(1)
-        .div(100)
-        .toFixed()
-    : 0;
-  const praiUniswapSupply = stats
-    ? formatNumber(stats.uniswapPairs[0].reserve1)
-    : 0;
-  const redemptionPrice = stats
-    ? formatNumber(stats.systemState.currentRedemptionPrice.value)
-    : 0;
-  const safesOpen = stats
-    ? Number(stats.systemState.safeCount) +
-      Number(stats.systemState.unmanagedSafeCount)
-    : 0;
-  const systemSurplus =
-    stats && stats.accountingEngine ? stats.accountingEngine.surplusBuffer : 0;
 
-  const totalEthLocked = stats
-    ? formatNumber(stats.collateralType.totalCollateral)
-    : 0;
+  const annualizedBorrowRate = getRatePercentage(_.get(stats, 'collateralType.totalAnnualizedStabilityFee', '1'));
+  const annualizedRedemptionRate = getRatePercentage(_.get(stats, 'systemState.currentRedemptionRate.annualizedRate', '1'));
+  const dsmPrice = formatNumber(_.get(stats, 'systemState.currentCoinFsmUpdate.value', '0'));
+  const erc20CoinTotalSupply = formatNumber(_.get(stats, 'systemState.erc20CoinTotalSupply', '0'));
+  const globalDebtCeiling = formatNumber(_.get(stats, 'systemState.globalDebtCeiling', '0'));
+  const outstandingPrai = formatNumber(_.get(stats, 'systemState.globalDebt', '0'));
+  const praiUniswapSupply = formatNumber(_.get(stats, 'uniswapPairs.0.reserve1', '0'));
+  const redemptionPrice = formatNumber(_.get(stats, 'systemState.currentRedemptionPrice.value', '0'));
+  const safesOpen = Number(_.get(stats, 'systemState.safeCount', '0')) +
+      Number(_.get(stats, 'systemState.unmanagedSafeCount', '0'));
+  const surplus = _.get(stats, 'internalCoinBalance.balance', 0) - _.get(stats, 'internalDebtBalance.balance', 0);
+  const systemSurplus = Number.isInteger(surplus) ? surplus.toString() : surplus.toFixed(5);
+  const totalEthLocked = formatNumber(_.get(stats, 'collateralType.totalCollateral', '0'));
 
   return (
     <>
@@ -99,14 +73,14 @@ const Statistics = () => {
 
         <StatItem className="w50Mobile">
           <StateInner>
-            <Value>{`${perSecondRedemptionRate}%`}</Value>
-            <Label>{'Per-Second Redemption Rate'}</Label>
+            <Value>{`${annualizedRedemptionRate}%`}</Value>
+            <Label>{'Annual Redemption Rate'}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem className="w50Mobile">
           <StateInner>
-            <Value>{`${annualizedRedemptionRate}%`}</Value>
+            <Value>{`${annualizedBorrowRate}%`}</Value>
             <Label>{'Annual Borrow Rate'}</Label>
           </StateInner>
         </StatItem>

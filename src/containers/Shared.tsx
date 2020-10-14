@@ -100,22 +100,20 @@ const Shared = ({ children }: Props) => {
       <CreateAccountModal />
       <ConnectedWalletModal />
       <ScreenLoader />
-      <>
-        <EmptyDiv ref={navbarRef}>
-          <Navbar />
-        </EmptyDiv>
-        {alertPayload ? (
-          <Alerts
-            text={alertPayload.text}
-            margin={'10px auto 0 auto'}
-            type={alertPayload.type}
-          />
-        ) : null}
-         <Content minHeight={contentHeight}>{children}</Content>
-        <EmptyDiv ref={footerRef}>
-          <Footer slapToBottom />
-        </EmptyDiv>
-      </>
+      <EmptyDiv ref={navbarRef}>
+        <Navbar />
+      </EmptyDiv>
+      {alertPayload ? (
+        <Alerts
+          text={alertPayload.text}
+          margin={'10px auto 0 auto'}
+          type={alertPayload.type}
+        />
+      ) : null}
+       <Content minHeight={contentHeight}>{children}</Content>
+      <EmptyDiv ref={footerRef}>
+        <Footer slapToBottom />
+      </EmptyDiv>
     </Container>
   );
 };
