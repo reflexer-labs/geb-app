@@ -149,8 +149,8 @@ export interface IStats {
     totalCollateral: string;
   };
   fsmUpdates: Array<IValue>;
-  internalCoinBalances: { balance: string };
-  internalDebtBalances: { balance: string };
+  internalCoinBalance: { balance: string };
+  internalDebtBalance: { balance: string };
   systemState: {
     currentCoinFsmUpdate: IValue;
     currentRedemptionPrice: IValue;

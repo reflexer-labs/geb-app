@@ -82,7 +82,6 @@ const Shared = ({ children }: Props) => {
       const height =
         windowSize.height - (footerHeight + navbarHeight) - 20 + 'px';
       setContentHeight(height);
-      console.log(height);
     }
   }, [navbarRef, footerRef, windowSize.height]);
 

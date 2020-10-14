@@ -7,6 +7,7 @@ import { useStoreActions, useStoreState } from '../store';
 
 // Utils
 import { formatNumber, getRatePercentage } from '../utils/helper';
+import _ from '../utils/lodash';
 
 const Statistics = () => {
   const { t } = useTranslation();
@@ -25,41 +26,20 @@ const Statistics = () => {
   }, [popupsActions, statisticsActions, t]);
 
   const { stats } = statisticsState;
-  const annualizedBorrowRate = stats
-    ? getRatePercentage(stats.collateralType.totalAnnualizedStabilityFee)
-    : 0;
-  const annualizedRedemptionRate = stats
-    ? getRatePercentage(stats.systemState.currentRedemptionRate.annualizedRate)
-    : 0;
-  const dsmPrice =
-    stats && stats.systemState.currentCoinFsmUpdate
-      ? formatNumber(stats.systemState.currentCoinFsmUpdate.value)
-      : 0;
-  const erc20CoinTotalSupply = stats
-    ? formatNumber(stats.systemState.erc20CoinTotalSupply)
-    : 0;
-  const globalDebtCeiling = stats
-    ? formatNumber(stats.systemState.globalDebtCeiling)
-    : 0;
-  const outstandingPrai = stats
-    ? formatNumber(stats.systemState.globalDebt)
-    : 0;
-  const praiUniswapSupply = stats
-    ? formatNumber(stats.uniswapPairs[0].reserve1)
-    : 0;
-  const redemptionPrice = stats
-    ? formatNumber(stats.systemState.currentRedemptionPrice.value)
-    : 0;
-  const safesOpen = stats
-    ? Number(stats.systemState.safeCount) +
-      Number(stats.systemState.unmanagedSafeCount)
-    : 0;
-  const systemSurplus =
-    stats && stats.accountingEngine ? stats.accountingEngine.surplusBuffer : 0;
 
-  const totalEthLocked = stats
-    ? formatNumber(stats.collateralType.totalCollateral)
-    : 0;
+  const annualizedBorrowRate = getRatePercentage(_.get(stats, 'collateralType.totalAnnualizedStabilityFee', '1'));
+  const annualizedRedemptionRate = getRatePercentage(_.get(stats, 'systemState.currentRedemptionRate.annualizedRate', '1'));
+  const dsmPrice = formatNumber(_.get(stats, 'systemState.currentCoinFsmUpdate.value', '0'));
+  const erc20CoinTotalSupply = formatNumber(_.get(stats, 'systemState.erc20CoinTotalSupply', '0'));
+  const globalDebtCeiling = formatNumber(_.get(stats, 'systemState.globalDebtCeiling', '0'));
+  const outstandingPrai = formatNumber(_.get(stats, 'systemState.globalDebt', '0'));
+  const praiUniswapSupply = formatNumber(_.get(stats, 'uniswapPairs.0.reserve1', '0'));
+  const redemptionPrice = formatNumber(_.get(stats, 'systemState.currentRedemptionPrice.value', '0'));
+  const safesOpen = Number(_.get(stats, 'systemState.safeCount', '0')) +
+      Number(_.get(stats, 'systemState.unmanagedSafeCount', '0'));
+  const surplus = _.get(stats, 'internalCoinBalance.balance', 0) - _.get(stats, 'internalDebtBalance.balance', 0);
+  const systemSurplus = Number.isInteger(surplus) ? surplus.toString() : surplus.toFixed(5);
+  const totalEthLocked = formatNumber(_.get(stats, 'collateralType.totalCollateral', '0'));
 
   return (
     <>

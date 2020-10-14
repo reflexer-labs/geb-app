@@ -38,7 +38,8 @@ export const amountToFiat = (balance: number, fiatPrice: number) => {
 };
 
 export const formatNumber = (value: string, digits = 4) => {
-  return parseFloat(Number(value).toFixed(digits));
+  const n = Number(value);
+  return Number.isInteger(n) ? n : parseFloat(n.toFixed(digits));
 };
 
 export const getRatePercentage = (value: string) => {

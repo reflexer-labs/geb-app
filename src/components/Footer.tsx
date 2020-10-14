@@ -132,7 +132,7 @@ const Footer = ({ slapToBottom }: Props) => {
         </Column>
       </UpperSection>
       <LowerSection>
-        {/*<Button text={`Deployed Commit - master`} />*/}
+        <Button text={`Deployed Commit - master`} />
         <Button text="© Reflexer Labs 2020" />
       </LowerSection>
     </Container>
@@ -187,17 +187,18 @@ const UpperSection = styled.div`
       flex: 0 0 100%;
       text-align: left;
       margin-top:10px;
-      ${LinksContainer}{
-      display:none;
-    }
+      
+      ${LinksContainer} {
+        display:none;
+      }
 
-    &.active {
-      ${LinksContainer}{
-        display:block;
+      &.active {
+        ${LinksContainer} {
+          display:block;
+        }
       }
     }
-  } 
-`}
+  `}
 `;
 
 const Subscribe = styled.div`
@@ -258,6 +259,7 @@ const LowerSection = styled.div`
   display: flex;
   justify-content: space-between;
   margin-top: 60px;
+  
   button {
     padding: 4px 8px;
     pointer-events: none;

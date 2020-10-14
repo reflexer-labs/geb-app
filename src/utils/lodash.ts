@@ -2,7 +2,7 @@
 
 import { DynamicObject } from '../types';
 
-export const get = (obj: object, path: string, defaultValue = undefined) => {
+const get = (obj: any, path: string, defaultValue: any = undefined) => {
   const travel = (regexp: any) =>
     String.prototype.split
       .call(path, regexp)
@@ -11,3 +11,7 @@ export const get = (obj: object, path: string, defaultValue = undefined) => {
   const result = travel(/[,[\]]+?/) || travel(/[,[\].]+?/);
   return result === undefined || result === obj ? defaultValue : result;
 };
+
+export default {
+  get,
+}

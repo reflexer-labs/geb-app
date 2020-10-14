@@ -1,5 +1,5 @@
 // TODO: Move addresses to a separate constants file
-const GEB_ACCOUNTING_ENGINE_ADDRESS = '0x893790924aAA16F2312a2751aa5b50b723Fa8651';
+const GEB_ACCOUNTING_ENGINE_ADDRESS = '0x05deac0a37349975b895c1bc05786d098906844c';
 
 export default `{
   collateralType(id: "ETH-A") {
@@ -35,10 +35,10 @@ export default `{
     unmanagedSafeCount
   }
   # System surplus
-  internalCoinBalances(id: "${GEB_ACCOUNTING_ENGINE_ADDRESS}") {
+  internalCoinBalance(id: "${GEB_ACCOUNTING_ENGINE_ADDRESS}") {
     balance
   }
-  internalDebtBalances(id: "${GEB_ACCOUNTING_ENGINE_ADDRESS}") {
+  internalDebtBalance(id: "${GEB_ACCOUNTING_ENGINE_ADDRESS}") {
     balance
   }
   uniswapPairs(where: { medianizerSymbol: "PRAIUSD" }) {
