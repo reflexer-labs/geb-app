@@ -11,6 +11,7 @@ import NotificationPopup from './NotificationPopup';
 
 const Navbar = () => {
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
+
   const { active, account } = useWeb3React();
 
   const handleWalletConnect = () => {
@@ -24,16 +25,20 @@ const Navbar = () => {
     <Container>
       <Left>
         <Brand />
-        {active && account ? (
-          <NotificationContainer>
-            <NotificationPopup />
-          </NotificationContainer>
-        ) : null}
+
+        <span className="hideNav">
+          {active && account ? (
+            <NotificationContainer>
+              <NotificationPopup />
+            </NotificationContainer>
+          ) : null}
+        </span>
       </Left>
-      <HideMobile>
+
+      <HideMobile className="hideNav">
         <NavLinks />
       </HideMobile>
-      <RightSide>
+      <RightSide className="hideNav">
         <BtnContainer>
           <Button
             onClick={handleWalletConnect}
@@ -92,6 +97,7 @@ const MenuBtn = styled.div`
     display: flex;
   `}
 `;
+
 const BtnContainer = styled.div`
   margin-right: 20px;
   ${({ theme }) => theme.mediaWidth.upToSmall`

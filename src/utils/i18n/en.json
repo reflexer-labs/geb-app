@@ -77,5 +77,11 @@
   "show_less": "Show Less",
   "details": "Details",
   "review": "Review",
-  "incentives_header_text": "Use RAI and earn rewards"
+  "incentives_header_text": "Use RAI and earn rewards",
+  "statistics": "Statistics",
+  "statistics_header_text": "Overview of the Proto RAI system",
+  "fetching_statistics": "Fetching statistics...",
+  "submit": "Submit",
+  "invalid_email": "Please enter a valid email address",
+  "subscription_success": "Subscribed successfully!"
 }

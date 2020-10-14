@@ -3,11 +3,17 @@ import { css } from 'styled-components';
 import { injected, walletconnect, walletlink } from '../connectors';
 import { WalletInfo } from './interfaces';
 
-export const DEFAULT_NETWORK_ID = process.env.REACT_APP_NETWORK_ID
-  ? parseInt(process.env.REACT_APP_NETWORK_ID)
-  : 1;
+const { REACT_APP_GRAPH_API_URL, REACT_APP_NETWORK_ID } = process.env;
+
+export const DEFAULT_NETWORK_ID = parseInt(REACT_APP_NETWORK_ID ?? '1');
+export const GRAPH_API_URL =
+  REACT_APP_GRAPH_API_URL ??
+  'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai';
 
 export const NetworkContextName = 'NETWORK';
+
+export const MAILCHIMP_URL =
+  'https://finance.us20.list-manage.com/subscribe/post-json?u=a3b1b26a531e341b4e086da36&id=b5976e4e32';
 
 export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
   INJECTED: {
@@ -68,6 +74,7 @@ const MEDIA_WIDTHS = {
   upToSmall: 768,
   upToMedium: 992,
   upToLarge: 1280,
+  upToExtraLarge: 1366,
 };
 
 export const mediaWidthTemplates: {

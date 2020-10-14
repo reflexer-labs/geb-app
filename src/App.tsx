@@ -23,6 +23,7 @@ import EmergencyShutdown from './containers/EmergencyShutdown';
 import Voting from './containers/Voting';
 import VoteDetails from './containers/Voting/VoteDetails';
 import Incentives from './containers/Incentives';
+import Statistics from './containers/Statistics';
 
 declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}
@@ -43,18 +44,20 @@ function App() {
         <GlobalStyle bodyOverflow={bodyOverflow} />
         <ErrorBoundary>
           <Router basename={'geb-frontend'}>
-            <Shared />
             <Suspense fallback={null}>
               <Web3ReactManager>
-                <Switch>
-                  <Route exact component={Incentives} path={'/incentives'} />
-                  <Route exact component={VoteDetails} path={'/voting/:id'} />
-                  <Route exact component={Voting} path={'/voting'} />
-                  <Route exact component={EmergencyShutdown} path={'/esm'} />
-                  <Route exact component={SafeDetails} path={'/:id'} />
-                  <Route exact component={OnBoarding} path={'/'} />
-                  <Redirect from="*" to="/" />
-                </Switch>
+                <Shared>
+                  <Switch>
+                    <Route exact component={EmergencyShutdown} path={'/esm'} />
+                    <Route component={SafeDetails} path={'/safe/:id'} />
+                    <Route exact component={OnBoarding} path={'/onboarding'} />
+                    <Route exact component={Incentives} path={'/incentives'} />
+                    <Route exact component={VoteDetails} path={'/voting/:id'} />
+                    <Route exact component={Voting} path={'/voting'} />
+                    <Route exact component={Statistics} path={'/'} />
+                    <Redirect from="*" to="/" />
+                  </Switch>
+                </Shared>
               </Web3ReactManager>
             </Suspense>
           </Router>

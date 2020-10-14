@@ -141,7 +141,7 @@ const ArrowBtn = styled.button`
   box-shadow: none;
   outline: none;
   padding: 0;
-  margin: 0;
+  margin-left: 0;
   background: ${(props) => props.theme.colors.gradient};
   background-clip: text;
   -webkit-background-clip: text;
@@ -161,6 +161,9 @@ const ArrowBtn = styled.button`
   transition: all 0.3s ease;
   &:hover {
     opacity: 0.8;
+  }
+  img {
+    margin-left: 3px;
   }
 `;
 

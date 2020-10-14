@@ -43,7 +43,7 @@ const LoaderContainer = styled.div`
   text-align: center;
   img {
     display: block;
-    width: 50px;
+    width: 40px;
     margin: 0 auto;
     animation: ${zoom} 1.5s ease-in-out infinite;
     animation-fill-mode: both;
