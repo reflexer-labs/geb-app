@@ -2,34 +2,29 @@ import React from 'react';
 import styled from 'styled-components';
 import { useStoreActions } from '../store';
 import Brand from './Brand';
-// import Button from './Button';
-// import SettingsPopup from './SettingsPopup';
-// import { returnWalletAddres } from '../utils/helper';
-// import NavLinks from './NavLinks';
-// import { useWeb3React } from '@web3-react/core';
-// import NotificationPopup from './NotificationPopup';
+import Button from './Button';
+import SettingsPopup from './SettingsPopup';
+import { returnWalletAddres } from '../utils/helper';
+import NavLinks from './NavLinks';
+import { useWeb3React } from '@web3-react/core';
+import NotificationPopup from './NotificationPopup';
 
 const Navbar = () => {
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
-<<<<<<< HEAD
 
   const { active, account } = useWeb3React();
-=======
-  // const { active, account } = useWeb3React();
->>>>>>> 5d00a3ff2cad1c987e443e13150519f2089f512a
 
-  /*const handleWalletConnect = () => {
+  const handleWalletConnect = () => {
     if (active && account) {
       return popupsActions.setIsConnectedWalletModalOpen(true);
     }
     return popupsActions.setIsConnectorsWalletOpen(true);
-  };*/
+  };
 
   return (
     <Container>
       <Left>
         <Brand />
-<<<<<<< HEAD
 
         <span className="hideNav">
           {active && account ? (
@@ -45,19 +40,6 @@ const Navbar = () => {
       </HideMobile>
       <RightSide className="hideNav">
         <BtnContainer>
-=======
-        {/*{active && account ? (
-          <NotificationContainer>
-            <NotificationPopup />
-          </NotificationContainer>
-        ) : null}*/}
-      </Left>
-      <HideMobile>
-        {/*<NavLinks />*/}
-      </HideMobile>
-      <RightSide>
-        {/*<BtnContainer>
->>>>>>> 5d00a3ff2cad1c987e443e13150519f2089f512a
           <Button
             onClick={handleWalletConnect}
             text={
@@ -68,7 +50,7 @@ const Navbar = () => {
 
         <HideMobile>
           <SettingsPopup />
-        </HideMobile>*/}
+        </HideMobile>
 
         <MenuBtn onClick={() => popupsActions.setShowSideMenu(true)}>
           <RectContainer>
@@ -116,16 +98,12 @@ const MenuBtn = styled.div`
   `}
 `;
 
-<<<<<<< HEAD
 const BtnContainer = styled.div`
-=======
-/*const BtnContainer = styled.div`
->>>>>>> 5d00a3ff2cad1c987e443e13150519f2089f512a
   margin-right: 20px;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     display: none;
   `}
-`;*/
+`;
 
 const RectContainer = styled.div``;
 
@@ -158,6 +136,6 @@ const Left = styled.div`
   align-items: center;
 `;
 
-// const NotificationContainer = styled.div`
-//   margin-left: 34px;
-// `;
+const NotificationContainer = styled.div`
+  margin-left: 34px;
+`;
