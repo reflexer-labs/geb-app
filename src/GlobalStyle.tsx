@@ -5,6 +5,11 @@ interface Props {
 }
 
 const GlobalStyle = createGlobalStyle`
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
         body {
           background:${(props) => props.theme.colors.foreground};
             overflow: ${(props: Props) =>
@@ -42,6 +47,48 @@ const GlobalStyle = createGlobalStyle`
   }
 }
         }
+
+.three-line-legend {
+	width: 100%;
+	height: 70px;
+	position: absolute;
+	padding: 8px;
+	font-size: 12px;
+	color: #20262E;
+	background-color: rgba(255, 255, 255, 0.23);
+	text-align: left;
+	z-index: 10;
+  pointer-events: none;
+}
+
+.three-line-legend-dark {
+	width: 100%;
+	height: 70px;
+	position: absolute;
+	padding: 8px;
+	font-size: 12px;
+	color: white;
+	background-color: rgba(255, 255, 255, 0.23);
+	text-align: left;
+	z-index: 10;
+  pointer-events: none;
+}
+
+@media screen and (max-width: 800px) {
+  .three-line-legend {
+    display: none !important;
+  }
+}
+
+.tv-lightweight-charts{
+  width: 100% !important;
+  
+
+  & > * {
+    width: 100% !important;
+  }
+}
+
 `;
 
 export default GlobalStyle;

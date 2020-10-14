@@ -43,10 +43,13 @@ const LoaderContainer = styled.div`
   text-align: center;
   img {
     display: block;
-    width: 40px;
+    width: 60px;
     margin: 0 auto;
     animation: ${zoom} 1.5s ease-in-out infinite;
     animation-fill-mode: both;
+    ${({ theme }) => theme.mediaWidth.upToMedium`
+      width: 40px;
+    `}
   }
 `;
 

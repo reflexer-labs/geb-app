@@ -24,14 +24,15 @@ const Footer = ({ slapToBottom }: Props) => {
 
   const onChangeInput = (val: string) => {
     setEmail(val);
-    if (val && !isValidEmail(val)) {
-      setError(t('invalid_email'));
-    } else {
-      setError('');
-    }
+    setError('');
   };
 
   const onClickSubmit = () => {
+    if (email && !isValidEmail(email)) {
+      setError(t('invalid_email'));
+      setIsSubmitting(false);
+      return;
+    }
     const formData = {
       EMAIL: email,
     };
@@ -62,8 +63,6 @@ const Footer = ({ slapToBottom }: Props) => {
     );
   };
 
-  const isDisabled = !isValidEmail(email);
-
   const handleClick = (group: number) => {
     if (group === selectedGroup) {
       setSelectedGroup(0);
@@ -78,7 +77,7 @@ const Footer = ({ slapToBottom }: Props) => {
           <Brand height={30} />
           <Subscribe>
             <EmailInput
-              disabled={isDisabled}
+              disabled={error ? true : false}
               isSubmitting={isSubmitting}
               label={'Updates'}
               value={email}
@@ -108,7 +107,8 @@ const Footer = ({ slapToBottom }: Props) => {
         </Column>
         <Column className={`col20 ${selectedGroup === 2 ? 'active' : ''}`}>
           <Header onClick={() => handleClick(2)}>
-            Resources <Plus size={16} />
+            Resources{' '}
+            {selectedGroup === 2 ? <Minus size={16} /> : <Plus size={16} />}
           </Header>
           <LinksContainer>
             <LinkBtn
@@ -200,7 +200,13 @@ const Subscribe = styled.div`
   margin-top: 20px;
 `;
 
-const Company = styled.div``;
+const Company = styled.div`
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+ a > img {
+  height:25px !important;
+}
+ `}
+`;
 
 const Column = styled.div``;
 

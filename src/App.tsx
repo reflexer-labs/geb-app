@@ -23,7 +23,7 @@ import EmergencyShutdown from './containers/EmergencyShutdown';
 import Voting from './containers/Voting';
 import VoteDetails from './containers/Voting/VoteDetails';
 import Incentives from './containers/Incentives';
-import Statistics from './containers/Statistics';
+import StatisticsContainer from './containers/Statistics';
 
 declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}
@@ -43,7 +43,7 @@ function App() {
       <ThemeProvider theme={isLightTheme ? lightTheme : darkTheme}>
         <GlobalStyle bodyOverflow={bodyOverflow} />
         <ErrorBoundary>
-          <Router basename={'geb-frontend'}>
+          <Router basename={'geb-app'}>
             <Suspense fallback={null}>
               <Web3ReactManager>
                 <Shared>
@@ -54,7 +54,7 @@ function App() {
                     <Route exact component={Incentives} path={'/incentives'} />
                     <Route exact component={VoteDetails} path={'/voting/:id'} />
                     <Route exact component={Voting} path={'/voting'} />
-                    <Route exact component={Statistics} path={'/'} />
+                    <Route exact component={StatisticsContainer} path={'/'} />
                     <Redirect from="*" to="/" />
                   </Switch>
                 </Shared>

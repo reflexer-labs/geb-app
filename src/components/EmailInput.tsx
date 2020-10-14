@@ -65,6 +65,7 @@ export default EmailInput;
 
 const Container = styled.div`
   max-width: 300px;
+  position: relative;
 `;
 
 const Label = styled.div`
@@ -111,4 +112,9 @@ const CustomInput = styled.input`
 const Error = styled.p`
   color: ${(props) => props.theme.colors.dangerColor};
   font-size: ${(props) => props.theme.font.extraSmall};
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: 100%;
+  margin: 0;
 `;

@@ -8,6 +8,7 @@ import { useStoreActions, useStoreState } from '../store';
 // Utils
 import { formatNumber, getRatePercentage } from '../utils/helper';
 import _ from '../utils/lodash';
+import GlobalChart from './GlobalChart';
 
 const Statistics = () => {
   const { t } = useTranslation();
@@ -36,23 +37,45 @@ const Statistics = () => {
     fetchStatistics();
     // eslint-disable-next-line
   }, []);
-  
 
   const { stats } = statisticsState;
 
-  const annualizedBorrowRate = getRatePercentage(_.get(stats, 'collateralType.totalAnnualizedStabilityFee', '1'));
-  const annualizedRedemptionRate = getRatePercentage(_.get(stats, 'systemState.currentRedemptionRate.annualizedRate', '1'));
-  const dsmPrice = formatNumber(_.get(stats, 'systemState.currentCoinFsmUpdate.value', '0'));
-  const erc20CoinTotalSupply = formatNumber(_.get(stats, 'systemState.erc20CoinTotalSupply', '0'));
-  const globalDebtCeiling = formatNumber(_.get(stats, 'systemState.globalDebtCeiling', '0'));
-  const outstandingPrai = formatNumber(_.get(stats, 'systemState.globalDebt', '0'));
-  const praiUniswapSupply = formatNumber(_.get(stats, 'uniswapPairs.0.reserve1', '0'));
-  const redemptionPrice = formatNumber(_.get(stats, 'systemState.currentRedemptionPrice.value', '0'));
-  const safesOpen = Number(_.get(stats, 'systemState.safeCount', '0')) +
-      Number(_.get(stats, 'systemState.unmanagedSafeCount', '0'));
-  const surplus = _.get(stats, 'internalCoinBalance.balance', 0) - _.get(stats, 'internalDebtBalance.balance', 0);
-  const systemSurplus = Number.isInteger(surplus) ? surplus.toString() : surplus.toFixed(5);
-  const totalEthLocked = formatNumber(_.get(stats, 'collateralType.totalCollateral', '0'));
+  const annualizedBorrowRate = getRatePercentage(
+    _.get(stats, 'collateralType.totalAnnualizedStabilityFee', '1')
+  );
+  const annualizedRedemptionRate = getRatePercentage(
+    _.get(stats, 'systemState.currentRedemptionRate.annualizedRate', '1')
+  );
+  const dsmPrice = formatNumber(
+    _.get(stats, 'systemState.currentCoinFsmUpdate.value', '0')
+  );
+  const erc20CoinTotalSupply = formatNumber(
+    _.get(stats, 'systemState.erc20CoinTotalSupply', '0')
+  );
+  const globalDebtCeiling = formatNumber(
+    _.get(stats, 'systemState.globalDebtCeiling', '0')
+  );
+  const outstandingPrai = formatNumber(
+    _.get(stats, 'systemState.globalDebt', '0')
+  );
+  const praiUniswapSupply = formatNumber(
+    _.get(stats, 'uniswapPairs.0.reserve1', '0')
+  );
+  const redemptionPrice = formatNumber(
+    _.get(stats, 'systemState.currentRedemptionPrice.value', '0')
+  );
+  const safesOpen =
+    Number(_.get(stats, 'systemState.safeCount', '0')) +
+    Number(_.get(stats, 'systemState.unmanagedSafeCount', '0'));
+  const surplus =
+    _.get(stats, 'internalCoinBalance.balance', 0) -
+    _.get(stats, 'internalDebtBalance.balance', 0);
+  const systemSurplus = Number.isInteger(surplus)
+    ? surplus.toString()
+    : surplus.toFixed(5);
+  const totalEthLocked = formatNumber(
+    _.get(stats, 'collateralType.totalCollateral', '0')
+  );
 
   return (
     <>
@@ -74,7 +97,7 @@ const Statistics = () => {
         <StatItem className="w50Mobile">
           <StateInner>
             <Value>{`${annualizedRedemptionRate}%`}</Value>
-            <Label>{'Annual Redemption Rate'}</Label>
+            <Label>{'8-Hourly Redemption Rate'}</Label>
           </StateInner>
         </StatItem>
 
@@ -155,6 +178,21 @@ const Statistics = () => {
           </StateInner>
         </StatItem>
       </StatsGrid>
+
+      <ChartsContainer>
+        <Panel style={{ height: '100%', minHeight: '300px' }}>
+          <PanelInner>
+            <PanelHeader>Total PRAI Issued</PanelHeader>
+            <GlobalChart display="amount" />
+          </PanelInner>
+        </Panel>
+        <Panel style={{ height: '100%' }}>
+          <PanelInner>
+            <PanelHeader>Historical Redemption Rate</PanelHeader>
+            <GlobalChart display="average_rate" />
+          </PanelInner>
+        </Panel>
+      </ChartsContainer>
     </>
   );
 };
@@ -238,5 +276,48 @@ const Label = styled.div`
   margin-top: 8px;
   ${({ theme }) => theme.mediaWidth.upToMedium`
     font-size: ${(props) => props.theme.font.extraSmall};
+  `}
+`;
+
+const ChartsContainer = styled.div`
+  margin-top: 20px;
+  display: flex;
+  margin: 0 -7.5px;
+
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+  flex-direction: column;
+  margin:0;
+  `}
+`;
+
+const Panel = styled.div`
+  flex: 0 0 50%;
+  padding: 0 7.5px;
+
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+  flex: 0 0 100%;
+  padding:0;
+  &:first-child {
+    margin-bottom:15px;
+  }
+  `}
+`;
+
+const PanelInner = styled.div`
+  padding: 20px;
+  border: 1px solid ${(props) => props.theme.colors.border};
+  border-radius: ${(props) => props.theme.global.borderRadius};
+  background: ${(props) => props.theme.colors.background};
+  position: relative;
+`;
+
+const PanelHeader = styled.div`
+  padding: 0 15px 15px 15px;
+  border-bottom: 1px solid ${(props) => props.theme.colors.border};
+  color: ${(props) => props.theme.colors.primary};
+  font-weight: 600;
+  margin: 0 -20px 10px;
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+    font-size: ${(props) => props.theme.font.small};
   `}
 `;

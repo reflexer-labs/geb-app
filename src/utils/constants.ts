@@ -69,6 +69,14 @@ export const ETHERSCAN_PREFIXES: { [chainId in ChainId]: string } = {
   42: 'kovan.',
 };
 
+export const timeframeOptions = {
+  WEEK: '1 week',
+  MONTH: '1 month',
+  // THREE_MONTHS: '3 months',
+  // YEAR: '1 year',
+  ALL_TIME: 'All time',
+};
+
 const MEDIA_WIDTHS = {
   upToExtraSmall: 576,
   upToSmall: 768,

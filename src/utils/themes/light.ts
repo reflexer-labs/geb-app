@@ -35,7 +35,7 @@ const lightTheme: Theme = {
     extraLarge: '22px',
   },
   global: {
-    gridMaxWidth: '1454px',
+    gridMaxWidth: '1500px',
     borderRadius: '4px',
     extraCurvedRadius: '20px',
     buttonPadding: '8px 16px',
