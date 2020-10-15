@@ -35,6 +35,9 @@ jobs:
         args: --acl public-read --follow-symlinks --delete
       env:
         AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET_STAGING }}
+        REACT_APP_CHAIN_ID: ${{ secrets.REACT_APP_CHAIN_ID_STAGING }}
+        REACT_APP_NETWORK_ID: ${{ secrets.REACT_APP_NETWORK_ID_STAGING }}
+        REACT_APP_NETWORK_URL: ${{ secrets.REACT_APP_NETWORK_URL_STAGING }}
 
     - name: Deploy production
       if: github.ref == 'refs/heads/master'
@@ -43,3 +46,6 @@ jobs:
         args: --acl public-read --follow-symlinks --delete
       env:
         AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET_PRODUCTION }}
+        REACT_APP_CHAIN_ID: ${{ secrets.REACT_APP_CHAIN_ID_PRODUCTION }}
+        REACT_APP_NETWORK_ID: ${{ secrets.REACT_APP_NETWORK_ID_PRODUCTION }}
+        REACT_APP_NETWORK_URL: ${{ secrets.REACT_APP_NETWORK_URL_PRODUCTION }}
