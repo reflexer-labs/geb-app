@@ -67,9 +67,12 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   box-shadow: 0px 1px 0px #eef3f9;
-  padding: 0 20px;
+  padding: 0 40px;
   border-bottom: 1px solid ${(props) => props.theme.colors.border};
   background: ${(props) => props.theme.colors.background};
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+     padding: 0 20px;
+  `}
 `;
 
 const MenuBtn = styled.div`
