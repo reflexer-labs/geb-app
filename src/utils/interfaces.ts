@@ -1,6 +1,10 @@
 import { AbstractConnector } from '@web3-react/abstract-connector';
 import { DefaultTheme, ThemedCssFunction } from 'styled-components';
 
+export interface DynamicObject {
+  [key: string]: any
+}
+
 interface IColors {
   primary: string;
   secondary: string;

@@ -41,7 +41,7 @@ function App() {
       <ThemeProvider theme={isLightTheme ? lightTheme : darkTheme}>
         <GlobalStyle bodyOverflow={bodyOverflow} />
         <ErrorBoundary>
-          <Router basename={'geb-frontend'}>
+          <Router>
             <Shared />
             <Suspense fallback={null}>
               <Web3ReactManager>
@@ -49,7 +49,7 @@ function App() {
                   <Route exact component={VoteDetails} path={'/voting/:id'} />
                   <Route exact component={Voting} path={'/voting'} />
                   <Route exact component={EmergencyShutdown} path={'/esm'} />
-                  <Route exact component={SafeDetails} path={'/:id'} />
+                  <Route exact component={SafeDetails} path={'/safes/:id'} />
                   <Route exact component={OnBoarding} path={'/'} />
                   <Redirect from="*" to="/" />
                 </Switch>
