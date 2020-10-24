@@ -3,9 +3,8 @@ import { css } from 'styled-components';
 import { injected, walletconnect, walletlink } from '../connectors';
 import { WalletInfo } from './interfaces';
 
-const { REACT_APP_GRAPH_API_URL, REACT_APP_NETWORK_ID } = process.env;
+const { REACT_APP_GRAPH_API_URL } = process.env;
 
-export const DEFAULT_NETWORK_ID = parseInt(REACT_APP_NETWORK_ID ?? '1');
 export const GRAPH_API_URL =
   REACT_APP_GRAPH_API_URL ??
   'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai';

@@ -9,7 +9,6 @@ import Navbar from '../components/Navbar';
 import SideMenu from '../components/SideMenu';
 import SideToast from '../components/SideToast';
 import { useStoreState, useStoreActions } from '../store';
-import { DEFAULT_NETWORK_ID } from '../utils/constants';
 import ApplicationUpdater from '../services/ApplicationUpdater';
 import BalanceUpdater from '../services/BalanceUpdater';
 import { capitalizeName } from '../utils/helper';
@@ -24,6 +23,7 @@ import VotingOperationModal from '../components/Modals/VotingOperationModal';
 import Footer from '../components/Footer';
 import styled from 'styled-components';
 import useWindowSize from '../hooks/useWindowSize';
+import { NETWORK_ID } from '../connectors';
 
 interface Props {
   children: ReactNode;
@@ -59,7 +59,7 @@ const Shared = ({ children }: Props) => {
 
   useEffect(() => {
     if (chainId) {
-      networkChecker(DEFAULT_NETWORK_ID);
+      networkChecker(NETWORK_ID);
     }
     if (account) {
       walletActions.setStep(1);
