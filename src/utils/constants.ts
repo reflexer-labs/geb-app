@@ -10,6 +10,9 @@ export const GRAPH_API_URL =
   REACT_APP_GRAPH_API_URL ??
   'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai';
 
+export const MAILCHIMP_URL =
+  'https://finance.us20.list-manage.com/subscribe/post-json?u=a3b1b26a531e341b4e086da36&id=b5976e4e32';
+
 export const NetworkContextName = 'NETWORK';
 
 export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {

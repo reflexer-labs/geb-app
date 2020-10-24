@@ -2,11 +2,16 @@ import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
-const Brand = () => {
+interface Props {
+  height?: number;
+}
+
+const Brand = ({ height }: Props) => {
   return (
     <Container>
       <Link to="/">
         <img
+          height={height}
           src={process.env.PUBLIC_URL + '/img/brand.svg'}
           alt="reflexer labds"
         />
