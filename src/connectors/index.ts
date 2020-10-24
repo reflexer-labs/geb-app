@@ -13,33 +13,22 @@
 
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import { Web3Provider } from '@ethersproject/providers';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 import { NetworkConnector } from './NetworkConnector';
 
-const NETWORK_URL = process.env.REACT_APP_NETWORK_URL;
+const {
+  REACT_APP_NETWORK_ID,
+  REACT_APP_NETWORK_URL
+} = process.env;
 
-export const NETWORK_CHAIN_ID: number = parseInt(
-  process.env.REACT_APP_CHAIN_ID ?? '1'
-);
-
-if (typeof NETWORK_URL === 'undefined') {
-  throw new Error(
-    `REACT_APP_NETWORK_URL must be a defined environment variable`
-  );
-}
+export const NETWORK_URL = REACT_APP_NETWORK_URL ?? 'https://kovan.infura.io/v3/645c2c65dd8f4be18a50a0bf011bab85';
+export const NETWORK_ID = parseInt(REACT_APP_NETWORK_ID ?? '1');
 
 export const network = new NetworkConnector({
-  urls: { [NETWORK_CHAIN_ID]: NETWORK_URL },
+  urls: { [NETWORK_ID]: NETWORK_URL },
 });
-
-let networkLibrary: Web3Provider | undefined;
-export function getNetworkLibrary(): Web3Provider {
-  return (networkLibrary =
-    networkLibrary ?? new Web3Provider(network.provider as any));
-}
 
 export const injected = new InjectedConnector({
   supportedChainIds: [1, 3, 4, 5, 42],

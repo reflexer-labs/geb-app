@@ -17,9 +17,10 @@ const Steps = () => {
     popupsActions.setIsConnectorsWalletOpen(true);
 
   const handleCreateAccount = () => {
-    // TODO: create Reflexer Acccount
+    // TODO: create Reflexer Account
     walletActions.setStep(2);
   };
+
   const handleCreateSafe = () => {
     popupsActions.setIsCreateAccountModalOpen(true);
   };
@@ -62,14 +63,15 @@ const Steps = () => {
         break;
     }
   };
+
   return (
     <StepsContainer>
       <StepsBars>
-        <StepBar className="active"></StepBar>
+        <StepBar className="active" />
         <StepBar
           className={currentStep === 1 || currentStep === 2 ? 'active' : ''}
-        ></StepBar>
-        <StepBar className={currentStep === 2 ? 'active' : ''}></StepBar>
+        />
+        <StepBar className={currentStep === 2 ? 'active' : ''}/>
       </StepsBars>
 
       {returnSteps(currentStep)}

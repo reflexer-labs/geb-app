@@ -20,6 +20,7 @@ interface Props {
   backDropClose?: boolean;
   hideHeader?: boolean;
   hideFooter?: boolean;
+  backDropColor?: string;
 }
 const Modal = ({
   title,
@@ -35,6 +36,7 @@ const Modal = ({
   borderRadius,
   backDropClose,
   hideHeader,
+  backDropColor,
 }: Props) => {
   const { t } = useTranslation();
   const nodeRef = React.useRef(null);
@@ -70,7 +72,7 @@ const Modal = ({
     >
       <Container ref={nodeRef}>
         <InnerContent>
-          <BackDrop onClick={handleBackdrop} />
+          <BackDrop bg={backDropColor} onClick={handleBackdrop} />
           <ChildrenHolder
             style={{ maxWidth: maxWidth || '720px', width: width || '100%' }}
           >
@@ -193,8 +195,8 @@ const CloseBtn = styled.button`
   margin: 5px 20px 0 0;
 `;
 
-const BackDrop = styled.div`
-  background: ${(props) => props.theme.colors.overlay};
+const BackDrop = styled.div<{ bg?: string }>`
+  background: ${({ theme, bg }) => (bg ? bg : theme.colors.overlay)};
   position: absolute;
   top: 0;
   left: 0;
