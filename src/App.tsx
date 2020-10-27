@@ -32,7 +32,7 @@ declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}
 }
 
-function App() {
+const App = () => {
   const { settingsModel: settingsState } = useStoreState((state) => state);
 
   const { isLightTheme, lang, bodyOverflow } = settingsState;

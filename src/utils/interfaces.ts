@@ -1,4 +1,5 @@
 import { AbstractConnector } from '@web3-react/abstract-connector';
+import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
 import { DefaultTheme, ThemedCssFunction } from 'styled-components';
 
 export interface DynamicObject {
@@ -138,4 +139,15 @@ export interface IVotingTx {
   endsIn: string;
   isCompleted: boolean;
   isAbandoned: boolean;
+}
+
+export interface ILiquidationData {
+  currentPrice: { liquidationPrice: string; safetyPrice: string };
+  liquidationCRatio: string;
+  liquidationPenalty: string;
+}
+
+export interface ICreateSafePayload {
+  createSafeDefault: CreateSafeType;
+  signer: JsonRpcSigner;
 }

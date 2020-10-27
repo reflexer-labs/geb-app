@@ -1,5 +1,7 @@
 import { action, Action, thunk, Thunk } from 'easy-peasy';
-import { ISafe } from '../utils/interfaces';
+import { ICreateSafePayload, ISafe } from '../utils/interfaces';
+import { handleSafeCreation } from '../services/blockchain';
+import { fetchUserSafes } from '../services/graphql';
 
 export const INITIAL_SAFE_STATE = [
   {
@@ -11,43 +13,7 @@ export const INITIAL_SAFE_STATE = [
     borrowedRAI: '23.00',
     liquidationPrice: '$250.00',
   },
-  {
-    id: '1243',
-    img: `${process.env.PUBLIC_URL}/img/box-ph.svg`,
-    date: 'July 1, 2020',
-    riskState: 'low',
-    depositedEth: '80.00',
-    borrowedRAI: '20.00',
-    liquidationPrice: '$250.00',
-  },
-  {
-    id: '1245',
-    img: `${process.env.PUBLIC_URL}/img/box-ph.svg`,
-    date: 'July 1, 2020',
-    riskState: 'high',
-    depositedEth: '60.00',
-    borrowedRAI: '21.00',
-    liquidationPrice: '$250.00',
-  },
-  {
-    id: '1246',
-    img: `${process.env.PUBLIC_URL}/img/box-ph.svg`,
-    date: 'July 1, 2020',
-    riskState: 'low',
-    depositedEth: '50.00',
-    borrowedRAI: '19.00',
-    liquidationPrice: '$250.00',
-  },
-  {
-    id: '1247',
-    img: `${process.env.PUBLIC_URL}/img/box-ph.svg`,
-    date: 'July 1, 2020',
-    riskState: 'high',
-    depositedEth: '30.00',
-    borrowedRAI: '28.00',
-    liquidationPrice: '$250.00',
-  },
-];
+]
 
 export interface SafeModel {
   list: Array<ISafe>;
@@ -57,7 +23,8 @@ export interface SafeModel {
   totalEth: string;
   totalRAI: string;
   isES: boolean;
-  fetchAccountData: Thunk<SafeModel>;
+  createSafe: Thunk<SafeModel, ICreateSafePayload>;
+  fetchUserSafes: Thunk<SafeModel, string>;
   setIsSafeCreated: Action<SafeModel, boolean>;
   setList: Action<SafeModel, Array<ISafe>>;
   setSingleSafe: Action<SafeModel, ISafe>;
@@ -66,24 +33,31 @@ export interface SafeModel {
   setTotalRAI: Action<SafeModel, string>;
   setIsES: Action<SafeModel, boolean>;
 }
+
 const safeModel: SafeModel = {
-  list: INITIAL_SAFE_STATE,
+  list: [],
   safeCreated: false,
   operation: 0,
-  singleSafe: INITIAL_SAFE_STATE[0],
+  singleSafe: null,
   totalEth: '110.0000',
   totalRAI: '112.0000',
   isES: true,
-  fetchAccountData: thunk(async (actions, payload, { getStoreActions }) => {
+
+  createSafe: thunk(async (actions, payload, { getStoreActions }) => {
     const storeActions: any = getStoreActions();
+    await handleSafeCreation(payload.signer, payload.createSafeDefault);
     setTimeout(() => {
       storeActions.popupsModel.setIsLoadingModalOpen({
         isOpen: false,
         text: '',
       });
-      actions.setList(INITIAL_SAFE_STATE);
-    }, 2000);
+    }, 500);
   }),
+
+  fetchUserSafes: thunk(async (actions, payload) => {
+    return fetchUserSafes(payload);
+  }),
+
   setIsSafeCreated: action((state, payload) => {
     state.safeCreated = payload;
   }),

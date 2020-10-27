@@ -23,6 +23,7 @@ const CreateAccountModal = () => {
       borrowedRAI: '',
     });
   };
+
   return (
     <Modal
       isModalOpen={popupsState.isCreateAccountModalOpen}

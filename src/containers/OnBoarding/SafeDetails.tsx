@@ -6,7 +6,7 @@ import SafeHistory from '../../components/SafeHistory';
 import SafeStats from '../../components/SafeStats';
 import { useStoreState } from '../../store';
 
-const SafeDetails = () => {
+const SafeDetails = ({ ...props }) => {
   const { t } = useTranslation();
   const { safeModel: safeState } = useStoreState((state) => state);
 
@@ -14,7 +14,7 @@ const SafeDetails = () => {
     <>
       <GridContainer>
         <PageHeader
-          breadcrumbs={{ '/': t('accounts'), '': `#${safeState.list[0].id}` }}
+          breadcrumbs={{ '/': t('accounts'), '': `#${props.match.params.id}` }}
           text={t('accounts_header_text')}
         />
         {safeState.singleSafe ? (

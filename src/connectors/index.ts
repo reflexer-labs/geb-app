@@ -17,6 +17,8 @@ import { InjectedConnector } from '@web3-react/injected-connector';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 import { NetworkConnector } from './NetworkConnector';
+import { ethers } from 'ethers';
+import { Geb } from 'geb.js';
 
 const {
   REACT_APP_NETWORK_ID,
@@ -49,3 +51,7 @@ export const walletlink = new WalletLinkConnector({
   appLogoUrl:
     'https://mpng.pngfly.com/20181202/bex/kisspng-emoji-domain-unicorn-pin-badges-sticker-unicorn-tumblr-emoji-unicorn-iphoneemoji-5c046729264a77.5671679315437924251569.jpg',
 });
+
+// geb.js
+const provider = new ethers.providers.JsonRpcProvider(NETWORK_URL);
+export const geb = new Geb('kovan', provider);

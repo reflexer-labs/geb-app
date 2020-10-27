@@ -2,12 +2,16 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
 import StepsContent from './StepsContent';
+import { useActiveWeb3React } from '../hooks';
+import { geb } from '../connectors';
 
 const Steps = () => {
+  const { account, library } = useActiveWeb3React();
   const [currentStep, setCurrentStep] = useState(0);
   const { walletModel: walletState } = useStoreState((state) => state);
   const {
     popupsModel: popupsActions,
+    safeModel: safeActions,
     walletModel: walletActions,
   } = useStoreActions((state) => state);
 
@@ -16,9 +20,14 @@ const Steps = () => {
   const handleConnectWallet = () =>
     popupsActions.setIsConnectorsWalletOpen(true);
 
-  const handleCreateAccount = () => {
-    // TODO: create Reflexer Account
-    walletActions.setStep(2);
+  const handleCreateAccount = async () => {
+    if (account && library) {
+      const txData = geb.deployProxy();
+      const signer = library.getSigner(account);
+      // TODO: Catch error and display it to the user
+      await signer.sendTransaction(txData);
+      walletActions.setStep(2);
+    }
   };
 
   const handleCreateSafe = () => {
@@ -26,8 +35,27 @@ const Steps = () => {
   };
 
   useEffect(() => {
-    setCurrentStep(step);
-    //  eslint-disable-next-line
+    // Check account creation if user has proxy created
+    if (account && step === 1) {
+      geb.getProxyAction(account)
+        .then(() => {
+          // Check is user had already created safe
+          safeActions.fetchUserSafes(account.toLowerCase())
+            .then((safes: any) => {
+              if (safes.length === 0) {
+                setCurrentStep(2);
+              } else {
+                safeActions.setIsSafeCreated(true);
+                safeActions.setList(safes);
+              }
+            })
+        }).catch(() => {
+          setCurrentStep(step);
+        });
+    } else {
+      setCurrentStep(step);
+    }
+    // eslint-disable-next-line
   }, [step]);
 
   const returnSteps = (stepNumber: number) => {

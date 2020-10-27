@@ -6,6 +6,8 @@ import { CreateSafeType } from '../../utils/interfaces';
 import Button from '../Button';
 import CheckBox from '../CheckBox';
 import DecimalInput from '../DecimalInput';
+import { formatNumber, getAvailableRaiToBorrow, getRatePercentage } from '../../utils/helper';
+import { NETWORK_ID } from '../../connectors';
 
 interface Props {
   isChecked?: boolean;
@@ -14,6 +16,7 @@ interface Props {
 const CreateSafeBody = ({ isChecked }: Props) => {
   const { t } = useTranslation();
   const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || false);
+  const [error, setError] = useState('');
   const [defaultSafe, setDefaultSafe] = useState<CreateSafeType>({
     depositedETH: '',
     borrowedRAI: '',
@@ -28,16 +31,39 @@ const CreateSafeBody = ({ isChecked }: Props) => {
     walletModel: walletActions,
     popupsModel: popupsActions,
   } = useStoreActions((state) => state);
-  const { walletModel: walletState } = useStoreState((state) => state);
+  const {
+    connectWalletModel: connectWalletState,
+    walletModel: walletState
+  } = useStoreState((state) => state);
   const { createSafeDefault, uniSwapPool } = walletState;
 
+  const availableEth = formatNumber(connectWalletState.ethBalance[NETWORK_ID].toString());
+  const availableRai = getAvailableRaiToBorrow(defaultSafe.depositedETH, walletState.liquidationData.currentPrice.safetyPrice);
+  const collateralRatio = getRatePercentage(walletState.liquidationData.liquidationCRatio);
+  const liquidationPenalty = getRatePercentage(walletState.liquidationData.liquidationPenalty);
+  const liquidationPrice = formatNumber(walletState.liquidationData.currentPrice.liquidationPrice, 2);
+
+  const setMaxRai = () => {
+    setDefaultSafe({ ...defaultSafe, borrowedRAI: availableRai.toString() });
+  }
+
   const submitDefaultValues = () => {
-    walletActions.setCreateSafeDefault(defaultSafe);
-    walletActions.setIsUniSwapPoolChecked(checkUniSwapPool);
-    if (checkUniSwapPool) {
-      walletActions.setStage(1);
+    if (!defaultSafe.depositedETH) {
+      setError('Please enter the amount of ETH to be deposited.');
+    } else if (!defaultSafe.borrowedRAI || Number(defaultSafe.borrowedRAI) < 70) {
+      setError('Minimum amount of RAI to be borrowed must be at-least 70.');
+    } else if (Number(defaultSafe.depositedETH) > availableEth) {
+      setError('ETH deposited cannot exceed balance.');
+    } else if (Number(defaultSafe.borrowedRAI) > availableRai) {
+      setError('RAI borrowed cannot exceed available amount.');
     } else {
-      walletActions.setStage(2);
+      walletActions.setCreateSafeDefault(defaultSafe);
+      walletActions.setIsUniSwapPoolChecked(checkUniSwapPool);
+      if (checkUniSwapPool) {
+        walletActions.setStage(1);
+      } else {
+        walletActions.setStage(2);
+      }
     }
   };
 
@@ -73,6 +99,11 @@ const CreateSafeBody = ({ isChecked }: Props) => {
   };
 
   useEffect(() => {
+    walletActions.fetchLiquidationData();
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
     setDefaultSafe(createSafeDefault);
     setUniSwapVal(uniSwapPool);
   }, [createSafeDefault, uniSwapPool]);
@@ -82,16 +113,16 @@ const CreateSafeBody = ({ isChecked }: Props) => {
       <Body>
         <DoubleInput>
           <DecimalInput
-            label={'Deposit ETH (Avail 0.00)'}
+            label={`Deposit ETH (Avail ${availableEth})`}
             value={defaultSafe.depositedETH}
             onChange={(val: string) =>
-              setDefaultSafe({ ...defaultSafe, depositedETH: val })
+              setDefaultSafe({ borrowedRAI: '', depositedETH: val })
             }
             disableMax
             disabled={isChecked}
           />
           <DecimalInput
-            label={'Borrow RAI (Avail 0.00)'}
+            label={`Borrow RAI (Avail ${availableRai})`}
             value={defaultSafe.borrowedRAI}
             onChange={(val: string) =>
               setDefaultSafe({ ...defaultSafe, borrowedRAI: val })
@@ -100,6 +131,8 @@ const CreateSafeBody = ({ isChecked }: Props) => {
             disabled={isChecked}
           />
         </DoubleInput>
+
+        {error && <Error>{error}</Error>}
 
         {isChecked ? (
           <DoubleInput>
@@ -111,7 +144,7 @@ const CreateSafeBody = ({ isChecked }: Props) => {
               }
             />
             <DecimalInput
-              label={'RAI on Uniswap (Avail 0.00)'}
+              label={`RAI on Uniswap (Avail ${availableRai})`}
               value={uniSwapVal ? uniSwapVal.borrowedRAI : ''}
               onChange={(val: string) =>
                 setUniSwapVal({ ...uniSwapVal, borrowedRAI: val })
@@ -124,13 +157,13 @@ const CreateSafeBody = ({ isChecked }: Props) => {
         <Result>
           <Block>
             <Item>
-              <Label>{'Collateral Ratio'}</Label> <Value>{'250.00%'}</Value>
+              <Label>{'Collateral Ratio'}</Label> <Value>{`${collateralRatio}%`}</Value>
             </Item>
             <Item>
-              <Label>{'Liquidation Price'}</Label> <Value>{'$300.00'}</Value>
+              <Label>{'Liquidation Price'}</Label> <Value>{`$${liquidationPrice}`}</Value>
             </Item>
             <Item>
-              <Label>{'Liquidation Penalty'}</Label> <Value>{'11.00%'}</Value>
+              <Label>{'Liquidation Penalty'}</Label> <Value>{`${liquidationPenalty}%`}</Value>
             </Item>
           </Block>
         </Result>
@@ -148,6 +181,7 @@ const CreateSafeBody = ({ isChecked }: Props) => {
           </UniSwapCheckContainer>
         )}
       </Body>
+
       <Footer>
         <Button
           dimmed={!isChecked}
@@ -173,7 +207,8 @@ export default CreateSafeBody;
 
 const DoubleInput = styled.div`
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  
   > div {
     &:last-child {
       flex: 0 0 calc(57% + 10px);
@@ -260,4 +295,11 @@ const Footer = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 20px;
+`;
+
+const Error = styled.p`
+  color: ${(props) => props.theme.colors.dangerColor};
+  font-size: ${(props) => props.theme.font.extraSmall};
+  width: 100%;
+  margin: 16px 0;
 `;

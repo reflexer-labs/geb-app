@@ -2,9 +2,17 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import dayjs from 'dayjs';
+import { formatNumber } from '../utils/helper';
 
 const SafeBlock = ({ ...props }) => {
   const { t } = useTranslation();
+
+  const borrowedRAI = formatNumber(props.borrowedRAI, 2);
+  const createdAt = dayjs.unix(props.date).format('MMM D, YYYY h:mm A');
+  const depositedEth = formatNumber(props.depositedEth, 2);
+  const liquidationPrice = formatNumber(props.liquidationPrice, 2);
+
   return (
     <>
       <BlockContainer>
@@ -14,7 +22,7 @@ const SafeBlock = ({ ...props }) => {
             <SafeData>
               <SafeTitle>{`Safe #${props.id}`}</SafeTitle>
               <Date>
-                {t('created')} {props.date}
+                {t('created')} {createdAt}
               </Date>
             </SafeData>
           </SafeInfo>
@@ -24,14 +32,16 @@ const SafeBlock = ({ ...props }) => {
         </BlockHeader>
         <Block>
           <Item>
-            <Label>{'ETH Deposited'}</Label> <Value>{props.depositedEth}</Value>
+            <Label>{'ETH Deposited'}</Label>
+            <Value>{depositedEth}</Value>
           </Item>
           <Item>
-            <Label>{'RAI Borrowed'}</Label> <Value>{props.borrowedRAI}</Value>
+            <Label>{'RAI Borrowed'}</Label>
+            <Value>{borrowedRAI}</Value>
           </Item>
           <Item>
-            <Label>{'Liquidation Price'}</Label>{' '}
-            <Value>{props.liquidationPrice}</Value>
+            <Label>{'Liquidation Price'}</Label>
+            <Value>{liquidationPrice}</Value>
           </Item>
         </Block>
         <BtnContainer>

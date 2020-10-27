@@ -8,10 +8,11 @@ import TransactionOverview from './TransactionOverview';
 import { SUPPORTED_WALLETS } from '../../utils/constants';
 import { injected } from '../../connectors';
 import { useActiveWeb3React } from '../../hooks';
+import { formatNumber, getRatePercentage } from '../../utils/helper';
 
 const ReviewTransaction = () => {
   const isMetamask = window?.ethereum?.isMetaMask;
-  const { connector } = useActiveWeb3React();
+  const { account, connector, library } = useActiveWeb3React();
   const { t } = useTranslation();
 
   const {
@@ -21,29 +22,50 @@ const ReviewTransaction = () => {
   } = useStoreActions((state) => state);
   const { walletModel: walletState } = useStoreState((state) => state);
 
+  const { borrowedRAI, depositedETH } = walletState.createSafeDefault;
+  const collateralRatio = getRatePercentage(walletState.liquidationData.liquidationCRatio);
+  const liquidationPrice = formatNumber(walletState.liquidationData.currentPrice.liquidationPrice, 2);
+
   const handleCancel = () => {
     walletState.isUniSwapPoolChecked
       ? walletActions.setStage(1)
       : walletActions.setStage(0);
   };
 
-  const handleConfirm = () => {
-    safeActions.setIsSafeCreated(true);
-    popupsActions.setIsCreateAccountModalOpen(false);
-    popupsActions.setIsLoadingModalOpen({
-      isOpen: true,
-      text: t('fetching_account_info'),
-    });
-    safeActions.fetchAccountData();
-    walletActions.setStage(0);
-    walletActions.setUniSwapPool({
-      depositedETH: '',
-      borrowedRAI: '',
-    });
-    walletActions.setCreateSafeDefault({
-      depositedETH: '',
-      borrowedRAI: '',
-    });
+  const handleConfirm = async () => {
+    if (account && library) {
+      popupsActions.setIsCreateAccountModalOpen(false);
+      popupsActions.setIsLoadingModalOpen({
+        isOpen: true,
+        text: t('fetching_account_info'),
+      });
+
+      const signer = library.getSigner(account);
+      try {
+        await safeActions.createSafe({
+          createSafeDefault: walletState.createSafeDefault,
+          signer
+        });
+
+        safeActions.setIsSafeCreated(true);
+        walletActions.setStage(0);
+        walletActions.setUniSwapPool({
+          depositedETH: '',
+          borrowedRAI: '',
+        });
+        walletActions.setCreateSafeDefault({
+          depositedETH: '',
+          borrowedRAI: '',
+        });
+      } catch (e) {
+        console.log('handleConfirm error', e);
+        popupsActions.setIsCreateAccountModalOpen(true);
+        popupsActions.setIsLoadingModalOpen({
+          isOpen: false,
+          text: '',
+        });
+      }
+    }
   };
 
   const returnConnectorName = () => {
@@ -80,16 +102,16 @@ const ReviewTransaction = () => {
         <Result>
           <Block>
             <Item>
-              <Label>{'ETH Deposited'}</Label> <Value>{'0.00'}</Value>
+              <Label>{'ETH Deposited'}</Label> <Value>{depositedETH}</Value>
             </Item>
             <Item>
-              <Label>{'RAI Borrowed'}</Label> <Value>{'0.00'}</Value>
+              <Label>{'RAI Borrowed'}</Label> <Value>{borrowedRAI}</Value>
             </Item>
             <Item>
-              <Label>{'Collateral Ratio'}</Label> <Value>{'0.00%'}</Value>
+              <Label>{'Collateral Ratio'}</Label> <Value>{`${collateralRatio}%`}</Value>
             </Item>
             <Item>
-              <Label>{'Liquidation Price'}</Label> <Value>{'$0.00'}</Value>
+              <Label>{'Liquidation Price'}</Label> <Value>{`$${liquidationPrice}`}</Value>
             </Item>
           </Block>
 

@@ -3,11 +3,17 @@ import { css } from 'styled-components';
 import { injected, walletconnect, walletlink } from '../connectors';
 import { WalletInfo } from './interfaces';
 
-const { REACT_APP_GRAPH_API_URL } = process.env;
+const { REACT_APP_GRAPH_API_URLS, REACT_APP_NETWORK_ID } = process.env;
 
-export const GRAPH_API_URL =
-  REACT_APP_GRAPH_API_URL ??
-  'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai';
+export enum Network {
+  MAINNET = 'mainnet',
+  KOVAN = 'kovan'
+}
+
+export const ETH_NETWORK = REACT_APP_NETWORK_ID === '1' ? Network.MAINNET : Network.KOVAN;
+export const GRAPH_API_URLS = REACT_APP_GRAPH_API_URLS ?
+  REACT_APP_GRAPH_API_URLS.split(',') :
+  ['https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai'];
 
 export const MAILCHIMP_URL =
   'https://finance.us20.list-manage.com/subscribe/post-json?u=a3b1b26a531e341b4e086da36&id=b5976e4e32';
