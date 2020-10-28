@@ -2,6 +2,7 @@ import { ChainId } from '@uniswap/sdk';
 import { ethers } from 'ethers';
 import { utils as gebUtils } from 'geb.js';
 import { ETHERSCAN_PREFIXES } from './constants';
+import { ISafe } from './interfaces';
 
 export const returnWalletAddres = (walletAddress: string) =>
   `${walletAddress.slice(0, 4 + 2)}...${walletAddress.slice(-4)}`;
@@ -61,7 +62,7 @@ export const getAvailableRaiToBorrow = (depositedETH: string, safetyPrice: strin
   return formatNumber(gebUtils.wadToFixed(raiAvailableToBorrowWad).toString());
 }
 
-export const formatUserSafe = (safes: Array<any>) => {
+export const formatUserSafe = (safes: Array<any>): Array<ISafe> => {
   return safes.map(s => {
     return {
       id: s.safeId,
@@ -70,6 +71,8 @@ export const formatUserSafe = (safes: Array<any>) => {
       riskState: 'low',
       depositedEth: s.collateral,
       borrowedRAI: s.debt,
+      collateralRatio: s.collateralType.liquidationCRatio || '1',
+      liquidationPenalty: s.collateralType.liquidationPenalty || '1',
       liquidationPrice: s.collateralType.currentPrice.liquidationPrice,
     }
   })

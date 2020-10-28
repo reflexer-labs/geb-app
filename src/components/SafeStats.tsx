@@ -1,19 +1,28 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { useStoreActions } from '../store';
+import { useStoreActions, useStoreState } from '../store';
 import Button from './Button';
+import { formatNumber, getRatePercentage } from '../utils/helper';
 
 const SafeStats = () => {
   const { t } = useTranslation();
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
+  const { safeModel: safeState } = useStoreState((state) => state);
+
+  const { singleSafe } = safeState;
+  const borrowedRai = formatNumber(singleSafe?.borrowedRAI || '0', 2);
+  const collateralRatio = getRatePercentage(singleSafe?.collateralRatio || '1');
+  const depositedEth = formatNumber(singleSafe?.depositedEth || '0', 2);
+  const liquidationPrice = formatNumber(singleSafe?.liquidationPrice || '0', 2);
+  const liquidationPenalty = getRatePercentage(singleSafe?.liquidationPenalty || '1');
 
   return (
     <>
       <StatsGrid>
         <StatItem>
           <StateInner>
-            <Value>291.39%</Value>
+            <Value>{`${collateralRatio}%`}</Value>
             <Label>{'Collateralization Ratio'}</Label>
           </StateInner>
         </StatItem>
@@ -27,21 +36,21 @@ const SafeStats = () => {
 
         <StatItem>
           <StateInner>
-            <Value>$197.37</Value>
+            <Value>{`$${liquidationPrice}`}</Value>
             <Label>{'Liquidation Price'}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem>
           <StateInner>
-            <Value>11.00%</Value>
+            <Value>{`${liquidationPenalty}%`}</Value>
             <Label>{'Liquidation Penalty'}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem className="w50">
           <StateInner>
-            <Value>100.0000 ETH</Value>
+            <Value>{`${depositedEth} ETH`}</Value>
             <Label>{'ETH Deposited'}</Label>
             <Actions>
               <Button
@@ -70,7 +79,7 @@ const SafeStats = () => {
 
         <StatItem className="w50">
           <StateInner>
-            <Value>12,5000 RAI</Value>
+            <Value>{`${borrowedRai} RAI`}</Value>
             <Label>{'RAI Borrowed'}</Label>
             <Actions>
               <Button

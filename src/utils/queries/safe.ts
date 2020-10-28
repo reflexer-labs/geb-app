@@ -11,3 +11,19 @@ export const getUserSafesListQuery = (address: string) => `{
     debt
   }
 }`
+
+export const getSafeByIdQuery = (safeId: string) => `{
+  safes(where: { safeId: "${safeId}" }) {
+    safeId
+    collateralType {
+      currentPrice {
+        liquidationPrice
+      }
+      liquidationCRatio
+      liquidationPenalty
+    }
+    collateral
+    createdAt
+    debt
+  }
+}`

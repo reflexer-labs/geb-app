@@ -113,6 +113,8 @@ export interface ISafe {
   riskState: string;
   depositedEth: string;
   borrowedRAI: string;
+  collateralRatio: string;
+  liquidationPenalty: string;
   liquidationPrice: string;
 }
 

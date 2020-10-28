@@ -1,7 +1,7 @@
 import { action, Action, thunk, Thunk } from 'easy-peasy';
 import { ICreateSafePayload, ISafe } from '../utils/interfaces';
 import { handleSafeCreation } from '../services/blockchain';
-import { fetchUserSafes } from '../services/graphql';
+import { fetchSafeById, fetchUserSafes } from '../services/graphql';
 
 export const INITIAL_SAFE_STATE = [
   {
@@ -11,6 +11,8 @@ export const INITIAL_SAFE_STATE = [
     riskState: 'low',
     depositedEth: '100.00',
     borrowedRAI: '23.00',
+    collateralRatio: '1.5',
+    liquidationPenalty: '1.11',
     liquidationPrice: '$250.00',
   },
 ]
@@ -24,6 +26,7 @@ export interface SafeModel {
   totalRAI: string;
   isES: boolean;
   createSafe: Thunk<SafeModel, ICreateSafePayload>;
+  fetchSafeById: Thunk<SafeModel, string>;
   fetchUserSafes: Thunk<SafeModel, string>;
   setIsSafeCreated: Action<SafeModel, boolean>;
   setList: Action<SafeModel, Array<ISafe>>;
@@ -56,6 +59,11 @@ const safeModel: SafeModel = {
 
   fetchUserSafes: thunk(async (actions, payload) => {
     return fetchUserSafes(payload);
+  }),
+
+  fetchSafeById: thunk(async (actions, payload) => {
+    const safe = (await fetchSafeById(payload))[0];
+    actions.setSingleSafe(safe);
   }),
 
   setIsSafeCreated: action((state, payload) => {
