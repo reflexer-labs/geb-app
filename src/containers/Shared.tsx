@@ -24,6 +24,7 @@ import Footer from '../components/Footer';
 import styled from 'styled-components';
 import useWindowSize from '../hooks/useWindowSize';
 import { NETWORK_ID } from '../connectors';
+import IncentivesModal from '../components/Modals/IncentivesModal';
 
 interface Props {
   children: ReactNode;
@@ -99,6 +100,7 @@ const Shared = ({ children }: Props) => {
       <SafeOperationsModal />
       <CreateAccountModal />
       <ConnectedWalletModal />
+      <IncentivesModal />
       <ScreenLoader />
       <EmptyDiv ref={navbarRef}>
         <Navbar />

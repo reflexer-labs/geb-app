@@ -79,5 +79,8 @@
   "review": "Review",
   "submit": "Submit",
   "invalid_email": "Please enter a valid email address",
-  "subscription_success": "Subscribed successfully!"
+  "subscription_success": "Subscribed successfully!",
+  "incentives_header_text": "Manage, send and receive assets",
+  "liquidity_mining": "Liquidity Mining",
+  "assets": "Assets"
 }

@@ -13,7 +13,7 @@ const Brand = ({ height }: Props) => {
         <img
           height={height}
           src={process.env.PUBLIC_URL + '/img/brand.svg'}
-          alt="reflexer labds"
+          alt="reflexer labs"
         />
       </Link>
     </Container>
