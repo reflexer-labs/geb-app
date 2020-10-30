@@ -28,7 +28,7 @@ const IncentivesAssets = () => {
       <List>
         <Row ref={ref}>
           <Col>
-            <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
+            <img src={process.env.PUBLIC_URL + '/img/eth-logo.svg'} alt="" />
             <Label>
               ETH
               <Tag>Ethereum</Tag>
@@ -46,7 +46,7 @@ const IncentivesAssets = () => {
 
         <Row>
           <Col>
-            <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
+            <img src={process.env.PUBLIC_URL + '/img/rai-logo.svg'} alt="" />
             <Label>
               RAI
               <Tag>RAI Token</Tag>
@@ -63,7 +63,7 @@ const IncentivesAssets = () => {
         </Row>
         <Row>
           <Col>
-            <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
+            <img src={process.env.PUBLIC_URL + '/img/flx-logo.svg'} alt="" />
             <Label>
               FLX
               <Tag>Flex Token</Tag>
@@ -76,23 +76,6 @@ const IncentivesAssets = () => {
           <Col>
             $85,525
             <Diff className="red">-5.39%</Diff>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
-            <Label>
-              MAI
-              <Tag>MAI Token</Tag>
-            </Label>
-          </Col>
-          <Col>75.00</Col>
-          <Col>
-            $1.01 <Diff className="red">-0.91%</Diff>
-          </Col>
-          <Col>
-            $75.75
-            <Diff className="green">+2.59%</Diff>
           </Col>
         </Row>
       </List>
@@ -154,6 +137,12 @@ const Row = styled.div`
   display: flex;
   padding: 12px 20px;
   border-top: 1px solid ${(props) => props.theme.colors.border};
+  &:first-child {
+    img {
+      padding: 1px;
+      border: 1px solid ${(props) => props.theme.colors.border};
+    }
+  }
 `;
 
 const Col = styled.div`

@@ -80,7 +80,12 @@
   "submit": "Submit",
   "invalid_email": "Please enter a valid email address",
   "subscription_success": "Subscribed successfully!",
-  "incentives_header_text": "Manage, send and receive assets",
+  "incentives_header_text": "Use RAI and earn rewards",
   "liquidity_mining": "Liquidity Mining",
-  "assets": "Assets"
+  "assets": "Assets",
+  "checkout_rewards": "I also want to cash out my accrued rewards",
+  "leave_liquidity": "I want to leave liquidity in Uniswap",
+  "pool_token_withdraw": "Pool Tokens to Withdraw",
+  "pool_tokens": "Pool Tokens",
+  "redeem_rewards": "Redeem Rewards"
 }

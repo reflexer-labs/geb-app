@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { useStoreActions } from '../../store';
+import { useStoreActions, useStoreState } from '../../store';
 import Button from '../Button';
 import TransactionOverview from '../CreateSafe/TransactionOverview';
 import { SUPPORTED_WALLETS } from '../../utils/constants';
@@ -13,13 +13,17 @@ const IncentivesTransaction = () => {
   const { connector } = useActiveWeb3React();
   const { t } = useTranslation();
 
+  const { incentivesModel: incentivesState } = useStoreState((state) => state);
+
   const {
     popupsModel: popupsActions,
     incentivesModel: incentivesActions,
   } = useStoreActions((state) => state);
 
   const handleBack = () => {
-    incentivesActions.setOperation(0);
+    incentivesState.isLeaveLiquidityChecked
+      ? incentivesActions.setOperation(1)
+      : incentivesActions.setOperation(0);
   };
 
   const handleConfirm = () => {
@@ -52,7 +56,7 @@ const IncentivesTransaction = () => {
       <Body>
         <TransactionOverview
           title={t('confirm_transaction_details')}
-          isChecked
+          isChecked={incentivesState.type !== 'redeem_rewards'}
           description={
             t('confirm_details_text') +
             (returnConnectorName() ? 'on ' + returnConnectorName() : '')
@@ -60,15 +64,39 @@ const IncentivesTransaction = () => {
         />
         <Result>
           <Block>
-            <Item>
-              <Label>{'RAI per ETH'}</Label> <Value>{'0.12345678'}</Value>
-            </Item>
-            <Item>
-              <Label>{'ETH per RAI'}</Label> <Value>{'432.1098'}</Value>
-            </Item>
-            <Item>
-              <Label>{'Share of Pool'}</Label> <Value>{'0.00'}</Value>
-            </Item>
+            {incentivesState.type !== 'redeem_rewards' ? (
+              <>
+                <Item>
+                  <Label>{'RAI per ETH'}</Label> <Value>{'0.12345678'}</Value>
+                </Item>
+                <Item>
+                  <Label>{'ETH per RAI'}</Label> <Value>{'432.1098'}</Value>
+                </Item>
+                <Item>
+                  <Label>{'Share of Uniswap Pool'}</Label>{' '}
+                  <Value>{'0.00'}</Value>
+                </Item>
+                {incentivesState.type === 'withdraw' ? (
+                  <>
+                    <Item>
+                      <Label>{'Rewards Received Now'}</Label>{' '}
+                      <Value>{'0.00'}</Value>
+                    </Item>
+                    <Item>
+                      <Label>{'Rewards to Unlock'}</Label>{' '}
+                      <Value>{'0.00'}</Value>
+                    </Item>
+                    <Item>
+                      <Label>{'Unlock Time'}</Label> <Value>{'0.00'}</Value>
+                    </Item>
+                  </>
+                ) : null}
+              </>
+            ) : (
+              <Item>
+                <Label>{'Claimable FLX'}</Label> <Value>{'50.00'}</Value>
+              </Item>
+            )}
           </Block>
         </Result>
 

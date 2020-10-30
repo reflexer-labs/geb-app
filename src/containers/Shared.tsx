@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Alerts from '../components/Alerts';
 import ConnectedWalletModal from '../components/Modals/ConnectedWalletModal';
@@ -19,9 +19,7 @@ import LoadingModal from '../components/Modals/LoadingModal';
 import SafeOperationsModal from '../components/Modals/SafeOperationsModal';
 import ESMOperationModal from '../components/Modals/ESMOperationModal';
 import VotingOperationModal from '../components/Modals/VotingOperationModal';
-import Footer from '../components/Footer';
 import styled from 'styled-components';
-import useWindowSize from '../hooks/useWindowSize';
 import { NETWORK_ID } from '../connectors';
 import IncentivesModal from '../components/Modals/IncentivesModal';
 import CookieBanner from '../components/CookieBanner';
@@ -32,11 +30,7 @@ interface Props {
 
 const Shared = ({ children }: Props) => {
   const { t } = useTranslation();
-  const footerRef = React.useRef<HTMLDivElement>(null);
-  const navbarRef = React.useRef<HTMLDivElement>(null);
   const { chainId, account } = useActiveWeb3React();
-  const [contentHeight, setContentHeight] = useState('auto');
-  const windowSize = useWindowSize();
   const { popupsModel: popupsState } = useStoreState((state) => state);
   const {
     popupsModel: popupsActions,
@@ -70,22 +64,6 @@ const Shared = ({ children }: Props) => {
     // eslint-disable-next-line
   }, [chainId, account]);
 
-  useEffect(() => {
-    if (
-      windowSize.height &&
-      navbarRef &&
-      navbarRef.current &&
-      footerRef &&
-      footerRef.current
-    ) {
-      const footerHeight = footerRef.current.clientHeight;
-      const navbarHeight = navbarRef.current.clientHeight;
-      const height =
-        windowSize.height - (footerHeight + navbarHeight) - 20 + 'px';
-      setContentHeight(height);
-    }
-  }, [navbarRef, footerRef, windowSize.height]);
-
   return (
     <Container>
       <SideMenu />
@@ -101,7 +79,7 @@ const Shared = ({ children }: Props) => {
       <ConnectedWalletModal />
       <IncentivesModal />
       <ScreenLoader />
-      <EmptyDiv ref={navbarRef}>
+      <EmptyDiv>
         <Navbar />
       </EmptyDiv>
       {alertPayload ? (
@@ -111,9 +89,8 @@ const Shared = ({ children }: Props) => {
           type={alertPayload.type}
         />
       ) : null}
-      <Content minHeight={contentHeight}>{children}</Content>
-      <EmptyDiv ref={footerRef}>
-        <Footer slapToBottom />
+      <Content>{children}</Content>
+      <EmptyDiv>
         <CookieBanner />
       </EmptyDiv>
     </Container>
@@ -160,7 +137,5 @@ const Container = styled.div`
   }
 `;
 
-const Content = styled.div<{ minHeight: string }>`
-  min-height: ${({ minHeight }) => minHeight};
-`;
+const Content = styled.div``;
 const EmptyDiv = styled.div``;

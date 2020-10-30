@@ -5,11 +5,32 @@ import styled from 'styled-components';
 import { useStoreState } from '../../store';
 import IncentivesPayment from './IncentivesPayment';
 import IncentivesTransaction from './IncentivesTransaction';
+import PoolTokens from './PoolTokens';
+import RedeemRewards from './RedeemRewards';
 
 const IncentivesOperations = () => {
   const { t } = useTranslation();
   const nodeRef = React.useRef(null);
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
+
+  const returnBody = () => {
+    switch (incentivesState.operation) {
+      case 0:
+        return incentivesState.type !== 'redeem_rewards' ? (
+          <IncentivesPayment
+            isChecked={incentivesState.isLeaveLiquidityChecked}
+          />
+        ) : (
+          <RedeemRewards />
+        );
+      case 1:
+        return <PoolTokens />;
+      case 2:
+        return <IncentivesTransaction />;
+      default:
+        break;
+    }
+  };
 
   return (
     <SwitchTransition mode={'out-in'}>
@@ -32,17 +53,8 @@ const IncentivesOperations = () => {
               maxWidth: '720px',
             }}
           >
-            <Header>
-              {incentivesState.type === 'withdraw'
-                ? t('withdraw')
-                : t('deposit')}
-            </Header>
-
-            {incentivesState.operation === 0 ? (
-              <IncentivesPayment />
-            ) : (
-              <IncentivesTransaction />
-            )}
+            <Header>{t(incentivesState.type)}</Header>
+            {returnBody()}
           </ModalContent>
         </Fade>
       </CSSTransition>

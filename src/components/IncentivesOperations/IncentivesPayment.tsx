@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
 import Button from '../Button';
+import CheckBox from '../CheckBox';
 import DecimalInput from '../DecimalInput';
 import Dropdown from '../Dropdown';
 
@@ -14,10 +15,16 @@ const INITITAL_STATE = [
   { item: 'RAI/ETH', img: `${process.env.PUBLIC_URL + '/img/ref-icon.svg'}` },
 ];
 
-const IncentivesPayment = () => {
+interface Props {
+  isChecked?: boolean;
+}
+
+const IncentivesPayment = ({ isChecked }: Props) => {
   const { t } = useTranslation();
   const [ethAmount, setEthAmount] = useState('');
   const [raiAmount, setRaiAmount] = useState('');
+  const [cashRewardsCheck, setCashRewardsCheck] = useState(false);
+  const [leaveLiquidity, setLeaveLiquidity] = useState(isChecked || false);
 
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
 
@@ -32,7 +39,16 @@ const IncentivesPayment = () => {
   };
 
   const handleSubmit = () => {
-    incentivesActions.setOperation(1);
+    if (leaveLiquidity) {
+      incentivesActions.setOperation(1);
+    } else {
+      incentivesActions.setOperation(2);
+    }
+  };
+
+  const handleLeaveLiquidityCheck = (state: boolean) => {
+    setLeaveLiquidity(state);
+    incentivesActions.setIsLeaveLiquidityChecked(state);
   };
 
   return (
@@ -41,7 +57,7 @@ const IncentivesPayment = () => {
         <Dropdown
           items={[]}
           itemSelected={INITITAL_STATE[0]}
-          label={'Lending Platform'}
+          label={'DEX'}
           padding={'22px 20px'}
         />
         <Dropdown
@@ -63,7 +79,7 @@ const IncentivesPayment = () => {
           label={`${incentivesState.type} RAI (Avail 0.00)`}
           value={raiAmount}
           onChange={setRaiAmount}
-          handleMaxClick={() => console.log('something')}
+          disableMax
         />
       </DoubleInput>
 
@@ -76,17 +92,49 @@ const IncentivesPayment = () => {
             <Label>{'ETH per RAI'}</Label> <Value>{'432.1098'}</Value>
           </Item>
           <Item>
-            <Label>{'Share of Pool'}</Label> <Value>{'0.00'}</Value>
+            <Label>{'Share of Uniswap Pool'}</Label> <Value>{'0.00'}</Value>
           </Item>
+          {incentivesState.type === 'withdraw' ? (
+            <>
+              <Item>
+                <Label>{'Rewards Received Now'}</Label> <Value>{'0.00'}</Value>
+              </Item>
+              <Item>
+                <Label>{'Rewards to Unlock'}</Label> <Value>{'0.00'}</Value>
+              </Item>
+              <Item>
+                <Label>{'Unlock Time'}</Label> <Value>{'0.00'}</Value>
+              </Item>
+            </>
+          ) : null}
         </Block>
       </Result>
+
+      {incentivesState.type === 'withdraw' ? (
+        <>
+          <CheckBoxcontainer>
+            <Text>{t('checkout_rewards')}</Text>
+            <CheckBox
+              checked={cashRewardsCheck}
+              onChange={setCashRewardsCheck}
+            />
+          </CheckBoxcontainer>
+          <CheckBoxcontainer className={'adjust-margin'}>
+            <Text>{t('leave_liquidity')}</Text>
+            <CheckBox
+              checked={leaveLiquidity}
+              onChange={handleLeaveLiquidityCheck}
+            />
+          </CheckBoxcontainer>
+        </>
+      ) : null}
 
       <Footer>
         <Button dimmed text={t('cancel')} onClick={handleCancel} />
         <Button
           withArrow
           onClick={handleSubmit}
-          text={t('review_transaction')}
+          text={t(leaveLiquidity ? 'pool_tokens' : 'review_transaction')}
         />
       </Footer>
     </Body>
@@ -200,4 +248,20 @@ const DoubleInput = styled.div`
       }
     }
   `}
+`;
+
+const CheckBoxcontainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  &.adjust-margin {
+    margin-top: 5px;
+  }
+`;
+
+const Text = styled.div`
+  line-height: 18px;
+  letter-spacing: -0.18px;
+  color: ${(props) => props.theme.colors.secondary};
+  font-size: ${(props) => props.theme.font.extraSmall};
 `;

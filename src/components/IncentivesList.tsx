@@ -44,6 +44,14 @@ const IncentivesList = () => {
           onClick={() => handleClick('withdraw')}
           dimmed
         />
+
+        <div className="mid-btn">
+          <Button
+            text={t('redeem_rewards')}
+            onClick={() => handleClick('redeem_rewards')}
+            withArrow
+          />
+        </div>
         <Button
           withArrow
           onClick={() => handleClick('deposit')}
@@ -138,4 +146,14 @@ const BtnContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px 20px 20px;
+
+  .mid-btn {
+    button {
+      background: linear-gradient(225deg, #4ce096 0%, #78d8ff 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: ${(props) => props.theme.colors.inputBorderColor};
+    }
+  }
 `;
