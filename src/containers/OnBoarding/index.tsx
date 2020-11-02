@@ -27,7 +27,10 @@ const OnBoarding = () => {
   } = useStoreActions((state) => state);
 
   useEffect(() => {
-    if (account && previousAccount && account !== previousAccount) {
+    const isLoggedOut = !account;
+    const isAccountSwitched = account && previousAccount && account !== previousAccount
+
+    if (isLoggedOut || isAccountSwitched) {
       safeActions.setIsSafeCreated(false);
       walletActions.setStep(0);
     }
@@ -39,8 +42,8 @@ const OnBoarding = () => {
       <GridContainer>
         <Content>
           <PageHeader
-            breadcrumbs={{ '/': t('accounts') }}
-            text={t('accounts_header_text')}
+            breadcrumbs={{ '/': t(safeState.safeCreated ? 'accounts' : 'onboarding') }}
+            text={t(safeState.safeCreated ? 'accounts_header_text' : 'onboarding_header_text')}
           />
           {safeState.safeCreated ? (
             <BtnContainer>

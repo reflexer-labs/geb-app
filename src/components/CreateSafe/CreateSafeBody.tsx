@@ -45,17 +45,17 @@ const CreateSafeBody = ({ isChecked }: Props) => {
   const liquidationPenalty = getRatePercentage(walletState.liquidationData.liquidationPenalty);
   const liquidationPrice = typeof collateralRatio === 'number' ? formatNumber(walletState.liquidationData.currentPrice.liquidationPrice, 2) : 0;
 
-  const setMaxRai = () => {
-    setDefaultSafe({ ...defaultSafe, borrowedRAI: availableRai.toString() });
-  }
+  // const setMaxRai = () => {
+  //   setDefaultSafe({ ...defaultSafe, borrowedRAI: availableRai.toString() });
+  // }
 
   const submitDefaultValues = () => {
     if (!defaultSafe.depositedETH) {
       setError('Please enter the amount of ETH to be deposited.');
-    } else if (!defaultSafe.borrowedRAI || Number(defaultSafe.borrowedRAI) < 70) {
-      setError('Minimum amount of RAI to be borrowed must be at-least 70.');
     } else if (Number(defaultSafe.depositedETH) > availableEth) {
       setError('ETH deposited cannot exceed balance.');
+    } else if (!defaultSafe.borrowedRAI || Number(defaultSafe.borrowedRAI) < 70) {
+      setError('Minimum amount of RAI to be borrowed must be at least 70.');
     } else if (Number(defaultSafe.borrowedRAI) > availableRai) {
       setError('RAI borrowed cannot exceed available amount.');
     } else {
@@ -89,6 +89,20 @@ const CreateSafeBody = ({ isChecked }: Props) => {
     }
   };
 
+  const onChangeBorrow = (borrowedRAI: string) => {
+    setDefaultSafe({ ...defaultSafe, borrowedRAI });
+    if (error) {
+      setError('');
+    }
+  }
+
+  const onChangeDeposit = (depositedETH: string) => {
+    setDefaultSafe({ ...defaultSafe, depositedETH });
+    if (error) {
+      setError('');
+    }
+  }
+
   useEffect(() => {
     walletActions.fetchLiquidationData();
     // eslint-disable-next-line
@@ -106,19 +120,16 @@ const CreateSafeBody = ({ isChecked }: Props) => {
           <DecimalInput
             label={`Deposit ETH (Avail ${availableEth})`}
             value={defaultSafe.depositedETH}
-            onChange={(val: string) =>
-              setDefaultSafe({ ...defaultSafe, borrowedRAI: '', depositedETH: val })
-            }
+            onChange={onChangeDeposit}
             disableMax
             disabled={isChecked}
           />
           <DecimalInput
             label={`Borrow RAI (Avail ${availableRai})`}
             value={defaultSafe.borrowedRAI}
-            onChange={(val: string) =>
-              setDefaultSafe({ ...defaultSafe, borrowedRAI: val })
-            }
+            onChange={onChangeBorrow}
             disableMax
+            // handleMaxClick={setMaxRai}
             disabled={isChecked}
           />
         </DoubleInput>
@@ -130,17 +141,14 @@ const CreateSafeBody = ({ isChecked }: Props) => {
             <DecimalInput
               label={'ETH on Uniswap (Avail 0.00)'}
               value={uniSwapVal ? uniSwapVal.depositedETH : ''}
-              onChange={(val: string) =>
-                setUniSwapVal({ ...uniSwapVal, depositedETH: val })
-              }
+              onChange={onChangeDeposit}
             />
             <DecimalInput
               label={`RAI on Uniswap (Avail ${availableRai})`}
               value={uniSwapVal ? uniSwapVal.borrowedRAI : ''}
-              onChange={(val: string) =>
-                setUniSwapVal({ ...uniSwapVal, borrowedRAI: val })
-              }
+              onChange={onChangeBorrow}
               disableMax
+              // handleMaxClick={setMaxRai}
             />
           </DoubleInput>
         ) : null}

@@ -124,14 +124,12 @@ const Steps = () => {
 
   return (
     <StepsContainer>
-      <StepsBars>
-        <StepBar className="active" />
-        <StepBar
-          className={currentStep === 1 || currentStep === 2 ? 'active' : ''}
-        />
-        <StepBar className={currentStep === 2 ? 'active' : ''}/>
-      </StepsBars>
-
+      {currentStep > 0 && (
+        <StepsBars>
+          <StepBar className="active" />
+          <StepBar className={currentStep === 2 ? 'active' : ''}/>
+        </StepsBars>
+      )}
       {returnSteps(currentStep)}
     </StepsContainer>
   );

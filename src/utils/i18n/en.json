@@ -5,7 +5,7 @@
   "settings": "Settings",
   "connect_wallet": "Connect Wallet",
   "getting_started": "Getting Started",
-  "getting_started_text": "To get setup and running you need to complete a quick 3 step process. Let’s start by connecting your Wallet.",
+  "getting_started_text": "Connect your wallet to start opening Safes",
   "create_account": "Create Account",
   "create_account_text": "Your wallet is connected! Now lets create a Reflexer Account so you can start to deposit, borrow and earn rewards.",
   "create_safe": "Create a Safe",
@@ -88,5 +88,7 @@
   "pool_token_withdraw": "Pool Tokens to Withdraw",
   "pool_tokens": "Pool Tokens",
   "redeem_rewards": "Redeem",
-  "wallet_connected": "Wallet Connected"
+  "wallet_connected": "Wallet Connected",
+  "onboarding": "Onboarding",
+  "onboarding_header_text": "Manage your Reflexer account"
 }
