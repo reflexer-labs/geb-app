@@ -4,7 +4,7 @@ import { utils as gebUtils } from 'geb.js';
 import { ETHERSCAN_PREFIXES } from './constants';
 import { ISafe } from './interfaces';
 
-export const returnWalletAddres = (walletAddress: string) =>
+export const returnWalletAddress = (walletAddress: string) =>
   `${walletAddress.slice(0, 4 + 2)}...${walletAddress.slice(-4)}`;
 
 export const capitalizeName = (name: string) =>
@@ -77,3 +77,13 @@ export const formatUserSafe = (safes: Array<any>): Array<ISafe> => {
     }
   })
 }
+
+/* export const getCollateralRatio = (
+  depositedETH: string,
+  liquidationPrice: string,
+  liquidationCRatio: string,
+  debt: string,
+  accumulatedRate: string
+) => {
+  return (depositedETH * liquidationPrice * liquidationCRatio / (debt * accumulatedRate) * 100).toString()
+} */

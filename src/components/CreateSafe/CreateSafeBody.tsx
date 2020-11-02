@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
 import { CreateSafeType } from '../../utils/interfaces';
 import Button from '../Button';
-import CheckBox from '../CheckBox';
+// import CheckBox from '../CheckBox';
 import DecimalInput from '../DecimalInput';
 import { formatNumber, getAvailableRaiToBorrow, getRatePercentage } from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
@@ -15,6 +15,7 @@ interface Props {
 
 const CreateSafeBody = ({ isChecked }: Props) => {
   const { t } = useTranslation();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || false);
   const [error, setError] = useState('');
   const [defaultSafe, setDefaultSafe] = useState<CreateSafeType>({
@@ -168,7 +169,7 @@ const CreateSafeBody = ({ isChecked }: Props) => {
           </Block>
         </Result>
 
-        {isChecked ? null : (
+        {/*{isChecked ? null : (
           <UniSwapCheckContainer>
             <Text>{t('uniswap_modal_check_text')}</Text>
             <CheckBox
@@ -179,7 +180,7 @@ const CreateSafeBody = ({ isChecked }: Props) => {
               }}
             />
           </UniSwapCheckContainer>
-        )}
+        )}*/}
       </Body>
 
       <Footer>
@@ -274,18 +275,18 @@ const Value = styled.div`
   font-weight: 600;
 `;
 
-const UniSwapCheckContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-`;
+// const UniSwapCheckContainer = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   margin-top: 20px;
+// `;
 
-const Text = styled.div`
-  line-height: 18px;
-  letter-spacing: -0.18px;
-  color: ${(props) => props.theme.colors.secondary};
-  font-size: ${(props) => props.theme.font.extraSmall};
-`;
+// const Text = styled.div`
+//   line-height: 18px;
+//   letter-spacing: -0.18px;
+//   color: ${(props) => props.theme.colors.secondary};
+//   font-size: ${(props) => props.theme.font.extraSmall};
+// `;
 
 const Body = styled.div`
   padding: 20px;

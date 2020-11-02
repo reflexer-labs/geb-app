@@ -3,7 +3,7 @@ import Scrollbars from 'react-custom-scrollbars';
 import { useTranslation } from 'react-i18next';
 import styled, { keyframes } from 'styled-components';
 import { useStoreActions } from '../store';
-import { returnWalletAddres } from '../utils/helper';
+import { returnWalletAddress } from '../utils/helper';
 import Button from './Button';
 
 interface IVote {
@@ -93,7 +93,7 @@ const VotesList = () => {
                 .map((vote: IVote) => (
                   <ListeItem key={vote.address}>
                     <UpperSection>
-                      <Address>{returnWalletAddres(vote.address)}</Address>
+                      <Address>{returnWalletAddress(vote.address)}</Address>
                       <Votes>{vote.votes.toFixed(2)}</Votes>
                     </UpperSection>
                     <VotesPercentage size={returnPercentage(vote.votes)} />

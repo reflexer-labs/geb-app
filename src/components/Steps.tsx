@@ -8,7 +8,13 @@ import { geb } from '../connectors';
 const Steps = () => {
   const { account, library } = useActiveWeb3React();
   const [currentStep, setCurrentStep] = useState(0);
-  const { walletModel: walletState } = useStoreState((state) => state);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    connectWalletModel: connectWalletState,
+    walletModel: walletState
+  } = useStoreState((state) => state);
   const {
     popupsModel: popupsActions,
     safeModel: safeActions,
@@ -20,13 +26,28 @@ const Steps = () => {
   const handleConnectWallet = () =>
     popupsActions.setIsConnectorsWalletOpen(true);
 
+  const resetError = () => {
+    setTimeout(() => {
+      setError('');
+    }, 5000);
+  };
+
   const handleCreateAccount = async () => {
     if (account && library) {
+      setIsLoading(true);
       const txData = geb.deployProxy();
       const signer = library.getSigner(account);
-      // TODO: Catch error and display it to the user
-      await signer.sendTransaction(txData);
-      walletActions.setStep(2);
+
+      try {
+        const pending = await signer.sendTransaction(txData);
+        await pending.wait();
+        walletActions.setStep(2);
+      } catch (e) {
+        setError('Could not create an account. Please try again.');
+        resetError();
+      }
+
+      setIsLoading(false);
     }
   };
 
@@ -56,7 +77,7 @@ const Steps = () => {
       setCurrentStep(step);
     }
     // eslint-disable-next-line
-  }, [step]);
+  }, [account, step]);
 
   const returnSteps = (stepNumber: number) => {
     switch (stepNumber) {
@@ -67,6 +88,9 @@ const Steps = () => {
             text={'getting_started_text'}
             btnText={'connect_wallet'}
             handleClick={handleConnectWallet}
+            isDisabled={connectWalletState.isWrongNetwork}
+            isLoading={isLoading}
+            error={error}
           />
         );
       case 1:
@@ -76,6 +100,9 @@ const Steps = () => {
             text={'create_account_text'}
             btnText={'create_account'}
             handleClick={handleCreateAccount}
+            isDisabled={connectWalletState.isWrongNetwork}
+            isLoading={isLoading}
+            error={error}
           />
         );
       case 2:
@@ -85,6 +112,9 @@ const Steps = () => {
             text={'create_safe_text'}
             btnText={'create_safe'}
             handleClick={handleCreateSafe}
+            isDisabled={connectWalletState.isWrongNetwork}
+            isLoading={isLoading}
+            error={error}
           />
         );
       default:

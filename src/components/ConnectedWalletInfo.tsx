@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { useStoreActions } from '../store';
-import { returnWalletAddres } from '../utils/helper';
+import { returnWalletAddress } from '../utils/helper';
 import Button from './Button';
 import CopyIcon from './Icons/CopyIcon';
 import ExpandIcon from './Icons/ExpandIcon';
@@ -63,7 +63,7 @@ const ConnectedWalletInfo = () => {
 
         <Address>
           <ConnectedWalletIcon size={20} />
-          {account && active ? returnWalletAddres(account) : 'N/A'}
+          {account && active ? returnWalletAddress(account) : 'N/A'}
         </Address>
         {account && active ? (
           <WalletData>

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useStoreActions } from '../store';
 import Brand from './Brand';
 import Button from './Button';
-import { returnWalletAddres } from '../utils/helper';
+import { returnWalletAddress } from '../utils/helper';
 import NavLinks from './NavLinks';
 import { useWeb3React } from '@web3-react/core';
 
@@ -31,7 +31,7 @@ const Navbar = () => {
           <Button
             onClick={handleWalletConnect}
             text={
-              active && account ? returnWalletAddres(account) : 'connect_wallet'
+              active && account ? returnWalletAddress(account) : 'connect_wallet'
             }
           />
         </BtnContainer>

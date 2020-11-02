@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import Loader from './Loader';
 
 interface Props {
   text?: string;
@@ -8,6 +9,7 @@ interface Props {
   dimmed?: boolean;
   withArrow?: boolean;
   disabled?: boolean;
+  isLoading?: boolean;
   dimmedWithArrow?: boolean;
   isBordered?: boolean;
   arrowPlacement?: string;
@@ -20,6 +22,7 @@ const Button = ({
   dimmed,
   withArrow,
   disabled,
+  isLoading,
   dimmedWithArrow,
   isBordered,
   arrowPlacement = 'left',
@@ -33,6 +36,7 @@ const Button = ({
         </DimmedBtn>
       );
     }
+
     if (dimmedWithArrow) {
       return (
         <DimmedBtn disabled={disabled} onClick={onClick}>
@@ -67,8 +71,10 @@ const Button = ({
       );
     } else {
       return (
-        <Container disabled={disabled} onClick={onClick}>
-          {text && t(text)} {children ? children : null}
+        <Container disabled={disabled} isLoading={isLoading} onClick={onClick}>
+          {text && t(text)}
+          {children || null}
+          {isLoading && (<Loader inlineButton />)}
         </Container>
       );
     }
@@ -79,7 +85,7 @@ const Button = ({
 
 export default Button;
 
-const Container = styled.button`
+const Container = styled.button<{ isLoading?: boolean }>`
   outline: none;
   cursor: pointer;
   min-width: 134px;
@@ -93,10 +99,13 @@ const Container = styled.button`
   background: ${(props) => props.theme.colors.gradient};
   border-radius: ${(props) => props.theme.global.borderRadius};
   transition: all 0.3s ease;
+  
   &:hover {
     opacity: 0.8;
   }
+  
   &:disabled {
+    background: ${(props) => props.isLoading ? props.theme.colors.placeholder : props.theme.colors.secondary};
     cursor: not-allowed;
   }
 `;

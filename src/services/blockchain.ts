@@ -26,9 +26,5 @@ export const handleSafeCreation = async (signer: JsonRpcSigner, createSafeDefaul
   );
 
   const pending = await signer.sendTransaction(txData);
-  console.log(`Transaction ${pending.hash} waiting to be mined...`);
-
-  // TODO: Maybe not wait until transaction is mined?
   await pending.wait();
-  console.log('Transaction mined, safe opened!');
 }

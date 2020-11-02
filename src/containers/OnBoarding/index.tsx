@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'react-feather';
@@ -8,11 +8,31 @@ import GridContainer from '../../components/GridContainer';
 import PageHeader from '../../components/PageHeader';
 import SafeList from './SafeList';
 import Button from '../../components/Button';
+import { useActiveWeb3React } from '../../hooks';
+import usePrevious from '../../hooks/usePrevious';
 
 const OnBoarding = () => {
   const { t } = useTranslation();
-  const { safeModel: safeState } = useStoreState((state) => state);
-  const { popupsModel: popupsActions } = useStoreActions((state) => state);
+  const { account } = useActiveWeb3React();
+  const previousAccount = usePrevious(account);
+
+  const {
+    connectWalletModel: connectWalletState,
+    safeModel: safeState
+  } = useStoreState((state) => state);
+  const {
+    popupsModel: popupsActions,
+    safeModel: safeActions,
+    walletModel: walletActions
+  } = useStoreActions((state) => state);
+
+  useEffect(() => {
+    if (account && previousAccount && account !== previousAccount) {
+      safeActions.setIsSafeCreated(false);
+      walletActions.setStep(0);
+    }
+    // eslint-disable-next-line
+  }, [account, previousAccount]);
 
   return (
     <Container>
@@ -25,6 +45,7 @@ const OnBoarding = () => {
           {safeState.safeCreated ? (
             <BtnContainer>
               <Button
+                disabled={connectWalletState.isWrongNetwork}
                 onClick={() => popupsActions.setIsCreateAccountModalOpen(true)}
               >
                 <BtnInner>

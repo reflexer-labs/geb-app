@@ -57,23 +57,23 @@ export function useInactiveListener(suppress = false) {
   useEffect(() => {
     const { ethereum } = window;
 
-    if (ethereum && ethereum.on && !active && !error && !suppress) {
-      const handleChainChanged = () => {
+    const handleAccountsChanged = (accounts: string[]) => {
+      if (accounts.length > 0) {
         // eat errors
         activate(injected, undefined, true).catch((error) => {
-          console.error('Failed to activate after chain changed', error);
+          console.error('Failed to activate after accounts changed', error);
         });
-      };
+      }
+    };
 
-      const handleAccountsChanged = (accounts: string[]) => {
-        if (accounts.length > 0) {
-          // eat errors
-          activate(injected, undefined, true).catch((error) => {
-            console.error('Failed to activate after accounts changed', error);
-          });
-        }
-      };
+    const handleChainChanged = () => {
+      // eat errors
+      activate(injected, undefined, true).catch((error) => {
+        console.error('Failed to activate after chain changed', error);
+      });
+    };
 
+    if (ethereum && ethereum.on && !active && !error && !suppress) {
       ethereum.on('chainChanged', handleChainChanged);
       ethereum.on('accountsChanged', handleAccountsChanged);
 
@@ -84,6 +84,8 @@ export function useInactiveListener(suppress = false) {
         }
       };
     }
+
     return undefined;
+    // eslint-disable-next-line
   }, [active, error, suppress, activate]);
 }

@@ -8,15 +8,24 @@ interface Props {
   text: string;
   btnText: string;
   handleClick: () => void;
+  isDisabled: boolean;
+  isLoading: boolean;
+  error: string;
 }
 
-const StepsContent = ({ title, text, btnText, handleClick }: Props) => {
+const StepsContent = ({ title, text, btnText, handleClick, isDisabled, isLoading, error }: Props) => {
   const { t } = useTranslation();
   return (
     <Container>
       <Title>{t(title)}</Title>
       <Text>{t(text)}</Text>
-      <Button text={t(btnText)} onClick={handleClick} />
+      <Button
+        disabled={isDisabled || isLoading}
+        isLoading={isLoading}
+        text={t(btnText)}
+        onClick={handleClick}
+     />
+      {error && <Error>{error}</Error>}
     </Container>
   );
 };
@@ -40,4 +49,11 @@ const Text = styled.div`
   color: ${(props) => props.theme.colors.secondary};
   margin-bottom: 20px;
   line-height: 21px;
+`;
+
+const Error = styled.p`
+  color: ${(props) => props.theme.colors.dangerColor};
+  font-size: ${(props) => props.theme.font.extraSmall};
+  width: 100%;
+  margin: 16px 0;
 `;
