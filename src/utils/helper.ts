@@ -78,12 +78,20 @@ export const formatUserSafe = (safes: Array<any>): Array<ISafe> => {
   })
 }
 
-/* export const getCollateralRatio = (
+export const getCollateralRatio = (
   depositedETH: string,
   liquidationPrice: string,
   liquidationCRatio: string,
   debt: string,
   accumulatedRate: string
 ) => {
-  return (depositedETH * liquidationPrice * liquidationCRatio / (debt * accumulatedRate) * 100).toString()
-} */
+  if (Number(depositedETH) === 0) {
+    return '0';
+  } else if (Number(debt) === 0) {
+    return '∞';
+  }
+
+  const numerator = Number(depositedETH) * Number(liquidationPrice) * Number(liquidationCRatio)
+  const denominator = Number(debt) * Number(accumulatedRate)
+  return formatNumber((numerator / denominator * 100).toString(), 2)
+}

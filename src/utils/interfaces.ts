@@ -73,8 +73,9 @@ export interface NavLinkType {
 }
 
 export interface CreateSafeType {
-  depositedETH: string;
   borrowedRAI: string;
+  collateralRatio: number;
+  depositedETH: string;
 }
 
 export interface ToastPayload {
@@ -144,6 +145,7 @@ export interface IVotingTx {
 }
 
 export interface ILiquidationData {
+  accumulatedRate: string;
   currentPrice: { liquidationPrice: string; safetyPrice: string };
   liquidationCRatio: string;
   liquidationPenalty: string;

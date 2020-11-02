@@ -6,8 +6,9 @@ import { CreateSafeType } from '../../utils/interfaces';
 import Button from '../Button';
 // import CheckBox from '../CheckBox';
 import DecimalInput from '../DecimalInput';
-import { formatNumber, getAvailableRaiToBorrow, getRatePercentage } from '../../utils/helper';
+import { formatNumber, getAvailableRaiToBorrow, getCollateralRatio, getRatePercentage } from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
+import { DEFAULT_CREATE_SAFE_STATE } from '../../utils/constants';
 
 interface Props {
   isChecked?: boolean;
@@ -18,15 +19,9 @@ const CreateSafeBody = ({ isChecked }: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || false);
   const [error, setError] = useState('');
-  const [defaultSafe, setDefaultSafe] = useState<CreateSafeType>({
-    depositedETH: '',
-    borrowedRAI: '',
-  });
+  const [defaultSafe, setDefaultSafe] = useState<CreateSafeType>(DEFAULT_CREATE_SAFE_STATE);
 
-  const [uniSwapVal, setUniSwapVal] = useState<CreateSafeType>({
-    depositedETH: '',
-    borrowedRAI: '',
-  });
+  const [uniSwapVal, setUniSwapVal] = useState<CreateSafeType>(DEFAULT_CREATE_SAFE_STATE);
 
   const {
     walletModel: walletActions,
@@ -40,9 +35,15 @@ const CreateSafeBody = ({ isChecked }: Props) => {
 
   const availableEth = formatNumber(connectWalletState.ethBalance[NETWORK_ID].toString());
   const availableRai = getAvailableRaiToBorrow(defaultSafe.depositedETH, walletState.liquidationData.currentPrice.safetyPrice);
-  const collateralRatio = getRatePercentage(walletState.liquidationData.liquidationCRatio);
+  const collateralRatio = getCollateralRatio(
+    defaultSafe.depositedETH,
+    walletState.liquidationData.currentPrice.liquidationPrice,
+    walletState.liquidationData.liquidationCRatio,
+    defaultSafe.borrowedRAI,
+    walletState.liquidationData.accumulatedRate
+  )
   const liquidationPenalty = getRatePercentage(walletState.liquidationData.liquidationPenalty);
-  const liquidationPrice = formatNumber(walletState.liquidationData.currentPrice.liquidationPrice, 2);
+  const liquidationPrice = typeof collateralRatio === 'number' ? formatNumber(walletState.liquidationData.currentPrice.liquidationPrice, 2) : 0;
 
   const setMaxRai = () => {
     setDefaultSafe({ ...defaultSafe, borrowedRAI: availableRai.toString() });
@@ -58,8 +59,9 @@ const CreateSafeBody = ({ isChecked }: Props) => {
     } else if (Number(defaultSafe.borrowedRAI) > availableRai) {
       setError('RAI borrowed cannot exceed available amount.');
     } else {
-      walletActions.setCreateSafeDefault(defaultSafe);
+      walletActions.setCreateSafeDefault({ ...defaultSafe, collateralRatio: collateralRatio as number });
       walletActions.setIsUniSwapPoolChecked(checkUniSwapPool);
+
       if (checkUniSwapPool) {
         walletActions.setStage(1);
       } else {
@@ -69,7 +71,7 @@ const CreateSafeBody = ({ isChecked }: Props) => {
   };
 
   const submitUniSwapPool = () => {
-    walletActions.setUniSwapPool(uniSwapVal);
+    walletActions.setUniSwapPool({ ...uniSwapVal, collateralRatio: collateralRatio as number });
     walletActions.setStage(2);
   };
 
@@ -80,22 +82,10 @@ const CreateSafeBody = ({ isChecked }: Props) => {
       walletActions.setIsUniSwapPoolChecked(false);
       walletActions.setStage(0);
       popupsActions.setIsCreateAccountModalOpen(false);
-      walletActions.setUniSwapPool({
-        depositedETH: '',
-        borrowedRAI: '',
-      });
-      walletActions.setCreateSafeDefault({
-        depositedETH: '',
-        borrowedRAI: '',
-      });
-      setUniSwapVal({
-        depositedETH: '',
-        borrowedRAI: '',
-      });
-      setDefaultSafe({
-        depositedETH: '',
-        borrowedRAI: '',
-      });
+      walletActions.setUniSwapPool(DEFAULT_CREATE_SAFE_STATE);
+      walletActions.setCreateSafeDefault(DEFAULT_CREATE_SAFE_STATE);
+      setUniSwapVal(DEFAULT_CREATE_SAFE_STATE);
+      setDefaultSafe(DEFAULT_CREATE_SAFE_STATE);
     }
   };
 
@@ -117,7 +107,7 @@ const CreateSafeBody = ({ isChecked }: Props) => {
             label={`Deposit ETH (Avail ${availableEth})`}
             value={defaultSafe.depositedETH}
             onChange={(val: string) =>
-              setDefaultSafe({ borrowedRAI: '', depositedETH: val })
+              setDefaultSafe({ ...defaultSafe, borrowedRAI: '', depositedETH: val })
             }
             disableMax
             disabled={isChecked}

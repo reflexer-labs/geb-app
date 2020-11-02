@@ -91,3 +91,9 @@ export const mediaWidthTemplates: {
   `;
   return accumulator;
 }, {}) as any;
+
+export const DEFAULT_CREATE_SAFE_STATE = {
+  borrowedRAI: '',
+  collateralRatio: 0,
+  depositedETH: '',
+};

@@ -1,6 +1,7 @@
 import { action, Action, thunk, Thunk } from 'easy-peasy';
 import { CreateSafeType, ILiquidationData } from '../utils/interfaces';
 import { fetchLiquidation } from '../services/graphql';
+import { DEFAULT_CREATE_SAFE_STATE } from '../utils/constants';
 
 export interface WalletModel {
   isUniSwapPoolChecked: boolean;
@@ -22,11 +23,9 @@ const walletModel: WalletModel = {
   isUniSwapPoolChecked: true,
   step: 0,
   stage: 0,
-  createSafeDefault: {
-    depositedETH: '',
-    borrowedRAI: '',
-  },
+  createSafeDefault: DEFAULT_CREATE_SAFE_STATE,
   liquidationData: {
+    accumulatedRate: '0',
     currentPrice: {
       liquidationPrice: '0',
       safetyPrice: ''
@@ -34,10 +33,7 @@ const walletModel: WalletModel = {
     liquidationCRatio: '1', // Rate percentage
     liquidationPenalty: '1', // Rate percentage
   },
-  uniSwapPool: {
-    depositedETH: '',
-    borrowedRAI: '',
-  },
+  uniSwapPool: DEFAULT_CREATE_SAFE_STATE,
 
   fetchLiquidationData: thunk(async (actions) => {
     const data = await fetchLiquidation();

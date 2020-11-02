@@ -5,10 +5,10 @@ import { useStoreActions, useStoreState } from '../../store';
 import CreateSafeContent from './CreateSafeContent';
 import Button from '../Button';
 import TransactionOverview from './TransactionOverview';
-import { SUPPORTED_WALLETS } from '../../utils/constants';
+import { DEFAULT_CREATE_SAFE_STATE, SUPPORTED_WALLETS } from '../../utils/constants';
 import { injected } from '../../connectors';
 import { useActiveWeb3React } from '../../hooks';
-import { formatNumber, getRatePercentage } from '../../utils/helper';
+import { formatNumber } from '../../utils/helper';
 
 const ReviewTransaction = () => {
   const isMetamask = window?.ethereum?.isMetaMask;
@@ -22,8 +22,7 @@ const ReviewTransaction = () => {
   } = useStoreActions((state) => state);
   const { walletModel: walletState } = useStoreState((state) => state);
 
-  const { borrowedRAI, depositedETH } = walletState.createSafeDefault;
-  const collateralRatio = getRatePercentage(walletState.liquidationData.liquidationCRatio);
+  const { borrowedRAI, collateralRatio, depositedETH } = walletState.createSafeDefault;
   const liquidationPrice = formatNumber(walletState.liquidationData.currentPrice.liquidationPrice, 2);
 
   const handleCancel = () => {
@@ -49,16 +48,9 @@ const ReviewTransaction = () => {
 
         safeActions.setIsSafeCreated(true);
         walletActions.setStage(0);
-        walletActions.setUniSwapPool({
-          depositedETH: '',
-          borrowedRAI: '',
-        });
-        walletActions.setCreateSafeDefault({
-          depositedETH: '',
-          borrowedRAI: '',
-        });
+        walletActions.setUniSwapPool(DEFAULT_CREATE_SAFE_STATE);
+        walletActions.setCreateSafeDefault(DEFAULT_CREATE_SAFE_STATE);
       } catch (e) {
-        console.log('handleConfirm error', e);
         popupsActions.setIsCreateAccountModalOpen(true);
         popupsActions.setIsLoadingModalOpen({
           isOpen: false,
