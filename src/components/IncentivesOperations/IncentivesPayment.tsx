@@ -23,6 +23,7 @@ const IncentivesPayment = ({ isChecked }: Props) => {
   const { t } = useTranslation();
   const [ethAmount, setEthAmount] = useState('');
   const [raiAmount, setRaiAmount] = useState('');
+  const [uniPool, setUniPool] = useState('');
   const [cashRewardsCheck, setCashRewardsCheck] = useState(false);
   const [leaveLiquidity, setLeaveLiquidity] = useState(isChecked || false);
 
@@ -63,36 +64,60 @@ const IncentivesPayment = ({ isChecked }: Props) => {
         <Dropdown
           items={[]}
           itemSelected={INITITAL_STATE[1]}
-          label={'Lending Pair'}
+          label={'Pair'}
           padding={'22px 20px'}
         />
       </DoubleDropdown>
 
-      <DoubleInput>
-        <DecimalInput
-          label={`${incentivesState.type} ETH (Avail 0.00)`}
-          value={ethAmount}
-          onChange={setEthAmount}
-          disableMax
-        />
-        <DecimalInput
-          label={`${incentivesState.type} RAI (Avail 0.00)`}
-          value={raiAmount}
-          onChange={setRaiAmount}
-          disableMax
-        />
-      </DoubleInput>
+      {incentivesState.type === 'withdraw' ? (
+        <SingleInput>
+          <DecimalInput
+            label={`UNI Pool Tokens (Avail 0)`}
+            value={uniPool}
+            onChange={setUniPool}
+            disableMax
+          />
+        </SingleInput>
+      ) : (
+        <DoubleInput>
+          <DecimalInput
+            label={`${incentivesState.type} ETH (Avail 0.00)`}
+            value={ethAmount}
+            onChange={setEthAmount}
+            disableMax
+          />
+          <DecimalInput
+            label={`${incentivesState.type} RAI (Avail 0.00)`}
+            value={raiAmount}
+            onChange={setRaiAmount}
+            disableMax
+          />
+        </DoubleInput>
+      )}
 
       <Result>
         <Block>
           <Item>
-            <Label>{'RAI per ETH'}</Label> <Value>{'0.12345678'}</Value>
+            <Label>
+              {incentivesState.type === 'withdraw'
+                ? 'RAI Withdrawn from Pool'
+                : 'RAI per ETH'}
+            </Label>{' '}
+            <Value>{'0.12345678'}</Value>
           </Item>
           <Item>
-            <Label>{'ETH per RAI'}</Label> <Value>{'432.1098'}</Value>
+            <Label>
+              {incentivesState.type === 'withdraw'
+                ? 'ETH Withdrawn from Pool'
+                : 'ETH per RAI'}
+            </Label>{' '}
+            <Value>{'432.1098'}</Value>
           </Item>
           <Item>
             <Label>{'Share of Uniswap Pool'}</Label> <Value>{'0.00'}</Value>
+          </Item>
+          <Item>
+            <Label>{'Share of Incentives Pool'}</Label> <Value>{'0.00'}</Value>
           </Item>
           {incentivesState.type === 'withdraw' ? (
             <>
@@ -106,7 +131,16 @@ const IncentivesPayment = ({ isChecked }: Props) => {
                 <Label>{'Unlock Time'}</Label> <Value>{'0.00'}</Value>
               </Item>
             </>
-          ) : null}
+          ) : (
+            <>
+              <Item>
+                <Label>{'Campaign #'}</Label> <Value>{'1234'}</Value>
+              </Item>
+              <Item>
+                <Label>{'FLX per Block'}</Label> <Value>{'12.00'}</Value>
+              </Item>
+            </>
+          )}
         </Block>
       </Result>
 
@@ -264,4 +298,8 @@ const Text = styled.div`
   letter-spacing: -0.18px;
   color: ${(props) => props.theme.colors.secondary};
   font-size: ${(props) => props.theme.font.extraSmall};
+`;
+
+const SingleInput = styled.div`
+  margin: 20px 0;
 `;

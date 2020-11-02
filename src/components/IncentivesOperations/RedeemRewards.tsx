@@ -7,7 +7,9 @@ import DecimalInput from '../DecimalInput';
 import Dropdown from '../Dropdown';
 
 type Campaign = { id: string; climable_flex: string };
-const INITITAL_STATE = [
+type Stash = { id: string; flx_unlock: string };
+
+const INITITAL_STATE_CAMPAIGN: Array<Campaign> = [
   {
     id: '2354',
     climable_flex: '50.00',
@@ -22,14 +24,37 @@ const INITITAL_STATE = [
   },
 ];
 
+const INITITAL_STATE_STASH: Array<Stash> = [
+  {
+    id: '3456',
+    flx_unlock: '12.00',
+  },
+  {
+    id: '5668',
+    flx_unlock: '15.00',
+  },
+  {
+    id: '2338',
+    flx_unlock: '18.00',
+  },
+];
+
 const RedeemRewards = () => {
   const { t } = useTranslation();
 
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign>(
-    INITITAL_STATE[0]
+    INITITAL_STATE_CAMPAIGN[0]
+  );
+  const [selectedStash, setSelectedStash] = useState<Stash>(
+    INITITAL_STATE_STASH[0]
   );
 
-  const [flxAmount, setFLXAmount] = useState(INITITAL_STATE[0].climable_flex);
+  const [flxAmount, setFLXAmount] = useState(
+    INITITAL_STATE_CAMPAIGN[0].climable_flex
+  );
+  const [flxToUnLock, setFLXToUnLock] = useState(
+    INITITAL_STATE_STASH[0].flx_unlock
+  );
 
   const {
     incentivesModel: incentivesActions,
@@ -48,7 +73,7 @@ const RedeemRewards = () => {
   const handleSelectedCampaign = (selected: string) => {
     const id = selected.split('#').pop();
 
-    const campaign = INITITAL_STATE.find(
+    const campaign = INITITAL_STATE_CAMPAIGN.find(
       (campaign: Campaign) => campaign.id === id
     );
     if (campaign) {
@@ -57,11 +82,21 @@ const RedeemRewards = () => {
     }
   };
 
+  const handleSelectedStash = (selected: string) => {
+    const id = selected.split('#').pop();
+
+    const stash = INITITAL_STATE_STASH.find((stash: Stash) => stash.id === id);
+    if (stash) {
+      setSelectedStash(stash);
+      setFLXToUnLock(stash.flx_unlock);
+    }
+  };
+
   return (
     <Body>
       <DropdownContainer>
         <Dropdown
-          items={INITITAL_STATE.map(
+          items={INITITAL_STATE_CAMPAIGN.map(
             (campaign: Campaign) => `Campaign #${campaign.id}`
           )}
           getSelectedItem={handleSelectedCampaign}
@@ -70,12 +105,31 @@ const RedeemRewards = () => {
         />
       </DropdownContainer>
 
-      <DecimalInput
-        label={'Claimable FLX'}
-        value={flxAmount}
-        onChange={setFLXAmount}
-        disabled
-      />
+      <DropdownContainer>
+        <Dropdown
+          items={INITITAL_STATE_STASH.map(
+            (stash: Stash) => `Stash #${stash.id}`
+          )}
+          getSelectedItem={handleSelectedStash}
+          itemSelected={`Stash #${selectedStash.id} - ${selectedStash.flx_unlock} FLX Unlocked`}
+          label={'Select Stash'}
+        />
+      </DropdownContainer>
+
+      <DoubleInputs>
+        <DecimalInput
+          label={'Claimable FLX'}
+          value={flxAmount}
+          onChange={setFLXAmount}
+          disabled
+        />
+        <DecimalInput
+          label={'FLX to Unlock'}
+          value={flxToUnLock}
+          onChange={setFLXToUnLock}
+          disabled
+        />
+      </DoubleInputs>
 
       <Footer>
         <Button dimmed text={t('cancel')} onClick={handleCancel} />
@@ -103,4 +157,25 @@ const Footer = styled.div`
 
 const DropdownContainer = styled.div`
   margin-bottom: 30px;
+`;
+
+const DoubleInputs = styled.div`
+  display: flex;
+  margin: 0 -10px 20px -10px;
+  > div {
+    flex: 0 0 50%;
+    padding: 0 10px;
+  }
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    flex-direction: column;
+    > div {
+      flex: 0 0 100%;
+      max-width: 100%;
+      &:last-child {
+        margin-left: 0;
+        margin-top: 20px;
+      }
+    }
+  `}
 `;

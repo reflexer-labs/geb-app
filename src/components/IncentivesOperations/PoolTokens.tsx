@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions } from '../../store';
@@ -7,6 +7,8 @@ import DecimalInput from '../DecimalInput';
 
 const PoolTokens = () => {
   const { t } = useTranslation();
+
+  const [poolTokensVal, setPoolTokensVal] = useState('');
 
   const { incentivesModel: incentivesActions } = useStoreActions(
     (state) => state
@@ -23,10 +25,12 @@ const PoolTokens = () => {
   return (
     <Body>
       <TextBox>
-        <Title>{t('pool_token_withdraw')}</Title>
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ullam
-        repellendus accusantium exercitationem velit dignissimos hic illo
-        incidunt unde veniam corrupti.
+        <DecimalInput
+          label={`Pool Tokens to Withdraw`}
+          value={poolTokensVal}
+          onChange={setPoolTokensVal}
+          disableMax
+        />
       </TextBox>
 
       <InputsContainer>
@@ -68,12 +72,6 @@ const Body = styled.div`
 const TextBox = styled.div`
   font-size: ${(props) => props.theme.font.small};
   color: ${(props) => props.theme.colors.secondary};
-`;
-
-const Title = styled.div`
-  font-size: ${(props) => props.theme.font.medium};
-  color: ${(props) => props.theme.colors.primary};
-  margin-bottom: 10px;
 `;
 
 const Footer = styled.div`

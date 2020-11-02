@@ -13,6 +13,7 @@ const IncentivesModal = () => {
   const handleCancel = () => {
     popupsActions.setIsIncentivesModalOpen(false);
     incentivesActions.setOperation(0);
+    incentivesActions.setIsLeaveLiquidityChecked(false);
   };
   return (
     <Modal

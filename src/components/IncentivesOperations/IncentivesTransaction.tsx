@@ -29,6 +29,7 @@ const IncentivesTransaction = () => {
   const handleConfirm = () => {
     popupsActions.setIsIncentivesModalOpen(false);
     incentivesActions.setOperation(0);
+    incentivesActions.setIsLeaveLiquidityChecked(false);
   };
 
   const returnConnectorName = () => {
@@ -67,13 +68,27 @@ const IncentivesTransaction = () => {
             {incentivesState.type !== 'redeem_rewards' ? (
               <>
                 <Item>
-                  <Label>{'RAI per ETH'}</Label> <Value>{'0.12345678'}</Value>
+                  <Label>
+                    {incentivesState.type === 'withdraw'
+                      ? 'RAI Withdrawn from Pool'
+                      : 'RAI per ETH'}
+                  </Label>{' '}
+                  <Value>{'0.12345678'}</Value>
                 </Item>
                 <Item>
-                  <Label>{'ETH per RAI'}</Label> <Value>{'432.1098'}</Value>
+                  <Label>
+                    {incentivesState.type === 'withdraw'
+                      ? 'ETH Withdrawn from Pool'
+                      : 'ETH per RAI'}
+                  </Label>{' '}
+                  <Value>{'432.1098'}</Value>
                 </Item>
                 <Item>
                   <Label>{'Share of Uniswap Pool'}</Label>{' '}
+                  <Value>{'0.00'}</Value>
+                </Item>
+                <Item>
+                  <Label>{'Share of Incentives Pool'}</Label>{' '}
                   <Value>{'0.00'}</Value>
                 </Item>
                 {incentivesState.type === 'withdraw' ? (
@@ -90,12 +105,29 @@ const IncentivesTransaction = () => {
                       <Label>{'Unlock Time'}</Label> <Value>{'0.00'}</Value>
                     </Item>
                   </>
-                ) : null}
+                ) : (
+                  <>
+                    <Item>
+                      <Label>{'Campaign #'}</Label> <Value>{'1234'}</Value>
+                    </Item>
+                    <Item>
+                      <Label>{'FLX per Block'}</Label> <Value>{'12.00'}</Value>
+                    </Item>
+                  </>
+                )}
               </>
             ) : (
-              <Item>
-                <Label>{'Claimable FLX'}</Label> <Value>{'50.00'}</Value>
-              </Item>
+              <>
+                <Item>
+                  <Label>{'Claimable FLX'}</Label> <Value>{'50.00'}</Value>
+                </Item>
+                <Item>
+                  <Label>{'FLX to Unlock'}</Label> <Value>{'12.00'}</Value>
+                </Item>
+                <Item>
+                  <Label>{'Unlock Time'}</Label> <Value>{'0.00'}</Value>
+                </Item>
+              </>
             )}
           </Block>
         </Result>
