@@ -70,7 +70,7 @@ const IncentivesTransaction = () => {
                 <Item>
                   <Label>
                     {incentivesState.type === 'withdraw'
-                      ? 'RAI Withdrawn from Pool'
+                      ? 'RAI Withdrawn'
                       : 'RAI per ETH'}
                   </Label>{' '}
                   <Value>{'0.12345678'}</Value>
@@ -78,7 +78,7 @@ const IncentivesTransaction = () => {
                 <Item>
                   <Label>
                     {incentivesState.type === 'withdraw'
-                      ? 'ETH Withdrawn from Pool'
+                      ? 'ETH Withdrawn'
                       : 'ETH per RAI'}
                   </Label>{' '}
                   <Value>{'432.1098'}</Value>

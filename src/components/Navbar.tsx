@@ -6,7 +6,6 @@ import Button from './Button';
 import { returnWalletAddres } from '../utils/helper';
 import NavLinks from './NavLinks';
 import { useWeb3React } from '@web3-react/core';
-import NotificationPopup from './NotificationPopup';
 
 const Navbar = () => {
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
@@ -23,11 +22,6 @@ const Navbar = () => {
     <Container>
       <Left>
         <Brand />
-        {active && account ? (
-          <NotificationContainer>
-            <NotificationPopup />
-          </NotificationContainer>
-        ) : null}
       </Left>
       <HideMobile>
         <NavLinks />
@@ -125,8 +119,4 @@ const Left = styled.div`
   min-width: 194px;
   display: flex;
   align-items: center;
-`;
-
-const NotificationContainer = styled.div`
-  margin-left: 34px;
 `;

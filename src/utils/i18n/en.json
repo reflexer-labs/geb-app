@@ -47,7 +47,7 @@
   "error_try_refresh": "Error connecting. Try refreshing the page.",
   "show_portis": "Show Portis",
   "accounts": "Accounts",
-  "accounts_header_text": "Manage your Safe account",
+  "accounts_header_text": "Onboarding - Manage your Reflexer account",
   "created": "Created",
   "risk": "Risk:",
   "manage_safe": "Manage Safe",
@@ -87,5 +87,5 @@
   "leave_liquidity": "I want to leave liquidity in Uniswap",
   "pool_token_withdraw": "Pool Tokens to Withdraw",
   "pool_tokens": "Pool Tokens",
-  "redeem_rewards": "Redeem Rewards"
+  "redeem_rewards": "Redeem"
 }
