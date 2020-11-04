@@ -144,7 +144,7 @@ const InnerContent = styled.div`
   justify-content: center;
   min-height: 100vh;
   position: relative;
-
+  padding: 50px 0;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     padding: 50px 20px;
   `}

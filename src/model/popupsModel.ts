@@ -15,6 +15,7 @@ export interface PopupsModel {
   showSideMenu: boolean;
   isScreenModalOpen: boolean;
   isVotingModalOpen: boolean;
+  isIncentivesModalOpen: boolean;
   alertPayload: IAlert | null;
   ESMOperationPayload: IOperation;
   safeOperationPayload: IOperation;
@@ -34,6 +35,7 @@ export interface PopupsModel {
   setAlertPayload: Action<PopupsModel, IAlert | null>;
   setESMOperationPayload: Action<PopupsModel, IOperation>;
   setIsVotingModalOpen: Action<PopupsModel, boolean>;
+  setIsIncentivesModalOpen: Action<PopupsModel, boolean>;
 }
 
 const popupsModel: PopupsModel = {
@@ -42,6 +44,7 @@ const popupsModel: PopupsModel = {
   isCreateAccountModalOpen: false,
   isConnectedWalletModalOpen: false,
   isScreenModalOpen: false,
+  isIncentivesModalOpen: false,
   safeOperationPayload: {
     isOpen: false,
     type: '',
@@ -113,6 +116,9 @@ const popupsModel: PopupsModel = {
   }),
   setIsVotingModalOpen: action((state, payload) => {
     state.isVotingModalOpen = payload;
+  }),
+  setIsIncentivesModalOpen: action((state, payload) => {
+    state.isIncentivesModalOpen = payload;
   }),
 };
 

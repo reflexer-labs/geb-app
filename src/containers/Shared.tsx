@@ -1,10 +1,9 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Alerts from '../components/Alerts';
 import ConnectedWalletModal from '../components/Modals/ConnectedWalletModal';
 import CreateAccountModal from '../components/Modals/CreateAccountModal';
 import ScreenLoader from '../components/Modals/ScreenLoader';
-import SettingsModal from '../components/Modals/SettingsModal';
 import Navbar from '../components/Navbar';
 import SideMenu from '../components/SideMenu';
 import SideToast from '../components/SideToast';
@@ -20,10 +19,10 @@ import LoadingModal from '../components/Modals/LoadingModal';
 import SafeOperationsModal from '../components/Modals/SafeOperationsModal';
 import ESMOperationModal from '../components/Modals/ESMOperationModal';
 import VotingOperationModal from '../components/Modals/VotingOperationModal';
-import Footer from '../components/Footer';
 import styled from 'styled-components';
-import useWindowSize from '../hooks/useWindowSize';
 import { NETWORK_ID } from '../connectors';
+import IncentivesModal from '../components/Modals/IncentivesModal';
+import CookieBanner from '../components/CookieBanner';
 
 interface Props {
   children: ReactNode;
@@ -31,11 +30,7 @@ interface Props {
 
 const Shared = ({ children }: Props) => {
   const { t } = useTranslation();
-  const footerRef = React.useRef<HTMLDivElement>(null);
-  const navbarRef = React.useRef<HTMLDivElement>(null);
   const { chainId, account } = useActiveWeb3React();
-  const [contentHeight, setContentHeight] = useState('auto');
-  const windowSize = useWindowSize();
   const { popupsModel: popupsState } = useStoreState((state) => state);
   const {
     popupsModel: popupsActions,
@@ -69,22 +64,6 @@ const Shared = ({ children }: Props) => {
     // eslint-disable-next-line
   }, [chainId, account]);
 
-  useEffect(() => {
-    if (
-      windowSize.height &&
-      navbarRef &&
-      navbarRef.current &&
-      footerRef &&
-      footerRef.current
-    ) {
-      const footerHeight = footerRef.current.clientHeight;
-      const navbarHeight = navbarRef.current.clientHeight;
-      const height =
-        windowSize.height - (footerHeight + navbarHeight) - 20 + 'px';
-      setContentHeight(height);
-    }
-  }, [navbarRef, footerRef, windowSize.height]);
-
   return (
     <Container>
       <SideMenu />
@@ -92,15 +71,15 @@ const Shared = ({ children }: Props) => {
       <WalletModal />
       <ApplicationUpdater />
       <BalanceUpdater />
-      <SettingsModal />
       <LoadingModal />
       <VotingOperationModal />
       <ESMOperationModal />
       <SafeOperationsModal />
       <CreateAccountModal />
       <ConnectedWalletModal />
+      <IncentivesModal />
       <ScreenLoader />
-      <EmptyDiv ref={navbarRef}>
+      <EmptyDiv>
         <Navbar />
       </EmptyDiv>
       {alertPayload ? (
@@ -110,9 +89,9 @@ const Shared = ({ children }: Props) => {
           type={alertPayload.type}
         />
       ) : null}
-      <Content minHeight={contentHeight}>{children}</Content>
-      <EmptyDiv ref={footerRef}>
-        <Footer slapToBottom />
+      <Content>{children}</Content>
+      <EmptyDiv>
+        <CookieBanner />
       </EmptyDiv>
     </Container>
   );
@@ -122,9 +101,41 @@ export default Shared;
 
 const Container = styled.div`
   min-height: 100vh;
+  .CookieConsent {
+    z-index: 999 !important;
+    bottom: 20px !important;
+    width: 90% !important;
+    max-width: 1280px;
+    margin: 0 auto;
+    right: 0;
+    border-radius: ${(props) => props.theme.global.borderRadius};
+    padding: 10px 20px;
+
+    button {
+      background: ${(props) => props.theme.colors.gradient} !important;
+      color: ${(props) => props.theme.colors.neutral} !important;
+      padding: 8px 15px !important;
+      background: ${(props) => props.theme.colors.gradient};
+      border-radius: ${(props) => props.theme.global.borderRadius} !important;
+      font-size: ${(props) => props.theme.font.small};
+      font-weight: 600;
+      cursor: pointer;
+      flex: 0 0 auto;
+      margin: 0px 15px 0px 0px !important;
+      text-align: center;
+      outline: none;
+      position: relative;
+      top: -5px;
+    }
+
+    @media (max-width: 991px) {
+      display: block !important;
+      button {
+        margin-left: 10px !important;
+      }
+    }
+  }
 `;
 
-const Content = styled.div<{ minHeight: string }>`
-  min-height: ${({ minHeight }) => minHeight};
-`;
+const Content = styled.div``;
 const EmptyDiv = styled.div``;

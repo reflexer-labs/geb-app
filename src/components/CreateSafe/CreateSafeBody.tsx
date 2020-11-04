@@ -96,7 +96,7 @@ const CreateSafeBody = ({ isChecked }: Props) => {
             onChange={(val: string) =>
               setDefaultSafe({ ...defaultSafe, borrowedRAI: val })
             }
-            handleMaxClick={() => console.log('something')}
+            disableMax
             disabled={isChecked}
           />
         </DoubleInput>
@@ -116,7 +116,7 @@ const CreateSafeBody = ({ isChecked }: Props) => {
               onChange={(val: string) =>
                 setUniSwapVal({ ...uniSwapVal, borrowedRAI: val })
               }
-              handleMaxClick={() => console.log('something')}
+              disableMax
             />
           </DoubleInput>
         ) : null}
