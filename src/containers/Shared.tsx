@@ -1,6 +1,5 @@
 import React, { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import Alerts from '../components/Alerts';
 import ConnectedWalletModal from '../components/Modals/ConnectedWalletModal';
 import CreateAccountModal from '../components/Modals/CreateAccountModal';
 import ScreenLoader from '../components/Modals/ScreenLoader';
@@ -23,6 +22,9 @@ import styled from 'styled-components';
 import { NETWORK_ID } from '../connectors';
 import IncentivesModal from '../components/Modals/IncentivesModal';
 import CookieBanner from '../components/CookieBanner';
+import BlockBodyContainer from '../components/BlockBodyContainer';
+import { toast } from 'react-toastify';
+import ToastPayload from '../components/ToastPayload';
 
 interface Props {
   children: ReactNode;
@@ -31,24 +33,49 @@ interface Props {
 const Shared = ({ children }: Props) => {
   const { t } = useTranslation();
   const { chainId, account } = useActiveWeb3React();
-  const { popupsModel: popupsState } = useStoreState((state) => state);
   const {
-    popupsModel: popupsActions,
+    popupsModel: popupsState,
+    settingsModel: settingsState,
+  } = useStoreState((state) => state);
+  const {
     walletModel: walletActions,
+    settingsModel: settingsActions,
+    connectWalletModel: connectedWalletActions,
   } = useStoreActions((state) => state);
-  const { sideToastPayload, alertPayload } = popupsState;
-
+  const { sideToastPayload } = popupsState;
+  const toastId = 'networdToastHash';
   const networkChecker = (id: ChainId) => {
     if (chainId && chainId !== id) {
       const chainName = ETHERSCAN_PREFIXES[id];
-      popupsActions.setAlertPayload({
-        type: 'danger',
-        text: `${t('wrong_network')} ${capitalizeName(
-          chainName === '' ? 'Mainnet' : chainName
-        )}`,
-      });
+      connectedWalletActions.setIsWrongNetwork(true);
+      settingsActions.setBlockBody(true);
+      toast(
+        <ToastPayload
+          icon={'AlertTriangle'}
+          iconSize={40}
+          iconColor={'orange'}
+          text={`${t('wrong_network')} ${capitalizeName(
+            chainName === '' ? 'Mainnet' : chainName
+          )}`}
+        />,
+        { autoClose: false, type: 'warning', toastId }
+      );
     } else {
-      popupsActions.setAlertPayload(null);
+      toast.update(toastId, { autoClose: 1 });
+      settingsActions.setBlockBody(false);
+      connectedWalletActions.setIsWrongNetwork(false);
+      if (account) {
+        toast(
+          <ToastPayload
+            icon={'Check'}
+            iconColor={'green'}
+            text={t('wallet_connected')}
+          />,
+          {
+            type: 'success',
+          }
+        );
+      }
     }
   };
 
@@ -66,6 +93,7 @@ const Shared = ({ children }: Props) => {
 
   return (
     <Container>
+      {settingsState.blockBody ? <BlockBodyContainer /> : null}
       <SideMenu />
       <SideToast {...sideToastPayload} />
       <WalletModal />
@@ -82,13 +110,6 @@ const Shared = ({ children }: Props) => {
       <EmptyDiv>
         <Navbar />
       </EmptyDiv>
-      {alertPayload ? (
-        <Alerts
-          text={alertPayload.text}
-          margin={'10px auto 0 auto'}
-          type={alertPayload.type}
-        />
-      ) : null}
       <Content>{children}</Content>
       <EmptyDiv>
         <CookieBanner />
