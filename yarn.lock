@@ -1216,15 +1216,6 @@
     "@ethersproject/bytes" "^5.0.4"
     "@ethersproject/properties" "^5.0.3"
 
-"@ethersproject/bignumber@5.x":
-  version "5.0.8"
-  resolved "https://registry.yarnpkg.com/@ethersproject/bignumber/-/bignumber-5.0.8.tgz#cee33bd8eb0266176def0d371b45274b1d2c4ec0"
-  integrity sha512-KXFVAFKS1jdTXYN8BE5Oj+ZfPMh28iRdFeNGBVT6cUFdtiPVqeXqc0ggvBqA3A1VoFFGgM7oAeaagA393aORHA==
-  dependencies:
-    "@ethersproject/bytes" "^5.0.4"
-    "@ethersproject/logger" "^5.0.5"
-    bn.js "^4.4.0"
-
 "@ethersproject/bignumber@^5.0.7":
   version "5.0.7"
   resolved "https://registry.yarnpkg.com/@ethersproject/bignumber/-/bignumber-5.0.7.tgz#720b3e3df3e125a99669ee869478106d0afe7b76"
@@ -1715,28 +1706,6 @@
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.3.tgz#2b5a3ab3f918cca48a8c754c08168e3f03eba61b"
   integrity sha512-shAmDyaQC4H92APFoIaVDHCx5bStIocgvbwQyxPRrbUY20V1EYTbSDchWbuwlMG3V17cprZhA6+78JfB+3DTPw==
-
-"@reflexer-finance/geb-contract-api@^0.0.29":
-  version "0.0.29"
-  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-contract-api/-/geb-contract-api-0.0.29.tgz#aa5c99667248e6b970f07292e8737474eef4c3a4"
-  integrity sha512-Dn8q7OEj8vrxl2y4n+SNW6BKvsp2cHxKQF057ROMN/BV6Dh6minQ0kSruhYOjWGDQ1pMHVMJCq3Ld/7k9wXCIA==
-  dependencies:
-    "@ethersproject/bignumber" "5.x"
-    "@reflexer-finance/geb-contract-base" "^0.0.15"
-
-"@reflexer-finance/geb-contract-base@^0.0.15":
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-contract-base/-/geb-contract-base-0.0.15.tgz#eb1e9f219f72cea1cc99c36a7df1876923b7c816"
-  integrity sha512-2zDMWVpo59OvhwrlHZAkGeIL5o9Os/LAwL4FbQ/ATdE/gjUIwclXKA73zsmE1kuF1UDpkvDZGyLGQ0mU5dXPKg==
-  dependencies:
-    "@ethersproject/bignumber" "5.x"
-
-"@reflexer-finance/geb-ethers-provider@^0.0.17":
-  version "0.0.17"
-  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-ethers-provider/-/geb-ethers-provider-0.0.17.tgz#6d73534027015b9d78b596c405bbb40631ebd5b1"
-  integrity sha512-VUrgietvm3GYAjHNbmBTChcIVv9RRYfPawleIABuMV/6TuumyJlzN5bB+yBxtGeFauSGpGaGC6hWWRfQA11q0g==
-  dependencies:
-    "@reflexer-finance/geb-contract-base" "^0.0.15"
 
 "@sheerun/mutationobserver-shim@^0.3.2":
   version "0.3.3"
@@ -3849,6 +3818,11 @@ class-utils@^0.3.5:
     define-property "^0.2.5"
     isobject "^3.0.0"
     static-extend "^0.1.1"
+
+classnames@^2.2.6:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
+  integrity sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q==
 
 clean-css@^4.2.3:
   version "4.2.3"
@@ -6245,16 +6219,6 @@ functional-red-black-tree@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
-
-geb.js@0.0.31:
-  version "0.0.31"
-  resolved "https://registry.yarnpkg.com/geb.js/-/geb.js-0.0.31.tgz#7224b28b800d29f4a5ef4e05ecac953696c95272"
-  integrity sha512-lhKxyMCxquaEHfOT5XF3WuwGpm7BX3CixdkcFLnXlKhRPa9jA+u4Yo9bVh+oOrPO4F3Y2XK0TI6w4pMyiuvDhA==
-  dependencies:
-    "@ethersproject/bignumber" "5.x"
-    "@reflexer-finance/geb-contract-api" "^0.0.29"
-    "@reflexer-finance/geb-contract-base" "^0.0.15"
-    "@reflexer-finance/geb-ethers-provider" "^0.0.17"
 
 generate-function@^2.0.0:
   version "2.3.1"
@@ -10745,6 +10709,15 @@ react-scripts@3.4.3:
     workbox-webpack-plugin "4.3.1"
   optionalDependencies:
     fsevents "2.1.2"
+
+react-toastify@^6.0.9:
+  version "6.0.9"
+  resolved "https://registry.yarnpkg.com/react-toastify/-/react-toastify-6.0.9.tgz#2a65e5ad9e05f3ee47664cbc69441498b9d694ce"
+  integrity sha512-StHXv+4kezHUnPyoILlvygSptQ79bxVuvKcC05yXP0FlqQgPA1ue+80BqxZZiCw2jWDGiY2MHyqBfFKf5YzZbA==
+  dependencies:
+    classnames "^2.2.6"
+    prop-types "^15.7.2"
+    react-transition-group "^4.4.1"
 
 react-transition-group@^4.4.1:
   version "4.4.1"

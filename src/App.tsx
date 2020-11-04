@@ -24,6 +24,9 @@ import Voting from './containers/Voting';
 import VoteDetails from './containers/Voting/VoteDetails';
 import Incentives from './containers/Incentives';
 import Privacy from './containers/Privacy';
+import CustomToast from './components/CustomToast';
+
+// Toast css
 
 declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}
@@ -42,6 +45,7 @@ function App() {
     <I18nextProvider i18n={i18next}>
       <ThemeProvider theme={isLightTheme ? lightTheme : darkTheme}>
         <GlobalStyle bodyOverflow={bodyOverflow} />
+        <CustomToast />
         <ErrorBoundary>
           <Router>
             <Shared>
