@@ -5,7 +5,9 @@ export default `{
       liquidationPrice
       safetyPrice
     }
+    debtFloor
     liquidationCRatio
     liquidationPenalty
+    safetyCRatio
   }
 }`

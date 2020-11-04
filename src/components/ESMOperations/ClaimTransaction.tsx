@@ -80,7 +80,7 @@ const ClaimTransaction = ({ safe, FLX }: Props) => {
                 <Label>
                   {FLX ? 'FLX amount to be burnt' : 'Claimable ETH'}
                 </Label>{' '}
-                <Value>{safe ? safe.depositedEth : FLX}</Value>
+                <Value>{safe ? safe.collateral : FLX}</Value>
               </Item>
             ) : (
               <>

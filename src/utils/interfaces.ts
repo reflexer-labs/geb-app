@@ -112,11 +112,16 @@ export interface ISafe {
   img: string;
   date: string;
   riskState: string;
-  depositedEth: string;
-  borrowedRAI: string;
+  collateral: string;
+  debt: string;
+  accumulatedRate: string;
   collateralRatio: string;
+  currentRedemptionPrice: string;
+  currentLiquidationPrice: string;
+  liquidationCRatio: string;
   liquidationPenalty: string;
   liquidationPrice: string;
+  totalAnnualizedStabilityFee: string;
 }
 
 export interface LoadingPayload {
@@ -147,8 +152,10 @@ export interface IVotingTx {
 export interface ILiquidationData {
   accumulatedRate: string;
   currentPrice: { liquidationPrice: string; safetyPrice: string };
+  debtFloor: string;
   liquidationCRatio: string;
   liquidationPenalty: string;
+  safetyCRatio: string;
 }
 
 export interface ICreateSafePayload {

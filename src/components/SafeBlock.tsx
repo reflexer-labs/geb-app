@@ -8,10 +8,9 @@ import { formatNumber } from '../utils/helper';
 const SafeBlock = ({ ...props }) => {
   const { t } = useTranslation();
 
-  const borrowedRAI = formatNumber(props.borrowedRAI, 2);
+  const collateral = formatNumber(props.collateral, 2);
+  const debt = formatNumber(props.debt, 2);
   const createdAt = dayjs.unix(props.date).format('MMM D, YYYY h:mm A');
-  const depositedEth = formatNumber(props.depositedEth, 2);
-  const liquidationPrice = formatNumber(props.liquidationPrice, 2);
 
   return (
     <>
@@ -26,22 +25,26 @@ const SafeBlock = ({ ...props }) => {
               </Date>
             </SafeData>
           </SafeInfo>
-          <SafeState className={props.riskState === 'high' ? 'high' : ''}>
+          <SafeState className={props.riskState}>
             {t('risk')} <span>{props.riskState}</span>
           </SafeState>
         </BlockHeader>
         <Block>
           <Item>
             <Label>{'ETH Deposited'}</Label>
-            <Value>{depositedEth}</Value>
+            <Value>{collateral}</Value>
           </Item>
           <Item>
             <Label>{'RAI Borrowed'}</Label>
-            <Value>{borrowedRAI}</Value>
+            <Value>{debt}</Value>
+          </Item>
+          <Item>
+            <Label>{'Collateralization Ratio'}</Label>
+            <Value>{`${props.collateralRatio}%`}</Value>
           </Item>
           <Item>
             <Label>{'Liquidation Price'}</Label>
-            <Value>{liquidationPrice}</Value>
+            <Value>{props.liquidationPrice}</Value>
           </Item>
         </Block>
         <BtnContainer>

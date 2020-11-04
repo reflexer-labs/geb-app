@@ -30,8 +30,10 @@ const walletModel: WalletModel = {
       liquidationPrice: '0',
       safetyPrice: ''
     },
+    debtFloor: '0',
     liquidationCRatio: '1', // Rate percentage
     liquidationPenalty: '1', // Rate percentage
+    safetyCRatio: '0'
   },
   uniSwapPool: DEFAULT_CREATE_SAFE_STATE,
 

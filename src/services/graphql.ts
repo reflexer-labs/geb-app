@@ -35,7 +35,7 @@ export const fetchUserSafes = (address: string) => {
       throw new Error('retry');
     }
 
-    return formatUserSafe(res.data.data.safes)
+    return formatUserSafe(res.data.data.safes, res.data.data.systemState.currentRedemptionPrice.value)
   }, {
     retries: GRAPH_API_URLS.length - 1
   });
@@ -53,7 +53,7 @@ export const fetchSafeById = (safeId: string) => {
       throw new Error('retry');
     }
 
-    return formatUserSafe(res.data.data.safes)
+    return formatUserSafe(res.data.data.safes, res.data.data.systemState.currentRedemptionPrice.value)
   }, {
     retries: GRAPH_API_URLS.length - 1
   });

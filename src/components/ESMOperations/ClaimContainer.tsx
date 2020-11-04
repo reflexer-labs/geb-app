@@ -96,7 +96,7 @@ const ClaimContainer = ({ setClaimableSafe, setFLXToBurn }: Props) => {
           {popupsState.ESMOperationPayload.type === 'ETH' ? (
             <Item>
               <Label>{'Claimable ETH'}</Label>{' '}
-              <Value>{selectedSafe ? selectedSafe.depositedEth : '0.00'}</Value>
+              <Value>{selectedSafe ? selectedSafe.collateral : '0.00'}</Value>
             </Item>
           ) : null}
 

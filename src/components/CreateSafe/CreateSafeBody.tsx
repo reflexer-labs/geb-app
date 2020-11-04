@@ -6,7 +6,13 @@ import { CreateSafeType } from '../../utils/interfaces';
 import Button from '../Button';
 // import CheckBox from '../CheckBox';
 import DecimalInput from '../DecimalInput';
-import { formatNumber, getAvailableRaiToBorrow, getCollateralRatio, getRatePercentage } from '../../utils/helper';
+import {
+  formatNumber,
+  getAvailableRaiToBorrow,
+  getCollateralRatio,
+  getRatePercentage,
+  // validateBorrow
+} from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
 import { DEFAULT_CREATE_SAFE_STATE } from '../../utils/constants';
 
@@ -37,9 +43,9 @@ const CreateSafeBody = ({ isChecked }: Props) => {
   const availableRai = getAvailableRaiToBorrow(defaultSafe.depositedETH, walletState.liquidationData.currentPrice.safetyPrice);
   const collateralRatio = getCollateralRatio(
     defaultSafe.depositedETH,
+    defaultSafe.borrowedRAI,
     walletState.liquidationData.currentPrice.liquidationPrice,
     walletState.liquidationData.liquidationCRatio,
-    defaultSafe.borrowedRAI,
     walletState.liquidationData.accumulatedRate
   )
   const liquidationPenalty = getRatePercentage(walletState.liquidationData.liquidationPenalty);
@@ -53,12 +59,22 @@ const CreateSafeBody = ({ isChecked }: Props) => {
     if (!defaultSafe.depositedETH) {
       setError('Please enter the amount of ETH to be deposited.');
     } else if (Number(defaultSafe.depositedETH) > availableEth) {
-      setError('ETH deposited cannot exceed balance.');
+      setError('Insufficient balance.');
     } else if (!defaultSafe.borrowedRAI || Number(defaultSafe.borrowedRAI) < 70) {
       setError('Minimum amount of RAI to be borrowed must be at least 70.');
     } else if (Number(defaultSafe.borrowedRAI) > availableRai) {
       setError('RAI borrowed cannot exceed available amount.');
     } else {
+      /*const isDebtValid = validateBorrow(
+        defaultSafe.borrowedRAI,
+        defaultSafe.depositedETH,
+        '0',
+        walletState.liquidationData.accumulatedRate,
+        walletState.liquidationData.debtFloor,
+        walletState.liquidationData.safetyCRatio,
+        walletState.liquidationData.currentPrice.safetyPrice,
+      );*/
+
       walletActions.setCreateSafeDefault({ ...defaultSafe, collateralRatio: collateralRatio as number });
       walletActions.setIsUniSwapPoolChecked(checkUniSwapPool);
 

@@ -11,32 +11,33 @@ const SafeStats = () => {
   const { safeModel: safeState } = useStoreState((state) => state);
 
   const { singleSafe } = safeState;
-  const borrowedRai = formatNumber(singleSafe?.borrowedRAI || '0', 2);
-  const collateralRatio = getRatePercentage(singleSafe?.collateralRatio || '1');
-  const depositedEth = formatNumber(singleSafe?.depositedEth || '0', 2);
-  const liquidationPrice = formatNumber(singleSafe?.liquidationPrice || '0', 2);
+
+  const collateral = formatNumber(singleSafe?.collateral || '0', 2);
+  const debt = formatNumber(singleSafe?.debt || '0', 2);
+  const interestOwed = singleSafe ? (Number(singleSafe.debt) * (Number(singleSafe.accumulatedRate) - 1)) : 0;
   const liquidationPenalty = getRatePercentage(singleSafe?.liquidationPenalty || '1');
+  const totalAnnualizedStabilityFee = formatNumber(singleSafe?.totalAnnualizedStabilityFee || '0', 2);
 
   return (
     <>
       <StatsGrid>
         <StatItem>
           <StateInner>
-            <Value>{`${collateralRatio}%`}</Value>
+            <Value>{`${singleSafe?.collateralRatio}%`}</Value>
             <Label>{'Collateralization Ratio'}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem>
           <StateInner>
-            <Value>$25.01</Value>
-            <Label>{'Interest Owed (2.50% APR)'}</Label>
+            <Value>{`$${interestOwed}`}</Value>
+            <Label>{`Interest Owed (${totalAnnualizedStabilityFee}% APR)`}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem>
           <StateInner>
-            <Value>{`$${liquidationPrice}`}</Value>
+            <Value>{`$${singleSafe?.liquidationPrice}`}</Value>
             <Label>{'Liquidation Price'}</Label>
           </StateInner>
         </StatItem>
@@ -50,7 +51,7 @@ const SafeStats = () => {
 
         <StatItem className="w50">
           <StateInner>
-            <Value>{`${depositedEth} ETH`}</Value>
+            <Value>{`${collateral} ETH`}</Value>
             <Label>{'ETH Deposited'}</Label>
             <Actions>
               <Button
@@ -79,7 +80,7 @@ const SafeStats = () => {
 
         <StatItem className="w50">
           <StateInner>
-            <Value>{`${borrowedRai} RAI`}</Value>
+            <Value>{`${debt} RAI`}</Value>
             <Label>{'RAI Borrowed'}</Label>
             <Actions>
               <Button

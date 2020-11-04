@@ -9,11 +9,16 @@ export const INITIAL_SAFE_STATE = [
     img: `${process.env.PUBLIC_URL}/img/box-ph.svg`,
     date: 'July 3, 2020',
     riskState: 'low',
-    depositedEth: '100.00',
-    borrowedRAI: '23.00',
-    collateralRatio: '1.5',
+    collateral: '100.00',
+    debt: '23.00',
+    accumulatedRate: '1.15',
+    collateralRatio: '150',
+    currentRedemptionPrice: '2.15',
+    currentLiquidationPrice: '225.75',
+    liquidationCRatio: '1.5',
     liquidationPenalty: '1.11',
-    liquidationPrice: '$250.00',
+    liquidationPrice: '250.00',
+    totalAnnualizedStabilityFee: '0'
   },
 ]
 

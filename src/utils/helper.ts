@@ -1,5 +1,5 @@
 import { ChainId } from '@uniswap/sdk';
-import { ethers } from 'ethers';
+import { BigNumber, FixedNumber } from 'ethers';
 import { utils as gebUtils } from 'geb.js';
 import { ETHERSCAN_PREFIXES } from './constants';
 import { ISafe } from './interfaces';
@@ -56,42 +56,100 @@ export const getAvailableRaiToBorrow = (depositedETH: string, safetyPrice: strin
     return 0;
   }
 
-  const safetyPriceRay = ethers.BigNumber.from(ethers.FixedNumber.fromString(safetyPrice, 'fixed256x27').toHexString());
-  const ethLockWad = ethers.BigNumber.from(ethers.FixedNumber.fromString(depositedETH, 'fixed256x18').toHexString());
+  const safetyPriceRay = BigNumber.from(FixedNumber.fromString(safetyPrice, 'fixed256x27').toHexString());
+  const ethLockWad = BigNumber.from(FixedNumber.fromString(depositedETH, 'fixed256x18').toHexString());
   const raiAvailableToBorrowWad = ethLockWad.mul(safetyPriceRay).div(gebUtils.RAY);
   return formatNumber(gebUtils.wadToFixed(raiAvailableToBorrowWad).toString());
 }
 
-export const formatUserSafe = (safes: Array<any>): Array<ISafe> => {
+export const formatUserSafe = (safes: Array<any>, currentRedemptionPrice: string): Array<ISafe> => {
   return safes.map(s => {
+    const collateralRatio = getCollateralRatio(
+      s.collateral,
+      s.debt,
+      s.liquidationPrice,
+      s.liquidationCRatio,
+      s.accumulatedRate
+    );
+    const liquidationPrice = getLiquidationPrice(
+      s.collateral,
+      s.debt,
+      s.liquidationCRatio,
+      s.accumulatedRate,
+      s.currentRedemptionPrice
+    );
+
     return {
       id: s.safeId,
       img: `${process.env.PUBLIC_URL}/img/box-ph.svg`,
       date: s.createdAt,
       riskState: 'low',
-      depositedEth: s.collateral,
-      borrowedRAI: s.debt,
-      collateralRatio: s.collateralType.liquidationCRatio || '1',
+      collateral: s.collateral,
+      debt: s.debt,
+      accumulatedRate: s.collateralType.accumulatedRate,
+      collateralRatio,
+      currentRedemptionPrice,
+      currentLiquidationPrice: s.collateralType.currentPrice.liquidationPrice,
+      liquidationCRatio: s.collateralType.liquidationCRatio || '1',
       liquidationPenalty: s.collateralType.liquidationPenalty || '1',
-      liquidationPrice: s.collateralType.currentPrice.liquidationPrice,
-    }
-  })
+      liquidationPrice,
+      totalAnnualizedStabilityFee: s.collateralType.totalAnnualizedStabilityFee || '0'
+    } as ISafe
+  }).sort((a, b) => Number(a.id) - Number(b.id));
 }
 
 export const getCollateralRatio = (
-  depositedETH: string,
+  collateral: string,
+  debt: string,
   liquidationPrice: string,
   liquidationCRatio: string,
-  debt: string,
   accumulatedRate: string
 ) => {
-  if (Number(depositedETH) === 0) {
+  if (Number(collateral) === 0) {
     return '0';
   } else if (Number(debt) === 0) {
     return '∞';
   }
 
-  const numerator = Number(depositedETH) * Number(liquidationPrice) * Number(liquidationCRatio)
-  const denominator = Number(debt) * Number(accumulatedRate)
-  return formatNumber((numerator / denominator * 100).toString(), 2)
+  const numerator = Number(collateral) * Number(liquidationPrice) * Number(liquidationCRatio);
+  const denominator = Number(debt) * Number(accumulatedRate);
+  return formatNumber((numerator / denominator * 100).toString(), 2);
+}
+
+export const getLiquidationPrice = (
+  collateral: string,
+  debt: string,
+  liquidationCRatio: string,
+  accumulatedRate: string,
+  currentRedemptionPrice: string
+) => {
+  if (Number(collateral) === 0) {
+    return '0';
+  } else if (Number(debt) === 0) {
+    return '∞';
+  }
+
+  const numerator = Number(debt) * Number(accumulatedRate) * Number(currentRedemptionPrice) * Number(liquidationCRatio);
+  const denominator = Number(collateral);
+  return formatNumber((numerator / denominator).toString(), 2);
+}
+
+export const validateBorrow = (
+  borrowedRai: string,
+  collateral: string,
+  debt: string,
+  accumulatedRate: string,
+  debtFloor: string,
+  safetyCratio: string,
+  safetyPrice: string
+) => {
+  const input = BigNumber.from(FixedNumber.fromString(borrowedRai, 'fixed256x18').toHexString());
+
+  if (input.add(debt).mul(accumulatedRate).lte(BigNumber.from(collateral).mul(safetyPrice))) {
+    return `Too much debt, below ${safetyCratio} collateralization ratio`;
+  } else if (input.add(debt).lt(debtFloor)) {
+    return `The resulting debt should be at least ${debtFloor} RAI or zero.`;
+  }
+
+  return '';
 }
