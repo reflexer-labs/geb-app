@@ -11,7 +11,7 @@ import {
   getAvailableRaiToBorrow,
   getCollateralRatio,
   getRatePercentage,
-  // validateBorrow
+  validateBorrow
 } from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
 import { DEFAULT_CREATE_SAFE_STATE } from '../../utils/constants';
@@ -26,7 +26,6 @@ const CreateSafeBody = ({ isChecked }: Props) => {
   const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || false);
   const [error, setError] = useState('');
   const [defaultSafe, setDefaultSafe] = useState<CreateSafeType>(DEFAULT_CREATE_SAFE_STATE);
-
   const [uniSwapVal, setUniSwapVal] = useState<CreateSafeType>(DEFAULT_CREATE_SAFE_STATE);
 
   const {
@@ -65,7 +64,7 @@ const CreateSafeBody = ({ isChecked }: Props) => {
     } else if (Number(defaultSafe.borrowedRAI) > availableRai) {
       setError('RAI borrowed cannot exceed available amount.');
     } else {
-      /*const isDebtValid = validateBorrow(
+      const debtError = validateBorrow(
         defaultSafe.borrowedRAI,
         defaultSafe.depositedETH,
         '0',
@@ -73,15 +72,19 @@ const CreateSafeBody = ({ isChecked }: Props) => {
         walletState.liquidationData.debtFloor,
         walletState.liquidationData.safetyCRatio,
         walletState.liquidationData.currentPrice.safetyPrice,
-      );*/
+      );
 
-      walletActions.setCreateSafeDefault({ ...defaultSafe, collateralRatio: collateralRatio as number });
-      walletActions.setIsUniSwapPoolChecked(checkUniSwapPool);
-
-      if (checkUniSwapPool) {
-        walletActions.setStage(1);
+      if (debtError) {
+        setError(debtError);
       } else {
-        walletActions.setStage(2);
+        walletActions.setCreateSafeDefault({ ...defaultSafe, collateralRatio: collateralRatio as number });
+        walletActions.setIsUniSwapPoolChecked(checkUniSwapPool);
+
+        if (checkUniSwapPool) {
+          walletActions.setStage(1);
+        } else {
+          walletActions.setStage(2);
+        }
       }
     }
   };

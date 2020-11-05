@@ -6,6 +6,7 @@ export const getUserSafesListQuery = (address: string) => `{
       currentPrice {
         liquidationPrice
       }
+      liquidationCRatio
     }
     collateral
     createdAt

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
 import Button from './Button';
-import { formatNumber, getRatePercentage } from '../utils/helper';
+import { formatNumber, getInterestOwed, getRatePercentage } from '../utils/helper';
 
 const SafeStats = () => {
   const { t } = useTranslation();
@@ -14,7 +14,7 @@ const SafeStats = () => {
 
   const collateral = formatNumber(singleSafe?.collateral || '0', 2);
   const debt = formatNumber(singleSafe?.debt || '0', 2);
-  const interestOwed = singleSafe ? (Number(singleSafe.debt) * (Number(singleSafe.accumulatedRate) - 1)) : 0;
+  const interestOwed = singleSafe ? getInterestOwed(singleSafe.debt, singleSafe.accumulatedRate) : 0;
   const liquidationPenalty = getRatePercentage(singleSafe?.liquidationPenalty || '1');
   const totalAnnualizedStabilityFee = formatNumber(singleSafe?.totalAnnualizedStabilityFee || '0', 2);
 

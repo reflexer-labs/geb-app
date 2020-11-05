@@ -67,16 +67,16 @@ export const formatUserSafe = (safes: Array<any>, currentRedemptionPrice: string
     const collateralRatio = getCollateralRatio(
       s.collateral,
       s.debt,
-      s.liquidationPrice,
-      s.liquidationCRatio,
-      s.accumulatedRate
+      s.collateralType.currentPrice.liquidationPrice,
+      s.collateralType.liquidationCRatio,
+      s.collateralType.accumulatedRate
     );
     const liquidationPrice = getLiquidationPrice(
       s.collateral,
       s.debt,
-      s.liquidationCRatio,
-      s.accumulatedRate,
-      s.currentRedemptionPrice
+      s.collateralType.liquidationCRatio,
+      s.collateralType.accumulatedRate,
+      currentRedemptionPrice
     );
 
     return {
@@ -135,21 +135,29 @@ export const getLiquidationPrice = (
 }
 
 export const validateBorrow = (
-  borrowedRai: string,
-  collateral: string,
-  debt: string,
-  accumulatedRate: string,
-  debtFloor: string,
-  safetyCratio: string,
-  safetyPrice: string
+  _borrowedRai: string,
+  _collateral: string,
+  _debt: string,
+  _accumulatedRate: string,
+  _debtFloor: string,
+  _safetyCratio: string,
+  _safetyPrice: string
 ) => {
-  const input = BigNumber.from(FixedNumber.fromString(borrowedRai, 'fixed256x18').toHexString());
+  const accumulatedRate = BigNumber.from(FixedNumber.fromString(_accumulatedRate, 'fixed256x45').toHexString());
+  const borrowedRai = BigNumber.from(FixedNumber.fromString(_borrowedRai, 'fixed256x18').toHexString());
+  const collateral = BigNumber.from(FixedNumber.fromString(_collateral, 'fixed256x18').toHexString());
+  const debt = BigNumber.from(FixedNumber.fromString(_debt, 'fixed256x18').toHexString());
+  const safetyPrice = BigNumber.from(FixedNumber.fromString(_safetyPrice, 'fixed256x27').toHexString());
 
-  if (input.add(debt).mul(accumulatedRate).lte(BigNumber.from(collateral).mul(safetyPrice))) {
-    return `Too much debt, below ${safetyCratio} collateralization ratio`;
-  } else if (input.add(debt).lt(debtFloor)) {
-    return `The resulting debt should be at least ${debtFloor} RAI or zero.`;
+  if (borrowedRai.add(debt).mul(accumulatedRate).lte(collateral.mul(safetyPrice))) {
+    return `Too much debt, below ${_safetyCratio} collateralization ratio`;
+  } else if (borrowedRai.add(debt).lt(_debtFloor)) {
+    return `The resulting debt should be at least ${_debtFloor} RAI or zero.`;
   }
 
   return '';
+}
+
+export const getInterestOwed = (debt: string, accumulatedRate: string) => {
+  return formatNumber(String(Number(debt) * (Number(accumulatedRate) - 1)), 2);
 }
