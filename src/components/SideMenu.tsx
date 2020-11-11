@@ -67,7 +67,7 @@ const SideMenu = () => {
                 </Account>
               ) : (
                 <ConnectBtnContainer>
-                  <Icon src={process.env.PUBLIC_URL + '/img/LogoIcon.png'} />
+                  <Icon src={require('../assets/LogoIcon.png')} />
                   <Title>{t('welcome_reflexer')}</Title>
                   <Text>{t('connect_text')}</Text>
                   <Button

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import { useStoreActions } from '../store';
-import { returnWalletAddress } from '../utils/helper';
+import { useStoreActions, useStoreState } from '../store';
+import { newTransactionsFirst, returnWalletAddress } from '../utils/helper';
 import Button from './Button';
 import CopyIcon from './Icons/CopyIcon';
 import ExpandIcon from './Icons/ExpandIcon';
@@ -12,6 +12,8 @@ import { injected, walletlink } from '../connectors';
 import { getEtherscanLink } from '../utils/helper';
 import ConnectedWalletIcon from './ConnectedWalletIcon';
 import { SUPPORTED_WALLETS } from '../utils/constants';
+import Transaction from './Transaction';
+import { isTransactionRecent } from '../hooks/TransactionHooks';
 
 const ConnectedWalletInfo = () => {
   const { t } = useTranslation();
@@ -21,9 +23,14 @@ const ConnectedWalletInfo = () => {
 
   const [copied, setCopied] = useState(false);
 
+  const { transactionsModel: transactionsState } = useStoreState(
+    (state) => state
+  );
+
   const {
     popupsModel: popupsActions,
     walletModel: walletActions,
+    transactionsModel: transactionsActions,
   } = useStoreActions((state) => state);
 
   const handleChange = () => {
@@ -47,6 +54,33 @@ const ConnectedWalletInfo = () => {
       )
       .map((k) => SUPPORTED_WALLETS[k].name)[0];
     return name;
+  };
+
+  const sortedRecentTransactions = useMemo(() => {
+    const txs = Object.values(transactionsState.transactions);
+    return txs.filter(isTransactionRecent).sort(newTransactionsFirst);
+  }, [transactionsState.transactions]);
+
+  const pendingTransactions = sortedRecentTransactions
+    .filter((tx) => !tx.receipt)
+    .map((tx) => tx.hash);
+  const confirmedTransactions = sortedRecentTransactions
+    .filter((tx) => tx.receipt)
+    .map((tx) => tx.hash);
+
+  const renderTransactions = (transactions: string[]) => {
+    return (
+      <>
+        {transactions.map((hash, i) => {
+          return <Transaction key={i} hash={hash} />;
+        })}
+      </>
+    );
+  };
+
+  const handleClearTransactions = () => {
+    transactionsActions.clearTransactions();
+    localStorage.removeItem(`${account}-${chainId}`);
   };
 
   return (
@@ -93,7 +127,24 @@ const ConnectedWalletInfo = () => {
           </WalletData>
         ) : null}
       </DataContainer>
-      <TransactionsContainer>{t('transaction_msg')}</TransactionsContainer>
+      <TransactionsContainer>
+        {!!pendingTransactions.length || !!confirmedTransactions.length ? (
+          <>
+            <Heading>
+              {t('recent_transactions')}
+              <Button
+                text={'clear_all'}
+                withArrow
+                onClick={handleClearTransactions}
+              />
+            </Heading>
+            {renderTransactions(pendingTransactions)}
+            {renderTransactions(confirmedTransactions)}
+          </>
+        ) : (
+          t('transaction_msg')
+        )}
+      </TransactionsContainer>
     </>
   );
 };
@@ -197,4 +248,18 @@ const TransactionsContainer = styled.div`
   margin: 20px -20px -20px -20px;
   border-radius: 0 0 25px 25px;
   font-size: ${(props) => props.theme.font.small};
+`;
+
+const Heading = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: ${(props) => props.theme.font.default};
+  color: ${(props) => props.theme.colors.primary};
+  margin-bottom: 15px;
+  button {
+    img {
+      display: none;
+    }
+  }
 `;

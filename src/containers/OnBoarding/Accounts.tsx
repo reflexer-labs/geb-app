@@ -8,7 +8,7 @@ const Accounts = () => {
       <Content>
         <ImgContainer>
           <img
-            src={process.env.PUBLIC_URL + '/img/placeholder.png'}
+            src={require('../../assets/placeholder.png')}
             alt="placeholder"
           />{' '}
         </ImgContainer>

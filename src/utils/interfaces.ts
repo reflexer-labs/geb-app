@@ -1,9 +1,11 @@
 import { AbstractConnector } from '@web3-react/abstract-connector';
+import { TransactionResponse } from '@ethersproject/providers';
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
 import { DefaultTheme, ThemedCssFunction } from 'styled-components';
+import { ChainId } from '@uniswap/sdk';
 
 export interface DynamicObject {
-  [key: string]: any
+  [key: string]: any;
 }
 
 interface IColors {
@@ -76,15 +78,6 @@ export interface CreateSafeType {
   borrowedRAI: string;
   collateralRatio: number;
   depositedETH: string;
-}
-
-export interface ToastPayload {
-  showPopup: boolean;
-  text: string;
-  hideSpinner?: boolean | null;
-  isTransaction?: boolean | null;
-  timeout?: number | null;
-  autoHide?: boolean;
 }
 
 export interface IBlockNumber {
@@ -161,4 +154,34 @@ export interface ILiquidationData {
 export interface ICreateSafePayload {
   createSafeDefault: CreateSafeType;
   signer: JsonRpcSigner;
+}
+
+export interface IWaitingPayload {
+  title?: string;
+  text?: string;
+  hint?: string;
+  status: string;
+  hash?: string;
+}
+
+export interface SerializableTransactionReceipt {
+  to: string;
+  from: string;
+  contractAddress: string;
+  transactionIndex: number;
+  blockHash: string;
+  transactionHash: string;
+  blockNumber: number;
+  status?: number;
+}
+export interface ITransaction {
+  chainId: ChainId;
+  hash: string;
+  from: string;
+  receipt?: SerializableTransactionReceipt;
+  summary?: string;
+  lastCheckedBlockNumber?: number;
+  addedTime: number;
+  confirmedTime?: number;
+  originalTx: TransactionResponse;
 }

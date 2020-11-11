@@ -46,7 +46,7 @@ const VotingTx = ({ tx }: Props) => {
       <BtnContainer className={tx.isCompleted ? 'disabled' : ''}>
         <Link to={`/voting/${tx.id}`}>
           {t('delay_transaction')}{' '}
-          <img src={process.env.PUBLIC_URL + '/img/arrow.svg'} alt={''} />
+          <img src={require('../assets/arrow.svg')} alt={''} />
         </Link>
       </BtnContainer>
     </Container>

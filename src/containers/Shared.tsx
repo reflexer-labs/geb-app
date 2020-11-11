@@ -1,15 +1,14 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import ConnectedWalletModal from '../components/Modals/ConnectedWalletModal';
 import CreateAccountModal from '../components/Modals/CreateAccountModal';
 import ScreenLoader from '../components/Modals/ScreenLoader';
 import Navbar from '../components/Navbar';
 import SideMenu from '../components/SideMenu';
-import SideToast from '../components/SideToast';
 import { useStoreState, useStoreActions } from '../store';
 import ApplicationUpdater from '../services/ApplicationUpdater';
 import BalanceUpdater from '../services/BalanceUpdater';
-import { capitalizeName } from '../utils/helper';
+import { capitalizeName, timeout } from '../utils/helper';
 import WalletModal from '../components/WalletModal';
 import { ChainId } from '@uniswap/sdk';
 import { ETHERSCAN_PREFIXES } from '../utils/constants';
@@ -19,12 +18,14 @@ import SafeOperationsModal from '../components/Modals/SafeOperationsModal';
 import ESMOperationModal from '../components/Modals/ESMOperationModal';
 import VotingOperationModal from '../components/Modals/VotingOperationModal';
 import styled from 'styled-components';
-import { NETWORK_ID } from '../connectors';
+import { geb, NETWORK_ID } from '../connectors';
 import IncentivesModal from '../components/Modals/IncentivesModal';
 import CookieBanner from '../components/CookieBanner';
 import BlockBodyContainer from '../components/BlockBodyContainer';
 import { toast } from 'react-toastify';
 import ToastPayload from '../components/ToastPayload';
+import WaitingModal from '../components/Modals/WaitingModal';
+import TransactionUpdater from '../services/TransactionUpdater';
 
 interface Props {
   children: ReactNode;
@@ -33,72 +34,116 @@ interface Props {
 const Shared = ({ children }: Props) => {
   const { t } = useTranslation();
   const { chainId, account } = useActiveWeb3React();
-  const {
-    popupsModel: popupsState,
-    settingsModel: settingsState,
-  } = useStoreState((state) => state);
+  const { settingsModel: settingsState } = useStoreState((state) => state);
+
   const {
     walletModel: walletActions,
     settingsModel: settingsActions,
     connectWalletModel: connectedWalletActions,
+    safeModel: safeActions,
+    popupsModel: popupActions,
+    transactionsModel: transactionsActions,
   } = useStoreActions((state) => state);
-  const { sideToastPayload } = popupsState;
   const toastId = 'networdToastHash';
-  const networkChecker = (id: ChainId) => {
-    if (chainId && chainId !== id) {
-      const chainName = ETHERSCAN_PREFIXES[id];
-      connectedWalletActions.setIsWrongNetwork(true);
-      settingsActions.setBlockBody(true);
-      toast(
-        <ToastPayload
-          icon={'AlertTriangle'}
-          iconSize={40}
-          iconColor={'orange'}
-          text={`${t('wrong_network')} ${capitalizeName(
-            chainName === '' ? 'Mainnet' : chainName
-          )}`}
-        />,
-        { autoClose: false, type: 'warning', toastId }
-      );
-    } else {
-      toast.update(toastId, { autoClose: 1 });
-      settingsActions.setBlockBody(false);
-      connectedWalletActions.setIsWrongNetwork(false);
-      if (account) {
+  const networkChecker = useCallback(
+    (id: ChainId) => {
+      if (chainId && chainId !== id) {
+        const chainName = ETHERSCAN_PREFIXES[id];
+        connectedWalletActions.setIsWrongNetwork(true);
+        settingsActions.setBlockBody(true);
         toast(
           <ToastPayload
-            icon={'Check'}
-            iconColor={'green'}
-            text={t('wallet_connected')}
+            icon={'AlertTriangle'}
+            iconSize={40}
+            iconColor={'orange'}
+            text={`${t('wrong_network')} ${capitalizeName(
+              chainName === '' ? 'Mainnet' : chainName
+            )}`}
           />,
-          {
-            type: 'success',
-          }
+          { autoClose: false, type: 'warning', toastId }
         );
+      } else {
+        toast.update(toastId, { autoClose: 1 });
+        settingsActions.setBlockBody(false);
+        connectedWalletActions.setIsWrongNetwork(false);
+        if (account) {
+          toast(
+            <ToastPayload
+              icon={'Check'}
+              iconColor={'green'}
+              text={t('wallet_connected')}
+            />,
+            {
+              type: 'success',
+            }
+          );
+        }
       }
-    }
-  };
+    },
+    [account, chainId, connectedWalletActions, settingsActions, t]
+  );
+
+  const accountChecker = useCallback(
+    (account: string) => {
+      popupActions.setIsWaitingModalOpen(true);
+      geb
+        .getProxyAction(account)
+        .then(() => {
+          // Check if user have existing transactions
+          const txs = localStorage.getItem(`${account}-${chainId}`);
+          if (txs) {
+            transactionsActions.setTransactions(JSON.parse(txs));
+          }
+          popupActions.setWaitingPayload({
+            title: 'Checking for user safes',
+            status: 'loading',
+          });
+          // Check is user had already created safe
+          safeActions.fetchUserSafes(account).then(async (safes: any) => {
+            if (safes.length === 0) {
+              walletActions.setStep(2);
+            } else {
+              popupActions.setWaitingPayload({
+                title: 'Fetching user safes',
+                status: 'loading',
+              });
+              walletActions.setStep(1);
+              safeActions.setIsSafeCreated(true);
+              safeActions.setList(safes);
+              await timeout(200);
+            }
+          });
+        })
+        .catch((e) => {
+          console.log('e', e);
+          walletActions.setStep(1);
+        })
+        .finally(() =>
+          setTimeout(() => popupActions.setIsWaitingModalOpen(false), 1000)
+        );
+    },
+    [chainId, popupActions, safeActions, transactionsActions, walletActions]
+  );
 
   useEffect(() => {
     if (chainId) {
       networkChecker(NETWORK_ID);
     }
     if (account) {
-      walletActions.setStep(1);
+      accountChecker(account);
     } else {
       walletActions.setStep(0);
     }
-    // eslint-disable-next-line
-  }, [chainId, account]);
+  }, [chainId, account, networkChecker, accountChecker, walletActions]);
 
   return (
     <Container>
       {settingsState.blockBody ? <BlockBodyContainer /> : null}
       <SideMenu />
-      <SideToast {...sideToastPayload} />
       <WalletModal />
       <ApplicationUpdater />
       <BalanceUpdater />
+      <TransactionUpdater />
       <LoadingModal />
       <VotingOperationModal />
       <ESMOperationModal />
@@ -107,6 +152,7 @@ const Shared = ({ children }: Props) => {
       <ConnectedWalletModal />
       <IncentivesModal />
       <ScreenLoader />
+      <WaitingModal />
       <EmptyDiv>
         <Navbar />
       </EmptyDiv>

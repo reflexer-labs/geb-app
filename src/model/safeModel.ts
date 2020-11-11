@@ -3,25 +3,6 @@ import { ICreateSafePayload, ISafe } from '../utils/interfaces';
 import { handleSafeCreation } from '../services/blockchain';
 import { fetchSafeById, fetchUserSafes } from '../services/graphql';
 
-export const INITIAL_SAFE_STATE = [
-  {
-    id: '2354',
-    img: `${process.env.PUBLIC_URL}/img/box-ph.svg`,
-    date: 'July 3, 2020',
-    riskState: 'low',
-    collateral: '100.00',
-    debt: '23.00',
-    accumulatedRate: '1.15',
-    collateralRatio: '150',
-    currentRedemptionPrice: '2.15',
-    currentLiquidationPrice: '225.75',
-    liquidationCRatio: '1.5',
-    liquidationPenalty: '1.11',
-    liquidationPrice: '250.00',
-    totalAnnualizedStabilityFee: '0'
-  },
-]
-
 export interface SafeModel {
   list: Array<ISafe>;
   safeCreated: boolean;
@@ -47,23 +28,40 @@ const safeModel: SafeModel = {
   safeCreated: false,
   operation: 0,
   singleSafe: null,
-  totalEth: '110.0000',
-  totalRAI: '112.0000',
+  totalEth: '0.00',
+  totalRAI: '0.00',
   isES: true,
 
   createSafe: thunk(async (actions, payload, { getStoreActions }) => {
     const storeActions: any = getStoreActions();
-    await handleSafeCreation(payload.signer, payload.createSafeDefault);
-    setTimeout(() => {
-      storeActions.popupsModel.setIsLoadingModalOpen({
-        isOpen: false,
-        text: '',
+    const txResponse = await handleSafeCreation(
+      payload.signer,
+      payload.createSafeDefault
+    );
+    if (txResponse) {
+      const { hash, chainId } = txResponse;
+      storeActions.transactionsModel.addTransaction({
+        chainId,
+        hash,
+        from: txResponse.from,
+        summary: 'Creating a new Safe',
+        addedTime: new Date().getTime(),
+        originalTx: txResponse,
       });
-    }, 500);
+      storeActions.popupsModel.setIsWaitingModalOpen(true);
+      storeActions.popupsModel.setWaitingPayload({
+        title: 'Transaction Submitted',
+        hash: txResponse.hash,
+        status: 'success',
+      });
+      await txResponse.wait();
+    }
   }),
 
   fetchUserSafes: thunk(async (actions, payload) => {
-    return fetchUserSafes(payload);
+    const safeRes = await fetchUserSafes(payload.toLowerCase());
+    actions.setList(safeRes);
+    return safeRes;
   }),
 
   fetchSafeById: thunk(async (actions, payload) => {

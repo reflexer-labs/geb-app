@@ -20,12 +20,11 @@ import { NetworkConnector } from './NetworkConnector';
 import { ethers } from 'ethers';
 import { Geb } from 'geb.js';
 
-const {
-  REACT_APP_NETWORK_ID,
-  REACT_APP_NETWORK_URL
-} = process.env;
+const { REACT_APP_NETWORK_ID, REACT_APP_NETWORK_URL } = process.env;
 
-export const NETWORK_URL = REACT_APP_NETWORK_URL ?? 'https://kovan.infura.io/v3/645c2c65dd8f4be18a50a0bf011bab85';
+export const NETWORK_URL =
+  REACT_APP_NETWORK_URL ??
+  'https://kovan.infura.io/v3/645c2c65dd8f4be18a50a0bf011bab85';
 export const NETWORK_ID = parseInt(REACT_APP_NETWORK_ID ?? '1');
 
 export const network = new NetworkConnector({

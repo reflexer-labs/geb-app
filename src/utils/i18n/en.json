@@ -90,5 +90,10 @@
   "redeem_rewards": "Redeem",
   "wallet_connected": "Wallet Connected",
   "onboarding": "Onboarding",
-  "onboarding_header_text": "Manage your Reflexer account"
+  "onboarding_header_text": "Manage your Reflexer account",
+  "dimiss": "Dismiss",
+  "close": "Close",
+  "pending": "Pending",
+  "recent_transactions": "Recent Transactions",
+  "clear_all": "Clear All"
 }

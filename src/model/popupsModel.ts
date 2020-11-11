@@ -3,7 +3,7 @@ import {
   IAlert,
   IOperation,
   LoadingPayload,
-  ToastPayload,
+  IWaitingPayload,
 } from '../utils/interfaces';
 
 export interface PopupsModel {
@@ -20,14 +20,13 @@ export interface PopupsModel {
   ESMOperationPayload: IOperation;
   safeOperationPayload: IOperation;
   isLoadingModalOpen: LoadingPayload;
-  sideToastPayload: ToastPayload;
+  isWaitingModalOpen: boolean;
+  waitingPayload: IWaitingPayload;
   setIsSettingModalOpen: Action<PopupsModel, boolean>;
   setIsConnectModalOpen: Action<PopupsModel, boolean>;
   setIsCreateAccountModalOpen: Action<PopupsModel, boolean>;
-  hideSideToast: Action<PopupsModel>;
   setIsConnectedWalletModalOpen: Action<PopupsModel, boolean>;
   setShowSideMenu: Action<PopupsModel, boolean>;
-  setSideToastPayload: Action<PopupsModel, ToastPayload>;
   setIsScreenModalOpen: Action<PopupsModel, boolean>;
   setIsConnectorsWalletOpen: Action<PopupsModel, boolean>;
   setIsLoadingModalOpen: Action<PopupsModel, LoadingPayload>;
@@ -36,6 +35,8 @@ export interface PopupsModel {
   setESMOperationPayload: Action<PopupsModel, IOperation>;
   setIsVotingModalOpen: Action<PopupsModel, boolean>;
   setIsIncentivesModalOpen: Action<PopupsModel, boolean>;
+  setIsWaitingModalOpen: Action<PopupsModel, boolean>;
+  setWaitingPayload: Action<PopupsModel, IWaitingPayload>;
 }
 
 const popupsModel: PopupsModel = {
@@ -45,6 +46,8 @@ const popupsModel: PopupsModel = {
   isConnectedWalletModalOpen: false,
   isScreenModalOpen: false,
   isIncentivesModalOpen: false,
+  isWaitingModalOpen: false,
+  waitingPayload: { title: '', text: '', hint: '', status: 'loading' },
   safeOperationPayload: {
     isOpen: false,
     type: '',
@@ -64,12 +67,6 @@ const popupsModel: PopupsModel = {
     isOpen: false,
     text: '',
   },
-  sideToastPayload: {
-    text: '',
-    showPopup: false,
-    autoHide: false,
-  },
-
   setIsSettingModalOpen: action((state, payload) => {
     state.isSettingsModalOpen = payload;
   }),
@@ -79,22 +76,11 @@ const popupsModel: PopupsModel = {
   setIsCreateAccountModalOpen: action((state, payload) => {
     state.isCreateAccountModalOpen = payload;
   }),
-  hideSideToast: action((state, payload) => {
-    state.sideToastPayload = {
-      text: '',
-      showPopup: false,
-      isTransaction: null,
-      hideSpinner: null,
-    };
-  }),
   setIsConnectedWalletModalOpen: action((state, payload) => {
     state.isConnectedWalletModalOpen = payload;
   }),
   setShowSideMenu: action((state, payload) => {
     state.showSideMenu = payload;
-  }),
-  setSideToastPayload: action((state, payload) => {
-    state.sideToastPayload = payload;
   }),
   setIsScreenModalOpen: action((state, payload) => {
     state.isScreenModalOpen = payload;
@@ -119,6 +105,12 @@ const popupsModel: PopupsModel = {
   }),
   setIsIncentivesModalOpen: action((state, payload) => {
     state.isIncentivesModalOpen = payload;
+  }),
+  setIsWaitingModalOpen: action((state, payload) => {
+    state.isWaitingModalOpen = payload;
+  }),
+  setWaitingPayload: action((state, payload) => {
+    state.waitingPayload = payload;
   }),
 };
 

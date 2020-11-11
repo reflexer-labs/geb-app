@@ -76,10 +76,7 @@ const VoteDetails = () => {
             <Value>
               <ExternalLink href="">
                 Discord{' '}
-                <img
-                  src={process.env.PUBLIC_URL + '/img/arrow-up.svg'}
-                  alt=""
-                />
+                <img src={require('../../assets/arrow-up.svg')} alt="" />
               </ExternalLink>
             </Value>
           </Block>

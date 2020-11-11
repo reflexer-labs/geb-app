@@ -10,10 +10,16 @@ interface Props {
   handleClick: () => void;
   isDisabled: boolean;
   isLoading: boolean;
-  error: string;
 }
 
-const StepsContent = ({ title, text, btnText, handleClick, isDisabled, isLoading, error }: Props) => {
+const StepsContent = ({
+  title,
+  text,
+  btnText,
+  handleClick,
+  isDisabled,
+  isLoading,
+}: Props) => {
   const { t } = useTranslation();
   return (
     <Container>
@@ -24,8 +30,7 @@ const StepsContent = ({ title, text, btnText, handleClick, isDisabled, isLoading
         isLoading={isLoading}
         text={t(btnText)}
         onClick={handleClick}
-     />
-      {error && <Error>{error}</Error>}
+      />
     </Container>
   );
 };
@@ -49,11 +54,4 @@ const Text = styled.div`
   color: ${(props) => props.theme.colors.secondary};
   margin-bottom: 20px;
   line-height: 21px;
-`;
-
-const Error = styled.p`
-  color: ${(props) => props.theme.colors.dangerColor};
-  font-size: ${(props) => props.theme.font.extraSmall};
-  width: 100%;
-  margin: 16px 0;
 `;

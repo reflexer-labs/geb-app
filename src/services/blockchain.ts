@@ -4,7 +4,13 @@ import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
 import { CreateSafeType } from '../utils/interfaces';
 import { ETH_NETWORK } from '../utils/constants';
 
-export const handleSafeCreation = async (signer: JsonRpcSigner, createSafeDefault: CreateSafeType) => {
+export const handleSafeCreation = async (
+  signer: JsonRpcSigner,
+  createSafeDefault: CreateSafeType
+) => {
+  if (!signer || !createSafeDefault) {
+    return false;
+  }
   const geb = new Geb(ETH_NETWORK, signer.provider);
 
   // Open a new SAFE, lock ETH and draw RAI in a single transaction using a proxy
@@ -14,7 +20,9 @@ export const handleSafeCreation = async (signer: JsonRpcSigner, createSafeDefaul
   const debtCeiling = await geb.contracts.safeEngine.globalDebtCeiling();
   const raiToDraw = ethersUtils.parseEther(createSafeDefault.borrowedRAI);
   if (globalDebt.add(raiToDraw).gt(debtCeiling)) {
-    throw new Error('Debt ceiling too low, not possible to draw this amount of RAI.');
+    throw new Error(
+      'Debt ceiling too low, not possible to draw this amount of RAI.'
+    );
   }
 
   // We're good to mint some RAI!
@@ -25,6 +33,6 @@ export const handleSafeCreation = async (signer: JsonRpcSigner, createSafeDefaul
     raiToDraw
   );
 
-  const pending = await signer.sendTransaction(txData);
-  await pending.wait();
-}
+  const tx = await signer.sendTransaction(txData);
+  return tx;
+};

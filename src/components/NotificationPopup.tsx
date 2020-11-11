@@ -33,7 +33,7 @@ const NotificationPopup = () => {
       </BellBtn>
       {isOpen ? (
         <>
-          <CaretImg src={process.env.PUBLIC_URL + '/img/caret-up.svg'} />
+          <CaretImg src={require('../assets/caret-up.svg')} />
 
           <Menu>
             <Scrollbars
@@ -52,10 +52,7 @@ const NotificationPopup = () => {
                     <Value>0.000</Value>
                     <ExternalLink href="">
                       Etherscan{' '}
-                      <img
-                        src={process.env.PUBLIC_URL + '/img/arrow-up.svg'}
-                        alt=""
-                      />
+                      <img src={require('../assets/arrow-up.svg')} alt="" />
                     </ExternalLink>
                   </Right>
                 </NotificationItem>

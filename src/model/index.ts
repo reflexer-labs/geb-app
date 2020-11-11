@@ -5,6 +5,7 @@ import connectWalletModel, { ConnectWalletModel } from './connectWalletModel';
 import safeModel, { SafeModel } from './safeModel';
 import votingModel, { VotingModel } from './votingModel';
 import incentivesModel, { IncentivesModel } from './IncentivesModel';
+import transactionsModel, { TransactionsModel } from './transactionsModel';
 
 export interface StoreModel {
   settingsModel: SettingsModel;
@@ -14,6 +15,7 @@ export interface StoreModel {
   safeModel: SafeModel;
   votingModel: VotingModel;
   incentivesModel: IncentivesModel;
+  transactionsModel: TransactionsModel;
 }
 
 const model: StoreModel = {
@@ -24,6 +26,7 @@ const model: StoreModel = {
   safeModel,
   votingModel,
   incentivesModel,
+  transactionsModel,
 };
 
 export default model;

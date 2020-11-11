@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
-import { useStoreActions } from '../store';
+import { useStoreActions, useStoreState } from '../store';
 import Brand from './Brand';
 import Button from './Button';
-import { returnWalletAddress } from '../utils/helper';
+import { newTransactionsFirst, returnWalletAddress } from '../utils/helper';
 import NavLinks from './NavLinks';
 import { useWeb3React } from '@web3-react/core';
+import { isTransactionRecent } from '../hooks/TransactionHooks';
 
 const Navbar = () => {
+  const { transactionsModel: transactionsState } = useStoreState(
+    (state) => state
+  );
+
+  const { transactions } = transactionsState;
+
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
   const { active, account } = useWeb3React();
 
@@ -18,6 +25,16 @@ const Navbar = () => {
     return popupsActions.setIsConnectorsWalletOpen(true);
   };
 
+  const sortedRecentTransactions = useMemo(() => {
+    const txs = Object.values(transactions);
+    return txs.filter(isTransactionRecent).sort(newTransactionsFirst);
+  }, [transactions]);
+
+  const pending = sortedRecentTransactions
+    .filter((tx) => !tx.receipt)
+    .map((tx) => tx.hash);
+
+  const hasPendingTransactions = !!pending.length;
   return (
     <Container>
       <Left>
@@ -29,9 +46,14 @@ const Navbar = () => {
       <RightSide>
         <BtnContainer>
           <Button
+            isLoading={hasPendingTransactions}
             onClick={handleWalletConnect}
             text={
-              active && account ? returnWalletAddress(account) : 'connect_wallet'
+              active && account
+                ? hasPendingTransactions
+                  ? `${pending.length} Pending`
+                  : returnWalletAddress(account)
+                : 'connect_wallet'
             }
           />
         </BtnContainer>
@@ -57,6 +79,7 @@ const Container = styled.div`
   justify-content: space-between;
   box-shadow: 0px 1px 0px #eef3f9;
   padding: 0 40px;
+  margin-bottom: 10px;
   border-bottom: 1px solid ${(props) => props.theme.colors.border};
   background: ${(props) => props.theme.colors.background};
   ${({ theme }) => theme.mediaWidth.upToSmall`
@@ -88,6 +111,13 @@ const BtnContainer = styled.div`
   ${({ theme }) => theme.mediaWidth.upToSmall`
     display: none;
   `}
+
+  svg {
+    stroke: white;
+    position: relative;
+    top: 2px;
+    margin-right: 5px;
+  }
 `;
 
 const RectContainer = styled.div``;

@@ -18,17 +18,19 @@ const OnBoarding = () => {
 
   const {
     connectWalletModel: connectWalletState,
-    safeModel: safeState
+    safeModel: safeState,
+    popupsModel: popupsState,
   } = useStoreState((state) => state);
   const {
     popupsModel: popupsActions,
     safeModel: safeActions,
-    walletModel: walletActions
+    walletModel: walletActions,
   } = useStoreActions((state) => state);
 
   useEffect(() => {
     const isLoggedOut = !account;
-    const isAccountSwitched = account && previousAccount && account !== previousAccount
+    const isAccountSwitched =
+      account && previousAccount && account !== previousAccount;
 
     if (isLoggedOut || isAccountSwitched) {
       safeActions.setIsSafeCreated(false);
@@ -42,8 +44,14 @@ const OnBoarding = () => {
       <GridContainer>
         <Content>
           <PageHeader
-            breadcrumbs={{ '/': t(safeState.safeCreated ? 'accounts' : 'onboarding') }}
-            text={t(safeState.safeCreated ? 'accounts_header_text' : 'onboarding_header_text')}
+            breadcrumbs={{
+              '/': t(safeState.safeCreated ? 'accounts' : 'onboarding'),
+            }}
+            text={t(
+              safeState.safeCreated
+                ? 'accounts_header_text'
+                : 'onboarding_header_text'
+            )}
           />
           {safeState.safeCreated ? (
             <BtnContainer>
@@ -58,7 +66,11 @@ const OnBoarding = () => {
               </Button>
             </BtnContainer>
           ) : null}
-          {safeState.safeCreated ? <SafeList /> : <Accounts />}
+          {safeState.safeCreated ? (
+            <SafeList />
+          ) : popupsState.isWaitingModalOpen ? null : (
+            <Accounts />
+          )}
         </Content>
       </GridContainer>
     </Container>

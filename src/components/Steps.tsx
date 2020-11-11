@@ -1,36 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
 import StepsContent from './StepsContent';
 import { useActiveWeb3React } from '../hooks';
 import { geb } from '../connectors';
+import { useTransactionAdder } from '../hooks/TransactionHooks';
 
 const Steps = () => {
   const { account, library } = useActiveWeb3React();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const {
     connectWalletModel: connectWalletState,
-    walletModel: walletState
+    walletModel: walletState,
   } = useStoreState((state) => state);
   const {
     popupsModel: popupsActions,
-    safeModel: safeActions,
     walletModel: walletActions,
   } = useStoreActions((state) => state);
+
+  const addTransaction = useTransactionAdder();
 
   const { step } = walletState;
 
   const handleConnectWallet = () =>
     popupsActions.setIsConnectorsWalletOpen(true);
-
-  const resetError = () => {
-    setTimeout(() => {
-      setError('');
-    }, 5000);
-  };
 
   const handleCreateAccount = async () => {
     if (account && library) {
@@ -39,45 +33,46 @@ const Steps = () => {
       const signer = library.getSigner(account);
 
       try {
-        const pending = await signer.sendTransaction(txData);
-        await pending.wait();
+        popupsActions.setIsWaitingModalOpen(true);
+        popupsActions.setWaitingPayload({
+          title: 'Waiting For Confirmation',
+          text: `Creating new account`,
+          hint: 'Confirm this transaction in your wallet',
+          status: 'loading',
+        });
+        const txResponse = await signer.sendTransaction(txData);
+        addTransaction(txResponse, 'Creating account');
+        popupsActions.setWaitingPayload({
+          title: 'Transaction Submitted',
+          hash: txResponse.hash,
+          status: 'success',
+        });
+        await txResponse.wait();
         walletActions.setStep(2);
       } catch (e) {
-        setError('Could not create an account. Please try again.');
-        resetError();
+        console.log(e);
+        if (e?.code === 4001) {
+          popupsActions.setWaitingPayload({
+            title: 'Transaction Rejected.',
+            status: 'error',
+          });
+          return;
+        } else {
+          popupsActions.setWaitingPayload({
+            title: 'Transaction Failed.',
+            status: 'error',
+          });
+          console.error(`Transaction failed`, e);
+        }
+      } finally {
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
     }
   };
 
   const handleCreateSafe = () => {
     popupsActions.setIsCreateAccountModalOpen(true);
   };
-
-  useEffect(() => {
-    // Check account creation if user has proxy created
-    if (account && step === 1) {
-      geb.getProxyAction(account)
-        .then(() => {
-          // Check is user had already created safe
-          safeActions.fetchUserSafes(account.toLowerCase())
-            .then((safes: any) => {
-              if (safes.length === 0) {
-                setCurrentStep(2);
-              } else {
-                safeActions.setIsSafeCreated(true);
-                safeActions.setList(safes);
-              }
-            })
-        }).catch(() => {
-          setCurrentStep(step);
-        });
-    } else {
-      setCurrentStep(step);
-    }
-    // eslint-disable-next-line
-  }, [account, step]);
 
   const returnSteps = (stepNumber: number) => {
     switch (stepNumber) {
@@ -90,7 +85,6 @@ const Steps = () => {
             handleClick={handleConnectWallet}
             isDisabled={connectWalletState.isWrongNetwork}
             isLoading={isLoading}
-            error={error}
           />
         );
       case 1:
@@ -102,7 +96,6 @@ const Steps = () => {
             handleClick={handleCreateAccount}
             isDisabled={connectWalletState.isWrongNetwork}
             isLoading={isLoading}
-            error={error}
           />
         );
       case 2:
@@ -114,7 +107,6 @@ const Steps = () => {
             handleClick={handleCreateSafe}
             isDisabled={connectWalletState.isWrongNetwork}
             isLoading={isLoading}
-            error={error}
           />
         );
       default:
@@ -124,13 +116,12 @@ const Steps = () => {
 
   return (
     <StepsContainer>
-      {currentStep > 0 && (
-        <StepsBars>
-          <StepBar className="active" />
-          <StepBar className={currentStep === 2 ? 'active' : ''}/>
-        </StepsBars>
-      )}
-      {returnSteps(currentStep)}
+      <StepsBars>
+        <StepBar className="active" />
+        <StepBar className={step !== 0 ? 'active' : ''} />
+        <StepBar className={step === 2 ? 'active' : ''} />
+      </StepsBars>
+      {returnSteps(step)}
     </StepsContainer>
   );
 };

@@ -9,7 +9,13 @@ interface Props {
   hideSpinner?: boolean | null;
   inlineButton?: boolean;
 }
-const Loader = ({ text, width, fontSize, hideSpinner, inlineButton }: Props) => {
+const Loader = ({
+  text,
+  width,
+  fontSize,
+  hideSpinner,
+  inlineButton,
+}: Props) => {
   return (
     <Container inline={inlineButton}>
       {hideSpinner ? null : (
@@ -39,24 +45,24 @@ const rotating = keyframes`
 `;
 
 const Container = styled.div<{ inline?: boolean }>`
-  ${(props) => props.inline ?
-    (css`
-      display: inline;
-      margin-left: 4px;
-      vertical-align: middle;
-    `) :
-    (css`
-      display: flex;
-      align-items: center;
-    `)
-  }
+  ${(props) =>
+    props.inline
+      ? css`
+          display: inline;
+          margin-left: 4px;
+          vertical-align: middle;
+        `
+      : css`
+          display: flex;
+          align-items: center;
+        `}
 
   svg {
     stroke: ${(props) => props.theme.colors.inputBorderColor};
     animation: ${rotating} 1.5s linear infinite;
     margin-right: 10px;
   }
-  
+
   span {
     font-size: ${(props) => props.theme.font.small};
   }

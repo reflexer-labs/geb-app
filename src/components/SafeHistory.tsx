@@ -35,7 +35,7 @@ const SafeHistory = ({ hideHistory }: Props) => {
           <List>
             <Row ref={ref}>
               <Col>
-                <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
+                <img src={require('../assets/box-ph.svg')} alt="" />
                 Repaid RAI
               </Col>
               <Col>Feb 12 2020</Col>
@@ -43,16 +43,13 @@ const SafeHistory = ({ hideHistory }: Props) => {
               <Col>
                 <ExternalLink href="">
                   0x1234....4321{' '}
-                  <img
-                    src={process.env.PUBLIC_URL + '/img/arrow-up.svg'}
-                    alt=""
-                  />
+                  <img src={require('../assets/arrow-up.svg')} alt="" />
                 </ExternalLink>
               </Col>
             </Row>
             <Row>
               <Col>
-                <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
+                <img src={require('../assets/box-ph.svg')} alt="" />
                 Withdrew RAI
               </Col>
               <Col>Feb 2 2020</Col>
@@ -60,16 +57,13 @@ const SafeHistory = ({ hideHistory }: Props) => {
               <Col>
                 <ExternalLink href="">
                   0x1234....4321{' '}
-                  <img
-                    src={process.env.PUBLIC_URL + '/img/arrow-up.svg'}
-                    alt=""
-                  />
+                  <img src={require('../assets/arrow-up.svg')} alt="" />
                 </ExternalLink>
               </Col>
             </Row>
             <Row>
               <Col>
-                <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
+                <img src={require('../assets/box-ph.svg')} alt="" />
                 Deposited ETH
               </Col>
               <Col>Feb 1 2020</Col>
@@ -77,16 +71,13 @@ const SafeHistory = ({ hideHistory }: Props) => {
               <Col>
                 <ExternalLink href="">
                   0x1234....4321{' '}
-                  <img
-                    src={process.env.PUBLIC_URL + '/img/arrow-up.svg'}
-                    alt=""
-                  />
+                  <img src={require('../assets/arrow-up.svg')} alt="" />
                 </ExternalLink>
               </Col>
             </Row>
             <Row>
               <Col>
-                <img src={process.env.PUBLIC_URL + '/img/box-ph.svg'} alt="" />
+                <img src={require('../assets/box-ph.svg')} alt="" />
                 Opened Safe
               </Col>
               <Col>Feb 1 2020</Col>
@@ -94,10 +85,7 @@ const SafeHistory = ({ hideHistory }: Props) => {
               <Col>
                 <ExternalLink href="">
                   0x1234....4321{' '}
-                  <img
-                    src={process.env.PUBLIC_URL + '/img/arrow-up.svg'}
-                    alt=""
-                  />
+                  <img src={require('../assets/arrow-up.svg')} alt="" />
                 </ExternalLink>
               </Col>
             </Row>

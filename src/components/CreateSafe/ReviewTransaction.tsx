@@ -5,7 +5,10 @@ import { useStoreActions, useStoreState } from '../../store';
 import CreateSafeContent from './CreateSafeContent';
 import Button from '../Button';
 import TransactionOverview from './TransactionOverview';
-import { DEFAULT_CREATE_SAFE_STATE, SUPPORTED_WALLETS } from '../../utils/constants';
+import {
+  DEFAULT_CREATE_SAFE_STATE,
+  SUPPORTED_WALLETS,
+} from '../../utils/constants';
 import { injected } from '../../connectors';
 import { useActiveWeb3React } from '../../hooks';
 import { formatNumber } from '../../utils/helper';
@@ -22,8 +25,15 @@ const ReviewTransaction = () => {
   } = useStoreActions((state) => state);
   const { walletModel: walletState } = useStoreState((state) => state);
 
-  const { borrowedRAI, collateralRatio, depositedETH } = walletState.createSafeDefault;
-  const liquidationPrice = formatNumber(walletState.liquidationData.currentPrice.liquidationPrice, 2);
+  const {
+    borrowedRAI,
+    collateralRatio,
+    depositedETH,
+  } = walletState.createSafeDefault;
+  const liquidationPrice = formatNumber(
+    walletState.liquidationData.currentPrice.liquidationPrice,
+    2
+  );
 
   const handleCancel = () => {
     walletState.isUniSwapPoolChecked
@@ -34,28 +44,40 @@ const ReviewTransaction = () => {
   const handleConfirm = async () => {
     if (account && library) {
       popupsActions.setIsCreateAccountModalOpen(false);
-      popupsActions.setIsLoadingModalOpen({
-        isOpen: true,
-        text: t('fetching_account_info'),
+      popupsActions.setIsWaitingModalOpen(true);
+      popupsActions.setWaitingPayload({
+        title: 'Waiting For Confirmation',
+        text: `Creating a new safe, Depositing ${depositedETH} ETH and Borrowing ${borrowedRAI} RAI`,
+        hint: 'Confirm this transaction in your wallet',
+        status: 'loading',
       });
-
       const signer = library.getSigner(account);
       try {
         await safeActions.createSafe({
           createSafeDefault: walletState.createSafeDefault,
-          signer
+          signer,
         });
-
+        await safeActions.fetchUserSafes(account);
         safeActions.setIsSafeCreated(true);
+      } catch (e) {
+        console.log(e);
+        if (e?.code === 4001) {
+          popupsActions.setWaitingPayload({
+            title: 'Transaction Rejected.',
+            status: 'error',
+          });
+          return;
+        } else {
+          popupsActions.setWaitingPayload({
+            title: 'Transaction Failed.',
+            status: 'error',
+          });
+          console.error(`Transaction failed`, e);
+        }
+      } finally {
         walletActions.setStage(0);
         walletActions.setUniSwapPool(DEFAULT_CREATE_SAFE_STATE);
         walletActions.setCreateSafeDefault(DEFAULT_CREATE_SAFE_STATE);
-      } catch (e) {
-        popupsActions.setIsCreateAccountModalOpen(true);
-        popupsActions.setIsLoadingModalOpen({
-          isOpen: false,
-          text: '',
-        });
       }
     }
   };
@@ -100,10 +122,12 @@ const ReviewTransaction = () => {
               <Label>{'RAI Borrowed'}</Label> <Value>{borrowedRAI}</Value>
             </Item>
             <Item>
-              <Label>{'Collateral Ratio'}</Label> <Value>{`${collateralRatio}%`}</Value>
+              <Label>{'Collateral Ratio'}</Label>{' '}
+              <Value>{`${collateralRatio}%`}</Value>
             </Item>
             <Item>
-              <Label>{'Liquidation Price'}</Label> <Value>{`$${liquidationPrice}`}</Value>
+              <Label>{'Liquidation Price'}</Label>{' '}
+              <Value>{`$${liquidationPrice}`}</Value>
             </Item>
           </Block>
 
