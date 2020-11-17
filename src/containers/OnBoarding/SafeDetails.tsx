@@ -10,9 +10,7 @@ import { isNumeric } from '../../utils/validations';
 const SafeDetails = ({ ...props }) => {
   const { t } = useTranslation();
 
-  const {
-    safeModel: safeActions,
-  } = useStoreActions((state) => state);
+  const { safeModel: safeActions } = useStoreActions((state) => state);
   const { safeModel: safeState } = useStoreState((state) => state);
   const safeId = props.match.params.id as string;
 
@@ -22,6 +20,7 @@ const SafeDetails = ({ ...props }) => {
     } else {
       props.history.push('/');
     }
+    return () => safeActions.setSingleSafe(null);
     // eslint-disable-next-line
   }, []);
 

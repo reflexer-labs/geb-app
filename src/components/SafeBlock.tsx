@@ -13,7 +13,7 @@ const SafeBlock = ({ ...props }) => {
   const debt = formatNumber(props.debt, 2);
   const createdAt = dayjs.unix(props.date).format('MMM D, YYYY h:mm A');
   function createImage() {
-    return { __html: toSvg(props.safeHandler, 40) };
+    return { __html: toSvg(props.safeHandler + props.id, 40) };
   }
 
   return (
@@ -48,7 +48,7 @@ const SafeBlock = ({ ...props }) => {
           </Item>
           <Item>
             <Label>{'Liquidation Price'}</Label>
-            <Value>{props.liquidationPrice}</Value>
+            <Value>${props.liquidationPrice}</Value>
           </Item>
         </Block>
         <BtnContainer>

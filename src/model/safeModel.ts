@@ -5,13 +5,18 @@ import {
   ILiquidationData,
   ISafe,
 } from '../utils/interfaces';
-import { handleSafeCreation } from '../services/blockchain';
+import {
+  handleDepositAndBorrow,
+  handleRepayAndWithdraw,
+  handleSafeCreation,
+} from '../services/blockchain';
 import {
   fetchLiquidation,
   fetchSafeById,
   fetchUserSafes,
 } from '../services/graphql';
 import { DEFAULT_SAFE_STATE } from '../utils/constants';
+import { timeout } from '../utils/helper';
 
 export interface SafeModel {
   list: Array<ISafe>;
@@ -26,17 +31,20 @@ export interface SafeModel {
   createSafeDefault: CreateSafeType;
   liquidationData: ILiquidationData;
   uniSwapPool: CreateSafeType;
+  depositAndBorrow: Thunk<SafeModel, ICreateSafePayload & { safeId: string }>;
+  repayAndWithdraw: Thunk<SafeModel, ICreateSafePayload & { safeId: string }>;
   createSafe: Thunk<SafeModel, ICreateSafePayload>;
   fetchSafeById: Thunk<SafeModel, string>;
   fetchUserSafes: Thunk<SafeModel, string>;
+  fetchLiquidationData: Thunk<SafeModel>;
   setIsSafeCreated: Action<SafeModel, boolean>;
   setList: Action<SafeModel, Array<ISafe>>;
-  setSingleSafe: Action<SafeModel, ISafe>;
+  setSingleSafe: Action<SafeModel, ISafe | null>;
   setOperation: Action<SafeModel, number>;
   setTotalEth: Action<SafeModel, string>;
   setTotalRAI: Action<SafeModel, string>;
   setIsES: Action<SafeModel, boolean>;
-  fetchLiquidationData: Thunk<SafeModel>;
+
   setLiquidationData: Action<SafeModel, ILiquidationData>;
   setCreateSafeDefault: Action<SafeModel, CreateSafeType>;
   setUniSwapPool: Action<SafeModel, CreateSafeType>;
@@ -94,7 +102,62 @@ const safeModel: SafeModel = {
       await txResponse.wait();
     }
   }),
-
+  depositAndBorrow: thunk(async (actions, payload, { getStoreActions }) => {
+    const storeActions: any = getStoreActions();
+    const txResponse = await handleDepositAndBorrow(
+      payload.signer,
+      payload.createSafeDefault,
+      payload.safeId
+    );
+    if (txResponse) {
+      const { hash, chainId } = txResponse;
+      storeActions.transactionsModel.addTransaction({
+        chainId,
+        hash,
+        from: txResponse.from,
+        summary: 'Depositing ETH & borrowing RAI',
+        addedTime: new Date().getTime(),
+        originalTx: txResponse,
+      });
+      storeActions.popupsModel.setIsWaitingModalOpen(true);
+      storeActions.popupsModel.setWaitingPayload({
+        title: 'Transaction Submitted',
+        hash: txResponse.hash,
+        status: 'success',
+      });
+      await txResponse.wait();
+      await timeout(3000);
+      await actions.fetchSafeById(payload.safeId);
+    }
+  }),
+  repayAndWithdraw: thunk(async (actions, payload, { getStoreActions }) => {
+    const storeActions: any = getStoreActions();
+    const txResponse = await handleRepayAndWithdraw(
+      payload.signer,
+      payload.createSafeDefault,
+      payload.safeId
+    );
+    if (txResponse) {
+      const { hash, chainId } = txResponse;
+      storeActions.transactionsModel.addTransaction({
+        chainId,
+        hash,
+        from: txResponse.from,
+        summary: 'Repaying RAI & withdrawing ETH',
+        addedTime: new Date().getTime(),
+        originalTx: txResponse,
+      });
+      storeActions.popupsModel.setIsWaitingModalOpen(true);
+      storeActions.popupsModel.setWaitingPayload({
+        title: 'Transaction Submitted',
+        hash: txResponse.hash,
+        status: 'success',
+      });
+      await txResponse.wait();
+      await timeout(3000);
+      await actions.fetchSafeById(payload.safeId);
+    }
+  }),
   fetchUserSafes: thunk(async (actions, payload) => {
     const safeRes = await fetchUserSafes(payload.toLowerCase());
     actions.setList(safeRes);

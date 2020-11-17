@@ -82,30 +82,6 @@ export const toFixedString = (
   return FixedNumber.fromString(value, 'fixed256x18').toHexString();
 };
 
-export const getAvailableRaiToBorrow = (
-  depositedETH: string,
-  safetyPrice: string,
-  accumulatedRate: string
-) => {
-  if (!depositedETH || !safetyPrice) {
-    return 0;
-  }
-
-  const safetyPriceRay = BigNumber.from(
-    BigNumber.from(toFixedString(safetyPrice, 'RAY'))
-  );
-  const ethLockWad = BigNumber.from(toFixedString(depositedETH, 'WAD'));
-  const accumulatedRateBN = BigNumber.from(
-    toFixedString(accumulatedRate, 'RAY')
-  );
-  const raiAvailableToBorrowWad = ethLockWad
-    .mul(safetyPriceRay)
-    .mul(accumulatedRateBN)
-    .div(gebUtils.RAY);
-
-  return formatNumber(gebUtils.wadToFixed(raiAvailableToBorrowWad).toString());
-};
-
 export const formatUserSafe = (
   safes: Array<any>,
   currentRedemptionPrice: string
@@ -127,12 +103,20 @@ export const formatUserSafe = (
         currentRedemptionPrice
       );
 
+      const availableDebt = returnAvaiableDebt(
+        s.collateralType.currentPrice.safetyPrice,
+        '0',
+        s.collateral,
+        s.debt
+      );
+
       return {
         id: s.safeId,
         date: s.createdAt,
         riskState: ratioChecker(Number(collateralRatio)),
         collateral: s.collateral,
         debt: s.debt,
+        availableDebt,
         accumulatedRate: s.collateralType.accumulatedRate,
         collateralRatio,
         currentRedemptionPrice,
@@ -211,16 +195,6 @@ export const safeIsSafe = (
   return totalDebtBN
     .mul(accumulatedRateBN)
     .lte(totalCollateralBN.mul(safetyPriceBN));
-
-  // if (
-  //   borrowedRai.add(debt).mul(accumulatedRate).lte(collateral.mul(safetyPrice))
-  // ) {
-  //   return `Too much debt, below ${_safetyCratio} collateralization ratio`;
-  // } else if (borrowedRai.add(debt).lt(_debtFloor)) {
-  //   return `The resulting debt should be at least ${_debtFloor} RAI or zero.`;
-  // }
-
-  // return '';
 };
 
 export const ratioChecker = (liquitdationRatio: number) => {
@@ -236,6 +210,77 @@ export const ratioChecker = (liquitdationRatio: number) => {
 export const getInterestOwed = (debt: string, accumulatedRate: string) => {
   const restAcc = numeral(accumulatedRate).subtract(1).value();
   return formatNumber(numeral(debt).multiply(restAcc).value().toString(), 2);
+};
+
+export const returnTotalValue = (
+  first: string,
+  second: string,
+  beautify = true,
+  type: keyof typeof floatsTypes = 'WAD'
+) => {
+  const firstBN = first
+    ? BigNumber.from(toFixedString(first, type))
+    : BigNumber.from('0');
+  const secondBN = second
+    ? BigNumber.from(toFixedString(second, type))
+    : BigNumber.from('0');
+
+  const totalBN = firstBN.add(secondBN);
+
+  if (!beautify) return totalBN;
+  return formatNumber(gebUtils.wadToFixed(totalBN).toString()).toString();
+};
+
+export const returnAvaiableDebt = (
+  safetyPrice: string,
+  currentCollatral = '0',
+  prevCollatral = '0',
+  prevDebt = '0'
+) => {
+  if (!safetyPrice) {
+    return '0';
+  }
+  const safetyPriceRay = BigNumber.from(
+    BigNumber.from(toFixedString(safetyPrice, 'RAY'))
+  );
+  const totalCollateralBN = returnTotalValue(
+    currentCollatral,
+    prevCollatral,
+    false
+  ) as BigNumber;
+
+  const totalDebtBN = totalCollateralBN.mul(safetyPriceRay).div(gebUtils.RAY);
+  const prevDebtBN = BigNumber.from(toFixedString(prevDebt, 'WAD'));
+  const availableDebt = totalDebtBN.sub(prevDebtBN);
+  return formatNumber(gebUtils.wadToFixed(availableDebt).toString()).toString();
+};
+
+export const returnDebtPlusInterest = (
+  safetyPrice: string,
+  collateral: string,
+  accumulatedRate: string,
+  beautify = true
+) => {
+  if (!safetyPrice || !collateral || !accumulatedRate) {
+    return '0';
+  }
+  const safetyPriceRay = BigNumber.from(
+    BigNumber.from(toFixedString(safetyPrice, 'RAY'))
+  );
+  const collateralBN = BigNumber.from(toFixedString(collateral, 'WAD'));
+  const accumulatedRateBN = BigNumber.from(
+    toFixedString(accumulatedRate, 'RAY')
+  );
+  const owedRAI = collateralBN
+    .mul(safetyPriceRay)
+    .mul(accumulatedRateBN)
+    .div(gebUtils.RAY)
+    .div(gebUtils.RAY);
+
+  console.log(owedRAI);
+
+  if (!beautify) return owedRAI;
+  return formatNumber(gebUtils.wadToFixed(owedRAI).toString()).toString();
 };
 
 export const newTransactionsFirst = (a: ITransaction, b: ITransaction) => {

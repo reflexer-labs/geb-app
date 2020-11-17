@@ -8,14 +8,17 @@ import Button from '../Button';
 import DecimalInput from '../DecimalInput';
 import {
   formatNumber,
-  getAvailableRaiToBorrow,
   getCollateralRatio,
   getLiquidationPrice,
   getRatePercentage,
+  returnAvaiableDebt,
+  returnTotalValue,
   safeIsSafe,
+  toFixedString,
 } from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
 import { DEFAULT_SAFE_STATE } from '../../utils/constants';
+import { BigNumber } from 'ethers';
 
 interface Props {
   isChecked?: boolean;
@@ -42,7 +45,7 @@ const SafeBody = ({ isChecked }: Props) => {
     safeModel: safeState,
     popupsModel: popupsState,
   } = useStoreState((state) => state);
-  const { createSafeDefault, uniSwapPool } = safeState;
+  const { createSafeDefault, uniSwapPool, singleSafe } = safeState;
   const { type, isCreate } = popupsState.safeOperationPayload;
   const {
     currentPrice,
@@ -54,38 +57,66 @@ const SafeBody = ({ isChecked }: Props) => {
     currentRedemptionPrice,
   } = safeState.liquidationData;
 
-  const availableEth =
-    type === 'deposit_borrow'
-      ? formatNumber(connectWalletState.ethBalance[NETWORK_ID].toString())
-      : '';
+  const totalCollateral = singleSafe
+    ? returnTotalValue(singleSafe.collateral, defaultSafe.leftInput).toString()
+    : defaultSafe.leftInput;
 
-  const availableRai =
-    type === 'deposit_borrow'
-      ? getAvailableRaiToBorrow(
-          defaultSafe.leftInput,
-          currentPrice.safetyPrice,
-          accumulatedRate
-        )
-      : '';
+  const totalDebt = singleSafe
+    ? returnTotalValue(singleSafe.debt, defaultSafe.rightInput).toString()
+    : defaultSafe.rightInput;
 
-  const returnInputType = (isLeft = true) => {
-    if (type === 'deposit_borrow' && isLeft) {
-      return `Deposit ETH (Avail ${availableEth})`;
-    }
-    if (type === 'deposit_borrow' && !isLeft) {
-      return `Borrow RAI (Avail ${availableRai})`;
-    }
-    if (type === 'repay_withdraw' && isLeft) {
-      return `Repay RAI (Avail ${availableRai})`;
-    }
-    if (type === 'repay_withdraw' && !isLeft) {
-      return `Withdraw ETH (Avail ${availableEth})`;
+  const getAvailableEth = () => {
+    if (type === 'deposit_borrow') {
+      return formatNumber(connectWalletState.ethBalance[NETWORK_ID].toString());
+    } else {
+      if (singleSafe) {
+        return singleSafe.collateral;
+      }
     }
     return '';
   };
+
+  const getAvailableRai = () => {
+    if (type === 'deposit_borrow' && isCreate) {
+      return returnAvaiableDebt(
+        currentPrice.safetyPrice,
+        defaultSafe.leftInput
+      );
+    } else if (type === 'deposit_borrow' && !isCreate) {
+      if (singleSafe) {
+        return returnAvaiableDebt(
+          currentPrice.safetyPrice,
+          defaultSafe.leftInput,
+          singleSafe.collateral,
+          singleSafe.debt
+        );
+      }
+    } else {
+      if (singleSafe) {
+        return formatNumber(singleSafe.debt, 4);
+      }
+    }
+    return '';
+  };
+  const returnInputType = (isLeft = true) => {
+    if (type === 'deposit_borrow' && isLeft) {
+      return `Deposit ETH (Avail ${getAvailableEth()})`;
+    }
+    if (type === 'deposit_borrow' && !isLeft) {
+      return `Borrow RAI (Avail ${getAvailableRai()})`;
+    }
+    if (type === 'repay_withdraw' && isLeft) {
+      return `Withdraw ETH (Avail ${getAvailableEth()})`;
+    }
+    if (type === 'repay_withdraw' && !isLeft) {
+      return `Repay RAI (Avail ${getAvailableRai()})`;
+    }
+    return '';
+  };
+
   const collateralRatio = getCollateralRatio(
-    defaultSafe.leftInput,
-    defaultSafe.rightInput,
+    totalCollateral,
+    totalDebt,
     currentPrice.liquidationPrice,
     liquidationCRatio,
     accumulatedRate
@@ -93,8 +124,8 @@ const SafeBody = ({ isChecked }: Props) => {
 
   const liquidationPenaltyPercentage = getRatePercentage(liquidationPenalty);
   const liquidationPrice = getLiquidationPrice(
-    defaultSafe.leftInput,
-    defaultSafe.rightInput,
+    totalCollateral,
+    totalDebt,
     liquidationCRatio,
     accumulatedRate,
     currentRedemptionPrice
@@ -104,31 +135,66 @@ const SafeBody = ({ isChecked }: Props) => {
   //   setDefaultSafe({ ...defaultSafe, borrowedRAI: availableRai.toString() });
   // }
 
-  const isPassedCreateValidation = () => {
-    if (!defaultSafe.leftInput) {
-      setError('Please enter the amount of ETH to be deposited.');
-      return false;
-    } else if (Number(defaultSafe.leftInput) > availableEth) {
-      setError('Insufficient balance.');
-      return false;
-    } else if (
-      !defaultSafe.rightInput ||
-      Number(defaultSafe.rightInput) < Number(debtFloor)
-    ) {
-      setError(
-        `Minimum amount of RAI to be borrowed must be at least ${debtFloor}.`
-      );
-      return false;
-    } else if (Number(defaultSafe.rightInput) > availableRai) {
-      setError('RAI borrowed cannot exceed available amount.');
-      return false;
-    } else {
+  const passedDepositBorrowValidation = () => {
+    const availableEthBN = BigNumber.from(
+      toFixedString(getAvailableEth().toString(), 'WAD')
+    );
+    const availableRaiBN = BigNumber.from(
+      toFixedString(getAvailableRai().toString(), 'WAD')
+    );
+
+    const leftInputBN = defaultSafe.leftInput
+      ? BigNumber.from(toFixedString(defaultSafe.leftInput, 'WAD'))
+      : BigNumber.from('0');
+
+    const rightInputBN = defaultSafe.rightInput
+      ? BigNumber.from(toFixedString(defaultSafe.rightInput, 'WAD'))
+      : BigNumber.from('0');
+
+    const debtFloorBN = BigNumber.from(toFixedString(debtFloor, 'WAD'));
+
+    if (type === 'deposit_borrow') {
+      if (leftInputBN.gt(availableEthBN)) {
+        setError('Insufficient balance.');
+        return false;
+      } else if (rightInputBN.gt(availableRaiBN)) {
+        setError('RAI borrowed cannot exceed available amount.');
+        return false;
+      } else if (
+        defaultSafe.rightInput &&
+        !rightInputBN.isZero() &&
+        rightInputBN.lt(BigNumber.from(debtFloorBN))
+      ) {
+        setError(
+          `The resulting debt should be at least ${debtFloor} RAI or zero.`
+        );
+        return false;
+      }
+      if (isCreate) {
+        if (leftInputBN.isZero()) {
+          setError('Please enter the amount of ETH to be deposited.');
+          return false;
+        }
+        if (rightInputBN.isZero()) {
+          setError('Please enter the amount of RAI to be borrowed.');
+          return false;
+        }
+      } else {
+        if (leftInputBN.isZero() && rightInputBN.isZero()) {
+          setError(
+            'Please enter the amount of ETH to be deposited or amount of RAI to be borrowed'
+          );
+          return false;
+        }
+      }
+
       const isSafe = safeIsSafe(
-        defaultSafe.rightInput,
-        defaultSafe.leftInput,
+        totalCollateral,
+        totalDebt,
         currentPrice.safetyPrice,
         accumulatedRate
       );
+
       if (!isSafe) {
         setError(
           `Too much debt, below ${safetyCRatio} collateralization ratio`
@@ -136,21 +202,38 @@ const SafeBody = ({ isChecked }: Props) => {
         return false;
       }
     }
+
+    if (type === 'repay_withdraw') {
+      if (leftInputBN.isZero() && rightInputBN.isZero()) {
+        setError(
+          'Please enter the amount of ETH to free or amount of RAI to be repay'
+        );
+        return false;
+      } else if (leftInputBN.gt(availableEthBN)) {
+        setError('ETH to unlock cannot exceed available amount.');
+        return false;
+      }
+    }
+
     return true;
   };
 
   const submitDefaultValues = () => {
-    let passedValidation = false;
-    if (isCreate) {
-      passedValidation = isPassedCreateValidation();
-    }
+    const passedValidation = passedDepositBorrowValidation();
 
     if (passedValidation) {
+      if (!defaultSafe.leftInput) {
+        defaultSafe.leftInput = '0';
+      }
+      if (!defaultSafe.rightInput) {
+        defaultSafe.rightInput = '0';
+      }
       safeActions.setCreateSafeDefault({
         ...defaultSafe,
         collateralRatio: collateralRatio as number,
         liquidationPrice: liquidationPrice as number,
       });
+
       safeActions.setIsUniSwapPoolChecked(checkUniSwapPool);
 
       if (checkUniSwapPool) {
@@ -214,7 +297,7 @@ const SafeBody = ({ isChecked }: Props) => {
   return (
     <>
       <Body>
-        <DoubleInput>
+        <DoubleInput className={type === 'repay_withdraw' ? 'reverse' : ''}>
           <DecimalInput
             label={returnInputType()}
             value={defaultSafe.leftInput}
@@ -242,7 +325,7 @@ const SafeBody = ({ isChecked }: Props) => {
               onChange={() => {}}
             />
             <DecimalInput
-              label={`RAI on Uniswap (Avail ${availableRai})`}
+              label={`RAI on Uniswap (Avail ${getAvailableRai()})`}
               value={uniSwapVal ? uniSwapVal.rightInput : ''}
               onChange={() => {}}
               disableMax
@@ -311,12 +394,24 @@ const DoubleInput = styled.div`
 
   > div {
     &:last-child {
-      flex: 0 0 calc(57% + 10px);
+      flex: 0 0 calc(57% + 5px);
       margin-left: -10px;
     }
     &:first-child {
       flex: 0 0 44%;
-      input {
+    }
+  }
+
+  &.reverse {
+    > div {
+      &:first-child {
+        order: 2;
+        flex: 0 0 calc(57% + 5px);
+        margin-left: -10px;
+      }
+      &:last-child {
+        flex: 0 0 44%;
+        margin-left: 0;
       }
     }
   }

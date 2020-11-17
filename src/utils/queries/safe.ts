@@ -6,6 +6,7 @@ export const getUserSafesListQuery = (address: string) => `{
       accumulatedRate
       currentPrice {
         liquidationPrice
+        safetyPrice
       }
       liquidationCRatio
     }
@@ -27,6 +28,7 @@ export const getSafeByIdQuery = (safeId: string) => `{
       accumulatedRate
       currentPrice {
         liquidationPrice
+        safetyPrice
       }
       liquidationCRatio
       liquidationPenalty

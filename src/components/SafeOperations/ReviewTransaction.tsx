@@ -19,7 +19,11 @@ const ReviewTransaction = () => {
     popupsModel: popupsActions,
     safeModel: safeActions,
   } = useStoreActions((state) => state);
-  const { safeModel: safeState } = useStoreState((state) => state);
+  const { safeModel: safeState, popupsModel: popupsState } = useStoreState(
+    (state) => state
+  );
+
+  const { type, isCreate } = popupsState.safeOperationPayload;
 
   const {
     leftInput,
@@ -34,6 +38,13 @@ const ReviewTransaction = () => {
       : safeActions.setStage(0);
   };
 
+  const handleWaitingTitle = () => {
+    if (type === 'repay_withdraw') {
+      return 'Repaying RAI & withdrawing ETH';
+    }
+    return 'Depositing ETH & borrowing RAI';
+  };
+
   const handleConfirm = async () => {
     if (account && library) {
       popupsActions.setSafeOperationPayload({
@@ -44,16 +55,31 @@ const ReviewTransaction = () => {
       popupsActions.setIsWaitingModalOpen(true);
       popupsActions.setWaitingPayload({
         title: 'Waiting For Confirmation',
-        text: 'Open a new Safe',
+        text: handleWaitingTitle(),
         hint: 'Confirm this transaction in your wallet',
         status: 'loading',
       });
       const signer = library.getSigner(account);
       try {
-        await safeActions.createSafe({
-          createSafeDefault: safeState.createSafeDefault,
-          signer,
-        });
+        if (type === 'deposit_borrow' && isCreate) {
+          await safeActions.createSafe({
+            createSafeDefault: safeState.createSafeDefault,
+            signer,
+          });
+        } else if (type === 'deposit_borrow' && safeState.singleSafe) {
+          await safeActions.depositAndBorrow({
+            createSafeDefault: safeState.createSafeDefault,
+            signer,
+            safeId: safeState.singleSafe.id,
+          });
+        } else if (type === 'repay_withdraw' && safeState.singleSafe) {
+          await safeActions.repayAndWithdraw({
+            createSafeDefault: safeState.createSafeDefault,
+            signer,
+            safeId: safeState.singleSafe.id,
+          });
+        }
+
         await safeActions.fetchUserSafes(account);
         safeActions.setIsSafeCreated(true);
       } catch (e) {

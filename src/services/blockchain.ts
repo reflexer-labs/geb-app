@@ -13,9 +13,6 @@ export const handleSafeCreation = async (
   }
   const geb = new Geb(ETH_NETWORK, signer.provider);
 
-  // Open a new SAFE, lock ETH and draw RAI in a single transaction using a proxy
-  // We first need to check that the system didn't reach the debt ceiling so that we can
-  // mint more RAI.
   const globalDebt = await geb.contracts.safeEngine.globalDebt();
   const debtCeiling = await geb.contracts.safeEngine.globalDebtCeiling();
   const raiToDraw = ethersUtils.parseEther(createSafeDefault.rightInput);
@@ -24,14 +21,61 @@ export const handleSafeCreation = async (
       'Debt ceiling too low, not possible to draw this amount of RAI.'
     );
   }
-
-  // We're good to mint some RAI!
   const proxy = await geb.getProxyAction(signer._address);
   const txData = proxy.openLockETHAndGenerateDebt(
     ethersUtils.parseEther(createSafeDefault.leftInput),
     gebUtils.ETH_A,
     raiToDraw
   );
+
+  const tx = await signer.sendTransaction(txData);
+  return tx;
+};
+
+export const handleDepositAndBorrow = async (
+  signer: JsonRpcSigner,
+  createSafeDefault: CreateSafeType,
+  safeId: string
+) => {
+  if (!signer || !createSafeDefault) {
+    return false;
+  }
+  const geb = new Geb(ETH_NETWORK, signer.provider);
+
+  const globalDebt = await geb.contracts.safeEngine.globalDebt();
+  const debtCeiling = await geb.contracts.safeEngine.globalDebtCeiling();
+  const raiToDraw = ethersUtils.parseEther(createSafeDefault.rightInput);
+  if (globalDebt.add(raiToDraw).gt(debtCeiling)) {
+    throw new Error(
+      'Debt ceiling too low, not possible to draw this amount of RAI.'
+    );
+  }
+  const proxy = await geb.getProxyAction(signer._address);
+  const txData = proxy.lockETHAndGenerateDebt(
+    ethersUtils.parseEther(createSafeDefault.leftInput),
+    safeId,
+    raiToDraw
+  );
+
+  const tx = await signer.sendTransaction(txData);
+  return tx;
+};
+
+export const handleRepayAndWithdraw = async (
+  signer: JsonRpcSigner,
+  createSafeDefault: CreateSafeType,
+  safeId: string
+) => {
+  if (!signer || !createSafeDefault) {
+    return false;
+  }
+  const geb = new Geb(ETH_NETWORK, signer.provider);
+
+  const ethToFree = ethersUtils.parseEther(createSafeDefault.leftInput);
+  const raiToRepay = ethersUtils.parseEther(createSafeDefault.rightInput);
+
+  const proxy = await geb.getProxyAction(signer._address);
+  const txData = proxy.repayDebtAndFreeETH(safeId, ethToFree, raiToRepay);
 
   const tx = await signer.sendTransaction(txData);
   return tx;
