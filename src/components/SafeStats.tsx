@@ -72,6 +72,7 @@ const SafeStats = () => {
                   popupsActions.setSafeOperationPayload({
                     isOpen: true,
                     type: 'deposit_borrow',
+                    isCreate: false,
                   })
                 }
               />
@@ -91,6 +92,7 @@ const SafeStats = () => {
                   popupsActions.setSafeOperationPayload({
                     isOpen: true,
                     type: 'repay_withdraw',
+                    isCreate: false,
                   })
                 }
               />

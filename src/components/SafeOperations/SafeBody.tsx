@@ -19,10 +19,9 @@ import { DEFAULT_SAFE_STATE } from '../../utils/constants';
 
 interface Props {
   isChecked?: boolean;
-  isCreate?: boolean;
 }
 
-const CreateSafeBody = ({ isChecked, isCreate = true }: Props) => {
+const SafeBody = ({ isChecked }: Props) => {
   const { t } = useTranslation();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || false);
@@ -41,13 +40,10 @@ const CreateSafeBody = ({ isChecked, isCreate = true }: Props) => {
   const {
     connectWalletModel: connectWalletState,
     safeModel: safeState,
+    popupsModel: popupsState,
   } = useStoreState((state) => state);
   const { createSafeDefault, uniSwapPool } = safeState;
-
-  const availableEth = formatNumber(
-    connectWalletState.ethBalance[NETWORK_ID].toString()
-  );
-
+  const { type, isCreate } = popupsState.safeOperationPayload;
   const {
     currentPrice,
     liquidationCRatio,
@@ -58,11 +54,35 @@ const CreateSafeBody = ({ isChecked, isCreate = true }: Props) => {
     currentRedemptionPrice,
   } = safeState.liquidationData;
 
-  const availableRai = getAvailableRaiToBorrow(
-    defaultSafe.leftInput,
-    currentPrice.safetyPrice,
-    accumulatedRate
-  );
+  const availableEth =
+    type === 'deposit_borrow'
+      ? formatNumber(connectWalletState.ethBalance[NETWORK_ID].toString())
+      : '';
+
+  const availableRai =
+    type === 'deposit_borrow'
+      ? getAvailableRaiToBorrow(
+          defaultSafe.leftInput,
+          currentPrice.safetyPrice,
+          accumulatedRate
+        )
+      : '';
+
+  const returnInputType = (isLeft = true) => {
+    if (type === 'deposit_borrow' && isLeft) {
+      return `Deposit ETH (Avail ${availableEth})`;
+    }
+    if (type === 'deposit_borrow' && !isLeft) {
+      return `Borrow RAI (Avail ${availableRai})`;
+    }
+    if (type === 'repay_withdraw' && isLeft) {
+      return `Repay RAI (Avail ${availableRai})`;
+    }
+    if (type === 'repay_withdraw' && !isLeft) {
+      return `Withdraw ETH (Avail ${availableEth})`;
+    }
+    return '';
+  };
   const collateralRatio = getCollateralRatio(
     defaultSafe.leftInput,
     defaultSafe.rightInput,
@@ -155,7 +175,11 @@ const CreateSafeBody = ({ isChecked, isCreate = true }: Props) => {
     } else {
       safeActions.setIsUniSwapPoolChecked(false);
       safeActions.setStage(0);
-      popupsActions.setIsCreateAccountModalOpen(false);
+      popupsActions.setSafeOperationPayload({
+        isOpen: false,
+        type: '',
+        isCreate: false,
+      });
       safeActions.setUniSwapPool(DEFAULT_SAFE_STATE);
       safeActions.setCreateSafeDefault(DEFAULT_SAFE_STATE);
       setUniSwapVal(DEFAULT_SAFE_STATE);
@@ -163,14 +187,14 @@ const CreateSafeBody = ({ isChecked, isCreate = true }: Props) => {
     }
   };
 
-  const onChangeBorrow = (val: string) => {
+  const onChangeRight = (val: string) => {
     setDefaultSafe({ ...defaultSafe, rightInput: val });
     if (error) {
       setError('');
     }
   };
 
-  const onChangeDeposit = (val: string) => {
+  const onChangeLeft = (val: string) => {
     setDefaultSafe({ ...defaultSafe, leftInput: val });
     if (error) {
       setError('');
@@ -192,16 +216,16 @@ const CreateSafeBody = ({ isChecked, isCreate = true }: Props) => {
       <Body>
         <DoubleInput>
           <DecimalInput
-            label={`Deposit ETH (Avail ${availableEth})`}
+            label={returnInputType()}
             value={defaultSafe.leftInput}
-            onChange={onChangeDeposit}
+            onChange={onChangeLeft}
             disableMax
             disabled={isChecked}
           />
           <DecimalInput
-            label={`Borrow RAI (Avail ${availableRai})`}
+            label={returnInputType(false)}
             value={defaultSafe.rightInput}
-            onChange={onChangeBorrow}
+            onChange={onChangeRight}
             disableMax
             // handleMaxClick={setMaxRai}
             disabled={isChecked}
@@ -215,12 +239,12 @@ const CreateSafeBody = ({ isChecked, isCreate = true }: Props) => {
             <DecimalInput
               label={'ETH on Uniswap (Avail 0.00)'}
               value={uniSwapVal ? uniSwapVal.leftInput : ''}
-              onChange={onChangeDeposit}
+              onChange={() => {}}
             />
             <DecimalInput
               label={`RAI on Uniswap (Avail ${availableRai})`}
               value={uniSwapVal ? uniSwapVal.rightInput : ''}
-              onChange={onChangeBorrow}
+              onChange={() => {}}
               disableMax
               // handleMaxClick={setMaxRai}
             />
@@ -279,7 +303,7 @@ const CreateSafeBody = ({ isChecked, isCreate = true }: Props) => {
   );
 };
 
-export default CreateSafeBody;
+export default SafeBody;
 
 const DoubleInput = styled.div`
   display: flex;

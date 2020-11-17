@@ -3,9 +3,9 @@ import { utils as gebUtils } from 'geb.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
-import CreateSafeContent from './CreateSafeContent';
+import SafeContent from './SafeContent';
 import Button from '../Button';
-import TransactionOverview from './TransactionOverview';
+import TransactionOverview from '../TransactionOverview';
 import { DEFAULT_SAFE_STATE, SUPPORTED_WALLETS } from '../../utils/constants';
 import { injected } from '../../connectors';
 import { useActiveWeb3React } from '../../hooks';
@@ -36,7 +36,11 @@ const ReviewTransaction = () => {
 
   const handleConfirm = async () => {
     if (account && library) {
-      popupsActions.setIsCreateAccountModalOpen(false);
+      popupsActions.setSafeOperationPayload({
+        isOpen: false,
+        type: '',
+        isCreate: false,
+      });
       popupsActions.setIsWaitingModalOpen(true);
       popupsActions.setWaitingPayload({
         title: 'Waiting For Confirmation',
@@ -97,7 +101,7 @@ const ReviewTransaction = () => {
   };
 
   return (
-    <CreateSafeContent>
+    <SafeContent>
       <Body>
         <TransactionOverview
           isChecked={safeState.isUniSwapPoolChecked}
@@ -152,7 +156,7 @@ const ReviewTransaction = () => {
           onClick={handleConfirm}
         />
       </Footer>
-    </CreateSafeContent>
+    </SafeContent>
   );
 };
 

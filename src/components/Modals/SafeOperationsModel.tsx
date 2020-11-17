@@ -1,9 +1,10 @@
 import React from 'react';
-import { useStoreActions, useStoreState } from '../../store';
-import SafeOperations from '../SafeOperations';
+import { useStoreState, useStoreActions } from '../../store';
+import SafeContainer from '../SafeOperations';
 import Modal from './Modal';
+import { DEFAULT_SAFE_STATE } from '../../utils/constants';
 
-const SafeOperationsModal = () => {
+const CreateAccountModal = () => {
   const { popupsModel: popupsState } = useStoreState((state) => state);
   const {
     popupsModel: popupsActions,
@@ -11,12 +12,17 @@ const SafeOperationsModal = () => {
   } = useStoreActions((state) => state);
 
   const handleCancel = () => {
+    safeActions.setIsUniSwapPoolChecked(false);
+    safeActions.setStage(0);
     popupsActions.setSafeOperationPayload({
       isOpen: false,
       type: '',
+      isCreate: false,
     });
-    safeActions.setOperation(0);
+    safeActions.setUniSwapPool(DEFAULT_SAFE_STATE);
+    safeActions.setCreateSafeDefault(DEFAULT_SAFE_STATE);
   };
+
   return (
     <Modal
       isModalOpen={popupsState.safeOperationPayload.isOpen}
@@ -24,9 +30,9 @@ const SafeOperationsModal = () => {
       backDropClose
       closeModal={handleCancel}
     >
-      <SafeOperations />
+      <SafeContainer />
     </Modal>
   );
 };
 
-export default SafeOperationsModal;
+export default CreateAccountModal;

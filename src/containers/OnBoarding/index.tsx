@@ -57,7 +57,13 @@ const OnBoarding = () => {
             <BtnContainer>
               <Button
                 disabled={connectWalletState.isWrongNetwork}
-                onClick={() => popupsActions.setIsCreateAccountModalOpen(true)}
+                onClick={() =>
+                  popupsActions.setSafeOperationPayload({
+                    isOpen: true,
+                    type: 'deposit_borrow',
+                    isCreate: true,
+                  })
+                }
               >
                 <BtnInner>
                   <Plus size={18} />

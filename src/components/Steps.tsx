@@ -70,7 +70,11 @@ const Steps = () => {
   };
 
   const handleCreateSafe = () => {
-    popupsActions.setIsCreateAccountModalOpen(true);
+    popupsActions.setSafeOperationPayload({
+      isOpen: true,
+      type: 'deposit_borrow',
+      isCreate: true,
+    });
   };
 
   const returnSteps = (stepNumber: number) => {

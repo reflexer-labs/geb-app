@@ -11,15 +11,11 @@ const TransactionOverview = ({ title, description, isChecked }: Props) => {
   return (
     <>
       <IconsHolder>
-        <LogoIcon src={require('../../assets/reflexer-icon.svg')} />
+        <LogoIcon src={require('../assets/reflexer-icon.svg')} />
         {isChecked ? (
           <>
-            <img
-              className="sep"
-              src={require('../../assets/arrow.svg')}
-              alt=""
-            />
-            <LogoIcon src={require('../../assets/uniswap-icon.svg')} />{' '}
+            <img className="sep" src={require('../assets/arrow.svg')} alt="" />
+            <LogoIcon src={require('../assets/uniswap-icon.svg')} />{' '}
           </>
         ) : null}
       </IconsHolder>

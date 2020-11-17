@@ -9,7 +9,6 @@ import {
 export interface PopupsModel {
   isSettingsModalOpen: boolean;
   isConnectModalOpen: boolean;
-  isCreateAccountModalOpen: boolean;
   isConnectedWalletModalOpen: boolean;
   isConnectorsWalletOpen: boolean;
   showSideMenu: boolean;
@@ -18,19 +17,21 @@ export interface PopupsModel {
   isIncentivesModalOpen: boolean;
   alertPayload: IAlert | null;
   ESMOperationPayload: IOperation;
-  safeOperationPayload: IOperation;
+  safeOperationPayload: IOperation & { isCreate: boolean };
   isLoadingModalOpen: LoadingPayload;
   isWaitingModalOpen: boolean;
   waitingPayload: IWaitingPayload;
   setIsSettingModalOpen: Action<PopupsModel, boolean>;
   setIsConnectModalOpen: Action<PopupsModel, boolean>;
-  setIsCreateAccountModalOpen: Action<PopupsModel, boolean>;
   setIsConnectedWalletModalOpen: Action<PopupsModel, boolean>;
   setShowSideMenu: Action<PopupsModel, boolean>;
   setIsScreenModalOpen: Action<PopupsModel, boolean>;
   setIsConnectorsWalletOpen: Action<PopupsModel, boolean>;
   setIsLoadingModalOpen: Action<PopupsModel, LoadingPayload>;
-  setSafeOperationPayload: Action<PopupsModel, IOperation>;
+  setSafeOperationPayload: Action<
+    PopupsModel,
+    IOperation & { isCreate: boolean }
+  >;
   setAlertPayload: Action<PopupsModel, IAlert | null>;
   setESMOperationPayload: Action<PopupsModel, IOperation>;
   setIsVotingModalOpen: Action<PopupsModel, boolean>;
@@ -42,7 +43,6 @@ export interface PopupsModel {
 const popupsModel: PopupsModel = {
   isSettingsModalOpen: false,
   isConnectModalOpen: false,
-  isCreateAccountModalOpen: false,
   isConnectedWalletModalOpen: false,
   isScreenModalOpen: false,
   isIncentivesModalOpen: false,
@@ -51,6 +51,7 @@ const popupsModel: PopupsModel = {
   safeOperationPayload: {
     isOpen: false,
     type: '',
+    isCreate: false,
   },
   alertPayload: {
     type: '',
@@ -72,9 +73,6 @@ const popupsModel: PopupsModel = {
   }),
   setIsConnectModalOpen: action((state, payload) => {
     state.isConnectModalOpen = payload;
-  }),
-  setIsCreateAccountModalOpen: action((state, payload) => {
-    state.isCreateAccountModalOpen = payload;
   }),
   setIsConnectedWalletModalOpen: action((state, payload) => {
     state.isConnectedWalletModalOpen = payload;

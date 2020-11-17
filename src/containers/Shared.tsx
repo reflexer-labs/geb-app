@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import ConnectedWalletModal from '../components/Modals/ConnectedWalletModal';
-import CreateAccountModal from '../components/Modals/CreateAccountModal';
+import CreateAccountModal from '../components/Modals/SafeOperationsModel';
 import ScreenLoader from '../components/Modals/ScreenLoader';
 import Navbar from '../components/Navbar';
 import SideMenu from '../components/SideMenu';
@@ -14,7 +14,6 @@ import { ChainId } from '@uniswap/sdk';
 import { ETHERSCAN_PREFIXES } from '../utils/constants';
 import { useActiveWeb3React } from '../hooks';
 import LoadingModal from '../components/Modals/LoadingModal';
-import SafeOperationsModal from '../components/Modals/SafeOperationsModal';
 import ESMOperationModal from '../components/Modals/ESMOperationModal';
 import VotingOperationModal from '../components/Modals/VotingOperationModal';
 import styled from 'styled-components';
@@ -158,7 +157,6 @@ const Shared = ({ children }: Props) => {
       <LoadingModal />
       <VotingOperationModal />
       <ESMOperationModal />
-      <SafeOperationsModal />
       <CreateAccountModal />
       <ConnectedWalletModal />
       <IncentivesModal />

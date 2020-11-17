@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
 import Button from '../Button';
-import TransactionOverview from '../CreateSafe/TransactionOverview';
+import TransactionOverview from '../TransactionOverview';
 import { SUPPORTED_WALLETS } from '../../utils/constants';
 import { injected } from '../../connectors';
 import { useActiveWeb3React } from '../../hooks';

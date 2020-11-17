@@ -1,68 +1,61 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import styled from 'styled-components';
 import { useStoreState } from '../../store';
-import SafePayment from './SafePayment';
-import SafeTransaction from './SafeTransaction';
+import Safe from './Safe';
+import ReviewTransaction from './ReviewTransaction';
+import UniSwapPool from './UniSwapPool';
 
-const SafeOperations = () => {
+interface Props {
+  width?: string;
+  maxWidth?: string;
+}
+
+const SafeContainer = ({ width, maxWidth }: Props) => {
   const nodeRef = React.useRef(null);
-  const { popupsModel: popupsState, safeModel: safeState } = useStoreState(
-    (state) => state
-  );
+
+  const [stageNo, setStageNo] = useState(0);
+  const { safeModel: safeState } = useStoreState((state) => state);
+  const { stage, isUniSwapPoolChecked } = safeState;
+
+  useEffect(() => {
+    setStageNo(stage);
+  }, [stage]);
+
+  const returnBody = () => {
+    switch (stageNo) {
+      case 1:
+        return <UniSwapPool isChecked={isUniSwapPoolChecked} />;
+      case 2:
+        return <ReviewTransaction />;
+      default:
+        return <Safe />;
+    }
+  };
 
   return (
     <SwitchTransition mode={'out-in'}>
       <CSSTransition
         nodeRef={nodeRef}
-        key={safeState.operation}
+        key={stageNo}
         timeout={250}
         classNames="fade"
       >
         <Fade
           ref={nodeRef}
           style={{
-            width: '100%',
-            maxWidth: '720px',
+            width: width || '100%',
+            maxWidth: maxWidth || '720px',
           }}
         >
-          <ModalContent
-            style={{
-              width: '100%',
-              maxWidth: '720px',
-            }}
-          >
-            <Header>
-              {'Safe'} <span>{popupsState.safeOperationPayload.type}</span>
-            </Header>
-
-            {safeState.operation === 0 ? <SafePayment /> : <SafeTransaction />}
-          </ModalContent>
+          {returnBody()}
         </Fade>
       </CSSTransition>
     </SwitchTransition>
   );
 };
 
-export default SafeOperations;
-
-const ModalContent = styled.div`
-  background: ${(props) => props.theme.colors.background};
-  border-radius: ${(props) => props.theme.global.borderRadius};
-  border: 1px solid ${(props) => props.theme.colors.border};
-`;
-
-const Header = styled.div`
-  padding: 20px;
-  font-size: ${(props) => props.theme.font.large};
-  font-weight: 600;
-  color: ${(props) => props.theme.colors.primary};
-  border-bottom: 1px solid ${(props) => props.theme.colors.border};
-  letter-spacing: -0.47px;
-  span {
-    text-transform: capitalize;
-  }
-`;
+export default SafeContainer;
 
 const Fade = styled.div`
   &.fade-enter {

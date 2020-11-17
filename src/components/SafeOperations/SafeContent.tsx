@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { useStoreState } from '../../store';
 
 interface Props {
   width?: string;
@@ -8,8 +9,9 @@ interface Props {
   children: React.ReactNode;
 }
 
-const CreateSafeContent = ({ width, maxWidth, children }: Props) => {
+const SafeContent = ({ width, maxWidth, children }: Props) => {
   const { t } = useTranslation();
+  const { popupsModel: popupsState } = useStoreState((state) => state);
 
   return (
     <ModalContent
@@ -18,13 +20,13 @@ const CreateSafeContent = ({ width, maxWidth, children }: Props) => {
         maxWidth: maxWidth || '720px',
       }}
     >
-      <Header>{t('create_safe_title')}</Header>
+      <Header>Safe {t(popupsState.safeOperationPayload.type)}</Header>
       {children}
     </ModalContent>
   );
 };
 
-export default CreateSafeContent;
+export default SafeContent;
 
 const ModalContent = styled.div`
   background: ${(props) => props.theme.colors.background};
