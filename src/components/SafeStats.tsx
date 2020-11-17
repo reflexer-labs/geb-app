@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
 import Button from './Button';
-import { formatNumber, getInterestOwed, getRatePercentage } from '../utils/helper';
+import {
+  formatNumber,
+  getInterestOwed,
+  getRatePercentage,
+} from '../utils/helper';
 
 const SafeStats = () => {
   const { t } = useTranslation();
@@ -14,9 +18,16 @@ const SafeStats = () => {
 
   const collateral = formatNumber(singleSafe?.collateral || '0', 2);
   const debt = formatNumber(singleSafe?.debt || '0', 2);
-  const interestOwed = singleSafe ? getInterestOwed(singleSafe.debt, singleSafe.accumulatedRate) : 0;
-  const liquidationPenalty = getRatePercentage(singleSafe?.liquidationPenalty || '1');
-  const totalAnnualizedStabilityFee = formatNumber(singleSafe?.totalAnnualizedStabilityFee || '0', 2);
+  const interestOwed = singleSafe
+    ? getInterestOwed(singleSafe.debt, singleSafe.accumulatedRate)
+    : 0;
+  const liquidationPenalty = getRatePercentage(
+    singleSafe?.liquidationPenalty || '1'
+  );
+  const totalAnnualizedStabilityFee = formatNumber(
+    singleSafe?.totalAnnualizedStabilityFee || '0',
+    2
+  );
 
   return (
     <>
@@ -55,22 +66,12 @@ const SafeStats = () => {
             <Label>{'ETH Deposited'}</Label>
             <Actions>
               <Button
-                dimmed
-                text={t('withdraw')}
-                onClick={() =>
-                  popupsActions.setSafeOperationPayload({
-                    isOpen: true,
-                    type: 'withdraw',
-                  })
-                }
-              />
-              <Button
                 withArrow
-                text={t('deposit')}
+                text={t('deposit_borrow')}
                 onClick={() =>
                   popupsActions.setSafeOperationPayload({
                     isOpen: true,
-                    type: 'deposit',
+                    type: 'deposit_borrow',
                   })
                 }
               />
@@ -84,22 +85,12 @@ const SafeStats = () => {
             <Label>{'RAI Borrowed'}</Label>
             <Actions>
               <Button
-                dimmed
-                text={t('repay')}
-                onClick={() =>
-                  popupsActions.setSafeOperationPayload({
-                    isOpen: true,
-                    type: 'repay',
-                  })
-                }
-              />
-              <Button
                 withArrow
-                text={t('borrow')}
+                text={t('repay_withdraw')}
                 onClick={() =>
                   popupsActions.setSafeOperationPayload({
                     isOpen: true,
-                    type: 'borrow',
+                    type: 'repay_withdraw',
                   })
                 }
               />
@@ -184,5 +175,5 @@ const Label = styled.div`
 const Actions = styled.div`
   display: flex;
   margin-top: 1rem;
-  justify-content: space-between;
+  justify-content: flex-end;
 `;

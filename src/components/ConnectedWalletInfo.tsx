@@ -29,7 +29,7 @@ const ConnectedWalletInfo = () => {
 
   const {
     popupsModel: popupsActions,
-    walletModel: walletActions,
+    connectWalletModel: connectWalletActions,
     transactionsModel: transactionsActions,
   } = useStoreActions((state) => state);
 
@@ -41,7 +41,7 @@ const ConnectedWalletInfo = () => {
   const handleDisconnect = () => {
     popupsActions.setIsConnectedWalletModalOpen(false);
     (connector as any).close();
-    walletActions.setStep(0);
+    connectWalletActions.setStep(0);
   };
 
   const formatConnectorName = () => {

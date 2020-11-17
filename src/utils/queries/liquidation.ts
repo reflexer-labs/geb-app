@@ -10,4 +10,9 @@ export default `{
     liquidationPenalty
     safetyCRatio
   }
-}`
+  systemState(id: "current") {
+    currentRedemptionPrice {
+      value
+    }
+  }
+}`;

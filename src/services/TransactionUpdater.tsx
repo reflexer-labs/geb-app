@@ -72,6 +72,7 @@ export default function TransactionUpdater(): null {
                       ? transactions[hash].summary || 'Transaction Confirmed'
                       : 'Transaction Failed'
                   }
+                  payload={{ type: 'transaction', value: hash, chainId }}
                 />,
                 { toastId }
               );

@@ -37,7 +37,6 @@ const Shared = ({ children }: Props) => {
   const { settingsModel: settingsState } = useStoreState((state) => state);
 
   const {
-    walletModel: walletActions,
     settingsModel: settingsActions,
     connectWalletModel: connectedWalletActions,
     safeModel: safeActions,
@@ -101,13 +100,13 @@ const Shared = ({ children }: Props) => {
           // Check is user had already created safe
           safeActions.fetchUserSafes(account).then(async (safes: any) => {
             if (safes.length === 0) {
-              walletActions.setStep(2);
+              connectedWalletActions.setStep(2);
             } else {
               popupActions.setWaitingPayload({
                 title: 'Fetching user safes',
                 status: 'loading',
               });
-              walletActions.setStep(1);
+              connectedWalletActions.setStep(1);
               safeActions.setIsSafeCreated(true);
               safeActions.setList(safes);
               await timeout(200);
@@ -116,13 +115,19 @@ const Shared = ({ children }: Props) => {
         })
         .catch((e) => {
           console.log('e', e);
-          walletActions.setStep(1);
+          connectedWalletActions.setStep(1);
         })
         .finally(() =>
           setTimeout(() => popupActions.setIsWaitingModalOpen(false), 1000)
         );
     },
-    [chainId, popupActions, safeActions, transactionsActions, walletActions]
+    [
+      chainId,
+      popupActions,
+      safeActions,
+      transactionsActions,
+      connectedWalletActions,
+    ]
   );
 
   useEffect(() => {
@@ -132,9 +137,15 @@ const Shared = ({ children }: Props) => {
     if (account) {
       accountChecker(account);
     } else {
-      walletActions.setStep(0);
+      connectedWalletActions.setStep(0);
     }
-  }, [chainId, account, networkChecker, accountChecker, walletActions]);
+  }, [
+    chainId,
+    account,
+    networkChecker,
+    accountChecker,
+    connectedWalletActions,
+  ]);
 
   return (
     <Container>

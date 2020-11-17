@@ -57,7 +57,7 @@ const WaitingModal = () => {
         {status !== 'loading' ? (
           <BtnContainer>
             <Button
-              text={status === 'success' ? t('close') : t('dismiss')}
+              text={status === 'success' ? 'close' : 'dismiss'}
               onClick={() => popupsActions.setIsWaitingModalOpen(false)}
             />
           </BtnContainer>

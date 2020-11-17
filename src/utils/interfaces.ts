@@ -75,9 +75,10 @@ export interface NavLinkType {
 }
 
 export interface CreateSafeType {
-  borrowedRAI: string;
+  leftInput: string;
   collateralRatio: number;
-  depositedETH: string;
+  rightInput: string;
+  liquidationPrice: number;
 }
 
 export interface IBlockNumber {
@@ -102,7 +103,6 @@ export interface WalletInfo {
 
 export interface ISafe {
   id: string;
-  img: string;
   date: string;
   riskState: string;
   collateral: string;
@@ -149,6 +149,7 @@ export interface ILiquidationData {
   liquidationCRatio: string;
   liquidationPenalty: string;
   safetyCRatio: string;
+  currentRedemptionPrice: string;
 }
 
 export interface ICreateSafePayload {

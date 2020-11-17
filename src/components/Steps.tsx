@@ -10,18 +10,17 @@ const Steps = () => {
   const { account, library } = useActiveWeb3React();
   const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    connectWalletModel: connectWalletState,
-    walletModel: walletState,
-  } = useStoreState((state) => state);
+  const { connectWalletModel: connectWalletState } = useStoreState(
+    (state) => state
+  );
   const {
     popupsModel: popupsActions,
-    walletModel: walletActions,
+    connectWalletModel: connectWalletActions,
   } = useStoreActions((state) => state);
 
   const addTransaction = useTransactionAdder();
 
-  const { step } = walletState;
+  const { step, isWrongNetwork } = connectWalletState;
 
   const handleConnectWallet = () =>
     popupsActions.setIsConnectorsWalletOpen(true);
@@ -48,7 +47,7 @@ const Steps = () => {
           status: 'success',
         });
         await txResponse.wait();
-        walletActions.setStep(2);
+        connectWalletActions.setStep(2);
       } catch (e) {
         console.log(e);
         if (e?.code === 4001) {
@@ -83,7 +82,7 @@ const Steps = () => {
             text={'getting_started_text'}
             btnText={'connect_wallet'}
             handleClick={handleConnectWallet}
-            isDisabled={connectWalletState.isWrongNetwork}
+            isDisabled={isWrongNetwork}
             isLoading={isLoading}
           />
         );
@@ -94,7 +93,7 @@ const Steps = () => {
             text={'create_account_text'}
             btnText={'create_account'}
             handleClick={handleCreateAccount}
-            isDisabled={connectWalletState.isWrongNetwork}
+            isDisabled={isWrongNetwork}
             isLoading={isLoading}
           />
         );
@@ -105,7 +104,7 @@ const Steps = () => {
             text={'create_safe_text'}
             btnText={'create_safe'}
             handleClick={handleCreateSafe}
-            isDisabled={connectWalletState.isWrongNetwork}
+            isDisabled={isWrongNetwork}
             isLoading={isLoading}
           />
         );
@@ -117,9 +116,12 @@ const Steps = () => {
   return (
     <StepsContainer>
       <StepsBars>
-        <StepBar className="active" />
-        <StepBar className={step !== 0 ? 'active' : ''} />
-        <StepBar className={step === 2 ? 'active' : ''} />
+        {step !== 0 ? (
+          <>
+            <StepBar className={step !== 0 ? 'active' : ''} />
+            <StepBar className={step === 2 ? 'active' : ''} />
+          </>
+        ) : null}
       </StepsBars>
       {returnSteps(step)}
     </StepsContainer>

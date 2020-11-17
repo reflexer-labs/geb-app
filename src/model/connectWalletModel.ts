@@ -5,6 +5,7 @@ import { IBlockNumber, IEthBalance } from '../utils/interfaces';
 export interface ConnectWalletModel {
   blockNumber: IBlockNumber;
   fiatPrice: number;
+  step: number;
   ethBalance: IEthBalance;
   isWrongNetwork: boolean;
   fetchFiatPrice: Thunk<ConnectWalletModel>;
@@ -18,12 +19,14 @@ export interface ConnectWalletModel {
     ConnectWalletModel,
     { chainId: number; balance: number }
   >;
+  setStep: Action<ConnectWalletModel, number>;
 }
 
 const connectWalletModel: ConnectWalletModel = {
   blockNumber: {},
   ethBalance: {},
   fiatPrice: 0,
+  step: 0,
   isWrongNetwork: false,
 
   fetchFiatPrice: thunk(async (actions, payload) => {
@@ -54,6 +57,9 @@ const connectWalletModel: ConnectWalletModel = {
   updateEthBalance: action((state, payload) => {
     const { chainId, balance } = payload;
     state.ethBalance[chainId] = balance;
+  }),
+  setStep: action((state, payload) => {
+    state.step = payload;
   }),
 };
 

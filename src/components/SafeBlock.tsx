@@ -1,4 +1,5 @@
 import React from 'react';
+import { toSvg } from 'jdenticon';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -11,13 +12,16 @@ const SafeBlock = ({ ...props }) => {
   const collateral = formatNumber(props.collateral, 2);
   const debt = formatNumber(props.debt, 2);
   const createdAt = dayjs.unix(props.date).format('MMM D, YYYY h:mm A');
+  function createImage() {
+    return { __html: toSvg(props.safeHandler, 40) };
+  }
 
   return (
     <>
       <BlockContainer>
         <BlockHeader>
           <SafeInfo>
-            <img src={props.img} alt="" />
+            {<div dangerouslySetInnerHTML={createImage()} />}
             <SafeData>
               <SafeTitle>{`Safe #${props.id}`}</SafeTitle>
               <Date>
@@ -25,7 +29,7 @@ const SafeBlock = ({ ...props }) => {
               </Date>
             </SafeData>
           </SafeInfo>
-          <SafeState className={props.riskState}>
+          <SafeState className={props.riskState.toLowerCase()}>
             {t('risk')} <span>{props.riskState}</span>
           </SafeState>
         </BlockHeader>
@@ -76,10 +80,9 @@ const BlockHeader = styled.div`
 const SafeInfo = styled.div`
   display: flex;
   align-items: center;
-  img {
+  svg {
     border-radius: ${(props) => props.theme.global.borderRadius};
-    width: 40px;
-    height: 40px;
+    border: 1px solid ${(props) => props.theme.colors.border};
   }
 `;
 
@@ -113,6 +116,11 @@ const SafeState = styled.div`
   height: fit-content;
   span {
     text-transform: capitalize;
+  }
+  &.medium {
+    color: ${(props) => props.theme.colors.warningColor};
+    border: 1px solid ${(props) => props.theme.colors.warningBorder};
+    background: ${(props) => props.theme.colors.warningBackground};
   }
   &.high {
     color: ${(props) => props.theme.colors.dangerColor};

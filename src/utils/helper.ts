@@ -1,7 +1,8 @@
+import numeral from 'numeral';
 import { ChainId } from '@uniswap/sdk';
 import { BigNumber, FixedNumber } from 'ethers';
 import { utils as gebUtils } from 'geb.js';
-import { ETHERSCAN_PREFIXES } from './constants';
+import { ETHERSCAN_PREFIXES, floatsTypes } from './constants';
 import { ISafe, ITransaction } from './interfaces';
 
 export const returnWalletAddress = (walletAddress: string) =>
@@ -40,34 +41,66 @@ export const amountToFiat = (balance: number, fiatPrice: number) => {
   return (balance * fiatPrice).toFixed(4);
 };
 
-export const formatNumber = (value: string, digits = 4) => {
+export const formatNumber = (value: string, digits = 4, round = false) => {
+  const nOfDigits = Array.from(Array(digits), (_) => 0).join('');
   const n = Number(value);
-  return Number.isInteger(n) ? n : parseFloat(n.toFixed(digits));
+  return Number.isInteger(n)
+    ? n
+    : round
+    ? numeral(n).format(`0.${nOfDigits}`)
+    : numeral(n).format(`0.${nOfDigits}`, Math.floor);
 };
 
 export const getRatePercentage = (value: string) => {
   const rate = Number(value);
   let ratePercentage = rate < 1 ? (1 - rate) * -1 : rate - 1;
-  return formatNumber(String(ratePercentage * 100));
+  return formatNumber(String(ratePercentage * 100), 0);
+};
+
+export const toFixedString = (
+  value: string,
+  type?: keyof typeof floatsTypes
+): string => {
+  const n = Number(value);
+  const nOfDecimals = Number.isInteger(n)
+    ? value.length
+    : value.split('.')[1].length;
+
+  if (type === 'WAD' || nOfDecimals === floatsTypes.WAD) {
+    return FixedNumber.fromString(value, 'fixed256x18').toHexString();
+  } else if (
+    type === 'RAY' ||
+    (nOfDecimals > floatsTypes.WAD && nOfDecimals <= floatsTypes.RAY)
+  ) {
+    return FixedNumber.fromString(value, 'fixed256x27').toHexString();
+  } else if (
+    type === 'RAD' ||
+    (nOfDecimals > floatsTypes.RAY && nOfDecimals <= floatsTypes.RAD)
+  ) {
+    return FixedNumber.fromString(value, 'fixed256x45').toHexString();
+  }
+  return FixedNumber.fromString(value, 'fixed256x18').toHexString();
 };
 
 export const getAvailableRaiToBorrow = (
   depositedETH: string,
-  safetyPrice: string
+  safetyPrice: string,
+  accumulatedRate: string
 ) => {
   if (!depositedETH || !safetyPrice) {
     return 0;
   }
 
   const safetyPriceRay = BigNumber.from(
-    FixedNumber.fromString(safetyPrice, 'fixed256x27').toHexString()
+    BigNumber.from(toFixedString(safetyPrice, 'RAY'))
   );
-  const ethLockWad = BigNumber.from(
-    FixedNumber.fromString(depositedETH, 'fixed256x18').toHexString()
+  const ethLockWad = BigNumber.from(toFixedString(depositedETH, 'WAD'));
+  const accumulatedRateBN = BigNumber.from(
+    toFixedString(accumulatedRate, 'RAY')
   );
-
   const raiAvailableToBorrowWad = ethLockWad
     .mul(safetyPriceRay)
+    .mul(accumulatedRateBN)
     .div(gebUtils.RAY);
 
   return formatNumber(gebUtils.wadToFixed(raiAvailableToBorrowWad).toString());
@@ -96,9 +129,8 @@ export const formatUserSafe = (
 
       return {
         id: s.safeId,
-        img: require('../assets/box-ph.svg'),
         date: s.createdAt,
-        riskState: 'low',
+        riskState: ratioChecker(Number(collateralRatio)),
         collateral: s.collateral,
         debt: s.debt,
         accumulatedRate: s.collateralType.accumulatedRate,
@@ -116,84 +148,94 @@ export const formatUserSafe = (
 };
 
 export const getCollateralRatio = (
-  collateral: string,
-  debt: string,
+  totalCollateral: string,
+  totalDebt: string,
   liquidationPrice: string,
   liquidationCRatio: string,
   accumulatedRate: string
 ) => {
-  if (Number(collateral) === 0) {
+  if (Number(totalCollateral) === 0) {
     return '0';
-  } else if (Number(debt) === 0) {
+  } else if (Number(totalDebt) === 0) {
     return '∞';
   }
 
-  const numerator =
-    Number(collateral) * Number(liquidationPrice) * Number(liquidationCRatio);
-  const denominator = Number(debt) * Number(accumulatedRate);
-  return formatNumber(((numerator / denominator) * 100).toString(), 2);
+  const denominator = numeral(totalDebt).multiply(accumulatedRate).value();
+
+  const numerator = numeral(totalCollateral)
+    .multiply(liquidationPrice)
+    .multiply(liquidationCRatio)
+    .divide(denominator)
+    .multiply(100);
+
+  return formatNumber(numerator.value().toString(), 2, true);
 };
 
 export const getLiquidationPrice = (
-  collateral: string,
-  debt: string,
+  totalCollateral: string,
+  totalDebt: string,
   liquidationCRatio: string,
   accumulatedRate: string,
   currentRedemptionPrice: string
 ) => {
-  if (Number(collateral) === 0) {
+  if (Number(totalCollateral) === 0) {
     return '0';
-  } else if (Number(debt) === 0) {
-    return '∞';
+  } else if (Number(totalDebt) === 0) {
+    return '0';
   }
 
-  const numerator =
-    Number(debt) *
-    Number(accumulatedRate) *
-    Number(currentRedemptionPrice) *
-    Number(liquidationCRatio);
-  const denominator = Number(collateral);
-  return formatNumber((numerator / denominator).toString(), 2);
+  const numerator = numeral(totalDebt)
+    .multiply(accumulatedRate)
+    .multiply(liquidationCRatio)
+    .multiply(currentRedemptionPrice)
+    .divide(totalCollateral);
+
+  return formatNumber(numerator.value().toString(), 2);
 };
 
-export const validateBorrow = (
-  _borrowedRai: string,
-  _collateral: string,
-  _debt: string,
-  _accumulatedRate: string,
-  _debtFloor: string,
-  _safetyCratio: string,
-  _safetyPrice: string
-) => {
-  const accumulatedRate = BigNumber.from(
-    FixedNumber.fromString(_accumulatedRate, 'fixed256x45').toHexString()
+export const safeIsSafe = (
+  totalCollateral: string,
+  totalDebt: string,
+  safetyPrice: string,
+  accumulatedRate: string
+): Boolean => {
+  const totalDebtBN = BigNumber.from(toFixedString(totalDebt, 'WAD'));
+  const totalCollateralBN = BigNumber.from(
+    toFixedString(totalCollateral, 'WAD')
   );
-  const borrowedRai = BigNumber.from(
-    FixedNumber.fromString(_borrowedRai, 'fixed256x18').toHexString()
-  );
-  const collateral = BigNumber.from(
-    FixedNumber.fromString(_collateral, 'fixed256x18').toHexString()
-  );
-  const debt = BigNumber.from(
-    FixedNumber.fromString(_debt, 'fixed256x18').toHexString()
-  );
-  const safetyPrice = BigNumber.from(
-    FixedNumber.fromString(_safetyPrice, 'fixed256x27').toHexString()
+  const safetyPriceBN = BigNumber.from(toFixedString(safetyPrice, 'RAY'));
+  const accumulatedRateBN = BigNumber.from(
+    toFixedString(accumulatedRate, 'RAY')
   );
 
-  if (
-    borrowedRai.add(debt).mul(accumulatedRate).lte(collateral.mul(safetyPrice))
-  ) {
-    return `Too much debt, below ${_safetyCratio} collateralization ratio`;
-  } else if (borrowedRai.add(debt).lt(_debtFloor)) {
-    return `The resulting debt should be at least ${_debtFloor} RAI or zero.`;
+  return totalDebtBN
+    .mul(accumulatedRateBN)
+    .lte(totalCollateralBN.mul(safetyPriceBN));
+
+  // if (
+  //   borrowedRai.add(debt).mul(accumulatedRate).lte(collateral.mul(safetyPrice))
+  // ) {
+  //   return `Too much debt, below ${_safetyCratio} collateralization ratio`;
+  // } else if (borrowedRai.add(debt).lt(_debtFloor)) {
+  //   return `The resulting debt should be at least ${_debtFloor} RAI or zero.`;
+  // }
+
+  // return '';
+};
+
+export const ratioChecker = (liquitdationRatio: number) => {
+  if (liquitdationRatio >= 300) {
+    return 'Low';
+  } else if (liquitdationRatio < 300 && liquitdationRatio >= 200) {
+    return 'Medium';
+  } else {
+    return 'High';
   }
-
-  return '';
 };
 
 export const getInterestOwed = (debt: string, accumulatedRate: string) => {
-  return formatNumber(String(Number(debt) * (Number(accumulatedRate) - 1)), 2);
+  const restAcc = numeral(accumulatedRate).subtract(1).value();
+  return formatNumber(numeral(debt).multiply(restAcc).value().toString(), 2);
 };
 
 export const newTransactionsFirst = (a: ITransaction, b: ITransaction) => {

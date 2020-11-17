@@ -18,7 +18,7 @@ export const handleSafeCreation = async (
   // mint more RAI.
   const globalDebt = await geb.contracts.safeEngine.globalDebt();
   const debtCeiling = await geb.contracts.safeEngine.globalDebtCeiling();
-  const raiToDraw = ethersUtils.parseEther(createSafeDefault.borrowedRAI);
+  const raiToDraw = ethersUtils.parseEther(createSafeDefault.rightInput);
   if (globalDebt.add(raiToDraw).gt(debtCeiling)) {
     throw new Error(
       'Debt ceiling too low, not possible to draw this amount of RAI.'
@@ -28,7 +28,7 @@ export const handleSafeCreation = async (
   // We're good to mint some RAI!
   const proxy = await geb.getProxyAction(signer._address);
   const txData = proxy.openLockETHAndGenerateDebt(
-    ethersUtils.parseEther(createSafeDefault.depositedETH),
+    ethersUtils.parseEther(createSafeDefault.leftInput),
     gebUtils.ETH_A,
     raiToDraw
   );

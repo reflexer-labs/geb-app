@@ -1,6 +1,5 @@
 import settingsModel, { SettingsModel } from './settingsModel';
 import popupsModel, { PopupsModel } from './popupsModel';
-import walletModel, { WalletModel } from './walletModel';
 import connectWalletModel, { ConnectWalletModel } from './connectWalletModel';
 import safeModel, { SafeModel } from './safeModel';
 import votingModel, { VotingModel } from './votingModel';
@@ -10,7 +9,6 @@ import transactionsModel, { TransactionsModel } from './transactionsModel';
 export interface StoreModel {
   settingsModel: SettingsModel;
   popupsModel: PopupsModel;
-  walletModel: WalletModel;
   connectWalletModel: ConnectWalletModel;
   safeModel: SafeModel;
   votingModel: VotingModel;
@@ -21,7 +19,6 @@ export interface StoreModel {
 const model: StoreModel = {
   settingsModel,
   popupsModel,
-  walletModel,
   connectWalletModel,
   safeModel,
   votingModel,

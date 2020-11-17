@@ -1,17 +1,14 @@
 import React from 'react';
+import { utils as gebUtils } from 'geb.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
 import CreateSafeContent from './CreateSafeContent';
 import Button from '../Button';
 import TransactionOverview from './TransactionOverview';
-import {
-  DEFAULT_CREATE_SAFE_STATE,
-  SUPPORTED_WALLETS,
-} from '../../utils/constants';
+import { DEFAULT_SAFE_STATE, SUPPORTED_WALLETS } from '../../utils/constants';
 import { injected } from '../../connectors';
 import { useActiveWeb3React } from '../../hooks';
-import { formatNumber } from '../../utils/helper';
 
 const ReviewTransaction = () => {
   const isMetamask = window?.ethereum?.isMetaMask;
@@ -19,26 +16,22 @@ const ReviewTransaction = () => {
   const { t } = useTranslation();
 
   const {
-    walletModel: walletActions,
     popupsModel: popupsActions,
     safeModel: safeActions,
   } = useStoreActions((state) => state);
-  const { walletModel: walletState } = useStoreState((state) => state);
+  const { safeModel: safeState } = useStoreState((state) => state);
 
   const {
-    borrowedRAI,
+    leftInput,
     collateralRatio,
-    depositedETH,
-  } = walletState.createSafeDefault;
-  const liquidationPrice = formatNumber(
-    walletState.liquidationData.currentPrice.liquidationPrice,
-    2
-  );
+    rightInput,
+    liquidationPrice,
+  } = safeState.createSafeDefault;
 
   const handleCancel = () => {
-    walletState.isUniSwapPoolChecked
-      ? walletActions.setStage(1)
-      : walletActions.setStage(0);
+    safeState.isUniSwapPoolChecked
+      ? safeActions.setStage(1)
+      : safeActions.setStage(0);
   };
 
   const handleConfirm = async () => {
@@ -47,14 +40,14 @@ const ReviewTransaction = () => {
       popupsActions.setIsWaitingModalOpen(true);
       popupsActions.setWaitingPayload({
         title: 'Waiting For Confirmation',
-        text: `Creating a new safe, Depositing ${depositedETH} ETH and Borrowing ${borrowedRAI} RAI`,
+        text: 'Open a new Safe',
         hint: 'Confirm this transaction in your wallet',
         status: 'loading',
       });
       const signer = library.getSigner(account);
       try {
         await safeActions.createSafe({
-          createSafeDefault: walletState.createSafeDefault,
+          createSafeDefault: safeState.createSafeDefault,
           signer,
         });
         await safeActions.fetchUserSafes(account);
@@ -73,11 +66,12 @@ const ReviewTransaction = () => {
             status: 'error',
           });
           console.error(`Transaction failed`, e);
+          console.log('Required String', gebUtils.getRequireString(e));
         }
       } finally {
-        walletActions.setStage(0);
-        walletActions.setUniSwapPool(DEFAULT_CREATE_SAFE_STATE);
-        walletActions.setCreateSafeDefault(DEFAULT_CREATE_SAFE_STATE);
+        safeActions.setStage(0);
+        safeActions.setUniSwapPool(DEFAULT_SAFE_STATE);
+        safeActions.setCreateSafeDefault(DEFAULT_SAFE_STATE);
       }
     }
   };
@@ -106,7 +100,7 @@ const ReviewTransaction = () => {
     <CreateSafeContent>
       <Body>
         <TransactionOverview
-          isChecked={walletState.isUniSwapPoolChecked}
+          isChecked={safeState.isUniSwapPoolChecked}
           title={t('confirm_transaction_details')}
           description={
             t('confirm_details_text') +
@@ -116,10 +110,10 @@ const ReviewTransaction = () => {
         <Result>
           <Block>
             <Item>
-              <Label>{'ETH Deposited'}</Label> <Value>{depositedETH}</Value>
+              <Label>{'ETH Deposited'}</Label> <Value>{leftInput}</Value>
             </Item>
             <Item>
-              <Label>{'RAI Borrowed'}</Label> <Value>{borrowedRAI}</Value>
+              <Label>{'RAI Borrowed'}</Label> <Value>{rightInput}</Value>
             </Item>
             <Item>
               <Label>{'Collateral Ratio'}</Label>{' '}
@@ -131,7 +125,7 @@ const ReviewTransaction = () => {
             </Item>
           </Block>
 
-          {walletState.isUniSwapPoolChecked ? (
+          {safeState.isUniSwapPoolChecked ? (
             <Block>
               <Item>
                 <Label>{'RAI per ETH'}</Label> <Value>{'$0.00'}</Value>

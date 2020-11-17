@@ -21,7 +21,11 @@ export const fetchLiquidation = () => {
         throw new Error('retry');
       }
 
-      return res.data.data.collateralType;
+      return {
+        ...res.data.data.collateralType,
+        currentRedemptionPrice:
+          res.data.data.systemState.currentRedemptionPrice.value,
+      };
     },
     {
       retries: GRAPH_API_URLS.length - 1,

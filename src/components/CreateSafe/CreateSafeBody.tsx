@@ -10,120 +10,175 @@ import {
   formatNumber,
   getAvailableRaiToBorrow,
   getCollateralRatio,
+  getLiquidationPrice,
   getRatePercentage,
-  validateBorrow
+  safeIsSafe,
 } from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
-import { DEFAULT_CREATE_SAFE_STATE } from '../../utils/constants';
+import { DEFAULT_SAFE_STATE } from '../../utils/constants';
 
 interface Props {
   isChecked?: boolean;
+  isCreate?: boolean;
 }
 
-const CreateSafeBody = ({ isChecked }: Props) => {
+const CreateSafeBody = ({ isChecked, isCreate = true }: Props) => {
   const { t } = useTranslation();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || false);
   const [error, setError] = useState('');
-  const [defaultSafe, setDefaultSafe] = useState<CreateSafeType>(DEFAULT_CREATE_SAFE_STATE);
-  const [uniSwapVal, setUniSwapVal] = useState<CreateSafeType>(DEFAULT_CREATE_SAFE_STATE);
+  const [defaultSafe, setDefaultSafe] = useState<CreateSafeType>(
+    DEFAULT_SAFE_STATE
+  );
+  const [uniSwapVal, setUniSwapVal] = useState<CreateSafeType>(
+    DEFAULT_SAFE_STATE
+  );
 
   const {
-    walletModel: walletActions,
+    safeModel: safeActions,
     popupsModel: popupsActions,
   } = useStoreActions((state) => state);
   const {
     connectWalletModel: connectWalletState,
-    walletModel: walletState
+    safeModel: safeState,
   } = useStoreState((state) => state);
-  const { createSafeDefault, uniSwapPool } = walletState;
+  const { createSafeDefault, uniSwapPool } = safeState;
 
-  const availableEth = formatNumber(connectWalletState.ethBalance[NETWORK_ID].toString());
-  const availableRai = getAvailableRaiToBorrow(defaultSafe.depositedETH, walletState.liquidationData.currentPrice.safetyPrice);
+  const availableEth = formatNumber(
+    connectWalletState.ethBalance[NETWORK_ID].toString()
+  );
+
+  const {
+    currentPrice,
+    liquidationCRatio,
+    accumulatedRate,
+    liquidationPenalty,
+    debtFloor,
+    safetyCRatio,
+    currentRedemptionPrice,
+  } = safeState.liquidationData;
+
+  const availableRai = getAvailableRaiToBorrow(
+    defaultSafe.leftInput,
+    currentPrice.safetyPrice,
+    accumulatedRate
+  );
   const collateralRatio = getCollateralRatio(
-    defaultSafe.depositedETH,
-    defaultSafe.borrowedRAI,
-    walletState.liquidationData.currentPrice.liquidationPrice,
-    walletState.liquidationData.liquidationCRatio,
-    walletState.liquidationData.accumulatedRate
-  )
-  const liquidationPenalty = getRatePercentage(walletState.liquidationData.liquidationPenalty);
-  const liquidationPrice = typeof collateralRatio === 'number' ? formatNumber(walletState.liquidationData.currentPrice.liquidationPrice, 2) : 0;
+    defaultSafe.leftInput,
+    defaultSafe.rightInput,
+    currentPrice.liquidationPrice,
+    liquidationCRatio,
+    accumulatedRate
+  );
+
+  const liquidationPenaltyPercentage = getRatePercentage(liquidationPenalty);
+  const liquidationPrice = getLiquidationPrice(
+    defaultSafe.leftInput,
+    defaultSafe.rightInput,
+    liquidationCRatio,
+    accumulatedRate,
+    currentRedemptionPrice
+  );
 
   // const setMaxRai = () => {
   //   setDefaultSafe({ ...defaultSafe, borrowedRAI: availableRai.toString() });
   // }
 
-  const submitDefaultValues = () => {
-    if (!defaultSafe.depositedETH) {
+  const isPassedCreateValidation = () => {
+    if (!defaultSafe.leftInput) {
       setError('Please enter the amount of ETH to be deposited.');
-    } else if (Number(defaultSafe.depositedETH) > availableEth) {
+      return false;
+    } else if (Number(defaultSafe.leftInput) > availableEth) {
       setError('Insufficient balance.');
-    } else if (!defaultSafe.borrowedRAI || Number(defaultSafe.borrowedRAI) < 70) {
-      setError('Minimum amount of RAI to be borrowed must be at least 70.');
-    } else if (Number(defaultSafe.borrowedRAI) > availableRai) {
-      setError('RAI borrowed cannot exceed available amount.');
-    } else {
-      const debtError = validateBorrow(
-        defaultSafe.borrowedRAI,
-        defaultSafe.depositedETH,
-        '0',
-        walletState.liquidationData.accumulatedRate,
-        walletState.liquidationData.debtFloor,
-        walletState.liquidationData.safetyCRatio,
-        walletState.liquidationData.currentPrice.safetyPrice,
+      return false;
+    } else if (
+      !defaultSafe.rightInput ||
+      Number(defaultSafe.rightInput) < Number(debtFloor)
+    ) {
+      setError(
+        `Minimum amount of RAI to be borrowed must be at least ${debtFloor}.`
       );
+      return false;
+    } else if (Number(defaultSafe.rightInput) > availableRai) {
+      setError('RAI borrowed cannot exceed available amount.');
+      return false;
+    } else {
+      const isSafe = safeIsSafe(
+        defaultSafe.rightInput,
+        defaultSafe.leftInput,
+        currentPrice.safetyPrice,
+        accumulatedRate
+      );
+      if (!isSafe) {
+        setError(
+          `Too much debt, below ${safetyCRatio} collateralization ratio`
+        );
+        return false;
+      }
+    }
+    return true;
+  };
 
-      if (debtError) {
-        setError(debtError);
+  const submitDefaultValues = () => {
+    let passedValidation = false;
+    if (isCreate) {
+      passedValidation = isPassedCreateValidation();
+    }
+
+    if (passedValidation) {
+      safeActions.setCreateSafeDefault({
+        ...defaultSafe,
+        collateralRatio: collateralRatio as number,
+        liquidationPrice: liquidationPrice as number,
+      });
+      safeActions.setIsUniSwapPoolChecked(checkUniSwapPool);
+
+      if (checkUniSwapPool) {
+        safeActions.setStage(1);
       } else {
-        walletActions.setCreateSafeDefault({ ...defaultSafe, collateralRatio: collateralRatio as number });
-        walletActions.setIsUniSwapPoolChecked(checkUniSwapPool);
-
-        if (checkUniSwapPool) {
-          walletActions.setStage(1);
-        } else {
-          walletActions.setStage(2);
-        }
+        safeActions.setStage(2);
       }
     }
   };
 
   const submitUniSwapPool = () => {
-    walletActions.setUniSwapPool({ ...uniSwapVal, collateralRatio: collateralRatio as number });
-    walletActions.setStage(2);
+    safeActions.setUniSwapPool({
+      ...uniSwapVal,
+      collateralRatio: collateralRatio as number,
+    });
+    safeActions.setStage(2);
   };
 
   const handleCancel = () => {
     if (isChecked) {
-      walletActions.setStage(0);
+      safeActions.setStage(0);
     } else {
-      walletActions.setIsUniSwapPoolChecked(false);
-      walletActions.setStage(0);
+      safeActions.setIsUniSwapPoolChecked(false);
+      safeActions.setStage(0);
       popupsActions.setIsCreateAccountModalOpen(false);
-      walletActions.setUniSwapPool(DEFAULT_CREATE_SAFE_STATE);
-      walletActions.setCreateSafeDefault(DEFAULT_CREATE_SAFE_STATE);
-      setUniSwapVal(DEFAULT_CREATE_SAFE_STATE);
-      setDefaultSafe(DEFAULT_CREATE_SAFE_STATE);
+      safeActions.setUniSwapPool(DEFAULT_SAFE_STATE);
+      safeActions.setCreateSafeDefault(DEFAULT_SAFE_STATE);
+      setUniSwapVal(DEFAULT_SAFE_STATE);
+      setDefaultSafe(DEFAULT_SAFE_STATE);
     }
   };
 
-  const onChangeBorrow = (borrowedRAI: string) => {
-    setDefaultSafe({ ...defaultSafe, borrowedRAI });
+  const onChangeBorrow = (val: string) => {
+    setDefaultSafe({ ...defaultSafe, rightInput: val });
     if (error) {
       setError('');
     }
-  }
+  };
 
-  const onChangeDeposit = (depositedETH: string) => {
-    setDefaultSafe({ ...defaultSafe, depositedETH });
+  const onChangeDeposit = (val: string) => {
+    setDefaultSafe({ ...defaultSafe, leftInput: val });
     if (error) {
       setError('');
     }
-  }
+  };
 
   useEffect(() => {
-    walletActions.fetchLiquidationData();
+    safeActions.fetchLiquidationData();
     // eslint-disable-next-line
   }, []);
 
@@ -138,14 +193,14 @@ const CreateSafeBody = ({ isChecked }: Props) => {
         <DoubleInput>
           <DecimalInput
             label={`Deposit ETH (Avail ${availableEth})`}
-            value={defaultSafe.depositedETH}
+            value={defaultSafe.leftInput}
             onChange={onChangeDeposit}
             disableMax
             disabled={isChecked}
           />
           <DecimalInput
             label={`Borrow RAI (Avail ${availableRai})`}
-            value={defaultSafe.borrowedRAI}
+            value={defaultSafe.rightInput}
             onChange={onChangeBorrow}
             disableMax
             // handleMaxClick={setMaxRai}
@@ -159,12 +214,12 @@ const CreateSafeBody = ({ isChecked }: Props) => {
           <DoubleInput>
             <DecimalInput
               label={'ETH on Uniswap (Avail 0.00)'}
-              value={uniSwapVal ? uniSwapVal.depositedETH : ''}
+              value={uniSwapVal ? uniSwapVal.leftInput : ''}
               onChange={onChangeDeposit}
             />
             <DecimalInput
               label={`RAI on Uniswap (Avail ${availableRai})`}
-              value={uniSwapVal ? uniSwapVal.borrowedRAI : ''}
+              value={uniSwapVal ? uniSwapVal.rightInput : ''}
               onChange={onChangeBorrow}
               disableMax
               // handleMaxClick={setMaxRai}
@@ -175,13 +230,16 @@ const CreateSafeBody = ({ isChecked }: Props) => {
         <Result>
           <Block>
             <Item>
-              <Label>{'Collateral Ratio'}</Label> <Value>{`${collateralRatio}%`}</Value>
+              <Label>{'Collateral Ratio'}</Label>{' '}
+              <Value>{`${collateralRatio}%`}</Value>
             </Item>
             <Item>
-              <Label>{'Liquidation Price'}</Label> <Value>{`$${liquidationPrice}`}</Value>
+              <Label>{'Liquidation Price'}</Label>{' '}
+              <Value>{`$${liquidationPrice}`}</Value>
             </Item>
             <Item>
-              <Label>{'Liquidation Penalty'}</Label> <Value>{`${liquidationPenalty}%`}</Value>
+              <Label>{'Liquidation Penalty'}</Label>{' '}
+              <Value>{`${liquidationPenaltyPercentage}%`}</Value>
             </Item>
           </Block>
         </Result>
@@ -226,7 +284,7 @@ export default CreateSafeBody;
 const DoubleInput = styled.div`
   display: flex;
   margin-bottom: 16px;
-  
+
   > div {
     &:last-child {
       flex: 0 0 calc(57% + 10px);

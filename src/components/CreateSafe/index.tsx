@@ -15,8 +15,8 @@ const CreateSafeContainer = ({ width, maxWidth }: Props) => {
   const nodeRef = React.useRef(null);
 
   const [stageNo, setStageNo] = useState(0);
-  const { walletModel: walletState } = useStoreState((state) => state);
-  const { stage, isUniSwapPoolChecked } = walletState;
+  const { safeModel: safeState } = useStoreState((state) => state);
+  const { stage, isUniSwapPoolChecked } = safeState;
 
   useEffect(() => {
     setStageNo(stage);

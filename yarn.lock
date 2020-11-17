@@ -1716,27 +1716,27 @@
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.3.tgz#2b5a3ab3f918cca48a8c754c08168e3f03eba61b"
   integrity sha512-shAmDyaQC4H92APFoIaVDHCx5bStIocgvbwQyxPRrbUY20V1EYTbSDchWbuwlMG3V17cprZhA6+78JfB+3DTPw==
 
-"@reflexer-finance/geb-contract-api@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-contract-api/-/geb-contract-api-0.1.0.tgz#09d7f363b7f12926b2c81caf23c4ad1e0fc6658e"
-  integrity sha512-KQ1KMIAiyM5GcAb4seln+8mm4tGxiFKOtlw5MyyKqgxYzbaL5//PxMbl2sPETdirbcSAjiOJv/AAShLvU1lWcg==
+"@reflexer-finance/geb-contract-api@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-contract-api/-/geb-contract-api-0.1.2.tgz#243e9087ae99297ac36b457a6b74de63627002d5"
+  integrity sha512-HaWmPhzgw4fQJsdT3qukPWt0SONNDMZ/2sVcxR551vDb6Yo8a0QjHrQX3QHEor8mUoxYJnlffkZeXjUQCZjHpw==
   dependencies:
     "@ethersproject/bignumber" "5.x"
-    "@reflexer-finance/geb-contract-base" "^0.1.0"
+    "@reflexer-finance/geb-contract-base" "^0.1.2"
 
-"@reflexer-finance/geb-contract-base@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-contract-base/-/geb-contract-base-0.1.0.tgz#febc6e3ad9589dd4deff3293d1f842d02a452af1"
-  integrity sha512-krU/k8N8OIjhMWf8LA8QB55b5L39NSOj2H20VDqYxbPQN3IFvWpliwCNITLIZ7RnWFSrWvSHws+fraBF5WydbQ==
+"@reflexer-finance/geb-contract-base@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-contract-base/-/geb-contract-base-0.1.2.tgz#37f4a09c8769262e0448336b9bebc797e353669d"
+  integrity sha512-GuvolyMxuZE8BYSvK9nWAvkALayvdiQNUWqt7gvpJr03Xy+Ir/ULBy7ne6wI10ekpcotW41QhSHstpfZnjArfA==
   dependencies:
     "@ethersproject/bignumber" "5.x"
 
-"@reflexer-finance/geb-ethers-provider@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-ethers-provider/-/geb-ethers-provider-0.1.0.tgz#4c894ea86a04fc5ad04ac004e1a6e20f736bca01"
-  integrity sha512-iW/3suObo24QyG66atPNgKLhYlzou8oqapae3zcIF7GF36baXKGsxkGFW0uGaGr4n/mWEGxKc1VCiP+iP1aCTA==
+"@reflexer-finance/geb-ethers-provider@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-ethers-provider/-/geb-ethers-provider-0.1.2.tgz#8ed5d4fd69f1292d5de06f8a8d6777fcd7dcca86"
+  integrity sha512-3AJzfiTxFK2KAQ5L2MCybimLnGUm6/KPkWHs1NDojORogLCwYU+wruNK4aJlfX9Vbn2pgCtJuHBCI41u5sT2UA==
   dependencies:
-    "@reflexer-finance/geb-contract-base" "^0.1.0"
+    "@reflexer-finance/geb-contract-base" "^0.1.2"
 
 "@sheerun/mutationobserver-shim@^0.3.2":
   version "0.3.3"
@@ -2053,6 +2053,11 @@
   version "12.12.62"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.62.tgz#733923d73669188d35950253dd18a21570085d2b"
   integrity sha512-qAfo81CsD7yQIM9mVyh6B/U47li5g7cfpVQEDMfQeF8pSZVwzbhwU3crc0qG4DmpsebpJPR49AKOExQyJ05Cpg==
+
+"@types/numeral@^0.0.28":
+  version "0.0.28"
+  resolved "https://registry.yarnpkg.com/@types/numeral/-/numeral-0.0.28.tgz#e43928f0bda10b169b6f7ecf99e3ddf836b8ebe4"
+  integrity sha512-Sjsy10w6XFHDktJJdXzBJmoondAKW+LcGpRFH+9+zXEDj0cOH8BxJuZA9vUDSMAzU1YRJlsPKmZEEiTYDlICLw==
 
 "@types/parse-json@^4.0.0":
   version "4.0.0"
@@ -3729,6 +3734,18 @@ caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000981, caniuse-lite@^1.0.30001020, can
   version "1.0.30001035"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001035.tgz#2bb53b8aa4716b2ed08e088d4dc816a5fe089a1e"
   integrity sha512-C1ZxgkuA4/bUEdMbU5WrGY4+UhMFFiXrgNAfxiMIqWgFTWfv/xsZCS2xEHT2LMq7xAZfuAnu6mcqyDl0ZR6wLQ==
+
+canvas-renderer@~2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/canvas-renderer/-/canvas-renderer-2.1.1.tgz#d91fe9511ab48056ff9fa8a04514bede76535f55"
+  integrity sha512-/V0XetN7s1Mk3NO7x2wxPZYv0pLMQtGAhecuOuKR88beiYCUle1AbCcFZNLu+4NVzi9RVHS0rXtIgzPEaKidLw==
+
+canvas-renderer@~2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/canvas-renderer/-/canvas-renderer-2.2.0.tgz#512151f5494aaac5270802fba22599785114716d"
+  integrity sha512-Itdq9pwXcs4IbbkRCXc7reeGBk6i6tlDtZTjE1yc+KvYkx1Mt3WLf6tidZ/Ixbm7Vmi+jpWKG0dRBor67x9yGw==
+  dependencies:
+    "@types/node" "*"
 
 capture-exit@^2.0.0:
   version "2.0.0"
@@ -6275,15 +6292,15 @@ functional-red-black-tree@^1.0.1:
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
 
-geb.js@0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/geb.js/-/geb.js-0.1.0.tgz#a73fb9300cd927fecde6b71f0a001f7c1057f15b"
-  integrity sha512-gg2Dt9uD1qyeNc0KkCABZHlS8pZBOWTlxT0A3mjgN3YfqmqTevUQyerNLrzwsCeqdDivDgV5n50HCOR2A2uyvA==
+geb.js@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/geb.js/-/geb.js-0.1.3.tgz#9bb501c6328b6b72343959dfcb88d5e5c0f71f6a"
+  integrity sha512-jejWUTLcgabRm4jc0B4XvDptiKuN7CqYjz1qqZpWdGYvlZ23quXsC54iazeQxGWwxZKkfg0KYogp2ZJWLoYITg==
   dependencies:
     "@ethersproject/bignumber" "5.x"
-    "@reflexer-finance/geb-contract-api" "^0.1.0"
-    "@reflexer-finance/geb-contract-base" "^0.1.0"
-    "@reflexer-finance/geb-ethers-provider" "^0.1.0"
+    "@reflexer-finance/geb-contract-api" "^0.1.2"
+    "@reflexer-finance/geb-contract-base" "^0.1.2"
+    "@reflexer-finance/geb-ethers-provider" "^0.1.2"
 
 generate-function@^2.0.0:
   version "2.3.1"
@@ -7451,6 +7468,21 @@ jazzicon@^1.5.0:
     color "^0.11.1"
     mersenne-twister "^1.0.1"
     raphael "^2.2.0"
+
+jdenticon@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/jdenticon/-/jdenticon-2.2.0.tgz#6a9d9cb2134a7848ff21d59b3871148cbc6af87f"
+  integrity sha512-WGqwpjN9pab/Sah9pGnFH5tQc3HF3WbLV/tPVbykvk5nuAkxG/zhzQYWC2owvpnS+/A0HmlSx35rtY8kyN+x7Q==
+  dependencies:
+    "@types/node" "*"
+    canvas-renderer "~2.1.1"
+
+jdenticon@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/jdenticon/-/jdenticon-3.0.1.tgz#ef43e3e7af9535986969d59286501bc7bb6b7d18"
+  integrity sha512-6Bh9FSmh2NEZsa3gWlcQgWgdIuXudT/Q34N9A/05qUtPyJ34rYZuk2v7AVxR+1FPdgNmy4JpGj1u2wH63sCCrw==
+  dependencies:
+    canvas-renderer "~2.2.0"
 
 jest-changed-files@^24.9.0:
   version "24.9.0"
@@ -8991,6 +9023,11 @@ num2fraction@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/num2fraction/-/num2fraction-1.2.2.tgz#6f682b6a027a4e9ddfa4564cd2589d1d4e669ede"
   integrity sha1-b2gragJ6Tp3fpFZM0lidHU5mnt4=
+
+numeral@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/numeral/-/numeral-2.0.6.tgz#4ad080936d443c2561aed9f2197efffe25f4e506"
+  integrity sha1-StCAk21EPCVhrtnyGX7//iX05QY=
 
 nwsapi@^2.0.7, nwsapi@^2.1.3:
   version "2.2.0"
@@ -10686,6 +10723,15 @@ react-is@^16.12.0, react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1, react-i
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-jdenticon@^0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/react-jdenticon/-/react-jdenticon-0.0.8.tgz#6fa3de1cdf8b64e03f7fa5f82171e0f69a34e977"
+  integrity sha512-+oVYV1Py3JBaCZIvOeOiuj9wmpLLDFGjsp7SCDXtai9l5khhiE2caDYubt/xZEcqlO8DyALcb+ZgRgPgXY70Zg==
+  dependencies:
+    jdenticon "^2.2.0"
+    prop-types "^15.7.2"
+    react "^16.8.0"
+
 react-router-dom@^5.2.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-5.2.0.tgz#9e65a4d0c45e13289e66c7b17c7e175d0ea15662"
@@ -10798,6 +10844,15 @@ react@^16.13.1:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react/-/react-16.13.1.tgz#2e818822f1a9743122c063d6410d85c1e3afe48e"
   integrity sha512-YMZQQq32xHLX0bz5Mnibv1/LHb3Sqzngu7xstSM+vrkE5Kzr9xE0yMByK5kMoTK30YVJE61WfbxIFFvfeDKT1w==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
+
+react@^16.8.0:
+  version "16.14.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.14.0.tgz#94d776ddd0aaa37da3eda8fc5b6b18a4c9a3114d"
+  integrity sha512-0X2CImDkJGApiAlcf0ODKIneSwBPhqJawOa5wCtKbu7ZECrmS26NvtSILynQ66cgkT/RJ4LidJOc3bUESwmU8g==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"

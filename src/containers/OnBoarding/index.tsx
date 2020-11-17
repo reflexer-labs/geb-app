@@ -24,7 +24,7 @@ const OnBoarding = () => {
   const {
     popupsModel: popupsActions,
     safeModel: safeActions,
-    walletModel: walletActions,
+    connectWalletModel: connectWalletActions,
   } = useStoreActions((state) => state);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const OnBoarding = () => {
 
     if (isLoggedOut || isAccountSwitched) {
       safeActions.setIsSafeCreated(false);
-      walletActions.setStep(0);
+      connectWalletActions.setStep(0);
     }
     // eslint-disable-next-line
   }, [account, previousAccount]);
