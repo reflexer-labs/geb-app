@@ -9,17 +9,16 @@ import { isNumeric } from '../../utils/validations';
 
 const SafeDetails = ({ ...props }) => {
   const { t } = useTranslation();
-
   const { safeModel: safeActions } = useStoreActions((state) => state);
   const { safeModel: safeState } = useStoreState((state) => state);
   const safeId = props.match.params.id as string;
 
   useEffect(() => {
-    if (isNumeric(safeId)) {
-      safeActions.fetchSafeById(safeId);
-    } else {
+    if (!isNumeric(safeId)) {
       props.history.push('/');
     }
+    safeActions.fetchSafeById(safeId);
+    safeActions.fetchSafeHistory(safeId);
     return () => safeActions.setSingleSafe(null);
     // eslint-disable-next-line
   }, []);

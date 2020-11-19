@@ -74,7 +74,7 @@ export interface NavLinkType {
   text: string;
 }
 
-export interface CreateSafeType {
+export interface ISafeData {
   leftInput: string;
   collateralRatio: number;
   rightInput: string;
@@ -85,7 +85,7 @@ export interface IBlockNumber {
   [chainId: number]: number;
 }
 
-export interface IEthBalance {
+export interface ITokenBalance {
   [chainId: number]: number;
 }
 
@@ -152,8 +152,8 @@ export interface ILiquidationData {
   currentRedemptionPrice: string;
 }
 
-export interface ICreateSafePayload {
-  createSafeDefault: CreateSafeType;
+export interface ISafePayload {
+  safeData: ISafeData;
   signer: JsonRpcSigner;
 }
 
@@ -185,4 +185,12 @@ export interface ITransaction {
   addedTime: number;
   confirmedTime?: number;
   originalTx: TransactionResponse;
+}
+
+export interface ISafeHistory {
+  title: string;
+  date: string;
+  amount: number;
+  link: string;
+  txHash: string;
 }

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import { formatNumber } from '../utils/helper';
+import { jdenticonConfig } from '../utils/constants';
 
 const SafeBlock = ({ ...props }) => {
   const { t } = useTranslation();
@@ -12,8 +13,9 @@ const SafeBlock = ({ ...props }) => {
   const collateral = formatNumber(props.collateral, 2);
   const debt = formatNumber(props.debt, 2);
   const createdAt = dayjs.unix(props.date).format('MMM D, YYYY h:mm A');
+
   function createImage() {
-    return { __html: toSvg(props.safeHandler + props.id, 40) };
+    return { __html: toSvg(props.safeHandler + props.id, 40, jdenticonConfig) };
   }
 
   return (
@@ -29,9 +31,11 @@ const SafeBlock = ({ ...props }) => {
               </Date>
             </SafeData>
           </SafeInfo>
-          <SafeState className={props.riskState.toLowerCase()}>
-            {t('risk')} <span>{props.riskState}</span>
-          </SafeState>
+          {props.riskState ? (
+            <SafeState className={props.riskState.toLowerCase()}>
+              {t('risk')} <span>{props.riskState}</span>
+            </SafeState>
+          ) : null}
         </BlockHeader>
         <Block>
           <Item>

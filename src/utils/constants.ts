@@ -107,3 +107,16 @@ export const floatsTypes = {
   RAY: 27,
   RAD: 45,
 };
+
+export const jdenticonConfig = {
+  hues: [103],
+  lightness: {
+    color: [0.84, 0.84],
+    grayscale: [0.84, 0.84],
+  },
+  saturation: {
+    color: 0.48,
+    grayscale: 0.48,
+  },
+  backColor: '#50ccd5',
+};

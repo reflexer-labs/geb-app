@@ -20,7 +20,7 @@ const CreateAccountModal = () => {
       isCreate: false,
     });
     safeActions.setUniSwapPool(DEFAULT_SAFE_STATE);
-    safeActions.setCreateSafeDefault(DEFAULT_SAFE_STATE);
+    safeActions.setSafeData(DEFAULT_SAFE_STATE);
   };
 
   return (

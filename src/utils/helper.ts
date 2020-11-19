@@ -2,8 +2,14 @@ import numeral from 'numeral';
 import { ChainId } from '@uniswap/sdk';
 import { BigNumber, FixedNumber } from 'ethers';
 import { utils as gebUtils } from 'geb.js';
-import { ETHERSCAN_PREFIXES, floatsTypes } from './constants';
-import { ISafe, ITransaction } from './interfaces';
+import { AbstractConnector } from '@web3-react/abstract-connector';
+import {
+  ETHERSCAN_PREFIXES,
+  floatsTypes,
+  SUPPORTED_WALLETS,
+} from './constants';
+import { ISafe, ISafeHistory, ITransaction } from './interfaces';
+import { injected, NETWORK_ID } from '../connectors';
 
 export const returnWalletAddress = (walletAddress: string) =>
   `${walletAddress.slice(0, 4 + 2)}...${walletAddress.slice(-4)}`;
@@ -191,7 +197,6 @@ export const safeIsSafe = (
   const accumulatedRateBN = BigNumber.from(
     toFixedString(accumulatedRate, 'RAY')
   );
-
   return totalDebtBN
     .mul(accumulatedRateBN)
     .lte(totalCollateralBN.mul(safetyPriceBN));
@@ -202,6 +207,8 @@ export const ratioChecker = (liquitdationRatio: number) => {
     return 'Low';
   } else if (liquitdationRatio < 300 && liquitdationRatio >= 200) {
     return 'Medium';
+  } else if (liquitdationRatio === 0) {
+    return '';
   } else {
     return 'High';
   }
@@ -209,13 +216,18 @@ export const ratioChecker = (liquitdationRatio: number) => {
 
 export const getInterestOwed = (debt: string, accumulatedRate: string) => {
   const restAcc = numeral(accumulatedRate).subtract(1).value();
-  return formatNumber(numeral(debt).multiply(restAcc).value().toString(), 2);
+  return formatNumber(
+    numeral(debt).multiply(restAcc).value().toString(),
+    4,
+    true
+  );
 };
 
 export const returnTotalValue = (
   first: string,
   second: string,
   beautify = true,
+  isRepay = false,
   type: keyof typeof floatsTypes = 'WAD'
 ) => {
   const firstBN = first
@@ -225,7 +237,7 @@ export const returnTotalValue = (
     ? BigNumber.from(toFixedString(second, type))
     : BigNumber.from('0');
 
-  const totalBN = firstBN.add(secondBN);
+  const totalBN = isRepay ? firstBN.sub(secondBN) : firstBN.add(secondBN);
 
   if (!beautify) return totalBN;
   return formatNumber(gebUtils.wadToFixed(totalBN).toString()).toString();
@@ -255,7 +267,21 @@ export const returnAvaiableDebt = (
   return formatNumber(gebUtils.wadToFixed(availableDebt).toString()).toString();
 };
 
-export const returnDebtPlusInterest = (
+export const returnTotalDebt = (
+  debt: string,
+  accumulatedRate: string,
+  beautify = true
+) => {
+  const debtBN = BigNumber.from(toFixedString(debt, 'WAD'));
+  const accumulatedRateBN = BigNumber.from(
+    toFixedString(accumulatedRate, 'RAY')
+  );
+  const totalDebtBN = debtBN.mul(accumulatedRateBN).div(gebUtils.RAY);
+  if (!beautify) return totalDebtBN;
+  return gebUtils.wadToFixed(totalDebtBN).toString();
+};
+
+export const returnTotalDebtPlusInterest = (
   safetyPrice: string,
   collateral: string,
   accumulatedRate: string,
@@ -277,10 +303,59 @@ export const returnDebtPlusInterest = (
     .div(gebUtils.RAY)
     .div(gebUtils.RAY);
 
-  console.log(owedRAI);
-
   if (!beautify) return owedRAI;
   return formatNumber(gebUtils.wadToFixed(owedRAI).toString()).toString();
+};
+
+export const formatHistoryArray = (
+  history: Array<any>
+): Array<ISafeHistory> => {
+  const items: Array<ISafeHistory> = [];
+  const networkId = NETWORK_ID;
+
+  for (let item of history) {
+    const deltaDebt = numeral(item.deltaDebt).value();
+    const deltaCollateral = numeral(item.deltaCollateral).value();
+
+    const sharedObj = {
+      date: item.createdAt,
+      txHash: item.createdAtTransaction,
+      link: getEtherscanLink(
+        networkId,
+        item.createdAtTransaction,
+        'transaction'
+      ),
+    };
+    if (deltaDebt > 0) {
+      items.push({
+        ...sharedObj,
+        title: 'Borrowed RAI',
+        amount: deltaDebt,
+      });
+    }
+    if (deltaDebt < 0) {
+      items.push({
+        ...sharedObj,
+        title: 'Repaid RAI',
+        amount: -1 * deltaDebt,
+      });
+    }
+    if (deltaCollateral > 0) {
+      items.push({
+        ...sharedObj,
+        title: 'Deposited ETH',
+        amount: deltaCollateral,
+      });
+    }
+    if (deltaCollateral < 0) {
+      items.push({
+        ...sharedObj,
+        title: 'Withdrew ETH',
+        amount: -1 * deltaCollateral,
+      });
+    }
+  }
+  return items.sort((a, b) => Number(b.date) - Number(a.date));
 };
 
 export const newTransactionsFirst = (a: ITransaction, b: ITransaction) => {
@@ -289,4 +364,36 @@ export const newTransactionsFirst = (a: ITransaction, b: ITransaction) => {
 
 export const timeout = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+export const returnPercentAmount = (
+  partialValue: string,
+  totalValue: string
+) => {
+  return numeral(partialValue).divide(totalValue).multiply(100).value();
+};
+
+export const returnConnectorName = (
+  connector: AbstractConnector | undefined
+) => {
+  if (!connector || typeof connector === undefined) return null;
+
+  const isMetamask = window?.ethereum?.isMetaMask;
+  return Object.keys(SUPPORTED_WALLETS)
+    .map((key) => {
+      const option = SUPPORTED_WALLETS[key];
+      if (option.connector === connector) {
+        if (option.connector === injected) {
+          if (isMetamask && option.name !== 'MetaMask') {
+            return null;
+          }
+          if (!isMetamask && option.name === 'MetaMask') {
+            return null;
+          }
+        }
+        return option.name !== 'Injected' ? option.name : null;
+      }
+      return null;
+    })
+    .filter((x: string | null) => x !== null)[0];
 };

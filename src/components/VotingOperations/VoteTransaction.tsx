@@ -4,12 +4,10 @@ import styled from 'styled-components';
 import { useStoreActions } from '../../store';
 import Button from '../Button';
 import TransactionOverview from '../TransactionOverview';
-import { SUPPORTED_WALLETS } from '../../utils/constants';
-import { injected } from '../../connectors';
 import { useActiveWeb3React } from '../../hooks';
+import { returnConnectorName } from '../../utils/helper';
 
 const VoteTransaction = () => {
-  const isMetamask = window?.ethereum?.isMetaMask;
   const { connector } = useActiveWeb3React();
   const { t } = useTranslation();
 
@@ -27,26 +25,6 @@ const VoteTransaction = () => {
     votingActions.setOperation(0);
   };
 
-  const returnConnectorName = () => {
-    return Object.keys(SUPPORTED_WALLETS)
-      .map((key) => {
-        const option = SUPPORTED_WALLETS[key];
-        if (option.connector === connector) {
-          if (option.connector === injected) {
-            if (isMetamask && option.name !== 'MetaMask') {
-              return null;
-            }
-            if (!isMetamask && option.name === 'MetaMask') {
-              return null;
-            }
-          }
-          return option.name !== 'Injected' ? option.name : null;
-        }
-        return null;
-      })
-      .filter((x: string | null) => x !== null)[0];
-  };
-
   return (
     <>
       <Body>
@@ -54,7 +32,9 @@ const VoteTransaction = () => {
           title={t('confirm_transaction_details')}
           description={
             t('confirm_details_text') +
-            (returnConnectorName() ? 'on ' + returnConnectorName() : '')
+            (returnConnectorName(connector)
+              ? 'on ' + returnConnectorName(connector)
+              : '')
           }
         />
         <Result>

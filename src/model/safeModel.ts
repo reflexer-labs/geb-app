@@ -1,9 +1,11 @@
+import numeral from 'numeral';
 import { action, Action, thunk, Thunk } from 'easy-peasy';
 import {
-  CreateSafeType,
-  ICreateSafePayload,
+  ISafeData,
+  ISafePayload,
   ILiquidationData,
   ISafe,
+  ISafeHistory,
 } from '../utils/interfaces';
 import {
   handleDepositAndBorrow,
@@ -13,10 +15,13 @@ import {
 import {
   fetchLiquidation,
   fetchSafeById,
+  fetchSafeHistory,
   fetchUserSafes,
 } from '../services/graphql';
 import { DEFAULT_SAFE_STATE } from '../utils/constants';
 import { timeout } from '../utils/helper';
+import { StoreModel } from '.';
+import { NETWORK_ID } from '../connectors';
 
 export interface SafeModel {
   list: Array<ISafe>;
@@ -28,14 +33,25 @@ export interface SafeModel {
   isES: boolean;
   isUniSwapPoolChecked: boolean;
   stage: number;
-  createSafeDefault: CreateSafeType;
+  safeData: ISafeData;
   liquidationData: ILiquidationData;
-  uniSwapPool: CreateSafeType;
-  depositAndBorrow: Thunk<SafeModel, ICreateSafePayload & { safeId: string }>;
-  repayAndWithdraw: Thunk<SafeModel, ICreateSafePayload & { safeId: string }>;
-  createSafe: Thunk<SafeModel, ICreateSafePayload>;
+  uniSwapPool: ISafeData;
+  historyList: Array<ISafeHistory>;
+  depositAndBorrow: Thunk<
+    SafeModel,
+    ISafePayload & { safeId: string },
+    any,
+    StoreModel
+  >;
+  repayAndWithdraw: Thunk<
+    SafeModel,
+    ISafePayload & { safeId: string },
+    any,
+    StoreModel
+  >;
+  createSafe: Thunk<SafeModel, ISafePayload, any, StoreModel>;
   fetchSafeById: Thunk<SafeModel, string>;
-  fetchUserSafes: Thunk<SafeModel, string>;
+  fetchUserSafes: Thunk<SafeModel, string, any, StoreModel>;
   fetchLiquidationData: Thunk<SafeModel>;
   setIsSafeCreated: Action<SafeModel, boolean>;
   setList: Action<SafeModel, Array<ISafe>>;
@@ -44,12 +60,13 @@ export interface SafeModel {
   setTotalEth: Action<SafeModel, string>;
   setTotalRAI: Action<SafeModel, string>;
   setIsES: Action<SafeModel, boolean>;
-
+  fetchSafeHistory: Thunk<SafeModel, string>;
   setLiquidationData: Action<SafeModel, ILiquidationData>;
-  setCreateSafeDefault: Action<SafeModel, CreateSafeType>;
-  setUniSwapPool: Action<SafeModel, CreateSafeType>;
+  setSafeData: Action<SafeModel, ISafeData>;
+  setUniSwapPool: Action<SafeModel, ISafeData>;
   setIsUniSwapPoolChecked: Action<SafeModel, boolean>;
   setStage: Action<SafeModel, number>;
+  setSafeHistoryList: Action<SafeModel, Array<ISafeHistory>>;
 }
 
 const safeModel: SafeModel = {
@@ -62,7 +79,7 @@ const safeModel: SafeModel = {
   isES: true,
   isUniSwapPoolChecked: true,
   stage: 0,
-  createSafeDefault: DEFAULT_SAFE_STATE,
+  safeData: DEFAULT_SAFE_STATE,
   liquidationData: {
     accumulatedRate: '0',
     currentPrice: {
@@ -76,12 +93,12 @@ const safeModel: SafeModel = {
     currentRedemptionPrice: '0',
   },
   uniSwapPool: DEFAULT_SAFE_STATE,
-
+  historyList: [],
   createSafe: thunk(async (actions, payload, { getStoreActions }) => {
-    const storeActions: any = getStoreActions();
+    const storeActions = getStoreActions();
     const txResponse = await handleSafeCreation(
       payload.signer,
-      payload.createSafeDefault
+      payload.safeData
     );
     if (txResponse) {
       const { hash, chainId } = txResponse;
@@ -103,10 +120,10 @@ const safeModel: SafeModel = {
     }
   }),
   depositAndBorrow: thunk(async (actions, payload, { getStoreActions }) => {
-    const storeActions: any = getStoreActions();
+    const storeActions = getStoreActions();
     const txResponse = await handleDepositAndBorrow(
       payload.signer,
-      payload.createSafeDefault,
+      payload.safeData,
       payload.safeId
     );
     if (txResponse) {
@@ -131,10 +148,10 @@ const safeModel: SafeModel = {
     }
   }),
   repayAndWithdraw: thunk(async (actions, payload, { getStoreActions }) => {
-    const storeActions: any = getStoreActions();
+    const storeActions = getStoreActions();
     const txResponse = await handleRepayAndWithdraw(
       payload.signer,
-      payload.createSafeDefault,
+      payload.safeData,
       payload.safeId
     );
     if (txResponse) {
@@ -158,17 +175,42 @@ const safeModel: SafeModel = {
       await actions.fetchSafeById(payload.safeId);
     }
   }),
-  fetchUserSafes: thunk(async (actions, payload) => {
-    const safeRes = await fetchUserSafes(payload.toLowerCase());
-    actions.setList(safeRes);
-    return safeRes;
+  fetchUserSafes: thunk(async (actions, payload, { getStoreActions }) => {
+    const storeActions = getStoreActions();
+    const fetched = await fetchUserSafes(payload.toLowerCase());
+    actions.setList(fetched.userSafes);
+    if (fetched.userSafes.length > 0) {
+      actions.setIsSafeCreated(true);
+      storeActions.connectWalletModel.setStep(1);
+    } else {
+      storeActions.popupsModel.setWaitingPayload({
+        title: 'Fetching user safes',
+        status: 'loading',
+      });
+      actions.setIsSafeCreated(false);
+      storeActions.connectWalletModel.setStep(1);
+    }
+    const chainId = NETWORK_ID;
+    if (fetched.availablePRAI && chainId) {
+      storeActions.connectWalletModel.updatePraiBalance({
+        chainId,
+        balance: numeral(fetched.availablePRAI).value(),
+      });
+    }
+    await timeout(200);
+    return fetched;
   }),
 
   fetchSafeById: thunk(async (actions, payload) => {
     const safe = (await fetchSafeById(payload))[0];
     actions.setSingleSafe(safe);
   }),
-
+  fetchSafeHistory: thunk(async (actions, payload) => {
+    const historyList = await fetchSafeHistory(payload);
+    if (historyList.length > 0) {
+      actions.setSafeHistoryList(historyList);
+    }
+  }),
   setIsSafeCreated: action((state, payload) => {
     state.safeCreated = payload;
   }),
@@ -199,8 +241,8 @@ const safeModel: SafeModel = {
     state.liquidationData = payload;
   }),
 
-  setCreateSafeDefault: action((state, payload) => {
-    state.createSafeDefault = payload;
+  setSafeData: action((state, payload) => {
+    state.safeData = payload;
   }),
   setUniSwapPool: action((state, payload) => {
     state.uniSwapPool = payload;
@@ -210,6 +252,9 @@ const safeModel: SafeModel = {
   }),
   setStage: action((state, payload) => {
     state.stage = payload;
+  }),
+  setSafeHistoryList: action((state, payload) => {
+    state.historyList = payload;
   }),
 };
 

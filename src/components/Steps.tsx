@@ -4,7 +4,10 @@ import { useStoreActions, useStoreState } from '../store';
 import StepsContent from './StepsContent';
 import { useActiveWeb3React } from '../hooks';
 import { geb } from '../connectors';
-import { useTransactionAdder } from '../hooks/TransactionHooks';
+import {
+  handleTransactionError,
+  useTransactionAdder,
+} from '../hooks/TransactionHooks';
 
 const Steps = () => {
   const { account, library } = useActiveWeb3React();
@@ -26,46 +29,32 @@ const Steps = () => {
     popupsActions.setIsConnectorsWalletOpen(true);
 
   const handleCreateAccount = async () => {
-    if (account && library) {
-      setIsLoading(true);
-      const txData = geb.deployProxy();
-      const signer = library.getSigner(account);
+    if (!account || !library) return false;
+    setIsLoading(true);
+    const txData = geb.deployProxy();
+    const signer = library.getSigner(account);
 
-      try {
-        popupsActions.setIsWaitingModalOpen(true);
-        popupsActions.setWaitingPayload({
-          title: 'Waiting For Confirmation',
-          text: `Creating new account`,
-          hint: 'Confirm this transaction in your wallet',
-          status: 'loading',
-        });
-        const txResponse = await signer.sendTransaction(txData);
-        addTransaction(txResponse, 'Creating account');
-        popupsActions.setWaitingPayload({
-          title: 'Transaction Submitted',
-          hash: txResponse.hash,
-          status: 'success',
-        });
-        await txResponse.wait();
-        connectWalletActions.setStep(2);
-      } catch (e) {
-        console.log(e);
-        if (e?.code === 4001) {
-          popupsActions.setWaitingPayload({
-            title: 'Transaction Rejected.',
-            status: 'error',
-          });
-          return;
-        } else {
-          popupsActions.setWaitingPayload({
-            title: 'Transaction Failed.',
-            status: 'error',
-          });
-          console.error(`Transaction failed`, e);
-        }
-      } finally {
-        setIsLoading(false);
-      }
+    try {
+      popupsActions.setIsWaitingModalOpen(true);
+      popupsActions.setWaitingPayload({
+        title: 'Waiting For Confirmation',
+        text: `Creating new account`,
+        hint: 'Confirm this transaction in your wallet',
+        status: 'loading',
+      });
+      const txResponse = await signer.sendTransaction(txData);
+      addTransaction(txResponse, 'Creating account');
+      popupsActions.setWaitingPayload({
+        title: 'Transaction Submitted',
+        hash: txResponse.hash,
+        status: 'success',
+      });
+      await txResponse.wait();
+      connectWalletActions.setStep(2);
+    } catch (e) {
+      handleTransactionError(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 

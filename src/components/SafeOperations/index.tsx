@@ -5,6 +5,7 @@ import { useStoreState } from '../../store';
 import Safe from './Safe';
 import ReviewTransaction from './ReviewTransaction';
 import UniSwapPool from './UniSwapPool';
+import ApprovePRAI from './ApprovePRAI';
 
 interface Props {
   width?: string;
@@ -27,6 +28,8 @@ const SafeContainer = ({ width, maxWidth }: Props) => {
       case 1:
         return <UniSwapPool isChecked={isUniSwapPoolChecked} />;
       case 2:
+        return <ApprovePRAI />;
+      case 3:
         return <ReviewTransaction />;
       default:
         return <Safe />;

@@ -21,6 +21,7 @@ const SafeStats = () => {
   const interestOwed = singleSafe
     ? getInterestOwed(singleSafe.debt, singleSafe.accumulatedRate)
     : 0;
+
   const liquidationPenalty = getRatePercentage(
     singleSafe?.liquidationPenalty || '1'
   );

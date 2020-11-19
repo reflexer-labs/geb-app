@@ -3,6 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { Scrollbars } from 'react-custom-scrollbars';
 import styled from 'styled-components';
 import useWindowSize from '../hooks/useWindowSize';
+import { useStoreState } from '../store';
+import { ISafeHistory } from '../utils/interfaces';
+import dayjs from 'dayjs';
+import { returnWalletAddress } from '../utils/helper';
+import { toSvg } from 'jdenticon';
+import { jdenticonConfig } from '../utils/constants';
 
 interface Props {
   hideHistory?: boolean;
@@ -12,6 +18,34 @@ const SafeHistory = ({ hideHistory }: Props) => {
   const [colWidth, setColWidth] = useState('100%');
   const { width } = useWindowSize();
   const ref = useRef<HTMLDivElement>(null);
+  const { safeModel: safeState } = useStoreState((state) => state);
+
+  function createImage(value: string) {
+    return { __html: toSvg(value, 33, jdenticonConfig) };
+  }
+
+  const formatRow = (item: ISafeHistory, i: number) => {
+    const { title, date, amount, link, txHash } = item;
+    const humanizedAmount =
+      amount.toString().length < 4 ? amount : amount.toFixed(4);
+    const humanizedDate = dayjs.unix(Number(date)).format('MMM D, YYYY h:mm A');
+    return (
+      <Row ref={ref} key={Number(item.date) + i}>
+        <Col>
+          <div dangerouslySetInnerHTML={createImage(item.date)} />
+          {title}
+        </Col>
+        <Col>{humanizedDate}</Col>
+        <Col>{humanizedAmount}</Col>
+        <Col>
+          <ExternalLink href={link} target="_blank">
+            {returnWalletAddress(txHash)}{' '}
+            <img src={require('../assets/arrow-up.svg')} alt="" />
+          </ExternalLink>
+        </Col>
+      </Row>
+    );
+  };
 
   useEffect(() => {
     if (ref && ref.current) {
@@ -22,7 +56,7 @@ const SafeHistory = ({ hideHistory }: Props) => {
   return (
     <Container>
       <Title>{t('history')}</Title>
-      {hideHistory ? null : (
+      {!safeState.historyList.length || hideHistory ? null : (
         <Header style={{ width: colWidth }}>
           <Thead>Action</Thead>
           <Thead>Date</Thead>
@@ -31,64 +65,11 @@ const SafeHistory = ({ hideHistory }: Props) => {
         </Header>
       )}
       <Scrollbars autoHide style={{ width: '100%', height: '162px' }}>
-        {!hideHistory ? (
+        {!hideHistory || safeState.historyList.length > 0 ? (
           <List>
-            <Row ref={ref}>
-              <Col>
-                <img src={require('../assets/box-ph.svg')} alt="" />
-                Repaid RAI
-              </Col>
-              <Col>Feb 12 2020</Col>
-              <Col>20.00</Col>
-              <Col>
-                <ExternalLink href="">
-                  0x1234....4321{' '}
-                  <img src={require('../assets/arrow-up.svg')} alt="" />
-                </ExternalLink>
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <img src={require('../assets/box-ph.svg')} alt="" />
-                Withdrew RAI
-              </Col>
-              <Col>Feb 2 2020</Col>
-              <Col>50.00</Col>
-              <Col>
-                <ExternalLink href="">
-                  0x1234....4321{' '}
-                  <img src={require('../assets/arrow-up.svg')} alt="" />
-                </ExternalLink>
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <img src={require('../assets/box-ph.svg')} alt="" />
-                Deposited ETH
-              </Col>
-              <Col>Feb 1 2020</Col>
-              <Col>100.00</Col>
-              <Col>
-                <ExternalLink href="">
-                  0x1234....4321{' '}
-                  <img src={require('../assets/arrow-up.svg')} alt="" />
-                </ExternalLink>
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <img src={require('../assets/box-ph.svg')} alt="" />
-                Opened Safe
-              </Col>
-              <Col>Feb 1 2020</Col>
-              <Col>0.00</Col>
-              <Col>
-                <ExternalLink href="">
-                  0x1234....4321{' '}
-                  <img src={require('../assets/arrow-up.svg')} alt="" />
-                </ExternalLink>
-              </Col>
-            </Row>
+            {safeState.historyList.map((item: ISafeHistory, i: number) =>
+              formatRow(item, i)
+            )}
           </List>
         ) : (
           <HideHistory>{t('no_history')}</HideHistory>
@@ -167,11 +148,9 @@ const Col = styled.div`
   }
   color: ${(props) => props.theme.colors.primary};
   font-size: ${(props) => props.theme.font.small};
-  img {
+  svg {
     border-radius: 50%;
     margin-right: 11px;
-    width: 37px;
-    height: 37px;
   }
 
   ${({ theme }) => theme.mediaWidth.upToSmall`

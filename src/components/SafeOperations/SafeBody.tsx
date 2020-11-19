@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
-import { CreateSafeType } from '../../utils/interfaces';
+import { ISafeData } from '../../utils/interfaces';
 import Button from '../Button';
 // import CheckBox from '../CheckBox';
 import DecimalInput from '../DecimalInput';
@@ -12,6 +12,8 @@ import {
   getLiquidationPrice,
   getRatePercentage,
   returnAvaiableDebt,
+  returnPercentAmount,
+  returnTotalDebt,
   returnTotalValue,
   safeIsSafe,
   toFixedString,
@@ -29,12 +31,8 @@ const SafeBody = ({ isChecked }: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || false);
   const [error, setError] = useState('');
-  const [defaultSafe, setDefaultSafe] = useState<CreateSafeType>(
-    DEFAULT_SAFE_STATE
-  );
-  const [uniSwapVal, setUniSwapVal] = useState<CreateSafeType>(
-    DEFAULT_SAFE_STATE
-  );
+  const [defaultSafe, setDefaultSafe] = useState<ISafeData>(DEFAULT_SAFE_STATE);
+  const [uniSwapVal, setUniSwapVal] = useState<ISafeData>(DEFAULT_SAFE_STATE);
 
   const {
     safeModel: safeActions,
@@ -45,7 +43,7 @@ const SafeBody = ({ isChecked }: Props) => {
     safeModel: safeState,
     popupsModel: popupsState,
   } = useStoreState((state) => state);
-  const { createSafeDefault, uniSwapPool, singleSafe } = safeState;
+  const { safeData, uniSwapPool, singleSafe } = safeState;
   const { type, isCreate } = popupsState.safeOperationPayload;
   const {
     currentPrice,
@@ -57,12 +55,31 @@ const SafeBody = ({ isChecked }: Props) => {
     currentRedemptionPrice,
   } = safeState.liquidationData;
 
+  const praiBalance = connectWalletState.praiBalance[NETWORK_ID];
+
   const totalCollateral = singleSafe
-    ? returnTotalValue(singleSafe.collateral, defaultSafe.leftInput).toString()
+    ? type === 'repay_withdraw'
+      ? returnTotalValue(
+          singleSafe.collateral,
+          defaultSafe.leftInput,
+          true,
+          true
+        ).toString()
+      : returnTotalValue(
+          singleSafe.collateral,
+          defaultSafe.leftInput
+        ).toString()
     : defaultSafe.leftInput;
 
   const totalDebt = singleSafe
-    ? returnTotalValue(singleSafe.debt, defaultSafe.rightInput).toString()
+    ? type === 'repay_withdraw'
+      ? returnTotalValue(
+          singleSafe.debt,
+          defaultSafe.rightInput,
+          true,
+          true
+        ).toString()
+      : returnTotalValue(singleSafe.debt, defaultSafe.rightInput).toString()
     : defaultSafe.rightInput;
 
   const getAvailableEth = () => {
@@ -93,7 +110,9 @@ const SafeBody = ({ isChecked }: Props) => {
       }
     } else {
       if (singleSafe) {
-        return formatNumber(singleSafe.debt, 4);
+        if (!connectWalletState.praiBalance) return '0';
+        return returnTotalDebt(singleSafe.debt, accumulatedRate) as string;
+        // const availableBalance = Math.min(praiBalance, debtBalance);
       }
     }
     return '';
@@ -108,8 +127,10 @@ const SafeBody = ({ isChecked }: Props) => {
     if (type === 'repay_withdraw' && isLeft) {
       return `Withdraw ETH (Avail ${getAvailableEth()})`;
     }
-    if (type === 'repay_withdraw' && !isLeft) {
-      return `Repay RAI (Avail ${getAvailableRai()})`;
+    if (type === 'repay_withdraw' && singleSafe && !isLeft) {
+      return `Repay RAI (Owe: ${formatNumber(
+        getAvailableRai()
+      )}, Avail: ${praiBalance.toFixed(4)})`;
     }
     return '';
   };
@@ -131,11 +152,7 @@ const SafeBody = ({ isChecked }: Props) => {
     currentRedemptionPrice
   );
 
-  // const setMaxRai = () => {
-  //   setDefaultSafe({ ...defaultSafe, borrowedRAI: availableRai.toString() });
-  // }
-
-  const passedDepositBorrowValidation = () => {
+  const isPassedValidation = () => {
     const availableEthBN = BigNumber.from(
       toFixedString(getAvailableEth().toString(), 'WAD')
     );
@@ -154,13 +171,7 @@ const SafeBody = ({ isChecked }: Props) => {
     const debtFloorBN = BigNumber.from(toFixedString(debtFloor, 'WAD'));
 
     if (type === 'deposit_borrow') {
-      if (leftInputBN.gt(availableEthBN)) {
-        setError('Insufficient balance.');
-        return false;
-      } else if (rightInputBN.gt(availableRaiBN)) {
-        setError('RAI borrowed cannot exceed available amount.');
-        return false;
-      } else if (
+      if (
         defaultSafe.rightInput &&
         !rightInputBN.isZero() &&
         rightInputBN.lt(BigNumber.from(debtFloorBN))
@@ -170,7 +181,14 @@ const SafeBody = ({ isChecked }: Props) => {
         );
         return false;
       }
-      if (isCreate) {
+
+      if (leftInputBN.gt(availableEthBN)) {
+        setError('Insufficient balance.');
+        return false;
+      } else if (rightInputBN.gt(availableRaiBN)) {
+        setError('RAI borrowed cannot exceed available amount.');
+        return false;
+      } else if (isCreate) {
         if (leftInputBN.isZero()) {
           setError('Please enter the amount of ETH to be deposited.');
           return false;
@@ -187,40 +205,79 @@ const SafeBody = ({ isChecked }: Props) => {
           return false;
         }
       }
-
-      const isSafe = safeIsSafe(
-        totalCollateral,
-        totalDebt,
-        currentPrice.safetyPrice,
-        accumulatedRate
-      );
-
-      if (!isSafe) {
-        setError(
-          `Too much debt, below ${safetyCRatio} collateralization ratio`
-        );
-        return false;
-      }
     }
-
     if (type === 'repay_withdraw') {
       if (leftInputBN.isZero() && rightInputBN.isZero()) {
         setError(
-          'Please enter the amount of ETH to free or amount of RAI to be repay'
+          'Please enter the amount of ETH to free or the amount of RAI to be repay'
         );
         return false;
       } else if (leftInputBN.gt(availableEthBN)) {
         setError('ETH to unlock cannot exceed available amount.');
         return false;
       }
+      if (rightInputBN.gt(availableRaiBN)) {
+        setError('RAI to repay cannot exceed available amount.');
+        return false;
+      }
+      if (
+        defaultSafe.rightInput &&
+        !rightInputBN.isZero() &&
+        rightInputBN.lt(BigNumber.from(debtFloorBN))
+      ) {
+        setError(`Repay amount should be at least ${debtFloor} RAI or zero.`);
+        return false;
+      }
+
+      if (!rightInputBN.isZero()) {
+        const repayPercent = returnPercentAmount(
+          defaultSafe.rightInput,
+          getAvailableRai() as string
+        );
+
+        if (
+          rightInputBN.lt(BigNumber.from(availableRaiBN)) &&
+          repayPercent > 95
+        ) {
+          setError(
+            `You can only repay a minimum of ${getAvailableRai()} RAI to avoid leaving residual values`
+          );
+          return false;
+        }
+      }
+    }
+
+    const isSafe = safeIsSafe(
+      totalCollateral,
+      totalDebt,
+      currentPrice.safetyPrice,
+      accumulatedRate
+    );
+
+    if (!isSafe && (collateralRatio as number) > 0) {
+      setError(`Too much debt, below ${safetyCRatio} collateralization ratio`);
+      return false;
     }
 
     return true;
   };
 
-  const submitDefaultValues = () => {
-    const passedValidation = passedDepositBorrowValidation();
+  const passedCheckForCoinAllowance = () => {
+    const coinAllowance = connectWalletState.coinAllowance;
+    const rightInputBN = defaultSafe.rightInput
+      ? BigNumber.from(toFixedString(defaultSafe.rightInput, 'WAD'))
+      : BigNumber.from('0');
+    if (coinAllowance) {
+      const coinAllowanceBN = BigNumber.from(
+        toFixedString(coinAllowance, 'RAD')
+      );
+      return coinAllowanceBN.gte(rightInputBN);
+    }
+    return false;
+  };
 
+  const submitDefaultValues = () => {
+    const passedValidation = isPassedValidation();
     if (passedValidation) {
       if (!defaultSafe.leftInput) {
         defaultSafe.leftInput = '0';
@@ -228,18 +285,25 @@ const SafeBody = ({ isChecked }: Props) => {
       if (!defaultSafe.rightInput) {
         defaultSafe.rightInput = '0';
       }
-      safeActions.setCreateSafeDefault({
+      safeActions.setSafeData({
         ...defaultSafe,
         collateralRatio: collateralRatio as number,
         liquidationPrice: liquidationPrice as number,
       });
 
       safeActions.setIsUniSwapPoolChecked(checkUniSwapPool);
+      const isPassed = passedCheckForCoinAllowance();
 
       if (checkUniSwapPool) {
         safeActions.setStage(1);
-      } else {
+      } else if (
+        type === 'repay_withdraw' &&
+        Number(defaultSafe.rightInput) > 0 &&
+        !isPassed
+      ) {
         safeActions.setStage(2);
+      } else {
+        safeActions.setStage(3);
       }
     }
   };
@@ -249,7 +313,7 @@ const SafeBody = ({ isChecked }: Props) => {
       ...uniSwapVal,
       collateralRatio: collateralRatio as number,
     });
-    safeActions.setStage(2);
+    safeActions.setStage(3);
   };
 
   const handleCancel = () => {
@@ -264,7 +328,7 @@ const SafeBody = ({ isChecked }: Props) => {
         isCreate: false,
       });
       safeActions.setUniSwapPool(DEFAULT_SAFE_STATE);
-      safeActions.setCreateSafeDefault(DEFAULT_SAFE_STATE);
+      safeActions.setSafeData(DEFAULT_SAFE_STATE);
       setUniSwapVal(DEFAULT_SAFE_STATE);
       setDefaultSafe(DEFAULT_SAFE_STATE);
     }
@@ -290,9 +354,9 @@ const SafeBody = ({ isChecked }: Props) => {
   }, []);
 
   useEffect(() => {
-    setDefaultSafe(createSafeDefault);
+    setDefaultSafe(safeData);
     setUniSwapVal(uniSwapPool);
-  }, [createSafeDefault, uniSwapPool]);
+  }, [safeData, uniSwapPool]);
 
   return (
     <>
@@ -302,16 +366,17 @@ const SafeBody = ({ isChecked }: Props) => {
             label={returnInputType()}
             value={defaultSafe.leftInput}
             onChange={onChangeLeft}
-            disableMax
             disabled={isChecked}
+            disableMax={type !== 'repay_withdraw'}
+            handleMaxClick={() => onChangeLeft(getAvailableEth().toString())}
           />
           <DecimalInput
             label={returnInputType(false)}
             value={defaultSafe.rightInput}
             onChange={onChangeRight}
-            disableMax
-            // handleMaxClick={setMaxRai}
             disabled={isChecked}
+            disableMax={type !== 'repay_withdraw'}
+            handleMaxClick={() => onChangeRight(getAvailableRai().toString())}
           />
         </DoubleInput>
 
@@ -338,11 +403,11 @@ const SafeBody = ({ isChecked }: Props) => {
           <Block>
             <Item>
               <Label>{'Collateral Ratio'}</Label>{' '}
-              <Value>{`${collateralRatio}%`}</Value>
+              <Value>{`${collateralRatio > 0 ? collateralRatio : 0}%`}</Value>
             </Item>
             <Item>
               <Label>{'Liquidation Price'}</Label>{' '}
-              <Value>{`$${liquidationPrice}`}</Value>
+              <Value>{`$${liquidationPrice > 0 ? liquidationPrice : 0}`}</Value>
             </Item>
             <Item>
               <Label>{'Liquidation Penalty'}</Label>{' '}
@@ -394,11 +459,11 @@ const DoubleInput = styled.div`
 
   > div {
     &:last-child {
-      flex: 0 0 calc(57% + 5px);
-      margin-left: -10px;
+      flex: 0 0 calc(50% + 5px);
+      margin-left: -5px;
     }
     &:first-child {
-      flex: 0 0 44%;
+      flex: 0 0 50%;
     }
   }
 
@@ -406,11 +471,11 @@ const DoubleInput = styled.div`
     > div {
       &:first-child {
         order: 2;
-        flex: 0 0 calc(57% + 5px);
-        margin-left: -10px;
+        flex: 0 0 calc(50% + 5px);
+        margin-left: -5px;
       }
       &:last-child {
-        flex: 0 0 44%;
+        flex: 0 0 50%;
         margin-left: 0;
       }
     }
@@ -426,6 +491,22 @@ const DoubleInput = styled.div`
         margin-top: 20px;
       }
     }
+
+    &.reverse {
+      > div {
+      flex: 0 0 100%;
+      max-width: 100%;
+      &:last-child {
+        margin-left: 0;
+        margin-top: 0px;
+      }
+      &:first-child {
+        margin-left: 0;
+        margin-top: 20px;
+      }
+    }
+    }
+    
   `}
 `;
 

@@ -1,3 +1,4 @@
+import { utils as gebUtils } from 'geb.js';
 import { TransactionResponse } from '@ethersproject/providers';
 import { useCallback } from 'react';
 import { useActiveWeb3React } from '.';
@@ -41,4 +42,20 @@ export function useIsTransactionPending(transactionHash?: string): boolean {
   if (!transactionHash || !transactions[transactionHash]) return false;
 
   return !transactions[transactionHash].receipt;
+}
+
+export function handleTransactionError(e: any) {
+  if (e?.code === 4001) {
+    store.dispatch.popupsModel.setWaitingPayload({
+      title: 'Transaction Rejected.',
+      status: 'error',
+    });
+    return;
+  }
+  store.dispatch.popupsModel.setWaitingPayload({
+    title: 'Transaction Failed.',
+    status: 'error',
+  });
+  console.error(`Transaction failed`, e);
+  console.log('Required String', gebUtils.getRequireString(e));
 }

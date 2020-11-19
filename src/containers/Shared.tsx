@@ -8,7 +8,7 @@ import SideMenu from '../components/SideMenu';
 import { useStoreState, useStoreActions } from '../store';
 import ApplicationUpdater from '../services/ApplicationUpdater';
 import BalanceUpdater from '../services/BalanceUpdater';
-import { capitalizeName, timeout } from '../utils/helper';
+import { capitalizeName } from '../utils/helper';
 import WalletModal from '../components/WalletModal';
 import { ChainId } from '@uniswap/sdk';
 import { ETHERSCAN_PREFIXES } from '../utils/constants';
@@ -17,7 +17,7 @@ import LoadingModal from '../components/Modals/LoadingModal';
 import ESMOperationModal from '../components/Modals/ESMOperationModal';
 import VotingOperationModal from '../components/Modals/VotingOperationModal';
 import styled from 'styled-components';
-import { geb, NETWORK_ID } from '../connectors';
+import { NETWORK_ID } from '../connectors';
 import IncentivesModal from '../components/Modals/IncentivesModal';
 import CookieBanner from '../components/CookieBanner';
 import BlockBodyContainer from '../components/BlockBodyContainer';
@@ -25,6 +25,8 @@ import { toast } from 'react-toastify';
 import ToastPayload from '../components/ToastPayload';
 import WaitingModal from '../components/Modals/WaitingModal';
 import TransactionUpdater from '../services/TransactionUpdater';
+import usePrevious from '../hooks/usePrevious';
+import { useHistory } from 'react-router-dom';
 
 interface Props {
   children: ReactNode;
@@ -33,21 +35,23 @@ interface Props {
 const Shared = ({ children }: Props) => {
   const { t } = useTranslation();
   const { chainId, account } = useActiveWeb3React();
+  const history = useHistory();
+  const previousAccount = usePrevious(account);
   const { settingsModel: settingsState } = useStoreState((state) => state);
 
   const {
     settingsModel: settingsActions,
-    connectWalletModel: connectedWalletActions,
-    safeModel: safeActions,
-    popupsModel: popupActions,
+    connectWalletModel: connectWalletActions,
+    popupsModel: popupsActions,
     transactionsModel: transactionsActions,
+    safeModel: safeActions,
   } = useStoreActions((state) => state);
   const toastId = 'networdToastHash';
   const networkChecker = useCallback(
     (id: ChainId) => {
       if (chainId && chainId !== id) {
         const chainName = ETHERSCAN_PREFIXES[id];
-        connectedWalletActions.setIsWrongNetwork(true);
+        connectWalletActions.setIsWrongNetwork(true);
         settingsActions.setBlockBody(true);
         toast(
           <ToastPayload
@@ -63,7 +67,7 @@ const Shared = ({ children }: Props) => {
       } else {
         toast.update(toastId, { autoClose: 1 });
         settingsActions.setBlockBody(false);
-        connectedWalletActions.setIsWrongNetwork(false);
+        connectWalletActions.setIsWrongNetwork(false);
         if (account) {
           toast(
             <ToastPayload
@@ -78,54 +82,30 @@ const Shared = ({ children }: Props) => {
         }
       }
     },
-    [account, chainId, connectedWalletActions, settingsActions, t]
+    [account, chainId, connectWalletActions, settingsActions, t]
   );
 
   const accountChecker = useCallback(
-    (account: string) => {
-      popupActions.setIsWaitingModalOpen(true);
-      geb
-        .getProxyAction(account)
-        .then(() => {
-          // Check if user have existing transactions
-          const txs = localStorage.getItem(`${account}-${chainId}`);
-          if (txs) {
-            transactionsActions.setTransactions(JSON.parse(txs));
-          }
-          popupActions.setWaitingPayload({
-            title: 'Checking for user safes',
-            status: 'loading',
-          });
-          // Check is user had already created safe
-          safeActions.fetchUserSafes(account).then(async (safes: any) => {
-            if (safes.length === 0) {
-              connectedWalletActions.setStep(2);
-            } else {
-              popupActions.setWaitingPayload({
-                title: 'Fetching user safes',
-                status: 'loading',
-              });
-              connectedWalletActions.setStep(1);
-              safeActions.setIsSafeCreated(true);
-              safeActions.setList(safes);
-              await timeout(200);
-            }
-          });
-        })
-        .catch((e) => {
-          console.log('e', e);
-          connectedWalletActions.setStep(1);
-        })
-        .finally(() =>
-          setTimeout(() => popupActions.setIsWaitingModalOpen(false), 1000)
-        );
+    async (account: string) => {
+      popupsActions.setIsWaitingModalOpen(true);
+      const isUserCreated = await connectWalletActions.fetchUser(account);
+      if (isUserCreated) {
+        const txs = localStorage.getItem(`${account}-${chainId}`);
+        if (txs) {
+          transactionsActions.setTransactions(JSON.parse(txs));
+        }
+      } else {
+        safeActions.setIsSafeCreated(false);
+        connectWalletActions.setStep(1);
+      }
+      setTimeout(() => popupsActions.setIsWaitingModalOpen(false), 1000);
     },
     [
-      chainId,
-      popupActions,
+      popupsActions,
+      connectWalletActions,
       safeActions,
+      chainId,
       transactionsActions,
-      connectedWalletActions,
     ]
   );
 
@@ -136,15 +116,34 @@ const Shared = ({ children }: Props) => {
     if (account) {
       accountChecker(account);
     } else {
-      connectedWalletActions.setStep(0);
+      connectWalletActions.setStep(0);
     }
-  }, [
-    chainId,
+  }, [chainId, account, networkChecker, accountChecker, connectWalletActions]);
+
+  function setSafeOptions() {
+    const isAccountSwitched =
+      account && previousAccount && account !== previousAccount;
+
+    if (isAccountSwitched) {
+      history.push('/');
+    }
+  }
+
+  const setSafeOptionsCallBack = useCallback(setSafeOptions, [
     account,
-    networkChecker,
-    accountChecker,
-    connectedWalletActions,
+    previousAccount,
+    chainId,
   ]);
+
+  useEffect(() => {
+    setSafeOptionsCallBack();
+  }, [setSafeOptionsCallBack]);
+
+  useEffect(() => {
+    if (account) {
+      safeActions.fetchUserSafes(account);
+    }
+  }, [account, safeActions]);
 
   return (
     <Container>

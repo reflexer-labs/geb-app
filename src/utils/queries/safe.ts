@@ -19,6 +19,9 @@ export const getUserSafesListQuery = (address: string) => `{
       value
     }
   }
+ erc20Balances(where: {address: "${address}"}) {
+  balance
+  }
 }`;
 
 export const getSafeByIdQuery = (safeId: string) => `{
@@ -41,6 +44,17 @@ export const getSafeByIdQuery = (safeId: string) => `{
   systemState(id: "current") {
     currentRedemptionPrice {
       value
+    }
+  }
+}`;
+
+export const getSafeHistoryQuery = (safeId: string) => `{
+  safes(where: {safeId: ${safeId}}){
+    modifySAFECollateralization {
+      deltaDebt
+      deltaCollateral
+      createdAt
+      createdAtTransaction
     }
   }
 }`;

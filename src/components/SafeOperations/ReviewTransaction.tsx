@@ -1,17 +1,16 @@
 import React from 'react';
-import { utils as gebUtils } from 'geb.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
 import SafeContent from './SafeContent';
 import Button from '../Button';
 import TransactionOverview from '../TransactionOverview';
-import { DEFAULT_SAFE_STATE, SUPPORTED_WALLETS } from '../../utils/constants';
-import { injected } from '../../connectors';
+import { DEFAULT_SAFE_STATE } from '../../utils/constants';
 import { useActiveWeb3React } from '../../hooks';
+import { handleTransactionError } from '../../hooks/TransactionHooks';
+import { returnConnectorName, timeout } from '../../utils/helper';
 
 const ReviewTransaction = () => {
-  const isMetamask = window?.ethereum?.isMetaMask;
   const { account, connector, library } = useActiveWeb3React();
   const { t } = useTranslation();
 
@@ -30,7 +29,7 @@ const ReviewTransaction = () => {
     collateralRatio,
     rightInput,
     liquidationPrice,
-  } = safeState.createSafeDefault;
+  } = safeState.safeData;
 
   const handleCancel = () => {
     safeState.isUniSwapPoolChecked
@@ -63,67 +62,33 @@ const ReviewTransaction = () => {
       try {
         if (type === 'deposit_borrow' && isCreate) {
           await safeActions.createSafe({
-            createSafeDefault: safeState.createSafeDefault,
+            safeData: safeState.safeData,
             signer,
           });
         } else if (type === 'deposit_borrow' && safeState.singleSafe) {
           await safeActions.depositAndBorrow({
-            createSafeDefault: safeState.createSafeDefault,
+            safeData: safeState.safeData,
             signer,
             safeId: safeState.singleSafe.id,
           });
         } else if (type === 'repay_withdraw' && safeState.singleSafe) {
           await safeActions.repayAndWithdraw({
-            createSafeDefault: safeState.createSafeDefault,
+            safeData: safeState.safeData,
             signer,
             safeId: safeState.singleSafe.id,
           });
         }
-
+        await timeout(3000);
         await safeActions.fetchUserSafes(account);
         safeActions.setIsSafeCreated(true);
       } catch (e) {
-        console.log(e);
-        if (e?.code === 4001) {
-          popupsActions.setWaitingPayload({
-            title: 'Transaction Rejected.',
-            status: 'error',
-          });
-          return;
-        } else {
-          popupsActions.setWaitingPayload({
-            title: 'Transaction Failed.',
-            status: 'error',
-          });
-          console.error(`Transaction failed`, e);
-          console.log('Required String', gebUtils.getRequireString(e));
-        }
+        handleTransactionError(e);
       } finally {
         safeActions.setStage(0);
         safeActions.setUniSwapPool(DEFAULT_SAFE_STATE);
-        safeActions.setCreateSafeDefault(DEFAULT_SAFE_STATE);
+        safeActions.setSafeData(DEFAULT_SAFE_STATE);
       }
     }
-  };
-
-  const returnConnectorName = () => {
-    return Object.keys(SUPPORTED_WALLETS)
-      .map((key) => {
-        const option = SUPPORTED_WALLETS[key];
-        if (option.connector === connector) {
-          if (option.connector === injected) {
-            if (isMetamask && option.name !== 'MetaMask') {
-              return null;
-            }
-            if (!isMetamask && option.name === 'MetaMask') {
-              return null;
-            }
-          }
-          return option.name !== 'Injected' ? option.name : null;
-        }
-        return null;
-      })
-      .filter((x: string | null) => x !== null)[0];
   };
 
   return (
@@ -134,24 +99,32 @@ const ReviewTransaction = () => {
           title={t('confirm_transaction_details')}
           description={
             t('confirm_details_text') +
-            (returnConnectorName() ? 'on ' + returnConnectorName() : '')
+            (returnConnectorName(connector)
+              ? 'on ' + returnConnectorName(connector)
+              : '')
           }
         />
         <Result>
           <Block>
             <Item>
-              <Label>{'ETH Deposited'}</Label> <Value>{leftInput}</Value>
+              <Label>
+                {type === 'repay_withdraw' ? 'ETH Withdrew' : 'ETH Deposited'}
+              </Label>{' '}
+              <Value>{leftInput}</Value>
             </Item>
             <Item>
-              <Label>{'RAI Borrowed'}</Label> <Value>{rightInput}</Value>
+              <Label>
+                {type === 'repay_withdraw' ? 'RAI Rapaid' : 'RAI Borrowed'}
+              </Label>{' '}
+              <Value>{rightInput}</Value>
             </Item>
             <Item>
               <Label>{'Collateral Ratio'}</Label>{' '}
-              <Value>{`${collateralRatio}%`}</Value>
+              <Value>{`${collateralRatio > 0 ? collateralRatio : 0}%`}</Value>
             </Item>
             <Item>
               <Label>{'Liquidation Price'}</Label>{' '}
-              <Value>{`$${liquidationPrice}`}</Value>
+              <Value>{`$${liquidationPrice > 0 ? liquidationPrice : 0}`}</Value>
             </Item>
           </Block>
 

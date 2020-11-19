@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'react-feather';
@@ -9,12 +9,10 @@ import PageHeader from '../../components/PageHeader';
 import SafeList from './SafeList';
 import Button from '../../components/Button';
 import { useActiveWeb3React } from '../../hooks';
-import usePrevious from '../../hooks/usePrevious';
 
 const OnBoarding = () => {
   const { t } = useTranslation();
-  const { account } = useActiveWeb3React();
-  const previousAccount = usePrevious(account);
+  const { account, chainId } = useActiveWeb3React();
 
   const {
     connectWalletModel: connectWalletState,
@@ -24,20 +22,27 @@ const OnBoarding = () => {
   const {
     popupsModel: popupsActions,
     safeModel: safeActions,
-    connectWalletModel: connectWalletActions,
   } = useStoreActions((state) => state);
 
-  useEffect(() => {
-    const isLoggedOut = !account;
-    const isAccountSwitched =
-      account && previousAccount && account !== previousAccount;
+  const { isUserCreated } = connectWalletState;
 
-    if (isLoggedOut || isAccountSwitched) {
-      safeActions.setIsSafeCreated(false);
-      connectWalletActions.setStep(0);
-    }
-    // eslint-disable-next-line
-  }, [account, previousAccount]);
+  function fetchUserSafes() {
+    if (!account || !chainId || !isUserCreated) return null;
+    popupsActions.setWaitingPayload({
+      title: 'Checking for user safes',
+      status: 'loading',
+    });
+    safeActions.fetchUserSafes(account);
+  }
+
+  const fetchUserCallBack = useCallback(fetchUserSafes, [
+    isUserCreated,
+    account,
+  ]);
+
+  useEffect(() => {
+    fetchUserCallBack();
+  }, [fetchUserCallBack]);
 
   return (
     <Container>
