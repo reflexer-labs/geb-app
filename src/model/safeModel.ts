@@ -35,7 +35,7 @@ export interface SafeModel {
   historyList: Array<ISafeHistory>;
   depositAndBorrow: Thunk<
     SafeModel,
-    ISafePayload & { safeId: string },
+    ISafePayload & { safeId?: string },
     any,
     StoreModel
   >;
@@ -137,7 +137,7 @@ const safeModel: SafeModel = {
         chainId,
         hash,
         from: txResponse.from,
-        summary: 'Modifying Safe',
+        summary: payload.safeId ? 'Modifying Safe' : 'Creating a new Safe',
         addedTime: new Date().getTime(),
         originalTx: txResponse,
       });
@@ -220,6 +220,7 @@ const safeModel: SafeModel = {
     actions.setLiquidationData({
       ...res.collateralType,
       currentRedemptionPrice: res.currentRedemptionPrice,
+      globalDebt: res.globalDebt,
     });
     storeActions.connectWalletModel.updatePraiBalance({
       chainId: NETWORK_ID,

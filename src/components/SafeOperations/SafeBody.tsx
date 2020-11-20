@@ -175,6 +175,10 @@ const SafeBody = ({ isChecked }: Props) => {
       toFixedString(getAvailableRai().toString(), 'WAD')
     );
 
+    const praiBalanceBN = BigNumber.from(
+      toFixedString(praiBalance.toString(), 'WAD')
+    );
+
     const leftInputBN = defaultSafe.leftInput
       ? BigNumber.from(toFixedString(defaultSafe.leftInput, 'WAD'))
       : BigNumber.from('0');
@@ -189,21 +193,10 @@ const SafeBody = ({ isChecked }: Props) => {
       toFixedString(accumulatedRate, 'RAY')
     );
 
-    const globalDebtBN = BigNumber.from(toFixedString(globalDebt, 'WAD'));
-    const debtCeilingBN = BigNumber.from(toFixedString(debtCeiling, 'WAD'));
+    const globalDebtBN = BigNumber.from(toFixedString(globalDebt, 'RAD'));
+    const debtCeilingBN = BigNumber.from(toFixedString(debtCeiling, 'RAD'));
 
     if (type === 'deposit_borrow') {
-      if (
-        defaultSafe.rightInput &&
-        !rightInputBN.isZero() &&
-        rightInputBN.lt(debtFloorBN)
-      ) {
-        setError(
-          `The resulting debt should be at least ${debtFloor} RAI or zero.`
-        );
-        return false;
-      }
-
       if (leftInputBN.gt(availableEthBN)) {
         setError('Insufficient balance.');
         return false;
@@ -239,18 +232,6 @@ const SafeBody = ({ isChecked }: Props) => {
         return false;
       }
 
-      if (
-        defaultSafe.rightInput &&
-        !rightInputBN.isZero() &&
-        !totalDebtBN.isZero() &&
-        totalDebtBN.mul(accumlatedRateBN).lt(debtFloorBN.mul(gebUtils.RAY))
-      ) {
-        setError(
-          `The resulting debt should be at least ${debtFloor} RAI or zero.`
-        );
-        return false;
-      }
-
       if (!rightInputBN.isZero()) {
         const repayPercent = returnPercentAmount(
           defaultSafe.rightInput,
@@ -267,6 +248,23 @@ const SafeBody = ({ isChecked }: Props) => {
           return false;
         }
       }
+
+      if (!rightInputBN.isZero() && rightInputBN.gt(praiBalanceBN)) {
+        setError(`ballance_issue`);
+        return false;
+      }
+    }
+
+    if (
+      defaultSafe.rightInput &&
+      !rightInputBN.isZero() &&
+      !totalDebtBN.isZero() &&
+      totalDebtBN.mul(accumlatedRateBN).lt(debtFloorBN.mul(gebUtils.RAY))
+    ) {
+      setError(
+        `The resulting debt should be at least ${debtFloor} RAI or zero.`
+      );
+      return false;
     }
 
     const isSafe = safeIsSafe(
@@ -305,6 +303,27 @@ const SafeBody = ({ isChecked }: Props) => {
     return false;
   };
 
+  const returnMaxRepayValue = () => {
+    const availableRaiBN = BigNumber.from(
+      toFixedString(getAvailableRai().toString(), 'WAD')
+    );
+    const praiBalanceBN = BigNumber.from(
+      toFixedString(praiBalance.toString(), 'WAD')
+    );
+    const diff = gebUtils
+      .wadToFixed(availableRaiBN.sub(praiBalanceBN))
+      .toString();
+
+    return (
+      <>
+        Insufficient RAI balance, You can only repay a maximum of
+        <InlineBtn title={'Set Value'} onClick={() => onChangeRight(diff)}>
+          {diff}
+        </InlineBtn>
+      </>
+    );
+  };
+
   const submitDefaultValues = () => {
     const passedValidation = isPassedValidation();
     if (passedValidation) {
@@ -314,8 +333,11 @@ const SafeBody = ({ isChecked }: Props) => {
       if (!defaultSafe.rightInput) {
         defaultSafe.rightInput = '0';
       }
+
       safeActions.setSafeData({
         ...defaultSafe,
+        totalCollateral,
+        totalDebt,
         collateralRatio: collateralRatio as number,
         liquidationPrice: liquidationPrice as number,
       });
@@ -414,7 +436,11 @@ const SafeBody = ({ isChecked }: Props) => {
           />
         </DoubleInput>
 
-        {error && <Error>{error}</Error>}
+        {error && (
+          <Error>
+            {error === 'ballance_issue' ? returnMaxRepayValue() : error}
+          </Error>
+        )}
 
         {isChecked ? (
           <DoubleInput>
@@ -624,4 +650,16 @@ const Error = styled.p`
   font-size: ${(props) => props.theme.font.extraSmall};
   width: 100%;
   margin: 16px 0;
+`;
+
+const InlineBtn = styled.button`
+  background: none;
+  box-shadow: none;
+  border: 0;
+  cursor: pointer;
+  outline: none;
+  &:hover {
+    text-decoration: undeline;
+    color: ${(props) => props.theme.colors.inputBorderColor};
+  }
 `;

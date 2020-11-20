@@ -72,7 +72,6 @@ export const fetchSafeById = (safeId: string, address: string) => {
       if (!res.data.data && attempt < GRAPH_API_URLS.length) {
         throw new Error('retry');
       }
-
       const safe = formatUserSafe(res.data.data.safes, {
         ...res.data.data.collateralType,
         currentRedemptionPrice:
@@ -80,8 +79,7 @@ export const fetchSafeById = (safeId: string, address: string) => {
       });
       const safeHistory = formatHistoryArray(
         res.data.data.safes[0].modifySAFECollateralization,
-        res.data.data.safes[0].liquidationFixedDiscount,
-        res.data.data.collateralType.accumulatedRate
+        res.data.data.safes[0].liquidationFixedDiscount
       );
 
       const proxyData =

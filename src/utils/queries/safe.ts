@@ -44,6 +44,7 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
       deltaCollateral
       createdAt
       createdAtTransaction
+      accumulatedRate
     }
     liquidationFixedDiscount {
       sellInitialAmount

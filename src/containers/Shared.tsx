@@ -47,103 +47,84 @@ const Shared = ({ children }: Props) => {
     safeModel: safeActions,
   } = useStoreActions((state) => state);
   const toastId = 'networdToastHash';
-  const networkChecker = useCallback(
-    (id: ChainId) => {
-      if (chainId && chainId !== id) {
-        const chainName = ETHERSCAN_PREFIXES[id];
-        connectWalletActions.setIsWrongNetwork(true);
-        settingsActions.setBlockBody(true);
-        toast(
-          <ToastPayload
-            icon={'AlertTriangle'}
-            iconSize={40}
-            iconColor={'orange'}
-            text={`${t('wrong_network')} ${capitalizeName(
-              chainName === '' ? 'Mainnet' : chainName
-            )}`}
-          />,
-          { autoClose: false, type: 'warning', toastId }
-        );
-      } else {
-        toast.update(toastId, { autoClose: 1 });
-        settingsActions.setBlockBody(false);
-        connectWalletActions.setIsWrongNetwork(false);
-        if (account) {
-          toast(
-            <ToastPayload
-              icon={'Check'}
-              iconColor={'green'}
-              text={t('wallet_connected')}
-            />,
-            {
-              type: 'success',
-            }
-          );
-        }
-      }
-    },
-    [account, chainId, connectWalletActions, settingsActions, t]
-  );
 
-  const accountChecker = useCallback(
-    async (account: string) => {
-      popupsActions.setIsWaitingModalOpen(true);
-      const isUserCreated = await connectWalletActions.fetchUser(account);
-      if (isUserCreated) {
-        const txs = localStorage.getItem(`${account}-${chainId}`);
-        if (txs) {
-          transactionsActions.setTransactions(JSON.parse(txs));
-        }
-      } else {
-        safeActions.setIsSafeCreated(false);
-        connectWalletActions.setStep(1);
+  async function accountChecker() {
+    if (!account || !chainId) return;
+    popupsActions.setIsWaitingModalOpen(true);
+    const isUserCreated = await connectWalletActions.fetchUser(account);
+    if (isUserCreated) {
+      const txs = localStorage.getItem(`${account}-${chainId}`);
+      if (txs) {
+        transactionsActions.setTransactions(JSON.parse(txs));
       }
-      setTimeout(() => popupsActions.setIsWaitingModalOpen(false), 1000);
-    },
-    [
-      popupsActions,
-      connectWalletActions,
-      safeActions,
-      chainId,
-      transactionsActions,
-    ]
-  );
-
-  useEffect(() => {
-    if (chainId) {
-      networkChecker(NETWORK_ID);
-    }
-    if (account) {
-      accountChecker(account);
+      safeActions.fetchUserSafes(account);
     } else {
-      connectWalletActions.setStep(0);
+      safeActions.setIsSafeCreated(false);
+      connectWalletActions.setStep(1);
     }
-  }, [chainId, account, networkChecker, accountChecker, connectWalletActions]);
+    setTimeout(() => popupsActions.setIsWaitingModalOpen(false), 1000);
+  }
 
-  function setSafeOptions() {
+  function accountChange() {
     const isAccountSwitched =
       account && previousAccount && account !== previousAccount;
-
+    if (!account) {
+      connectWalletActions.setStep(0);
+      safeActions.setIsSafeCreated(false);
+      connectWalletActions.setIsUserCreated(false);
+    }
     if (isAccountSwitched) {
       history.push('/');
     }
   }
 
-  const setSafeOptionsCallBack = useCallback(setSafeOptions, [
+  function networkChecker() {
+    accountChange();
+    const id: ChainId = NETWORK_ID;
+    if (chainId && chainId !== id) {
+      const chainName = ETHERSCAN_PREFIXES[id];
+      connectWalletActions.setIsWrongNetwork(true);
+      settingsActions.setBlockBody(true);
+      toast(
+        <ToastPayload
+          icon={'AlertTriangle'}
+          iconSize={40}
+          iconColor={'orange'}
+          text={`${t('wrong_network')} ${capitalizeName(
+            chainName === '' ? 'Mainnet' : chainName
+          )}`}
+        />,
+        { autoClose: false, type: 'warning', toastId }
+      );
+    } else {
+      toast.update(toastId, { autoClose: 1 });
+      settingsActions.setBlockBody(false);
+      connectWalletActions.setIsWrongNetwork(false);
+      if (account) {
+        toast(
+          <ToastPayload
+            icon={'Check'}
+            iconColor={'green'}
+            text={t('wallet_connected')}
+          />,
+          {
+            type: 'success',
+          }
+        );
+        connectWalletActions.setStep(1);
+        accountChecker();
+      }
+    }
+  }
+
+  const networkCheckerCallBack = useCallback(networkChecker, [
     account,
-    previousAccount,
     chainId,
   ]);
 
   useEffect(() => {
-    setSafeOptionsCallBack();
-  }, [setSafeOptionsCallBack]);
-
-  useEffect(() => {
-    if (account) {
-      safeActions.fetchUserSafes(account);
-    }
-  }, [account, safeActions]);
+    networkCheckerCallBack();
+  }, [networkCheckerCallBack]);
 
   return (
     <Container>

@@ -8,7 +8,7 @@ import TransactionOverview from '../TransactionOverview';
 import { DEFAULT_SAFE_STATE } from '../../utils/constants';
 import { useActiveWeb3React } from '../../hooks';
 import { handleTransactionError } from '../../hooks/TransactionHooks';
-import { formatNumber, returnConnectorName, timeout } from '../../utils/helper';
+import { formatNumber, returnConnectorName } from '../../utils/helper';
 
 const ReviewTransaction = () => {
   const { account, connector, library } = useActiveWeb3React();
@@ -41,7 +41,10 @@ const ReviewTransaction = () => {
   };
 
   const handleWaitingTitle = () => {
-    return 'Modifying Safe';
+    if (!isCreate) {
+      return 'Modifying Safe';
+    }
+    return 'Creating a new Safe';
   };
 
   const handleConfirm = async () => {
@@ -61,7 +64,7 @@ const ReviewTransaction = () => {
       const signer = library.getSigner(account);
       try {
         if (type === 'deposit_borrow' && isCreate) {
-          await safeActions.createSafe({
+          await safeActions.depositAndBorrow({
             safeData: safeState.safeData,
             signer,
           });
@@ -82,9 +85,8 @@ const ReviewTransaction = () => {
         safeActions.setUniSwapPool(DEFAULT_SAFE_STATE);
         safeActions.setSafeData(DEFAULT_SAFE_STATE);
         connectWalletActions.setIsStepLoading(true);
-        await timeout(3000);
-        await safeActions.fetchUserSafes(account);
         safeActions.setIsSafeCreated(true);
+        await safeActions.fetchUserSafes(account);
       } catch (e) {
         handleTransactionError(e);
       } finally {
@@ -115,13 +117,13 @@ const ReviewTransaction = () => {
               <Label>
                 {type === 'repay_withdraw' ? 'ETH Withdrew' : 'ETH Deposited'}
               </Label>{' '}
-              <Value>{formatNumber(leftInput)}</Value>
+              <Value>{leftInput}</Value>
             </Item>
             <Item>
               <Label>
                 {type === 'repay_withdraw' ? 'RAI Rapaid' : 'RAI Borrowed'}
               </Label>{' '}
-              <Value>{formatNumber(rightInput)}</Value>
+              <Value>{rightInput}</Value>
             </Item>
             <Item>
               <Label>{'Total ETH Collateral'}</Label>{' '}

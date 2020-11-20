@@ -1,5 +1,5 @@
 import { utils as ethersUtils } from 'ethers';
-import { Geb, utils as gebUtils } from 'geb.js';
+import { Geb, TransactionRequest, utils as gebUtils } from 'geb.js';
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
 import { ISafeData } from '../utils/interfaces';
 import { ETH_NETWORK } from '../utils/constants';
@@ -12,15 +12,16 @@ export const handleSafeCreation = async (
   if (!signer || !safeData) {
     return false;
   }
-  const geb = new Geb(ETH_NETWORK, signer.provider);
+  const collateralBN = ethersUtils.parseEther(safeData.leftInput);
+  const debtBN = ethersUtils.parseEther(safeData.rightInput);
 
-  const raiToDraw = ethersUtils.parseEther(safeData.rightInput);
+  const geb = new Geb(ETH_NETWORK, signer.provider);
 
   const proxy = await geb.getProxyAction(signer._address);
   const txData = proxy.openLockETHAndGenerateDebt(
-    ethersUtils.parseEther(safeData.leftInput),
+    collateralBN,
     gebUtils.ETH_A,
-    raiToDraw
+    debtBN
   );
 
   const tx = await handlePreTxGasEstimate(signer, txData);
@@ -32,21 +33,38 @@ export const handleSafeCreation = async (
 export const handleDepositAndBorrow = async (
   signer: JsonRpcSigner,
   safeData: ISafeData,
-  safeId: string
+  safeId = ''
 ) => {
   if (!signer || !safeData) {
     return false;
   }
+
+  const collateralBN = ethersUtils.parseEther(safeData.leftInput);
+  const debtBN = ethersUtils.parseEther(safeData.rightInput);
+
   const geb = new Geb(ETH_NETWORK, signer.provider);
 
-  const raiToDraw = ethersUtils.parseEther(safeData.rightInput);
-
   const proxy = await geb.getProxyAction(signer._address);
-  const txData = proxy.lockETHAndGenerateDebt(
-    ethersUtils.parseEther(safeData.leftInput),
-    safeId,
-    raiToDraw
-  );
+
+  let txData: TransactionRequest = {};
+
+  if (safeId) {
+    if (collateralBN.isZero() && !debtBN.isZero()) {
+      txData = proxy.generateDebt(safeId, debtBN);
+    } else if (!collateralBN.isZero() && debtBN.isZero()) {
+      txData = proxy.lockETH(collateralBN, safeId);
+    } else {
+      txData = proxy.lockETHAndGenerateDebt(collateralBN, safeId, debtBN);
+    }
+  } else {
+    txData = proxy.openLockETHAndGenerateDebt(
+      collateralBN,
+      gebUtils.ETH_A,
+      debtBN
+    );
+  }
+
+  if (!txData) throw new Error('No transaction request!');
 
   const tx = await handlePreTxGasEstimate(signer, txData);
 
@@ -62,13 +80,26 @@ export const handleRepayAndWithdraw = async (
   if (!signer || !safeData) {
     return false;
   }
+  if (!safeId) throw new Error('No safe Id');
+
   const geb = new Geb(ETH_NETWORK, signer.provider);
 
   const ethToFree = ethersUtils.parseEther(safeData.leftInput);
   const raiToRepay = ethersUtils.parseEther(safeData.rightInput);
 
   const proxy = await geb.getProxyAction(signer._address);
-  const txData = proxy.repayDebtAndFreeETH(safeId, ethToFree, raiToRepay);
+
+  let txData: TransactionRequest = {};
+
+  if (ethToFree.isZero() && !raiToRepay.isZero()) {
+    txData = proxy.repayDebt(safeId, raiToRepay);
+  } else if (!ethToFree.isZero() && raiToRepay.isZero()) {
+    txData = proxy.freeETH(safeId, ethToFree);
+  } else {
+    txData = proxy.repayDebtAndFreeETH(safeId, ethToFree, raiToRepay);
+  }
+
+  if (!txData) throw new Error('No transaction request!');
 
   const tx = await handlePreTxGasEstimate(signer, txData);
 
