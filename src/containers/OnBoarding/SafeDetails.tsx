@@ -9,7 +9,10 @@ import { isNumeric } from '../../utils/validations';
 
 const SafeDetails = ({ ...props }) => {
   const { t } = useTranslation();
-  const { safeModel: safeActions } = useStoreActions((state) => state);
+  const {
+    safeModel: safeActions,
+    popupsModel: popupsActions,
+  } = useStoreActions((state) => state);
   const { safeModel: safeState } = useStoreState((state) => state);
   const safeId = props.match.params.id as string;
 
@@ -17,10 +20,28 @@ const SafeDetails = ({ ...props }) => {
     if (!isNumeric(safeId)) {
       props.history.push('/');
     }
-    safeActions.fetchSafeById(safeId);
-    return () => safeActions.setSingleSafe(null);
-    // eslint-disable-next-line
-  }, []);
+
+    async function fetchSafe() {
+      popupsActions.setIsWaitingModalOpen(true);
+      popupsActions.setWaitingPayload({
+        title: 'Fetching Safe Data',
+        status: 'loading',
+      });
+      await safeActions.fetchSafeById(safeId);
+      popupsActions.setIsWaitingModalOpen(false);
+    }
+
+    fetchSafe();
+
+    const interval = setInterval(() => {
+      safeActions.fetchSafeById(safeId);
+    }, 2000);
+
+    return () => {
+      safeActions.setSingleSafe(null);
+      clearInterval(interval);
+    };
+  }, [popupsActions, props.history, safeActions, safeId]);
 
   return (
     <>

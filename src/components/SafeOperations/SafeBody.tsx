@@ -143,7 +143,7 @@ const SafeBody = ({ isChecked }: Props) => {
     if (type === 'repay_withdraw' && singleSafe && !isLeft) {
       return `Repay RAI (Owe: ${formatNumber(
         getAvailableRai()
-      )}, Avail: ${praiBalance.toFixed(4)})`;
+      )}, Avail: ${formatNumber(praiBalance.toString())})`;
     }
     return '';
   };

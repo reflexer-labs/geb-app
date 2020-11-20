@@ -215,10 +215,10 @@ export const ratioChecker = (liquitdationRatio: number) => {
     return 'Low';
   } else if (liquitdationRatio < 300 && liquitdationRatio >= 200) {
     return 'Medium';
-  } else if (liquitdationRatio === 0) {
-    return '';
-  } else {
+  } else if (liquitdationRatio < 200 && liquitdationRatio > 0) {
     return 'High';
+  } else {
+    return '';
   }
 };
 

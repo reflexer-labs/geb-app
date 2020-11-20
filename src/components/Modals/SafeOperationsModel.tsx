@@ -5,7 +5,9 @@ import Modal from './Modal';
 import { DEFAULT_SAFE_STATE } from '../../utils/constants';
 
 const CreateAccountModal = () => {
-  const { popupsModel: popupsState } = useStoreState((state) => state);
+  const { popupsModel: popupsState, safeModel: safeState } = useStoreState(
+    (state) => state
+  );
   const {
     popupsModel: popupsActions,
     safeModel: safeActions,
@@ -27,7 +29,7 @@ const CreateAccountModal = () => {
     <Modal
       isModalOpen={popupsState.safeOperationPayload.isOpen}
       handleModalContent
-      backDropClose
+      backDropClose={!safeState.blockBackdrop}
       closeModal={handleCancel}
     >
       <SafeContainer />

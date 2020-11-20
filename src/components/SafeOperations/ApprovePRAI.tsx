@@ -25,10 +25,14 @@ const ApprovePRAI = () => {
 
   const addTransaction = useTransactionAdder();
 
-  const { connectWalletModel: connectWalletState } = useStoreState(
-    (state) => state
-  );
-  const { safeModel: safeActions } = useStoreActions((state) => state);
+  const {
+    connectWalletModel: connectWalletState,
+    safeModel: safeState,
+  } = useStoreState((state) => state);
+  const {
+    safeModel: safeActions,
+    connectWalletModel: connectWalletActions,
+  } = useStoreActions((state) => state);
 
   const { proxyAddress } = connectWalletState;
 
@@ -53,6 +57,7 @@ const ApprovePRAI = () => {
           'No proxy address, disconnect your wallet and reconnect it again'
         );
       }
+      safeActions.setBlockBackdrop(true);
       setTextPayload({
         title: 'Waiting for confirmation',
         text: 'Confirm this transaction in your wallet',
@@ -77,9 +82,12 @@ const ApprovePRAI = () => {
         text: 'PRAI unlocked successfully, proceeding to review transaction...',
         status: 'success',
       });
+      await connectWalletActions.fetchUser(account);
       await timeout(2000);
       safeActions.setStage(3);
+      safeActions.setBlockBackdrop(false);
     } catch (e) {
+      safeActions.setBlockBackdrop(false);
       if (e?.code === 4001) {
         setTextPayload({
           title: 'Transaction Rejected.',
@@ -100,13 +108,15 @@ const ApprovePRAI = () => {
   return (
     <Container>
       <InnerContainer>
-        <BackContainer>
-          <Button
-            dimmedWithArrow
-            text={'back'}
-            onClick={() => safeActions.setStage(1)}
-          />
-        </BackContainer>
+        {safeState.blockBackdrop ? null : (
+          <BackContainer>
+            <Button
+              dimmedWithArrow
+              text={'back'}
+              onClick={() => safeActions.setStage(1)}
+            />
+          </BackContainer>
+        )}
         <ImgContainer>{returnStatusIcon(textPayload.status)}</ImgContainer>
         <Title>{textPayload.title}</Title>
 
