@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
 import StepsContent from './StepsContent';
@@ -11,7 +11,6 @@ import {
 
 const Steps = () => {
   const { account, library } = useActiveWeb3React();
-  const [isLoading, setIsLoading] = useState(false);
 
   const { connectWalletModel: connectWalletState } = useStoreState(
     (state) => state
@@ -23,14 +22,14 @@ const Steps = () => {
 
   const addTransaction = useTransactionAdder();
 
-  const { step, isWrongNetwork } = connectWalletState;
+  const { step, isWrongNetwork, isStepLoading } = connectWalletState;
 
   const handleConnectWallet = () =>
     popupsActions.setIsConnectorsWalletOpen(true);
 
   const handleCreateAccount = async () => {
     if (!account || !library) return false;
-    setIsLoading(true);
+    connectWalletActions.setIsStepLoading(true);
     const txData = geb.deployProxy();
     const signer = library.getSigner(account);
 
@@ -54,7 +53,7 @@ const Steps = () => {
     } catch (e) {
       handleTransactionError(e);
     } finally {
-      setIsLoading(false);
+      connectWalletActions.setIsStepLoading(false);
     }
   };
 
@@ -76,7 +75,7 @@ const Steps = () => {
             btnText={'connect_wallet'}
             handleClick={handleConnectWallet}
             isDisabled={isWrongNetwork}
-            isLoading={isLoading}
+            isLoading={isStepLoading}
           />
         );
       case 1:
@@ -87,7 +86,7 @@ const Steps = () => {
             btnText={'create_account'}
             handleClick={handleCreateAccount}
             isDisabled={isWrongNetwork}
-            isLoading={isLoading}
+            isLoading={isStepLoading}
           />
         );
       case 2:
@@ -98,7 +97,7 @@ const Steps = () => {
             btnText={'create_safe'}
             handleClick={handleCreateSafe}
             isDisabled={isWrongNetwork}
-            isLoading={isLoading}
+            isLoading={isStepLoading}
           />
         );
       default:

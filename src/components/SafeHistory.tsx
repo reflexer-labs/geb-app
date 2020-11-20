@@ -59,7 +59,7 @@ const SafeHistory = ({ hideHistory }: Props) => {
           <Thead>Receipt</Thead>
         </Header>
       )}
-      <Scrollbars autoHeight autoHeightMax={'35.5vh'} style={{ width: '100%' }}>
+      <Scrollbars autoHeight autoHeightMax={'36vh'} style={{ width: '100%' }}>
         {!hideHistory || safeState.historyList.length > 0 ? (
           <List>
             {safeState.historyList.map((item: ISafeHistory, i: number) =>

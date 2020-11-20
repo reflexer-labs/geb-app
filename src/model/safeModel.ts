@@ -94,6 +94,7 @@ const safeModel: SafeModel = {
   historyList: [],
   createSafe: thunk(async (actions, payload, { getStoreActions }) => {
     const storeActions = getStoreActions();
+    storeActions.connectWalletModel.setIsStepLoading(true);
     const txResponse = await handleSafeCreation(
       payload.signer,
       payload.safeData

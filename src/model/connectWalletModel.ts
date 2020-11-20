@@ -15,6 +15,7 @@ export interface ConnectWalletModel {
   ethBalance: ITokenBalance;
   praiBalance: ITokenBalance;
   isWrongNetwork: boolean;
+  isStepLoading: boolean;
   fetchFiatPrice: Thunk<ConnectWalletModel>;
   setFiatPrice: Action<ConnectWalletModel, number>;
   setIsWrongNetwork: Action<ConnectWalletModel, boolean>;
@@ -35,6 +36,7 @@ export interface ConnectWalletModel {
   setIsUserCreated: Action<ConnectWalletModel, boolean>;
   setProxyAddress: Action<ConnectWalletModel, string>;
   setCoinAllowance: Action<ConnectWalletModel, string>;
+  setIsStepLoading: Action<ConnectWalletModel, boolean>;
 }
 
 const connectWalletModel: ConnectWalletModel = {
@@ -45,6 +47,7 @@ const connectWalletModel: ConnectWalletModel = {
   step: 0,
   proxyAddress: '',
   coinAllowance: '',
+  isStepLoading: false,
   isWrongNetwork: false,
   isUserCreated: false,
   fetchFiatPrice: thunk(async (actions, payload) => {
@@ -108,6 +111,7 @@ const connectWalletModel: ConnectWalletModel = {
   }),
   setStep: action((state, payload) => {
     state.step = payload;
+    state.isStepLoading = false;
   }),
   setIsUserCreated: action((state, payload) => {
     state.isUserCreated = payload;
@@ -117,6 +121,9 @@ const connectWalletModel: ConnectWalletModel = {
   }),
   setCoinAllowance: action((state, payload) => {
     state.coinAllowance = payload;
+  }),
+  setIsStepLoading: action((state, payload) => {
+    state.isStepLoading = payload;
   }),
 };
 

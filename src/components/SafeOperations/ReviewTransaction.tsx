@@ -17,6 +17,7 @@ const ReviewTransaction = () => {
   const {
     popupsModel: popupsActions,
     safeModel: safeActions,
+    connectWalletModel: connectWalletActions,
   } = useStoreActions((state) => state);
   const { safeModel: safeState, popupsModel: popupsState } = useStoreState(
     (state) => state
@@ -89,6 +90,7 @@ const ReviewTransaction = () => {
         safeActions.setStage(0);
         safeActions.setUniSwapPool(DEFAULT_SAFE_STATE);
         safeActions.setSafeData(DEFAULT_SAFE_STATE);
+        connectWalletActions.setIsStepLoading(true);
       }
     }
   };
