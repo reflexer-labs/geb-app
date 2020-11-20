@@ -322,18 +322,20 @@ export const formatHistoryArray = (
   const items: Array<ISafeHistory> = [];
   const networkId = NETWORK_ID;
 
+  history = history.sort((a, b) => Number(a.createdAt) - Number(b.createdAt));
+
   items.push({
     title: 'Open Safe',
-    txHash: history[history.length - 1].createdAtTransaction,
-    date: Number(history[history.length - 1].createdAt - 1).toString(),
+    txHash: history[0].createdAtTransaction,
+    date: Number(history[0].createdAt - 1).toString(),
     amount: 0,
     link: getEtherscanLink(
       networkId,
-      history[history.length - 1].createdAtTransaction,
+      history[0].createdAtTransaction,
       'transaction'
     ),
     icon: 'ArrowRightCircle',
-    isEth: true,
+    color: '',
   });
 
   for (let i of liquidationItems) {
@@ -343,8 +345,8 @@ export const formatHistoryArray = (
       amount: parseFloat(i.sellInitialAmount) - parseFloat(i.sellAmount),
       link: getEtherscanLink(networkId, i.createdAtTransaction, 'transaction'),
       txHash: i.createdAtTransaction,
-      icon: 'Zap',
-      isEth: true,
+      icon: 'XCircle',
+      color: 'red',
     });
   }
 
@@ -360,7 +362,6 @@ export const formatHistoryArray = (
         item.createdAtTransaction,
         'transaction'
       ),
-      isEth: true,
     };
     if (deltaDebt > 0) {
       items.push({
@@ -368,7 +369,7 @@ export const formatHistoryArray = (
         title: 'Borrowed RAI',
         amount: deltaDebt,
         icon: 'ArrowUpCircle',
-        isEth: false,
+        color: 'green',
       });
     }
     if (deltaDebt < 0) {
@@ -377,7 +378,7 @@ export const formatHistoryArray = (
         title: 'Repaid RAI',
         amount: -1 * deltaDebt,
         icon: 'ArrowDownCircle',
-        isEth: false,
+        color: 'green',
       });
     }
     if (deltaCollateral > 0) {
@@ -386,6 +387,7 @@ export const formatHistoryArray = (
         title: 'Deposited ETH',
         amount: deltaCollateral,
         icon: 'ArrowDownCircle',
+        color: 'gray',
       });
     }
     if (deltaCollateral < 0) {
@@ -394,6 +396,7 @@ export const formatHistoryArray = (
         title: 'Withdrew ETH',
         amount: -1 * deltaCollateral,
         icon: 'ArrowUpCircle',
+        color: 'gray',
       });
     }
   }

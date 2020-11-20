@@ -198,5 +198,5 @@ export interface ISafeHistory {
   link: string;
   txHash: string;
   icon: IconName;
-  isEth: boolean;
+  color: string;
 }

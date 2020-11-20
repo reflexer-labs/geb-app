@@ -7,7 +7,8 @@ import { useStoreState } from '../store';
 import { ISafeHistory } from '../utils/interfaces';
 import dayjs from 'dayjs';
 import { returnWalletAddress } from '../utils/helper';
-import FeatherIconWrapper from './FeatherIconWrapper';
+import FeatherIconWrapper, { IconName } from './FeatherIconWrapper';
+import SafeIcon from './Icons/SafeIcon';
 
 interface Props {
   hideHistory?: boolean;
@@ -19,15 +20,21 @@ const SafeHistory = ({ hideHistory }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   const { safeModel: safeState } = useStoreState((state) => state);
 
+  const returnIcon = (color: string, icon: IconName) => {
+    if (color) {
+      return <FeatherIconWrapper name={icon} className={color} />;
+    }
+    return <SafeIcon />;
+  };
   const formatRow = (item: ISafeHistory, i: number) => {
-    const { title, date, amount, link, txHash, icon, isEth } = item;
+    const { title, date, amount, link, txHash, icon, color } = item;
     const humanizedAmount =
       amount.toString().length < 4 ? amount : amount.toFixed(4);
     const humanizedDate = dayjs.unix(Number(date)).format('MMM D, YYYY h:mm A');
     return (
       <Row ref={ref} key={title + i}>
         <Col>
-          <FeatherIconWrapper name={icon} className={isEth ? 'isEth' : ''} />
+          {returnIcon(color, icon)}
           {title}
         </Col>
         <Col>{humanizedDate}</Col>
@@ -144,11 +151,18 @@ const Col = styled.div`
   color: ${(props) => props.theme.colors.primary};
   font-size: ${(props) => props.theme.font.small};
   svg {
-    border-radius: 50%;
     margin-right: 11px;
     color: gray;
-    &.isEth {
+    width: 23px;
+    height: 23px;
+    &.gray {
+      color: gray;
+    }
+    &.green {
       color: #4ac6b2;
+    }
+    &.red {
+      color: red;
     }
   }
 
