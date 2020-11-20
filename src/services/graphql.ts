@@ -16,17 +16,8 @@ export const fetchUser = (address: string) => {
       if (!res.data.data && attempt < GRAPH_API_URLS.length) {
         throw new Error('retry');
       }
-      const proxyData =
-        res.data.data.userProxies.length > 0
-          ? res.data.data.userProxies[0]
-          : null;
 
-      const erc20Balance =
-        res.data.data.erc20Balances && res.data.data.erc20Balances.length > 0
-          ? res.data.data.erc20Balances[0].balance
-          : '0';
-
-      return { user: res.data.data.user, proxyData, erc20Balance };
+      return res.data.data.user;
     },
     {
       retries: GRAPH_API_URLS.length - 1,

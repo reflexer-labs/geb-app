@@ -134,7 +134,7 @@ const safeModel: SafeModel = {
         chainId,
         hash,
         from: txResponse.from,
-        summary: 'Depositing ETH & borrowing RAI',
+        summary: 'Modifying Safe',
         addedTime: new Date().getTime(),
         originalTx: txResponse,
       });
@@ -160,7 +160,7 @@ const safeModel: SafeModel = {
         chainId,
         hash,
         from: txResponse.from,
-        summary: 'Repaying RAI & withdrawing ETH',
+        summary: 'Modifying Safe',
         addedTime: new Date().getTime(),
         originalTx: txResponse,
       });

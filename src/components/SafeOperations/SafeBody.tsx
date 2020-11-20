@@ -287,7 +287,7 @@ const SafeBody = ({ isChecked }: Props) => {
       : BigNumber.from('0');
     if (coinAllowance) {
       const coinAllowanceBN = BigNumber.from(
-        toFixedString(coinAllowance, 'RAD')
+        toFixedString(coinAllowance, 'WAD')
       );
       return coinAllowanceBN.gte(rightInputBN);
     }
@@ -433,11 +433,15 @@ const SafeBody = ({ isChecked }: Props) => {
               <Value>{`${totalDebt ? totalDebt : 0}`}</Value>
             </Item>
             <Item>
-              <Label>{'Collateral Ratio'}</Label>{' '}
+              <Label>
+                {!isCreate ? 'New Collateral Ratio' : 'New Collateral Ratio'}
+              </Label>{' '}
               <Value>{`${collateralRatio > 0 ? collateralRatio : '∞'}%`}</Value>
             </Item>
             <Item>
-              <Label>{'Liquidation Price'}</Label>{' '}
+              <Label>
+                {!isCreate ? 'New Liquidation Price' : 'Liquidation Price'}
+              </Label>{' '}
               <Value>{`$${liquidationPrice > 0 ? liquidationPrice : 0}`}</Value>
             </Item>
             <Item>

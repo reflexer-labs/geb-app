@@ -1,6 +1,4 @@
-import numeral from 'numeral';
 import { action, Action, Thunk, thunk } from 'easy-peasy';
-import { NETWORK_ID } from '../connectors';
 import api from '../services/api';
 import { fetchUser } from '../services/graphql';
 import { IBlockNumber, ITokenBalance } from '../utils/interfaces';
@@ -56,24 +54,8 @@ const connectWalletModel: ConnectWalletModel = {
   }),
 
   fetchUser: thunk(async (actions, payload) => {
-    const fetched = await fetchUser(payload.toLowerCase());
-    if (!fetched) return false;
-    actions.updatePraiBalance({
-      chainId: NETWORK_ID,
-      balance: numeral(fetched.erc20Balance).value(),
-    });
-    if (fetched.proxyData) {
-      const { address, coinAllowance } = fetched.proxyData;
-      if (address) {
-        actions.setProxyAddress(address);
-      }
-      if (coinAllowance) {
-        actions.setCoinAllowance(coinAllowance.amount);
-      } else {
-        actions.setCoinAllowance('');
-      }
-    }
-    if (fetched.user) {
+    const user = await fetchUser(payload.toLowerCase());
+    if (user) {
       actions.setIsUserCreated(true);
       return true;
     } else {

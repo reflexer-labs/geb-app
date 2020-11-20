@@ -1,5 +1,3 @@
-import { userQuery } from './user';
-
 export const getUserSafesListQuery = (address: string) => `{
   safes(where: { owner: "${address}" }) {
     safeId
@@ -57,7 +55,15 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
       createdAtTransaction
     }
   }
-  ${userQuery(address)}
+  userProxies(where: {owner: "${address}"}) {
+    address
+    coinAllowance {
+      amount
+    }
+  }
+  erc20Balances(where: {address: "${address}"}) {
+   balance
+   }
   systemState(id: "current") {
     currentRedemptionPrice {
       value
