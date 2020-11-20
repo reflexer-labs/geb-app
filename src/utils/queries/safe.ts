@@ -40,21 +40,22 @@ export const getSafeByIdQuery = (safeId: string) => `{
     collateral
     createdAt
     debt
-  }
-  systemState(id: "current") {
-    currentRedemptionPrice {
-      value
-    }
-  }
-}`;
-
-export const getSafeHistoryQuery = (safeId: string) => `{
-  safes(where: {safeId: ${safeId}}){
     modifySAFECollateralization {
       deltaDebt
       deltaCollateral
       createdAt
       createdAtTransaction
+    }
+    liquidationFixedDiscount {
+      sellInitialAmount
+      sellAmount
+      createdAt
+      createdAtTransaction
+    }
+  }
+  systemState(id: "current") {
+    currentRedemptionPrice {
+      value
     }
   }
 }`;

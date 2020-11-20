@@ -15,6 +15,7 @@ const INITIAL_SAFE_STATE = [
     riskState: 'low',
     collateral: '100.00',
     debt: '23.00',
+    totalDebt: '',
     accumulatedRate: '1.15',
     collateralRatio: '150',
     currentRedemptionPrice: '2.15',

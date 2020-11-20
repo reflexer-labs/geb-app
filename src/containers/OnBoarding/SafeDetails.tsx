@@ -18,7 +18,6 @@ const SafeDetails = ({ ...props }) => {
       props.history.push('/');
     }
     safeActions.fetchSafeById(safeId);
-    safeActions.fetchSafeHistory(safeId);
     return () => safeActions.setSingleSafe(null);
     // eslint-disable-next-line
   }, []);

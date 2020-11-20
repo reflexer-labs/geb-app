@@ -15,7 +15,6 @@ import {
 import {
   fetchLiquidation,
   fetchSafeById,
-  fetchSafeHistory,
   fetchUserSafes,
 } from '../services/graphql';
 import { DEFAULT_SAFE_STATE } from '../utils/constants';
@@ -60,7 +59,6 @@ export interface SafeModel {
   setTotalEth: Action<SafeModel, string>;
   setTotalRAI: Action<SafeModel, string>;
   setIsES: Action<SafeModel, boolean>;
-  fetchSafeHistory: Thunk<SafeModel, string>;
   setLiquidationData: Action<SafeModel, ILiquidationData>;
   setSafeData: Action<SafeModel, ISafeData>;
   setUniSwapPool: Action<SafeModel, ISafeData>;
@@ -202,15 +200,13 @@ const safeModel: SafeModel = {
   }),
 
   fetchSafeById: thunk(async (actions, payload) => {
-    const safe = (await fetchSafeById(payload))[0];
-    actions.setSingleSafe(safe);
-  }),
-  fetchSafeHistory: thunk(async (actions, payload) => {
-    const historyList = await fetchSafeHistory(payload);
-    if (historyList.length > 0) {
-      actions.setSafeHistoryList(historyList);
+    const res = await fetchSafeById(payload);
+    actions.setSingleSafe(res.safe[0]);
+    if (res.safeHistory.length > 0) {
+      actions.setSafeHistoryList(res.safeHistory);
     }
   }),
+
   setIsSafeCreated: action((state, payload) => {
     state.safeCreated = payload;
   }),

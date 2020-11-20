@@ -17,7 +17,7 @@ const SafeStats = () => {
   const { singleSafe } = safeState;
 
   const collateral = formatNumber(singleSafe?.collateral || '0', 2);
-  const debt = formatNumber(singleSafe?.debt || '0', 2);
+  const totalDebt = formatNumber(singleSafe?.totalDebt || '0', 2);
   const interestOwed = singleSafe
     ? getInterestOwed(singleSafe.debt, singleSafe.accumulatedRate)
     : 0;
@@ -64,7 +64,7 @@ const SafeStats = () => {
         <StatItem className="w50">
           <StateInner>
             <Value>{`${collateral} ETH`}</Value>
-            <Label>{'ETH Deposited'}</Label>
+            <Label>{'ETH Collateral'}</Label>
             <Actions>
               <Button
                 withArrow
@@ -83,8 +83,8 @@ const SafeStats = () => {
 
         <StatItem className="w50">
           <StateInner>
-            <Value>{`${debt} RAI`}</Value>
-            <Label>{'RAI Borrowed'}</Label>
+            <Value>{`${totalDebt} RAI`}</Value>
+            <Label>{'RAI Debt'}</Label>
             <Actions>
               <Button
                 withArrow

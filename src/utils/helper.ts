@@ -118,12 +118,18 @@ export const formatUserSafe = (
         s.debt
       );
 
+      const totalDebt = returnTotalDebt(
+        s.debt,
+        s.collateralType.accumulatedRate
+      );
+
       return {
         id: s.safeId,
         date: s.createdAt,
         riskState: ratioChecker(Number(collateralRatio)),
         collateral: s.collateral,
         debt: s.debt,
+        totalDebt,
         availableDebt,
         accumulatedRate: s.collateralType.accumulatedRate,
         collateralRatio,
@@ -310,10 +316,37 @@ export const returnTotalDebtPlusInterest = (
 };
 
 export const formatHistoryArray = (
-  history: Array<any>
+  history: Array<any>,
+  liquidationItems: Array<any>
 ): Array<ISafeHistory> => {
   const items: Array<ISafeHistory> = [];
   const networkId = NETWORK_ID;
+
+  items.push({
+    title: 'Open Safe',
+    txHash: history[history.length - 1].createdAtTransaction,
+    date: Number(history[history.length - 1].createdAt - 1).toString(),
+    amount: 0,
+    link: getEtherscanLink(
+      networkId,
+      history[history.length - 1].createdAtTransaction,
+      'transaction'
+    ),
+    icon: 'ArrowRightCircle',
+    isEth: true,
+  });
+
+  for (let i of liquidationItems) {
+    items.push({
+      title: 'Liquidation ETH',
+      date: i.createdAt,
+      amount: parseFloat(i.sellInitialAmount) - parseFloat(i.sellAmount),
+      link: getEtherscanLink(networkId, i.createdAtTransaction, 'transaction'),
+      txHash: i.createdAtTransaction,
+      icon: 'Zap',
+      isEth: true,
+    });
+  }
 
   for (let item of history) {
     const deltaDebt = numeral(item.deltaDebt).value();
@@ -327,12 +360,15 @@ export const formatHistoryArray = (
         item.createdAtTransaction,
         'transaction'
       ),
+      isEth: true,
     };
     if (deltaDebt > 0) {
       items.push({
         ...sharedObj,
         title: 'Borrowed RAI',
         amount: deltaDebt,
+        icon: 'ArrowUpCircle',
+        isEth: false,
       });
     }
     if (deltaDebt < 0) {
@@ -340,6 +376,8 @@ export const formatHistoryArray = (
         ...sharedObj,
         title: 'Repaid RAI',
         amount: -1 * deltaDebt,
+        icon: 'ArrowDownCircle',
+        isEth: false,
       });
     }
     if (deltaCollateral > 0) {
@@ -347,6 +385,7 @@ export const formatHistoryArray = (
         ...sharedObj,
         title: 'Deposited ETH',
         amount: deltaCollateral,
+        icon: 'ArrowDownCircle',
       });
     }
     if (deltaCollateral < 0) {
@@ -354,6 +393,7 @@ export const formatHistoryArray = (
         ...sharedObj,
         title: 'Withdrew ETH',
         amount: -1 * deltaCollateral,
+        icon: 'ArrowUpCircle',
       });
     }
   }

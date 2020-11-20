@@ -7,8 +7,7 @@ import { useStoreState } from '../store';
 import { ISafeHistory } from '../utils/interfaces';
 import dayjs from 'dayjs';
 import { returnWalletAddress } from '../utils/helper';
-import { toSvg } from 'jdenticon';
-import { jdenticonConfig } from '../utils/constants';
+import FeatherIconWrapper from './FeatherIconWrapper';
 
 interface Props {
   hideHistory?: boolean;
@@ -20,19 +19,15 @@ const SafeHistory = ({ hideHistory }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   const { safeModel: safeState } = useStoreState((state) => state);
 
-  function createImage(value: string) {
-    return { __html: toSvg(value, 33, jdenticonConfig) };
-  }
-
   const formatRow = (item: ISafeHistory, i: number) => {
-    const { title, date, amount, link, txHash } = item;
+    const { title, date, amount, link, txHash, icon, isEth } = item;
     const humanizedAmount =
       amount.toString().length < 4 ? amount : amount.toFixed(4);
     const humanizedDate = dayjs.unix(Number(date)).format('MMM D, YYYY h:mm A');
     return (
-      <Row ref={ref} key={Number(item.date) + i}>
+      <Row ref={ref} key={title + i}>
         <Col>
-          <div dangerouslySetInnerHTML={createImage(item.date)} />
+          <FeatherIconWrapper name={icon} className={isEth ? 'isEth' : ''} />
           {title}
         </Col>
         <Col>{humanizedDate}</Col>
@@ -64,7 +59,7 @@ const SafeHistory = ({ hideHistory }: Props) => {
           <Thead>Receipt</Thead>
         </Header>
       )}
-      <Scrollbars autoHide style={{ width: '100%', height: '162px' }}>
+      <Scrollbars autoHeight autoHeightMax={'35.5vh'} style={{ width: '100%' }}>
         {!hideHistory || safeState.historyList.length > 0 ? (
           <List>
             {safeState.historyList.map((item: ISafeHistory, i: number) =>
@@ -131,7 +126,7 @@ const Thead = styled.div`
 
 const Row = styled.div`
   display: flex;
-  padding: 8px 20px;
+  padding: 12px 20px;
   border-top: 1px solid ${(props) => props.theme.colors.border};
 `;
 
@@ -151,6 +146,10 @@ const Col = styled.div`
   svg {
     border-radius: 50%;
     margin-right: 11px;
+    color: gray;
+    &.isEth {
+      color: #4ac6b2;
+    }
   }
 
   ${({ theme }) => theme.mediaWidth.upToSmall`

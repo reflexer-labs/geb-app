@@ -3,6 +3,7 @@ import { TransactionResponse } from '@ethersproject/providers';
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
 import { DefaultTheme, ThemedCssFunction } from 'styled-components';
 import { ChainId } from '@uniswap/sdk';
+import { IconName } from '../components/FeatherIconWrapper';
 
 export interface DynamicObject {
   [key: string]: any;
@@ -109,6 +110,7 @@ export interface ISafe {
   riskState: string;
   collateral: string;
   debt: string;
+  totalDebt: string;
   accumulatedRate: string;
   collateralRatio: string;
   currentRedemptionPrice: string;
@@ -195,4 +197,6 @@ export interface ISafeHistory {
   amount: number;
   link: string;
   txHash: string;
+  icon: IconName;
+  isEth: boolean;
 }

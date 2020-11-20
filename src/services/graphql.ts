@@ -1,11 +1,7 @@
 import axios from 'axios';
 import retry from 'async-retry';
 import liquidationQuery from '../utils/queries/liquidation';
-import {
-  getSafeHistoryQuery,
-  getSafeByIdQuery,
-  getUserSafesListQuery,
-} from '../utils/queries/safe';
+import { getSafeByIdQuery, getUserSafesListQuery } from '../utils/queries/safe';
 import { GRAPH_API_URLS } from '../utils/constants';
 import { formatUserSafe, formatHistoryArray } from '../utils/helper';
 import { getUserQuery } from '../utils/queries/user';
@@ -110,34 +106,19 @@ export const fetchSafeById = (safeId: string) => {
       if (!res.data.data && attempt < GRAPH_API_URLS.length) {
         throw new Error('retry');
       }
-
-      return formatUserSafe(
+      const safe = formatUserSafe(
         res.data.data.safes,
         res.data.data.systemState.currentRedemptionPrice.value
       );
-    },
-    {
-      retries: GRAPH_API_URLS.length - 1,
-    }
-  );
-};
-
-export const fetchSafeHistory = (safeId: string) => {
-  return retry(
-    async (bail, attempt) => {
-      const res = await axios.post(
-        GRAPH_API_URLS[attempt - 1],
-        JSON.stringify({ query: getSafeHistoryQuery(safeId) })
+      const safeHistory = formatHistoryArray(
+        res.data.data.safes[0].modifySAFECollateralization,
+        res.data.data.safes[0].liquidationFixedDiscount
       );
 
-      // Retry if returned data is empty
-      if (!res.data.data && attempt < GRAPH_API_URLS.length) {
-        throw new Error('retry');
-      }
-
-      return formatHistoryArray(
-        res.data.data.safes[0].modifySAFECollateralization
-      );
+      return {
+        safe,
+        safeHistory,
+      };
     },
     {
       retries: GRAPH_API_URLS.length - 1,
