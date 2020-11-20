@@ -12,11 +12,7 @@ import {
   handleRepayAndWithdraw,
   handleSafeCreation,
 } from '../services/blockchain';
-import {
-  fetchLiquidation,
-  fetchSafeById,
-  fetchUserSafes,
-} from '../services/graphql';
+import { fetchSafeById, fetchUserSafes } from '../services/graphql';
 import { DEFAULT_SAFE_STATE } from '../utils/constants';
 import { timeout } from '../utils/helper';
 import { StoreModel } from '.';
@@ -50,9 +46,13 @@ export interface SafeModel {
     StoreModel
   >;
   createSafe: Thunk<SafeModel, ISafePayload, any, StoreModel>;
-  fetchSafeById: Thunk<SafeModel, string>;
+  fetchSafeById: Thunk<
+    SafeModel,
+    { safeId: string; account: string },
+    any,
+    StoreModel
+  >;
   fetchUserSafes: Thunk<SafeModel, string, any, StoreModel>;
-  fetchLiquidationData: Thunk<SafeModel>;
   setIsSafeCreated: Action<SafeModel, boolean>;
   setList: Action<SafeModel, Array<ISafe>>;
   setSingleSafe: Action<SafeModel, ISafe | null>;
@@ -199,11 +199,34 @@ const safeModel: SafeModel = {
     return fetched;
   }),
 
-  fetchSafeById: thunk(async (actions, payload) => {
-    const res = await fetchSafeById(payload);
+  fetchSafeById: thunk(async (actions, payload, { getStoreActions }) => {
+    const storeActions = getStoreActions();
+    const res = await fetchSafeById(
+      payload.safeId,
+      payload.account.toLowerCase()
+    );
     actions.setSingleSafe(res.safe[0]);
     if (res.safeHistory.length > 0) {
       actions.setSafeHistoryList(res.safeHistory);
+    }
+    actions.setLiquidationData({
+      ...res.collateralType,
+      currentRedemptionPrice: res.currentRedemptionPrice,
+    });
+    storeActions.connectWalletModel.updatePraiBalance({
+      chainId: NETWORK_ID,
+      balance: numeral(res.erc20Balance).value(),
+    });
+    if (res.proxyData) {
+      const { address, coinAllowance } = res.proxyData;
+      if (address) {
+        storeActions.connectWalletModel.setProxyAddress(address);
+      }
+      if (coinAllowance) {
+        storeActions.connectWalletModel.setCoinAllowance(coinAllowance.amount);
+      } else {
+        storeActions.connectWalletModel.setCoinAllowance('');
+      }
     }
   }),
 
@@ -227,10 +250,6 @@ const safeModel: SafeModel = {
   }),
   setIsES: action((state, payload) => {
     state.isES = payload;
-  }),
-  fetchLiquidationData: thunk(async (actions) => {
-    const data = await fetchLiquidation();
-    actions.setLiquidationData(data);
   }),
 
   setLiquidationData: action((state, payload) => {

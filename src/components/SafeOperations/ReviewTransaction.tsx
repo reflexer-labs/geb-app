@@ -41,10 +41,7 @@ const ReviewTransaction = () => {
   };
 
   const handleWaitingTitle = () => {
-    if (type === 'repay_withdraw') {
-      return 'Repaying RAI & withdrawing ETH';
-    }
-    return 'Depositing ETH & borrowing RAI';
+    return 'Modifying Safe';
   };
 
   const handleConfirm = async () => {

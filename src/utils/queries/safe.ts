@@ -1,3 +1,5 @@
+import { userQuery } from './user';
+
 export const getUserSafesListQuery = (address: string) => `{
   safes(where: { owner: "${address}" }) {
     safeId
@@ -24,7 +26,7 @@ export const getUserSafesListQuery = (address: string) => `{
   }
 }`;
 
-export const getSafeByIdQuery = (safeId: string) => `{
+export const getSafeByIdQuery = (safeId: string, address: string) => `{
   safes(where: { safeId: "${safeId}" }) {
     safeId
     collateralType {
@@ -33,9 +35,11 @@ export const getSafeByIdQuery = (safeId: string) => `{
         liquidationPrice
         safetyPrice
       }
+      debtFloor
       liquidationCRatio
       liquidationPenalty
       totalAnnualizedStabilityFee
+      safetyCRatio
     }
     collateral
     createdAt
@@ -53,6 +57,7 @@ export const getSafeByIdQuery = (safeId: string) => `{
       createdAtTransaction
     }
   }
+  ${userQuery(address)}
   systemState(id: "current") {
     currentRedemptionPrice {
       value

@@ -317,7 +317,8 @@ export const returnTotalDebtPlusInterest = (
 
 export const formatHistoryArray = (
   history: Array<any>,
-  liquidationItems: Array<any>
+  liquidationItems: Array<any>,
+  accumulatedRate: string
 ): Array<ISafeHistory> => {
   const items: Array<ISafeHistory> = [];
   const networkId = NETWORK_ID;
@@ -367,7 +368,7 @@ export const formatHistoryArray = (
       items.push({
         ...sharedObj,
         title: 'Borrowed RAI',
-        amount: deltaDebt,
+        amount: numeral(deltaDebt).multiply(accumulatedRate).value(),
         icon: 'ArrowUpCircle',
         color: 'green',
       });
@@ -376,7 +377,10 @@ export const formatHistoryArray = (
       items.push({
         ...sharedObj,
         title: 'Repaid RAI',
-        amount: -1 * deltaDebt,
+        amount: numeral(deltaDebt)
+          .multiply(-1)
+          .multiply(accumulatedRate)
+          .value(),
         icon: 'ArrowDownCircle',
         color: 'green',
       });

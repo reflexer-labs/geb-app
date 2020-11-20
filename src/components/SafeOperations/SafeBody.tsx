@@ -206,10 +206,6 @@ const SafeBody = ({ isChecked }: Props) => {
           setError('Please enter the amount of ETH to be deposited.');
           return false;
         }
-        if (rightInputBN.isZero()) {
-          setError('Please enter the amount of RAI to be borrowed.');
-          return false;
-        }
       } else {
         if (leftInputBN.isZero() && rightInputBN.isZero()) {
           setError(
@@ -379,11 +375,6 @@ const SafeBody = ({ isChecked }: Props) => {
       setError('');
     }
   };
-
-  useEffect(() => {
-    safeActions.fetchLiquidationData();
-    // eslint-disable-next-line
-  }, []);
 
   useEffect(() => {
     setDefaultSafe(safeData);

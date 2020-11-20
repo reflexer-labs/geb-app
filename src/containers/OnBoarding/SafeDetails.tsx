@@ -4,11 +4,13 @@ import GridContainer from '../../components/GridContainer';
 import PageHeader from '../../components/PageHeader';
 import SafeHistory from '../../components/SafeHistory';
 import SafeStats from '../../components/SafeStats';
+import { useActiveWeb3React } from '../../hooks';
 import { useStoreActions, useStoreState } from '../../store';
 import { isNumeric } from '../../utils/validations';
 
 const SafeDetails = ({ ...props }) => {
   const { t } = useTranslation();
+  const { account } = useActiveWeb3React();
   const {
     safeModel: safeActions,
     popupsModel: popupsActions,
@@ -17,6 +19,7 @@ const SafeDetails = ({ ...props }) => {
   const safeId = props.match.params.id as string;
 
   useEffect(() => {
+    if (!account) return;
     if (!isNumeric(safeId)) {
       props.history.push('/');
     }
@@ -27,21 +30,21 @@ const SafeDetails = ({ ...props }) => {
         title: 'Fetching Safe Data',
         status: 'loading',
       });
-      await safeActions.fetchSafeById(safeId);
+      await safeActions.fetchSafeById({ safeId, account: account as string });
       popupsActions.setIsWaitingModalOpen(false);
     }
 
     fetchSafe();
 
     const interval = setInterval(() => {
-      safeActions.fetchSafeById(safeId);
+      safeActions.fetchSafeById({ safeId, account: account as string });
     }, 2000);
 
     return () => {
       safeActions.setSingleSafe(null);
       clearInterval(interval);
     };
-  }, [popupsActions, props.history, safeActions, safeId]);
+  }, [account, popupsActions, props.history, safeActions, safeId]);
 
   return (
     <>

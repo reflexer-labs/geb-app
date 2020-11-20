@@ -1,4 +1,5 @@
 import React from 'react';
+import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
@@ -16,8 +17,8 @@ const SafeStats = () => {
 
   const { singleSafe } = safeState;
 
-  const collateral = formatNumber(singleSafe?.collateral || '0', 2);
-  const totalDebt = formatNumber(singleSafe?.totalDebt || '0', 2);
+  const collateral = formatNumber(singleSafe?.collateral || '0');
+  const totalDebt = formatNumber(singleSafe?.totalDebt || '0');
   const interestOwed = singleSafe
     ? getInterestOwed(singleSafe.debt, singleSafe.accumulatedRate)
     : 0;
@@ -25,8 +26,15 @@ const SafeStats = () => {
   const liquidationPenalty = getRatePercentage(
     singleSafe?.liquidationPenalty || '1'
   );
+
+  const stabilityFees = numeral(
+    singleSafe?.totalAnnualizedStabilityFee.toString()
+  )
+    .subtract(1)
+    .multiply(100)
+    .value();
   const totalAnnualizedStabilityFee = formatNumber(
-    singleSafe?.totalAnnualizedStabilityFee || '0',
+    stabilityFees.toString() || '0',
     2
   );
 

@@ -13,6 +13,7 @@ const SafeContent = ({ width, maxWidth, children }: Props) => {
   const { t } = useTranslation();
   const { popupsModel: popupsState } = useStoreState((state) => state);
 
+  const { type, isCreate } = popupsState.safeOperationPayload;
   return (
     <ModalContent
       style={{
@@ -20,7 +21,7 @@ const SafeContent = ({ width, maxWidth, children }: Props) => {
         maxWidth: maxWidth || '720px',
       }}
     >
-      <Header>Safe {t(popupsState.safeOperationPayload.type)}</Header>
+      <Header>{isCreate ? t('create_safe') : `Safe ${t(type)}`}</Header>
       {children}
     </ModalContent>
   );

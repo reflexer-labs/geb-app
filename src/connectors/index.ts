@@ -47,9 +47,8 @@ export const walletconnect = new WalletConnectConnector({
 // mainnet only
 export const walletlink = new WalletLinkConnector({
   url: NETWORK_URL,
-  appName: 'Uniswap',
-  appLogoUrl:
-    'https://mpng.pngfly.com/20181202/bex/kisspng-emoji-domain-unicorn-pin-badges-sticker-unicorn-tumblr-emoji-unicorn-iphoneemoji-5c046729264a77.5671679315437924251569.jpg',
+  appName: 'Reflexer Labs',
+  appLogoUrl: require('../assets/logo192.png'),
 });
 
 // geb.js
