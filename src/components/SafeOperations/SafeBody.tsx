@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BigNumber } from 'ethers';
+import { utils as gebUtils } from 'geb.js';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
 import { ISafeData } from '../../utils/interfaces';
@@ -20,7 +22,6 @@ import {
 } from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
 import { DEFAULT_SAFE_STATE } from '../../utils/constants';
-import { BigNumber } from 'ethers';
 
 interface Props {
   isChecked?: boolean;
@@ -174,7 +175,7 @@ const SafeBody = ({ isChecked }: Props) => {
       if (
         defaultSafe.rightInput &&
         !rightInputBN.isZero() &&
-        rightInputBN.lt(BigNumber.from(debtFloorBN))
+        rightInputBN.lt(debtFloorBN)
       ) {
         setError(
           `The resulting debt should be at least ${debtFloor} RAI or zero.`
@@ -207,6 +208,11 @@ const SafeBody = ({ isChecked }: Props) => {
       }
     }
     if (type === 'repay_withdraw') {
+      const totalDebtBN = BigNumber.from(toFixedString(totalDebt, 'WAD'));
+      const accumlatedRateBN = BigNumber.from(
+        toFixedString(accumulatedRate, 'RAY')
+      );
+
       if (leftInputBN.isZero() && rightInputBN.isZero()) {
         setError(
           'Please enter the amount of ETH to free or the amount of RAI to be repay'
@@ -220,12 +226,15 @@ const SafeBody = ({ isChecked }: Props) => {
         setError('RAI to repay cannot exceed available amount.');
         return false;
       }
+
       if (
         defaultSafe.rightInput &&
         !rightInputBN.isZero() &&
-        rightInputBN.lt(BigNumber.from(debtFloorBN))
+        totalDebtBN.mul(accumlatedRateBN).lt(debtFloorBN.mul(gebUtils.RAY))
       ) {
-        setError(`Repay amount should be at least ${debtFloor} RAI or zero.`);
+        setError(
+          `The resulting debt should be at least ${debtFloor} RAI or zero.`
+        );
         return false;
       }
 
