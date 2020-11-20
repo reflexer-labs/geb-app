@@ -78,6 +78,10 @@ const ReviewTransaction = () => {
             safeId: safeState.singleSafe.id,
           });
         }
+        safeActions.setStage(0);
+        safeActions.setUniSwapPool(DEFAULT_SAFE_STATE);
+        safeActions.setSafeData(DEFAULT_SAFE_STATE);
+        connectWalletActions.setIsStepLoading(true);
         await timeout(3000);
         await safeActions.fetchUserSafes(account);
         safeActions.setIsSafeCreated(true);

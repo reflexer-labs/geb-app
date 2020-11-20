@@ -1,44 +1,41 @@
+export const liquidationQuery = `
+  collateralType(id: "ETH-A") {
+    accumulatedRate
+    currentPrice {
+      liquidationPrice
+      safetyPrice
+    }
+    debtFloor
+    debtCeiling
+    liquidationCRatio
+    liquidationPenalty
+    totalAnnualizedStabilityFee
+    safetyCRatio
+  }
+systemState(id: "current") {
+  globalDebt
+  currentRedemptionPrice {
+    value
+  }
+}`;
+
 export const getUserSafesListQuery = (address: string) => `{
   safes(where: { owner: "${address}" }) {
     safeId
     safeHandler
-    collateralType {
-      accumulatedRate
-      currentPrice {
-        liquidationPrice
-        safetyPrice
-      }
-      liquidationCRatio
-    }
     collateral
     createdAt
     debt
   }
-  systemState(id: "current") {
-    currentRedemptionPrice {
-      value
-    }
-  }
  erc20Balances(where: {address: "${address}"}) {
   balance
   }
+  ${liquidationQuery}
 }`;
 
 export const getSafeByIdQuery = (safeId: string, address: string) => `{
   safes(where: { safeId: "${safeId}" }) {
     safeId
-    collateralType {
-      accumulatedRate
-      currentPrice {
-        liquidationPrice
-        safetyPrice
-      }
-      debtFloor
-      liquidationCRatio
-      liquidationPenalty
-      totalAnnualizedStabilityFee
-      safetyCRatio
-    }
     collateral
     createdAt
     debt
@@ -64,9 +61,5 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
   erc20Balances(where: {address: "${address}"}) {
    balance
    }
-  systemState(id: "current") {
-    currentRedemptionPrice {
-      value
-    }
-  }
+   ${liquidationQuery}
 }`;

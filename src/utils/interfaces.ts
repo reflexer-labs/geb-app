@@ -154,6 +154,9 @@ export interface ILiquidationData {
   liquidationPenalty: string;
   safetyCRatio: string;
   currentRedemptionPrice: string;
+  totalAnnualizedStabilityFee: string;
+  debtCeiling: string;
+  globalDebt: string;
 }
 
 export interface ISafePayload {

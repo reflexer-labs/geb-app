@@ -131,6 +131,9 @@ const SafeState = styled.div`
     border: 1px solid ${(props) => props.theme.colors.dangerBorder};
     background: ${(props) => props.theme.colors.dangerBackground};
   }
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    padding: 8px 10px;
+  `}
 `;
 
 const Block = styled.div`

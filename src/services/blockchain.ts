@@ -14,14 +14,8 @@ export const handleSafeCreation = async (
   }
   const geb = new Geb(ETH_NETWORK, signer.provider);
 
-  const globalDebt = await geb.contracts.safeEngine.globalDebt();
-  const debtCeiling = await geb.contracts.safeEngine.globalDebtCeiling();
   const raiToDraw = ethersUtils.parseEther(safeData.rightInput);
-  if (globalDebt.add(raiToDraw).gt(debtCeiling)) {
-    throw new Error(
-      'Debt ceiling too low, not possible to draw this amount of RAI.'
-    );
-  }
+
   const proxy = await geb.getProxyAction(signer._address);
   const txData = proxy.openLockETHAndGenerateDebt(
     ethersUtils.parseEther(safeData.leftInput),
@@ -45,14 +39,8 @@ export const handleDepositAndBorrow = async (
   }
   const geb = new Geb(ETH_NETWORK, signer.provider);
 
-  const globalDebt = await geb.contracts.safeEngine.globalDebt();
-  const debtCeiling = await geb.contracts.safeEngine.globalDebtCeiling();
   const raiToDraw = ethersUtils.parseEther(safeData.rightInput);
-  if (globalDebt.add(raiToDraw).gt(debtCeiling)) {
-    throw new Error(
-      'Debt ceiling too low, not possible to draw this amount of RAI.'
-    );
-  }
+
   const proxy = await geb.getProxyAction(signer._address);
   const txData = proxy.lockETHAndGenerateDebt(
     ethersUtils.parseEther(safeData.leftInput),

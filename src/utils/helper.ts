@@ -8,7 +8,12 @@ import {
   floatsTypes,
   SUPPORTED_WALLETS,
 } from './constants';
-import { ISafe, ISafeHistory, ITransaction } from './interfaces';
+import {
+  ILiquidationData,
+  ISafe,
+  ISafeHistory,
+  ITransaction,
+} from './interfaces';
 import { injected, NETWORK_ID } from '../connectors';
 
 export const returnWalletAddress = (walletAddress: string) =>
@@ -92,36 +97,42 @@ export const toFixedString = (
 
 export const formatUserSafe = (
   safes: Array<any>,
-  currentRedemptionPrice: string
+  liquidationData: ILiquidationData
 ): Array<ISafe> => {
+  const {
+    currentRedemptionPrice,
+    currentPrice,
+    liquidationCRatio,
+    accumulatedRate,
+    totalAnnualizedStabilityFee,
+    liquidationPenalty,
+  } = liquidationData;
+
   return safes
     .map((s) => {
       const collateralRatio = getCollateralRatio(
         s.collateral,
         s.debt,
-        s.collateralType.currentPrice.liquidationPrice,
-        s.collateralType.liquidationCRatio,
-        s.collateralType.accumulatedRate
+        currentPrice?.liquidationPrice,
+        liquidationCRatio,
+        accumulatedRate
       );
       const liquidationPrice = getLiquidationPrice(
         s.collateral,
         s.debt,
-        s.collateralType.liquidationCRatio,
-        s.collateralType.accumulatedRate,
+        liquidationCRatio,
+        accumulatedRate,
         currentRedemptionPrice
       );
 
       const availableDebt = returnAvaiableDebt(
-        s.collateralType.currentPrice.safetyPrice,
+        currentPrice?.safetyPrice,
         '0',
         s.collateral,
         s.debt
       );
 
-      const totalDebt = returnTotalDebt(
-        s.debt,
-        s.collateralType.accumulatedRate
-      );
+      const totalDebt = returnTotalDebt(s.debt, accumulatedRate);
 
       return {
         id: s.safeId,
@@ -131,15 +142,14 @@ export const formatUserSafe = (
         debt: s.debt,
         totalDebt,
         availableDebt,
-        accumulatedRate: s.collateralType.accumulatedRate,
+        accumulatedRate: accumulatedRate,
         collateralRatio,
         currentRedemptionPrice,
-        currentLiquidationPrice: s.collateralType.currentPrice.liquidationPrice,
-        liquidationCRatio: s.collateralType.liquidationCRatio || '1',
-        liquidationPenalty: s.collateralType.liquidationPenalty || '1',
+        currentLiquidationPrice: currentPrice?.liquidationPrice,
+        liquidationCRatio: liquidationCRatio || '1',
+        liquidationPenalty: liquidationPenalty || '1',
         liquidationPrice,
-        totalAnnualizedStabilityFee:
-          s.collateralType.totalAnnualizedStabilityFee || '0',
+        totalAnnualizedStabilityFee: totalAnnualizedStabilityFee || '0',
       } as ISafe;
     })
     .sort((a, b) => Number(a.id) - Number(b.id));

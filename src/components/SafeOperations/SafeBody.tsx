@@ -54,6 +54,8 @@ const SafeBody = ({ isChecked }: Props) => {
     debtFloor,
     safetyCRatio,
     currentRedemptionPrice,
+    debtCeiling,
+    globalDebt,
   } = safeState.liquidationData;
 
   const praiBalance = connectWalletState.praiBalance[NETWORK_ID];
@@ -182,6 +184,13 @@ const SafeBody = ({ isChecked }: Props) => {
       : BigNumber.from('0');
 
     const debtFloorBN = BigNumber.from(toFixedString(debtFloor, 'WAD'));
+    const totalDebtBN = BigNumber.from(toFixedString(totalDebt, 'WAD'));
+    const accumlatedRateBN = BigNumber.from(
+      toFixedString(accumulatedRate, 'RAY')
+    );
+
+    const globalDebtBN = BigNumber.from(toFixedString(globalDebt, 'WAD'));
+    const debtCeilingBN = BigNumber.from(toFixedString(debtCeiling, 'WAD'));
 
     if (type === 'deposit_borrow') {
       if (
@@ -216,11 +225,6 @@ const SafeBody = ({ isChecked }: Props) => {
       }
     }
     if (type === 'repay_withdraw') {
-      const totalDebtBN = BigNumber.from(toFixedString(totalDebt, 'WAD'));
-      const accumlatedRateBN = BigNumber.from(
-        toFixedString(accumulatedRate, 'RAY')
-      );
-
       if (leftInputBN.isZero() && rightInputBN.isZero()) {
         setError(
           'Please enter the amount of ETH to free or the amount of RAI to be repay'
@@ -275,6 +279,13 @@ const SafeBody = ({ isChecked }: Props) => {
     if (!isSafe && (collateralRatio as number) > 0) {
       setError(`Too much debt, below ${safetyCRatio} collateralization ratio`);
       return false;
+    }
+
+    if (globalDebtBN.add(totalDebtBN).gt(debtCeilingBN)) {
+      setError(
+        'Debt ceiling too low, not possible to draw this amount of RAI.'
+      );
+      return;
     }
 
     return true;

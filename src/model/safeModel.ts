@@ -88,10 +88,13 @@ const safeModel: SafeModel = {
       safetyPrice: '',
     },
     debtFloor: '0',
+    debtCeiling: '0',
+    globalDebt: '0',
     liquidationCRatio: '1', // Rate percentage
     liquidationPenalty: '1', // Rate percentage
     safetyCRatio: '0',
     currentRedemptionPrice: '0',
+    totalAnnualizedStabilityFee: '0',
   },
   uniSwapPool: DEFAULT_SAFE_STATE,
   historyList: [],
@@ -188,6 +191,11 @@ const safeModel: SafeModel = {
       actions.setIsSafeCreated(false);
       storeActions.connectWalletModel.setStep(1);
     }
+    actions.setLiquidationData({
+      ...fetched.collateralType,
+      currentRedemptionPrice: fetched.currentRedemptionPrice,
+      globalDebt: fetched.globalDebt,
+    });
     const chainId = NETWORK_ID;
     if (fetched.availablePRAI && chainId) {
       storeActions.connectWalletModel.updatePraiBalance({
