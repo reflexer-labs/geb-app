@@ -1,9 +1,14 @@
 import { utils as gebUtils } from 'geb.js';
-import { TransactionResponse } from '@ethersproject/providers';
+import {
+  TransactionResponse,
+  TransactionRequest,
+} from '@ethersproject/providers';
+import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
 import { useCallback } from 'react';
 import { useActiveWeb3React } from '.';
 import store from '../store';
 import { ITransaction } from '../utils/interfaces';
+import { BigNumber } from 'ethers';
 
 export function useTransactionAdder(): (
   response: TransactionResponse,
@@ -42,6 +47,42 @@ export function useIsTransactionPending(transactionHash?: string): boolean {
   if (!transactionHash || !transactions[transactionHash]) return false;
 
   return !transactions[transactionHash].receipt;
+}
+
+export async function handlePreTxGasEstimate(
+  signer: JsonRpcSigner,
+  tx: TransactionRequest
+): Promise<TransactionRequest> {
+  let gasLimit: BigNumber;
+
+  try {
+    gasLimit = await signer.estimateGas(tx);
+  } catch (err) {
+    let gebError: string | null;
+    try {
+      const res = await signer.call(tx);
+      gebError = gebUtils.getRequireString(res);
+    } catch (err) {
+      gebError = gebUtils.getRequireString(err);
+    }
+
+    let errorMessage: string;
+    if (gebError) {
+      errorMessage = 'Geb error: ' + gebError;
+    } else {
+      errorMessage = 'Provider error: ' + (err || err.message);
+    }
+
+    store.dispatch.popupsModel.setWaitingPayload({
+      title: 'Transaction Failed.',
+      status: 'error',
+    });
+    console.error(errorMessage);
+    throw errorMessage;
+  }
+  // Add 15% slack in the gas limit
+  tx.gasLimit = gasLimit.mul(115).div(100).toHexString();
+  return tx;
 }
 
 export function handleTransactionError(e: any) {

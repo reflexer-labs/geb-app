@@ -3,6 +3,7 @@ import { Geb, utils as gebUtils } from 'geb.js';
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
 import { ISafeData } from '../utils/interfaces';
 import { ETH_NETWORK } from '../utils/constants';
+import { handlePreTxGasEstimate } from '../hooks/TransactionHooks';
 
 export const handleSafeCreation = async (
   signer: JsonRpcSigner,
@@ -28,8 +29,10 @@ export const handleSafeCreation = async (
     raiToDraw
   );
 
-  const tx = await signer.sendTransaction(txData);
-  return tx;
+  const tx = await handlePreTxGasEstimate(signer, txData);
+
+  const txResponse = await signer.sendTransaction(tx);
+  return txResponse;
 };
 
 export const handleDepositAndBorrow = async (
@@ -57,8 +60,10 @@ export const handleDepositAndBorrow = async (
     raiToDraw
   );
 
-  const tx = await signer.sendTransaction(txData);
-  return tx;
+  const tx = await handlePreTxGasEstimate(signer, txData);
+
+  const txResponse = await signer.sendTransaction(tx);
+  return txResponse;
 };
 
 export const handleRepayAndWithdraw = async (
@@ -77,6 +82,8 @@ export const handleRepayAndWithdraw = async (
   const proxy = await geb.getProxyAction(signer._address);
   const txData = proxy.repayDebtAndFreeETH(safeId, ethToFree, raiToRepay);
 
-  const tx = await signer.sendTransaction(txData);
-  return tx;
+  const tx = await handlePreTxGasEstimate(signer, txData);
+
+  const txResponse = await signer.sendTransaction(tx);
+  return txResponse;
 };
