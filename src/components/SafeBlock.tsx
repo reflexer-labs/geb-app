@@ -10,8 +10,8 @@ import { jdenticonConfig } from '../utils/constants';
 const SafeBlock = ({ ...props }) => {
   const { t } = useTranslation();
 
-  const collateral = formatNumber(props.collateral, 2);
-  const debt = formatNumber(props.debt, 2);
+  const collateral = formatNumber(props.collateral);
+  const totalDebt = formatNumber(props.totalDebt);
   const createdAt = dayjs.unix(props.date).format('MMM D, YYYY h:mm A');
 
   function createImage() {
@@ -44,7 +44,7 @@ const SafeBlock = ({ ...props }) => {
           </Item>
           <Item>
             <Label>{'RAI Borrowed'}</Label>
-            <Value>{debt}</Value>
+            <Value>{totalDebt}</Value>
           </Item>
           <Item>
             <Label>{'Collateralization Ratio'}</Label>
