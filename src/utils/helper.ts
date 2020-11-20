@@ -50,11 +50,13 @@ export const amountToFiat = (balance: number, fiatPrice: number) => {
 export const formatNumber = (value: string, digits = 4, round = false) => {
   const nOfDigits = Array.from(Array(digits), (_) => 0).join('');
   const n = Number(value);
-  return Number.isInteger(n)
-    ? n
-    : round
-    ? numeral(n).format(`0.${nOfDigits}`)
-    : numeral(n).format(`0.${nOfDigits}`, Math.floor);
+  if (Number.isInteger(n) || value.length < 5) {
+    return n;
+  }
+  if (round) {
+    return numeral(n).format(`0.${nOfDigits}`);
+  }
+  return numeral(n).format(`0.${nOfDigits}`, Math.floor);
 };
 
 export const getRatePercentage = (value: string) => {

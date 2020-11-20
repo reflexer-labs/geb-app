@@ -96,9 +96,11 @@ export const mediaWidthTemplates: {
 }, {}) as any;
 
 export const DEFAULT_SAFE_STATE = {
+  totalCollateral: '',
+  totalDebt: '',
   leftInput: '',
-  collateralRatio: 0,
   rightInput: '',
+  collateralRatio: 0,
   liquidationPrice: 0,
 };
 

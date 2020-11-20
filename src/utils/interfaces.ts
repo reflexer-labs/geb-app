@@ -75,9 +75,11 @@ export interface NavLinkType {
 }
 
 export interface ISafeData {
+  totalCollateral: string;
+  totalDebt: string;
   leftInput: string;
-  collateralRatio: number;
   rightInput: string;
+  collateralRatio: number;
   liquidationPrice: number;
 }
 

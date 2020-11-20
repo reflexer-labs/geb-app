@@ -8,7 +8,7 @@ import TransactionOverview from '../TransactionOverview';
 import { DEFAULT_SAFE_STATE } from '../../utils/constants';
 import { useActiveWeb3React } from '../../hooks';
 import { handleTransactionError } from '../../hooks/TransactionHooks';
-import { returnConnectorName, timeout } from '../../utils/helper';
+import { formatNumber, returnConnectorName, timeout } from '../../utils/helper';
 
 const ReviewTransaction = () => {
   const { account, connector, library } = useActiveWeb3React();
@@ -29,6 +29,8 @@ const ReviewTransaction = () => {
     collateralRatio,
     rightInput,
     liquidationPrice,
+    totalCollateral,
+    totalDebt,
   } = safeState.safeData;
 
   const handleCancel = () => {
@@ -110,17 +112,25 @@ const ReviewTransaction = () => {
               <Label>
                 {type === 'repay_withdraw' ? 'ETH Withdrew' : 'ETH Deposited'}
               </Label>{' '}
-              <Value>{leftInput}</Value>
+              <Value>{formatNumber(leftInput)}</Value>
             </Item>
             <Item>
               <Label>
                 {type === 'repay_withdraw' ? 'RAI Rapaid' : 'RAI Borrowed'}
               </Label>{' '}
-              <Value>{rightInput}</Value>
+              <Value>{formatNumber(rightInput)}</Value>
+            </Item>
+            <Item>
+              <Label>{'Total ETH Collateral'}</Label>{' '}
+              <Value>{`${formatNumber(totalCollateral)}`}</Value>
+            </Item>
+            <Item>
+              <Label>{'Total RAI Debt'}</Label>{' '}
+              <Value>{`${formatNumber(totalDebt)}`}</Value>
             </Item>
             <Item>
               <Label>{'Collateral Ratio'}</Label>{' '}
-              <Value>{`${collateralRatio > 0 ? collateralRatio : 0}%`}</Value>
+              <Value>{`${collateralRatio > 0 ? collateralRatio : '∞'}%`}</Value>
             </Item>
             <Item>
               <Label>{'Liquidation Price'}</Label>{' '}

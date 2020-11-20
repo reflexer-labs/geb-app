@@ -58,30 +58,44 @@ const SafeBody = ({ isChecked }: Props) => {
 
   const praiBalance = connectWalletState.praiBalance[NETWORK_ID];
 
-  const totalCollateral = singleSafe
-    ? type === 'repay_withdraw'
-      ? returnTotalValue(
+  const getTotalCollateral = () => {
+    if (singleSafe) {
+      if (type === 'repay_withdraw') {
+        return returnTotalValue(
           singleSafe.collateral,
           defaultSafe.leftInput,
           true,
           true
-        ).toString()
-      : returnTotalValue(
-          singleSafe.collateral,
-          defaultSafe.leftInput
-        ).toString()
-    : defaultSafe.leftInput;
+        ).toString();
+      }
+      return returnTotalValue(
+        singleSafe.collateral,
+        defaultSafe.leftInput
+      ).toString();
+    }
+    return defaultSafe.leftInput;
+  };
 
-  const totalDebt = singleSafe
-    ? type === 'repay_withdraw'
-      ? returnTotalValue(
-          singleSafe.debt,
+  const getTotalDebt = () => {
+    if (singleSafe) {
+      if (type === 'repay_withdraw') {
+        return returnTotalValue(
+          returnTotalDebt(singleSafe.debt, accumulatedRate) as string,
           defaultSafe.rightInput,
           true,
           true
-        ).toString()
-      : returnTotalValue(singleSafe.debt, defaultSafe.rightInput).toString()
-    : defaultSafe.rightInput;
+        ).toString();
+      }
+      return returnTotalValue(
+        singleSafe.debt,
+        defaultSafe.rightInput
+      ).toString();
+    }
+    return defaultSafe.rightInput;
+  };
+
+  const totalCollateral = getTotalCollateral();
+  const totalDebt = getTotalDebt();
 
   const getAvailableEth = () => {
     if (type === 'deposit_borrow') {
@@ -111,9 +125,7 @@ const SafeBody = ({ isChecked }: Props) => {
       }
     } else {
       if (singleSafe) {
-        if (!connectWalletState.praiBalance) return '0';
         return returnTotalDebt(singleSafe.debt, accumulatedRate) as string;
-        // const availableBalance = Math.min(praiBalance, debtBalance);
       }
     }
     return '';
@@ -230,6 +242,7 @@ const SafeBody = ({ isChecked }: Props) => {
       if (
         defaultSafe.rightInput &&
         !rightInputBN.isZero() &&
+        !totalDebtBN.isZero() &&
         totalDebtBN.mul(accumlatedRateBN).lt(debtFloorBN.mul(gebUtils.RAY))
       ) {
         setError(
@@ -344,14 +357,24 @@ const SafeBody = ({ isChecked }: Props) => {
   };
 
   const onChangeRight = (val: string) => {
-    setDefaultSafe({ ...defaultSafe, rightInput: val });
+    setDefaultSafe({
+      ...defaultSafe,
+      totalCollateral,
+      totalDebt,
+      rightInput: val,
+    });
     if (error) {
       setError('');
     }
   };
 
   const onChangeLeft = (val: string) => {
-    setDefaultSafe({ ...defaultSafe, leftInput: val });
+    setDefaultSafe({
+      ...defaultSafe,
+      totalCollateral,
+      totalDebt,
+      leftInput: val,
+    });
     if (error) {
       setError('');
     }
@@ -411,8 +434,16 @@ const SafeBody = ({ isChecked }: Props) => {
         <Result>
           <Block>
             <Item>
+              <Label>{'Total ETH Collateral'}</Label>{' '}
+              <Value>{`${totalCollateral ? totalCollateral : 0}`}</Value>
+            </Item>
+            <Item>
+              <Label>{'Total RAI Debt'}</Label>{' '}
+              <Value>{`${totalDebt ? totalDebt : 0}`}</Value>
+            </Item>
+            <Item>
               <Label>{'Collateral Ratio'}</Label>{' '}
-              <Value>{`${collateralRatio > 0 ? collateralRatio : 0}%`}</Value>
+              <Value>{`${collateralRatio > 0 ? collateralRatio : '∞'}%`}</Value>
             </Item>
             <Item>
               <Label>{'Liquidation Price'}</Label>{' '}
