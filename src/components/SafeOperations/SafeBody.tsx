@@ -471,7 +471,7 @@ const SafeBody = ({ isChecked }: Props) => {
             </Item>
             <Item>
               <Label>
-                {!isCreate ? 'New Collateral Ratio' : 'New Collateral Ratio'}
+                {!isCreate ? 'New Collateral Ratio' : 'Collateral Ratio'}
               </Label>{' '}
               <Value>{`${collateralRatio > 0 ? collateralRatio : '∞'}%`}</Value>
             </Item>
