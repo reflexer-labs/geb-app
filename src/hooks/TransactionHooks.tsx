@@ -24,14 +24,17 @@ export function useTransactionAdder(): (
       if (!hash) {
         throw Error('No transaction hash found.');
       }
-      store.dispatch.transactionsModel.addTransaction({
+
+      const tx: ITransaction = {
         chainId,
         hash,
         from: account,
         summary,
         addedTime: new Date().getTime(),
         originalTx: response,
-      });
+      };
+
+      store.dispatch.transactionsModel.addTransaction(tx);
     },
     [chainId, account]
   );

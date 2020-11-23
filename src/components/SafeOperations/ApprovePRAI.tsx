@@ -1,6 +1,6 @@
-import { ethers } from 'ethers';
+import { ethers, utils as ethersUtils } from 'ethers';
 import { Geb, utils as gebUtils } from 'geb.js';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { AlertTriangle, ArrowUpCircle, CheckCircle } from 'react-feather';
 import styled from 'styled-components';
 import { useActiveWeb3React } from '../../hooks';
@@ -20,6 +20,7 @@ const TEXT_PAYLOAD_DEFAULT_STATE = {
 
 const ApprovePRAI = () => {
   const [textPayload, setTextPayload] = useState(TEXT_PAYLOAD_DEFAULT_STATE);
+  const [isPaid, setIsPaid] = useState(false);
 
   const { library, account } = useActiveWeb3React();
 
@@ -29,12 +30,10 @@ const ApprovePRAI = () => {
     connectWalletModel: connectWalletState,
     safeModel: safeState,
   } = useStoreState((state) => state);
-  const {
-    safeModel: safeActions,
-    connectWalletModel: connectWalletActions,
-  } = useStoreActions((state) => state);
+  const { safeModel: safeActions } = useStoreActions((state) => state);
 
-  const { proxyAddress } = connectWalletState;
+  const { rightInput } = safeState.safeData;
+  const { proxyAddress, coinAllowance } = connectWalletState;
 
   const returnStatusIcon = (status: string) => {
     switch (status) {
@@ -48,6 +47,39 @@ const ApprovePRAI = () => {
         return <ArrowUpCircle width={'40px'} className={'stateless'} />;
     }
   };
+
+  const passedCheckForCoinAllowance = async (
+    allowance: string,
+    isPaid: boolean
+  ) => {
+    if (!isPaid) return;
+    const coinAllowanceBN = ethersUtils.parseEther(allowance);
+    const rightInputBN = ethersUtils.parseEther(rightInput);
+    if (allowance && coinAllowanceBN.gte(rightInputBN)) {
+      setTextPayload({
+        title: 'PRAI Unlocked',
+        text: 'PRAI unlocked successfully, proceeding to review transaction...',
+        status: 'success',
+      });
+      await timeout(2000);
+      safeActions.setStage(3);
+      safeActions.setBlockBackdrop(false);
+    } else {
+      safeActions.setStage(2);
+      setTextPayload(TEXT_PAYLOAD_DEFAULT_STATE);
+      safeActions.setBlockBackdrop(false);
+      setIsPaid(false);
+    }
+  };
+
+  const passedCheckCB = useCallback(passedCheckForCoinAllowance, [
+    coinAllowance,
+    isPaid,
+  ]);
+
+  useEffect(() => {
+    passedCheckCB(coinAllowance, isPaid);
+  }, [passedCheckCB, coinAllowance, isPaid]);
 
   const unlockPRAI = async () => {
     try {
@@ -77,15 +109,8 @@ const ApprovePRAI = () => {
       });
       addTransaction(txResponse, 'Unlocking PRAI');
       await txResponse.wait();
-      setTextPayload({
-        title: 'PRAI Unlocked',
-        text: 'PRAI unlocked successfully, proceeding to review transaction...',
-        status: 'success',
-      });
-      await connectWalletActions.fetchUser(account);
-      await timeout(2000);
-      safeActions.setStage(3);
-      safeActions.setBlockBackdrop(false);
+      setIsPaid(true);
+      await timeout(4000);
     } catch (e) {
       safeActions.setBlockBackdrop(false);
       if (e?.code === 4001) {

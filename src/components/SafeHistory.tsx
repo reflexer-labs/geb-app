@@ -190,8 +190,8 @@ const ExternalLink = styled.a`
   color: ${(props) => props.theme.colors.inputBorderColor};
 
   img {
-    width: 12px;
-    height: 12px;
+    width: 8px;
+    height: 8px;
     border-radius: 0;
     ${({ theme }) => theme.mediaWidth.upToSmall`
       width:8px;

@@ -3,10 +3,11 @@ import { toast } from 'react-toastify';
 import ToastPayload from '../components/ToastPayload';
 import { useActiveWeb3React } from '../hooks';
 import store, { useStoreState } from '../store';
+import { ITransaction } from '../utils/interfaces';
 
 export function shouldCheck(
   lastBlockNumber: number,
-  tx: { addedTime: number; receipt?: {}; lastCheckedBlockNumber?: number }
+  tx: ITransaction
 ): boolean {
   if (tx.receipt) return false;
   if (!tx.lastCheckedBlockNumber) return true;

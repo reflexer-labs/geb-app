@@ -10,7 +10,6 @@ import {
 import {
   handleDepositAndBorrow,
   handleRepayAndWithdraw,
-  handleSafeCreation,
 } from '../services/blockchain';
 import { fetchSafeById, fetchUserSafes } from '../services/graphql';
 import { DEFAULT_SAFE_STATE } from '../utils/constants';
@@ -45,7 +44,6 @@ export interface SafeModel {
     any,
     StoreModel
   >;
-  createSafe: Thunk<SafeModel, ISafePayload, any, StoreModel>;
   fetchSafeById: Thunk<
     SafeModel,
     { safeId: string; account: string },
@@ -98,32 +96,6 @@ const safeModel: SafeModel = {
   },
   uniSwapPool: DEFAULT_SAFE_STATE,
   historyList: [],
-  createSafe: thunk(async (actions, payload, { getStoreActions }) => {
-    const storeActions = getStoreActions();
-    storeActions.connectWalletModel.setIsStepLoading(true);
-    const txResponse = await handleSafeCreation(
-      payload.signer,
-      payload.safeData
-    );
-    if (txResponse) {
-      const { hash, chainId } = txResponse;
-      storeActions.transactionsModel.addTransaction({
-        chainId,
-        hash,
-        from: txResponse.from,
-        summary: 'Creating a new Safe',
-        addedTime: new Date().getTime(),
-        originalTx: txResponse,
-      });
-      storeActions.popupsModel.setIsWaitingModalOpen(true);
-      storeActions.popupsModel.setWaitingPayload({
-        title: 'Transaction Submitted',
-        hash: txResponse.hash,
-        status: 'success',
-      });
-      await txResponse.wait();
-    }
-  }),
   depositAndBorrow: thunk(async (actions, payload, { getStoreActions }) => {
     const storeActions = getStoreActions();
     const txResponse = await handleDepositAndBorrow(
@@ -150,46 +122,47 @@ const safeModel: SafeModel = {
       await txResponse.wait();
     }
   }),
-  repayAndWithdraw: thunk(async (actions, payload, { getStoreActions }) => {
-    const storeActions = getStoreActions();
-    const txResponse = await handleRepayAndWithdraw(
-      payload.signer,
-      payload.safeData,
-      payload.safeId
-    );
-    if (txResponse) {
-      const { hash, chainId } = txResponse;
-      storeActions.transactionsModel.addTransaction({
-        chainId,
-        hash,
-        from: txResponse.from,
-        summary: 'Modifying Safe',
-        addedTime: new Date().getTime(),
-        originalTx: txResponse,
-      });
-      storeActions.popupsModel.setIsWaitingModalOpen(true);
-      storeActions.popupsModel.setWaitingPayload({
-        title: 'Transaction Submitted',
-        hash: txResponse.hash,
-        status: 'success',
-      });
-      await txResponse.wait();
+  repayAndWithdraw: thunk(
+    async (actions, payload, { getStoreActions, getStoreState }) => {
+      const storeActions = getStoreActions();
+      const txResponse = await handleRepayAndWithdraw(
+        payload.signer,
+        payload.safeData,
+        payload.safeId
+      );
+      if (txResponse) {
+        const { hash, chainId } = txResponse;
+        storeActions.transactionsModel.addTransaction({
+          chainId,
+          hash,
+          from: txResponse.from,
+          summary: 'Modifying Safe',
+          addedTime: new Date().getTime(),
+          originalTx: txResponse,
+        });
+        storeActions.popupsModel.setIsWaitingModalOpen(true);
+        storeActions.popupsModel.setWaitingPayload({
+          title: 'Transaction Submitted',
+          hash: txResponse.hash,
+          status: 'success',
+        });
+        await txResponse.wait();
+      }
     }
-  }),
+  ),
   fetchUserSafes: thunk(async (actions, payload, { getStoreActions }) => {
     const storeActions = getStoreActions();
     const fetched = await fetchUserSafes(payload.toLowerCase());
     actions.setList(fetched.userSafes);
     if (fetched.userSafes.length > 0) {
       actions.setIsSafeCreated(true);
-      storeActions.connectWalletModel.setStep(1);
+      storeActions.connectWalletModel.setStep(2);
     } else {
       storeActions.popupsModel.setWaitingPayload({
         title: 'Fetching user safes',
         status: 'loading',
       });
       actions.setIsSafeCreated(false);
-      storeActions.connectWalletModel.setStep(1);
     }
     actions.setLiquidationData({
       ...fetched.collateralType,

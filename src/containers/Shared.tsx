@@ -37,7 +37,10 @@ const Shared = ({ children }: Props) => {
   const { chainId, account } = useActiveWeb3React();
   const history = useHistory();
   const previousAccount = usePrevious(account);
-  const { settingsModel: settingsState } = useStoreState((state) => state);
+  const {
+    settingsModel: settingsState,
+    connectWalletModel: connectWalletState,
+  } = useStoreState((state) => state);
 
   const {
     settingsModel: settingsActions,
@@ -52,7 +55,8 @@ const Shared = ({ children }: Props) => {
     if (!account || !chainId) return;
     popupsActions.setIsWaitingModalOpen(true);
     const isUserCreated = await connectWalletActions.fetchUser(account);
-    if (isUserCreated) {
+    if (isUserCreated && !connectWalletState.ctHash) {
+      connectWalletActions.setStep(2);
       const txs = localStorage.getItem(`${account}-${chainId}`);
       if (txs) {
         transactionsActions.setTransactions(JSON.parse(txs));
@@ -72,9 +76,11 @@ const Shared = ({ children }: Props) => {
       connectWalletActions.setStep(0);
       safeActions.setIsSafeCreated(false);
       connectWalletActions.setIsUserCreated(false);
+      transactionsActions.setTransactions({});
     }
     if (isAccountSwitched) {
       history.push('/');
+      transactionsActions.setTransactions({});
     }
   }
 

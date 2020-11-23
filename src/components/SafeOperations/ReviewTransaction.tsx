@@ -47,6 +47,14 @@ const ReviewTransaction = () => {
     return 'Creating a new Safe';
   };
 
+  const reset = () => {
+    safeActions.setStage(0);
+    safeActions.setUniSwapPool(DEFAULT_SAFE_STATE);
+    safeActions.setSafeData(DEFAULT_SAFE_STATE);
+    connectWalletActions.setIsStepLoading(true);
+    safeActions.setIsSafeCreated(true);
+  };
+
   const handleConfirm = async () => {
     if (account && library) {
       popupsActions.setSafeOperationPayload({
@@ -64,6 +72,7 @@ const ReviewTransaction = () => {
       const signer = library.getSigner(account);
       try {
         if (type === 'deposit_borrow' && isCreate) {
+          connectWalletActions.setIsStepLoading(true);
           await safeActions.depositAndBorrow({
             safeData: safeState.safeData,
             signer,
@@ -81,19 +90,12 @@ const ReviewTransaction = () => {
             safeId: safeState.singleSafe.id,
           });
         }
-        safeActions.setStage(0);
-        safeActions.setUniSwapPool(DEFAULT_SAFE_STATE);
-        safeActions.setSafeData(DEFAULT_SAFE_STATE);
-        connectWalletActions.setIsStepLoading(true);
-        safeActions.setIsSafeCreated(true);
+        reset();
         await safeActions.fetchUserSafes(account);
       } catch (e) {
         handleTransactionError(e);
       } finally {
-        safeActions.setStage(0);
-        safeActions.setUniSwapPool(DEFAULT_SAFE_STATE);
-        safeActions.setSafeData(DEFAULT_SAFE_STATE);
-        connectWalletActions.setIsStepLoading(true);
+        reset();
       }
     }
   };

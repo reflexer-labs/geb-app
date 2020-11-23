@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
 import StepsContent from './StepsContent';
@@ -10,11 +10,12 @@ import {
 } from '../hooks/TransactionHooks';
 
 const Steps = () => {
-  const { account, library } = useActiveWeb3React();
-
-  const { connectWalletModel: connectWalletState } = useStoreState(
-    (state) => state
-  );
+  const { account, library, chainId } = useActiveWeb3React();
+  const [blocksSinceCheck, setBlocksSinceCheck] = useState<number>();
+  const {
+    connectWalletModel: connectWalletState,
+    transactionsModel: transactionsState,
+  } = useStoreState((state) => state);
   const {
     popupsModel: popupsActions,
     connectWalletModel: connectWalletActions,
@@ -22,18 +23,60 @@ const Steps = () => {
 
   const addTransaction = useTransactionAdder();
 
-  const { step, isWrongNetwork, isStepLoading } = connectWalletState;
+  const {
+    step,
+    isWrongNetwork,
+    isStepLoading,
+    blockNumber,
+    ctHash,
+  } = connectWalletState;
+
+  const { transactions } = transactionsState;
+
+  const returnConfirmations = () => {
+    if (
+      !chainId ||
+      !blockNumber[chainId] ||
+      !ctHash ||
+      !transactions[ctHash] ||
+      step !== 1
+    ) {
+      return null;
+    }
+    const currentBlockNumber = blockNumber[chainId];
+    const txBlockNumber = transactions[ctHash].originalTx.blockNumber;
+    if (!txBlockNumber || !currentBlockNumber) return null;
+    const diff = currentBlockNumber - txBlockNumber;
+    if (diff > 10) {
+      connectWalletActions.setIsStepLoading(false);
+      connectWalletActions.setStep(2);
+      localStorage.removeItem('ctHash');
+      return null;
+    }
+    setBlocksSinceCheck(diff);
+  };
+
+  const returnConfCallback = useCallback(returnConfirmations, [
+    chainId,
+    blockNumber,
+    ctHash,
+    step,
+  ]);
+
+  useEffect(() => {
+    returnConfCallback();
+  }, [returnConfCallback]);
 
   const handleConnectWallet = () =>
     popupsActions.setIsConnectorsWalletOpen(true);
 
   const handleCreateAccount = async () => {
-    if (!account || !library) return false;
-    connectWalletActions.setIsStepLoading(true);
+    if (!account || !library || !chainId) return false;
     const txData = geb.deployProxy();
     const signer = library.getSigner(account);
 
     try {
+      connectWalletActions.setIsStepLoading(true);
       popupsActions.setIsWaitingModalOpen(true);
       popupsActions.setWaitingPayload({
         title: 'Waiting For Confirmation',
@@ -42,18 +85,20 @@ const Steps = () => {
         status: 'loading',
       });
       const txResponse = await signer.sendTransaction(txData);
-      addTransaction(txResponse, 'Creating account');
+      connectWalletActions.setCtHash(txResponse.hash);
+      addTransaction(
+        { ...txResponse, blockNumber: blockNumber[chainId] },
+        'Creating an account'
+      );
       popupsActions.setWaitingPayload({
         title: 'Transaction Submitted',
         hash: txResponse.hash,
         status: 'success',
       });
       await txResponse.wait();
-      connectWalletActions.setStep(2);
     } catch (e) {
-      handleTransactionError(e);
-    } finally {
       connectWalletActions.setIsStepLoading(false);
+      handleTransactionError(e);
     }
   };
 
@@ -116,6 +161,13 @@ const Steps = () => {
         ) : null}
       </StepsBars>
       {returnSteps(step)}
+      {step === 1 && ctHash ? (
+        <Confirmations>{`WATITING FOR CONFIRMATIONS ${
+          !blocksSinceCheck ? 0 : blocksSinceCheck > 10 ? 10 : blocksSinceCheck
+        } of 10`}</Confirmations>
+      ) : (
+        ''
+      )}
     </StepsContainer>
   );
 };
@@ -144,4 +196,10 @@ const StepBar = styled.div`
   &:last-child {
     margin-right: 0;
   }
+`;
+
+const Confirmations = styled.div`
+  text-align: center;
+  margin-top: 10px;
+  font-size: ${(props) => props.theme.font.extraSmall};
 `;

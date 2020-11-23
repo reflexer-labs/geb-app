@@ -5,31 +5,6 @@ import { ISafeData } from '../utils/interfaces';
 import { ETH_NETWORK } from '../utils/constants';
 import { handlePreTxGasEstimate } from '../hooks/TransactionHooks';
 
-export const handleSafeCreation = async (
-  signer: JsonRpcSigner,
-  safeData: ISafeData
-) => {
-  if (!signer || !safeData) {
-    return false;
-  }
-  const collateralBN = ethersUtils.parseEther(safeData.leftInput);
-  const debtBN = ethersUtils.parseEther(safeData.rightInput);
-
-  const geb = new Geb(ETH_NETWORK, signer.provider);
-
-  const proxy = await geb.getProxyAction(signer._address);
-  const txData = proxy.openLockETHAndGenerateDebt(
-    collateralBN,
-    gebUtils.ETH_A,
-    debtBN
-  );
-
-  const tx = await handlePreTxGasEstimate(signer, txData);
-
-  const txResponse = await signer.sendTransaction(tx);
-  return txResponse;
-};
-
 export const handleDepositAndBorrow = async (
   signer: JsonRpcSigner,
   safeData: ISafeData,

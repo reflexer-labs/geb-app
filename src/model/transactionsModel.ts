@@ -23,6 +23,8 @@ const transactionsModel: TransactionsModel = {
   }),
   checkTransaction: action((state, payload) => {
     const { tx, blockNumber } = payload;
+    console.log(tx, blockNumber);
+
     if (!tx) {
       return;
     }

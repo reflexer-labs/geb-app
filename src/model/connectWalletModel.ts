@@ -10,6 +10,7 @@ export interface ConnectWalletModel {
   isUserCreated: boolean;
   proxyAddress: string;
   coinAllowance: string;
+  ctHash: string;
   ethBalance: ITokenBalance;
   praiBalance: ITokenBalance;
   isWrongNetwork: boolean;
@@ -35,7 +36,10 @@ export interface ConnectWalletModel {
   setProxyAddress: Action<ConnectWalletModel, string>;
   setCoinAllowance: Action<ConnectWalletModel, string>;
   setIsStepLoading: Action<ConnectWalletModel, boolean>;
+  setCtHash: Action<ConnectWalletModel, string>;
 }
+
+const ctHashState = localStorage.getItem('ctHash');
 
 const connectWalletModel: ConnectWalletModel = {
   blockNumber: {},
@@ -45,6 +49,7 @@ const connectWalletModel: ConnectWalletModel = {
   step: 0,
   proxyAddress: '',
   coinAllowance: '',
+  ctHash: ctHashState || '',
   isStepLoading: false,
   isWrongNetwork: false,
   isUserCreated: false,
@@ -106,6 +111,11 @@ const connectWalletModel: ConnectWalletModel = {
   }),
   setIsStepLoading: action((state, payload) => {
     state.isStepLoading = payload;
+  }),
+
+  setCtHash: action((state, payload) => {
+    state.ctHash = payload;
+    localStorage.setItem('ctHash', payload);
   }),
 };
 
