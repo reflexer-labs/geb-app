@@ -26,7 +26,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       return (
         <Container>
           <Content>
-            <img src={process.env.PUBLIC_URL + '/img/error.svg'} alt="" />
+            <img src={require('./assets/error.svg')} alt="" />
             <h2>Something went wrong.</h2>
             <Details>
               {this.state.error && this.state.error.toString()}

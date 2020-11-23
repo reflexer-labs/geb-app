@@ -1,12 +1,31 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { INITIAL_SAFE_STATE } from '../../model/safeModel';
 import { useStoreActions, useStoreState } from '../../store';
 import { ISafe } from '../../utils/interfaces';
 import Button from '../Button';
 import DecimalInput from '../DecimalInput';
 import Dropdown from '../Dropdown';
+
+const INITIAL_SAFE_STATE = [
+  {
+    id: '2354',
+    img: require('../../assets/box-ph.svg'),
+    date: 'July 3, 2020',
+    riskState: 'low',
+    collateral: '100.00',
+    debt: '23.00',
+    totalDebt: '',
+    accumulatedRate: '1.15',
+    collateralRatio: '150',
+    currentRedemptionPrice: '2.15',
+    currentLiquidationPrice: '225.75',
+    liquidationCRatio: '1.5',
+    liquidationPenalty: '1.11',
+    liquidationPrice: '250.00',
+    totalAnnualizedStabilityFee: '0',
+  },
+];
 
 interface Props {
   setClaimableSafe: (safe: ISafe) => void;
@@ -96,7 +115,7 @@ const ClaimContainer = ({ setClaimableSafe, setFLXToBurn }: Props) => {
           {popupsState.ESMOperationPayload.type === 'ETH' ? (
             <Item>
               <Label>{'Claimable ETH'}</Label>{' '}
-              <Value>{selectedSafe ? selectedSafe.depositedEth : '0.00'}</Value>
+              <Value>{selectedSafe ? selectedSafe.collateral : '0.00'}</Value>
             </Item>
           ) : null}
 

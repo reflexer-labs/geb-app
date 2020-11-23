@@ -1,8 +1,12 @@
 import { AbstractConnector } from '@web3-react/abstract-connector';
+import { TransactionResponse } from '@ethersproject/providers';
+import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
 import { DefaultTheme, ThemedCssFunction } from 'styled-components';
+import { ChainId } from '@uniswap/sdk';
+import { IconName } from '../components/FeatherIconWrapper';
 
 export interface DynamicObject {
-  [key: string]: any
+  [key: string]: any;
 }
 
 interface IColors {
@@ -71,25 +75,20 @@ export interface NavLinkType {
   text: string;
 }
 
-export interface CreateSafeType {
-  depositedETH: string;
-  borrowedRAI: string;
-}
-
-export interface ToastPayload {
-  showPopup: boolean;
-  text: string;
-  hideSpinner?: boolean | null;
-  isTransaction?: boolean | null;
-  timeout?: number | null;
-  autoHide?: boolean;
+export interface ISafeData {
+  totalCollateral: string;
+  totalDebt: string;
+  leftInput: string;
+  rightInput: string;
+  collateralRatio: number;
+  liquidationPrice: number;
 }
 
 export interface IBlockNumber {
   [chainId: number]: number;
 }
 
-export interface IEthBalance {
+export interface ITokenBalance {
   [chainId: number]: number;
 }
 
@@ -107,12 +106,19 @@ export interface WalletInfo {
 
 export interface ISafe {
   id: string;
-  img: string;
   date: string;
   riskState: string;
-  depositedEth: string;
-  borrowedRAI: string;
+  collateral: string;
+  debt: string;
+  totalDebt: string;
+  accumulatedRate: string;
+  collateralRatio: string;
+  currentRedemptionPrice: string;
+  currentLiquidationPrice: string;
+  liquidationCRatio: string;
+  liquidationPenalty: string;
   liquidationPrice: string;
+  totalAnnualizedStabilityFee: string;
 }
 
 export interface LoadingPayload {
@@ -138,4 +144,62 @@ export interface IVotingTx {
   endsIn: string;
   isCompleted: boolean;
   isAbandoned: boolean;
+}
+
+export interface ILiquidationData {
+  accumulatedRate: string;
+  currentPrice: { liquidationPrice: string; safetyPrice: string };
+  debtFloor: string;
+  liquidationCRatio: string;
+  liquidationPenalty: string;
+  safetyCRatio: string;
+  currentRedemptionPrice: string;
+  totalAnnualizedStabilityFee: string;
+  debtCeiling: string;
+  globalDebt: string;
+}
+
+export interface ISafePayload {
+  safeData: ISafeData;
+  signer: JsonRpcSigner;
+}
+
+export interface IWaitingPayload {
+  title?: string;
+  text?: string;
+  hint?: string;
+  status: string;
+  hash?: string;
+}
+
+export interface SerializableTransactionReceipt {
+  to: string;
+  from: string;
+  contractAddress: string;
+  transactionIndex: number;
+  blockHash: string;
+  transactionHash: string;
+  blockNumber: number;
+  status?: number;
+}
+export interface ITransaction {
+  chainId: ChainId;
+  hash: string;
+  from: string;
+  receipt?: SerializableTransactionReceipt;
+  summary?: string;
+  lastCheckedBlockNumber?: number;
+  addedTime: number;
+  confirmedTime?: number;
+  originalTx: TransactionResponse;
+}
+
+export interface ISafeHistory {
+  title: string;
+  date: string;
+  amount: number;
+  link: string;
+  txHash: string;
+  icon: IconName;
+  color: string;
 }

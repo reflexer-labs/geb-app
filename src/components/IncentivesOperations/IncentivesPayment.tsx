@@ -10,9 +10,9 @@ import Dropdown from '../Dropdown';
 const INITITAL_STATE = [
   {
     item: 'Uniswap',
-    img: `${process.env.PUBLIC_URL + '/img/uni-icon.svg'}`,
+    img: require('../../assets/uni-icon.svg'),
   },
-  { item: 'RAI/ETH', img: `${process.env.PUBLIC_URL + '/img/ref-icon.svg'}` },
+  { item: 'RAI/ETH', img: require('../../assets/ref-icon.svg') },
 ];
 
 interface Props {

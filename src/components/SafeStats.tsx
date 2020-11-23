@@ -1,66 +1,87 @@
 import React from 'react';
+import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { useStoreActions } from '../store';
+import { useStoreActions, useStoreState } from '../store';
 import Button from './Button';
+import {
+  formatNumber,
+  getInterestOwed,
+  getRatePercentage,
+} from '../utils/helper';
 
 const SafeStats = () => {
   const { t } = useTranslation();
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
+  const { safeModel: safeState } = useStoreState((state) => state);
+
+  const { singleSafe } = safeState;
+
+  const collateral = formatNumber(singleSafe?.collateral || '0');
+  const totalDebt = formatNumber(singleSafe?.totalDebt || '0');
+  const interestOwed = singleSafe
+    ? getInterestOwed(singleSafe.debt, singleSafe.accumulatedRate)
+    : 0;
+
+  const liquidationPenalty = getRatePercentage(
+    singleSafe?.liquidationPenalty || '1'
+  );
+
+  const stabilityFees = numeral(
+    singleSafe?.totalAnnualizedStabilityFee.toString()
+  )
+    .subtract(1)
+    .multiply(100)
+    .value();
+  const totalAnnualizedStabilityFee = formatNumber(
+    stabilityFees.toString() || '0',
+    2
+  );
 
   return (
     <>
       <StatsGrid>
         <StatItem>
           <StateInner>
-            <Value>291.39%</Value>
+            <Value>{`${singleSafe?.collateralRatio}%`}</Value>
             <Label>{'Collateralization Ratio'}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem>
           <StateInner>
-            <Value>$25.01</Value>
-            <Label>{'Interest Owed (2.50% APR)'}</Label>
+            <Value>{`$${interestOwed}`}</Value>
+            <Label>{`Interest Owed (${totalAnnualizedStabilityFee}% APR)`}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem>
           <StateInner>
-            <Value>$197.37</Value>
+            <Value>{`$${singleSafe?.liquidationPrice}`}</Value>
             <Label>{'Liquidation Price'}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem>
           <StateInner>
-            <Value>11.00%</Value>
+            <Value>{`${liquidationPenalty}%`}</Value>
             <Label>{'Liquidation Penalty'}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem className="w50">
           <StateInner>
-            <Value>100.0000 ETH</Value>
-            <Label>{'ETH Deposited'}</Label>
+            <Value>{`${collateral} ETH`}</Value>
+            <Label>{'ETH Collateral'}</Label>
             <Actions>
               <Button
-                dimmed
-                text={t('withdraw')}
-                onClick={() =>
-                  popupsActions.setSafeOperationPayload({
-                    isOpen: true,
-                    type: 'withdraw',
-                  })
-                }
-              />
-              <Button
                 withArrow
-                text={t('deposit')}
+                text={t('deposit_borrow')}
                 onClick={() =>
                   popupsActions.setSafeOperationPayload({
                     isOpen: true,
-                    type: 'deposit',
+                    type: 'deposit_borrow',
+                    isCreate: false,
                   })
                 }
               />
@@ -70,26 +91,17 @@ const SafeStats = () => {
 
         <StatItem className="w50">
           <StateInner>
-            <Value>12,5000 RAI</Value>
-            <Label>{'RAI Borrowed'}</Label>
+            <Value>{`${totalDebt} RAI`}</Value>
+            <Label>{'RAI Debt'}</Label>
             <Actions>
               <Button
-                dimmed
-                text={t('repay')}
-                onClick={() =>
-                  popupsActions.setSafeOperationPayload({
-                    isOpen: true,
-                    type: 'repay',
-                  })
-                }
-              />
-              <Button
                 withArrow
-                text={t('borrow')}
+                text={t('repay_withdraw')}
                 onClick={() =>
                   popupsActions.setSafeOperationPayload({
                     isOpen: true,
-                    type: 'borrow',
+                    type: 'repay_withdraw',
+                    isCreate: false,
                   })
                 }
               />
@@ -174,5 +186,5 @@ const Label = styled.div`
 const Actions = styled.div`
   display: flex;
   margin-top: 1rem;
-  justify-content: space-between;
+  justify-content: flex-end;
 `;

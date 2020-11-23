@@ -16,7 +16,7 @@ const LoadingModal = () => {
       backDropColor={'rgba(255,255,255)'}
     >
       <LoaderContainer>
-        <img src={process.env.PUBLIC_URL + '/logo192.png'} alt={''} />
+        <img src={require('../../assets/logo192.png')} alt={''} />
         {popupsState.isLoadingModalOpen.text ? (
           <Text>{popupsState.isLoadingModalOpen.text}</Text>
         ) : null}

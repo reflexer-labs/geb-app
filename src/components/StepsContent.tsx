@@ -8,15 +8,29 @@ interface Props {
   text: string;
   btnText: string;
   handleClick: () => void;
+  isDisabled: boolean;
+  isLoading: boolean;
 }
 
-const StepsContent = ({ title, text, btnText, handleClick }: Props) => {
+const StepsContent = ({
+  title,
+  text,
+  btnText,
+  handleClick,
+  isDisabled,
+  isLoading,
+}: Props) => {
   const { t } = useTranslation();
   return (
     <Container>
       <Title>{t(title)}</Title>
       <Text>{t(text)}</Text>
-      <Button text={t(btnText)} onClick={handleClick} />
+      <Button
+        disabled={isDisabled || isLoading}
+        isLoading={isLoading}
+        text={t(btnText)}
+        onClick={handleClick}
+      />
     </Container>
   );
 };

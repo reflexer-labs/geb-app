@@ -76,7 +76,7 @@ const Privacy = ({ ...props }) => {
         </p>
         <p>
           We do not collect metadata or other personally identifiable
-          information, although that may change over time.{' '}
+          information, although that may change over time.
         </p>
         <p>
           We use your email address to send you a periodic (typically monthly)

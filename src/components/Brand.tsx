@@ -12,7 +12,7 @@ const Brand = ({ height }: Props) => {
       <Link to="/">
         <img
           height={height}
-          src={process.env.PUBLIC_URL + '/img/brand.svg'}
+          src={require('../assets/brand.svg')}
           alt="reflexer labs"
         />
       </Link>

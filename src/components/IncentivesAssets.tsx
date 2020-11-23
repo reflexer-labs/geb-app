@@ -28,7 +28,7 @@ const IncentivesAssets = () => {
       <List>
         <Row ref={ref}>
           <Col>
-            <img src={process.env.PUBLIC_URL + '/img/eth-logo.svg'} alt="" />
+            <img src={require('../assets/eth-logo.svg')} alt="" />
             <Label>
               ETH
               <Tag>Ethereum</Tag>
@@ -46,7 +46,7 @@ const IncentivesAssets = () => {
 
         <Row>
           <Col>
-            <img src={process.env.PUBLIC_URL + '/img/rai-logo.svg'} alt="" />
+            <img src={require('../assets/rai-logo.svg')} alt="" />
             <Label>
               RAI
               <Tag>RAI Token</Tag>
@@ -63,7 +63,7 @@ const IncentivesAssets = () => {
         </Row>
         <Row>
           <Col>
-            <img src={process.env.PUBLIC_URL + '/img/flx-logo.svg'} alt="" />
+            <img src={require('../assets/flx-logo.svg')} alt="" />
             <Label>
               FLX
               <Tag>Flex Token</Tag>

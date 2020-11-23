@@ -1,43 +1,64 @@
 import React from 'react';
+import { toSvg } from 'jdenticon';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import dayjs from 'dayjs';
+import { formatNumber } from '../utils/helper';
+import { jdenticonConfig } from '../utils/constants';
 
 const SafeBlock = ({ ...props }) => {
   const { t } = useTranslation();
+
+  const collateral = formatNumber(props.collateral);
+  const totalDebt = formatNumber(props.totalDebt);
+  const createdAt = dayjs.unix(props.date).format('MMM D, YYYY h:mm A');
+
+  function createImage() {
+    return { __html: toSvg(props.safeHandler + props.id, 40, jdenticonConfig) };
+  }
+
   return (
     <>
       <BlockContainer>
         <BlockHeader>
           <SafeInfo>
-            <img src={props.img} alt="" />
+            {<div dangerouslySetInnerHTML={createImage()} />}
             <SafeData>
               <SafeTitle>{`Safe #${props.id}`}</SafeTitle>
               <Date>
-                {t('created')} {props.date}
+                {t('created')} {createdAt}
               </Date>
             </SafeData>
           </SafeInfo>
-          <SafeState className={props.riskState === 'high' ? 'high' : ''}>
-            {t('risk')} <span>{props.riskState}</span>
-          </SafeState>
+          {props.riskState ? (
+            <SafeState className={props.riskState.toLowerCase()}>
+              {t('risk')} <span>{props.riskState}</span>
+            </SafeState>
+          ) : null}
         </BlockHeader>
         <Block>
           <Item>
-            <Label>{'ETH Deposited'}</Label> <Value>{props.depositedEth}</Value>
+            <Label>{'ETH Deposited'}</Label>
+            <Value>{collateral}</Value>
           </Item>
           <Item>
-            <Label>{'RAI Borrowed'}</Label> <Value>{props.borrowedRAI}</Value>
+            <Label>{'RAI Borrowed'}</Label>
+            <Value>{totalDebt}</Value>
           </Item>
           <Item>
-            <Label>{'Liquidation Price'}</Label>{' '}
-            <Value>{props.liquidationPrice}</Value>
+            <Label>{'Collateralization Ratio'}</Label>
+            <Value>{`${props.collateralRatio}%`}</Value>
+          </Item>
+          <Item>
+            <Label>{'Liquidation Price'}</Label>
+            <Value>${props.liquidationPrice}</Value>
           </Item>
         </Block>
         <BtnContainer>
           <Link to={`/safes/${props.id}`}>
             {t('manage_safe')}{' '}
-            <img src={process.env.PUBLIC_URL + '/img/arrow.svg'} alt={''} />
+            <img src={require('../assets/arrow.svg')} alt={''} />
           </Link>
         </BtnContainer>
       </BlockContainer>
@@ -63,10 +84,9 @@ const BlockHeader = styled.div`
 const SafeInfo = styled.div`
   display: flex;
   align-items: center;
-  img {
+  svg {
     border-radius: ${(props) => props.theme.global.borderRadius};
-    width: 40px;
-    height: 40px;
+    border: 1px solid ${(props) => props.theme.colors.border};
   }
 `;
 
@@ -101,11 +121,19 @@ const SafeState = styled.div`
   span {
     text-transform: capitalize;
   }
+  &.medium {
+    color: ${(props) => props.theme.colors.warningColor};
+    border: 1px solid ${(props) => props.theme.colors.warningBorder};
+    background: ${(props) => props.theme.colors.warningBackground};
+  }
   &.high {
     color: ${(props) => props.theme.colors.dangerColor};
     border: 1px solid ${(props) => props.theme.colors.dangerBorder};
     background: ${(props) => props.theme.colors.dangerBackground};
   }
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    padding: 8px 10px;
+  `}
 `;
 
 const Block = styled.div`

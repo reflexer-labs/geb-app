@@ -6,6 +6,8 @@ import { ISafe } from '../../utils/interfaces';
 const SafeList = () => {
   const { safeModel: safeState } = useStoreState((state) => state);
 
+  // TODO: Re-fetch safes list after creating a safe
+
   const returnSafeList = () => {
     if (safeState.list.length > 0) {
       return safeState.list.map((safe: ISafe) => (

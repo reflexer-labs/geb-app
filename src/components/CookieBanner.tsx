@@ -14,7 +14,7 @@ const CookieBanner = () => {
     >
       <CookiesText>
         {' '}
-        <img src={process.env.PUBLIC_URL + '/img/cookie.svg'} alt="" />
+        <img src={require('../assets/cookie.svg')} alt="" />
         This website uses cookies to enhance the user experience. By continuing
         to browse the site you're agreeing to our{' '}
         <CustomLink to={{ pathname: '/privacy', state: { goToCookies: true } }}>

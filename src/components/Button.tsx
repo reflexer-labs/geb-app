@@ -1,13 +1,16 @@
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import Loader from './Loader';
 
 interface Props {
   text?: string;
   onClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void;
   dimmed?: boolean;
+  dimmedNormal?: boolean;
   withArrow?: boolean;
   disabled?: boolean;
+  isLoading?: boolean;
   dimmedWithArrow?: boolean;
   isBordered?: boolean;
   arrowPlacement?: string;
@@ -18,8 +21,10 @@ const Button = ({
   text,
   onClick,
   dimmed,
+  dimmedNormal,
   withArrow,
   disabled,
+  isLoading,
   dimmedWithArrow,
   isBordered,
   arrowPlacement = 'left',
@@ -33,20 +38,18 @@ const Button = ({
         </DimmedBtn>
       );
     }
+
     if (dimmedWithArrow) {
       return (
         <DimmedBtn disabled={disabled} onClick={onClick}>
           {arrowPlacement === 'left' ? (
-            <img
-              src={process.env.PUBLIC_URL + '/img/dark-arrow.svg'}
-              alt={''}
-            />
+            <img src={require('../assets/dark-arrow.svg')} alt={''} />
           ) : null}
           {text && t(text)}
           {arrowPlacement === 'right' ? (
             <img
               className="rotate"
-              src={process.env.PUBLIC_URL + '/img/dark-arrow.svg'}
+              src={require('../assets/dark-arrow.svg')}
               alt={''}
             />
           ) : null}
@@ -56,7 +59,7 @@ const Button = ({
       return (
         <ArrowBtn disabled={disabled} onClick={onClick}>
           {text && t(text)}{' '}
-          <img src={process.env.PUBLIC_URL + '/img/arrow.svg'} alt={''} />
+          <img src={require('../assets/arrow.svg')} alt={''} />
         </ArrowBtn>
       );
     } else if (isBordered) {
@@ -67,8 +70,15 @@ const Button = ({
       );
     } else {
       return (
-        <Container disabled={disabled} onClick={onClick}>
-          {text && t(text)} {children ? children : null}
+        <Container
+          className={dimmedNormal ? 'dimmedNormal' : ''}
+          disabled={disabled}
+          isLoading={isLoading}
+          onClick={onClick}
+        >
+          {text && t(text)}
+          {children || null}
+          {isLoading && <Loader inlineButton />}
         </Container>
       );
     }
@@ -79,7 +89,7 @@ const Button = ({
 
 export default Button;
 
-const Container = styled.button`
+const Container = styled.button<{ isLoading?: boolean }>`
   outline: none;
   cursor: pointer;
   min-width: 134px;
@@ -93,10 +103,18 @@ const Container = styled.button`
   background: ${(props) => props.theme.colors.gradient};
   border-radius: ${(props) => props.theme.global.borderRadius};
   transition: all 0.3s ease;
+  &.dimmedNormal {
+    background: ${(props) => props.theme.colors.secondary};
+  }
   &:hover {
     opacity: 0.8;
   }
+
   &:disabled {
+    background: ${(props) =>
+      props.isLoading
+        ? props.theme.colors.placeholder
+        : props.theme.colors.secondary};
     cursor: not-allowed;
   }
 `;
