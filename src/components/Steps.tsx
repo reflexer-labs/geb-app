@@ -8,6 +8,7 @@ import {
   handleTransactionError,
   useTransactionAdder,
 } from '../hooks/TransactionHooks';
+import { timeout } from '../utils/helper';
 
 const Steps = () => {
   const { account, library, chainId } = useActiveWeb3React();
@@ -33,7 +34,7 @@ const Steps = () => {
 
   const { transactions } = transactionsState;
 
-  const returnConfirmations = () => {
+  const returnConfirmations = async () => {
     if (
       !chainId ||
       !blockNumber[chainId] ||
@@ -48,13 +49,14 @@ const Steps = () => {
     const txBlockNumber = transactions[ctHash].originalTx.blockNumber;
     if (!txBlockNumber || !currentBlockNumber) return null;
     const diff = currentBlockNumber - txBlockNumber;
+    setBlocksSinceCheck(diff >= 10 ? 10 : diff);
     if (diff > 10) {
+      await timeout(3000);
       connectWalletActions.setIsStepLoading(false);
       connectWalletActions.setStep(2);
       localStorage.removeItem('ctHash');
       return null;
     }
-    setBlocksSinceCheck(diff);
   };
 
   const returnConfCallback = useCallback(returnConfirmations, [

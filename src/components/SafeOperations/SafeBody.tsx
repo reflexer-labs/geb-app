@@ -262,7 +262,7 @@ const SafeBody = ({ isChecked }: Props) => {
 
       if (totalDebtBN.gte(perSafeDebtCeilingBN)) {
         setError(
-          `Individual safe can't have more than ${perSafeDebtCeiling} RAI of debt.`
+          `Individual safe can't have more than ${perSafeDebtCeiling} PRAI of debt.`
         );
         return;
       }
