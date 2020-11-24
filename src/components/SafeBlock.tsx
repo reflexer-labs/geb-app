@@ -31,11 +31,14 @@ const SafeBlock = ({ ...props }) => {
               </Date>
             </SafeData>
           </SafeInfo>
-          {props.riskState ? (
-            <SafeState className={props.riskState.toLowerCase()}>
-              {t('risk')} <span>{props.riskState}</span>
-            </SafeState>
-          ) : null}
+
+          <SafeState
+            className={
+              props.riskState ? props.riskState.toLowerCase() : 'dimmed'
+            }
+          >
+            {t('risk')} <span>{props.riskState || 'None'}</span>
+          </SafeState>
         </BlockHeader>
         <Block>
           <Item>
@@ -43,7 +46,7 @@ const SafeBlock = ({ ...props }) => {
             <Value>{collateral}</Value>
           </Item>
           <Item>
-            <Label>{'RAI Borrowed'}</Label>
+            <Label>{'PRAI Borrowed'}</Label>
             <Value>{totalDebt}</Value>
           </Item>
           <Item>
@@ -120,6 +123,11 @@ const SafeState = styled.div`
   height: fit-content;
   span {
     text-transform: capitalize;
+  }
+  &.dimmed {
+    color: ${(props) => props.theme.colors.dimmedColor};
+    border: 1px solid ${(props) => props.theme.colors.dimmedBorder};
+    background: ${(props) => props.theme.colors.dimmedBackground};
   }
   &.medium {
     color: ${(props) => props.theme.colors.warningColor};

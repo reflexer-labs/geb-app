@@ -14,6 +14,10 @@ export const liquidationQuery = `
   }
 systemState(id: "current") {
   globalDebt
+  perSafeDebtCeiling
+  currentRedemptionRate {
+    annualizedRate
+  }
   currentRedemptionPrice {
     value
   }

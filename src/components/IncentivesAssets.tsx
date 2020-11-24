@@ -48,8 +48,8 @@ const IncentivesAssets = () => {
           <Col>
             <img src={require('../assets/rai-logo.svg')} alt="" />
             <Label>
-              RAI
-              <Tag>RAI Token</Tag>
+              PRAI
+              <Tag>PRAI Token</Tag>
             </Label>
           </Col>
           <Col>250.00</Col>

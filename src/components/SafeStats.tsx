@@ -1,14 +1,9 @@
 import React from 'react';
-import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
 import Button from './Button';
-import {
-  formatNumber,
-  getInterestOwed,
-  getRatePercentage,
-} from '../utils/helper';
+import { formatNumber, getRatePercentage } from '../utils/helper';
 
 const SafeStats = () => {
   const { t } = useTranslation();
@@ -19,24 +14,28 @@ const SafeStats = () => {
 
   const collateral = formatNumber(singleSafe?.collateral || '0');
   const totalDebt = formatNumber(singleSafe?.totalDebt || '0');
-  const interestOwed = singleSafe
-    ? getInterestOwed(singleSafe.debt, singleSafe.accumulatedRate)
-    : 0;
+  // const interestOwed = singleSafe
+  //   ? getInterestOwed(singleSafe.debt, singleSafe.accumulatedRate)
+  //   : 0;
 
   const liquidationPenalty = getRatePercentage(
     singleSafe?.liquidationPenalty || '1'
   );
 
-  const stabilityFees = numeral(
-    singleSafe?.totalAnnualizedStabilityFee.toString()
-  )
-    .subtract(1)
-    .multiply(100)
-    .value();
-  const totalAnnualizedStabilityFee = formatNumber(
-    stabilityFees.toString() || '0',
-    2
-  );
+  // const stabilityFees = numeral(
+  //   singleSafe?.totalAnnualizedStabilityFee.toString()
+  // )
+  //   .subtract(1)
+  //   .multiply(100)
+  //   .value();
+  // const totalAnnualizedStabilityFee = formatNumber(
+  //   stabilityFees.toString() || '0',
+  //   2
+  // );
+
+  const currentRedemptionRate = singleSafe
+    ? getRatePercentage(singleSafe.currentRedemptionRate)
+    : '0';
 
   return (
     <>
@@ -50,8 +49,8 @@ const SafeStats = () => {
 
         <StatItem>
           <StateInner>
-            <Value>{`$${interestOwed}`}</Value>
-            <Label>{`Interest Owed (${totalAnnualizedStabilityFee}% APR)`}</Label>
+            <Value>{`%${currentRedemptionRate}`}</Value>
+            <Label>{`Current Redemption Rate`}</Label>
           </StateInner>
         </StatItem>
 
@@ -91,8 +90,8 @@ const SafeStats = () => {
 
         <StatItem className="w50">
           <StateInner>
-            <Value>{`${totalDebt} RAI`}</Value>
-            <Label>{'RAI Debt'}</Label>
+            <Value>{`${totalDebt} PRAI`}</Value>
+            <Label>{'PRAI Debt'}</Label>
             <Actions>
               <Button
                 withArrow

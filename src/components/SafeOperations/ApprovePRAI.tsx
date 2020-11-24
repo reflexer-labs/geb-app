@@ -12,9 +12,8 @@ import Button from '../Button';
 import Loader from '../Loader';
 
 const TEXT_PAYLOAD_DEFAULT_STATE = {
-  title: 'Unlock PRAI',
-  text:
-    ' Your amount is higher than your allowance for PRAI, You need to unlock PRAI to proceed',
+  title: 'PRAI Allowance',
+  text: 'Allow your account to manage your PRAI',
   status: '',
 };
 
@@ -110,7 +109,7 @@ const ApprovePRAI = () => {
       addTransaction(txResponse, 'Unlocking PRAI');
       await txResponse.wait();
       setIsPaid(true);
-      await timeout(4000);
+      await timeout(5000);
     } catch (e) {
       safeActions.setBlockBackdrop(false);
       if (e?.code === 4001) {

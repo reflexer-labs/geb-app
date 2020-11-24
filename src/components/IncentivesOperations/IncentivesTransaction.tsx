@@ -50,8 +50,8 @@ const IncentivesTransaction = () => {
                 <Item>
                   <Label>
                     {incentivesState.type === 'withdraw'
-                      ? 'RAI Withdrawn'
-                      : 'RAI per ETH'}
+                      ? 'PRAI Withdrawn'
+                      : 'PRAI per ETH'}
                   </Label>{' '}
                   <Value>{'0.12345678'}</Value>
                 </Item>
@@ -59,7 +59,7 @@ const IncentivesTransaction = () => {
                   <Label>
                     {incentivesState.type === 'withdraw'
                       ? 'ETH Withdrawn'
-                      : 'ETH per RAI'}
+                      : 'ETH per PRAI'}
                   </Label>{' '}
                   <Value>{'432.1098'}</Value>
                 </Item>

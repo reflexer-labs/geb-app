@@ -43,6 +43,7 @@ const Steps = () => {
     ) {
       return null;
     }
+    connectWalletActions.setIsStepLoading(true);
     const currentBlockNumber = blockNumber[chainId];
     const txBlockNumber = transactions[ctHash].originalTx.blockNumber;
     if (!txBlockNumber || !currentBlockNumber) return null;

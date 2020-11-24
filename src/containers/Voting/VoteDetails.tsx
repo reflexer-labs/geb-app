@@ -43,7 +43,7 @@ const VoteDetails = () => {
         <VotesList />
 
         <InterestModel>
-          <ModelTitle>Upgrade RAI Interest Model</ModelTitle>
+          <ModelTitle>Upgrade PRAI Interest Model</ModelTitle>
           <ModelDate>Created July 3, 2020</ModelDate>
           <ModelText>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras proin

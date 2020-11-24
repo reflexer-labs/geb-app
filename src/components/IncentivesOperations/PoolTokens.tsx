@@ -43,7 +43,7 @@ const PoolTokens = () => {
         />
 
         <DecimalInput
-          label={`RAI Received`}
+          label={`PRAI Received`}
           value={'4.2342'}
           onChange={() => {}}
           disabled

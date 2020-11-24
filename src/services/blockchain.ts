@@ -60,18 +60,18 @@ export const handleRepayAndWithdraw = async (
   const geb = new Geb(ETH_NETWORK, signer.provider);
 
   const ethToFree = ethersUtils.parseEther(safeData.leftInput);
-  const raiToRepay = ethersUtils.parseEther(safeData.rightInput);
+  const praiToRepay = ethersUtils.parseEther(safeData.rightInput);
 
   const proxy = await geb.getProxyAction(signer._address);
 
   let txData: TransactionRequest = {};
 
-  if (ethToFree.isZero() && !raiToRepay.isZero()) {
-    txData = proxy.repayDebt(safeId, raiToRepay);
-  } else if (!ethToFree.isZero() && raiToRepay.isZero()) {
+  if (ethToFree.isZero() && !praiToRepay.isZero()) {
+    txData = proxy.repayDebt(safeId, praiToRepay);
+  } else if (!ethToFree.isZero() && praiToRepay.isZero()) {
     txData = proxy.freeETH(safeId, ethToFree);
   } else {
-    txData = proxy.repayDebtAndFreeETH(safeId, ethToFree, raiToRepay);
+    txData = proxy.repayDebtAndFreeETH(safeId, ethToFree, praiToRepay);
   }
 
   if (!txData) throw new Error('No transaction request!');

@@ -123,7 +123,7 @@ const ReviewTransaction = () => {
             </Item>
             <Item>
               <Label>
-                {type === 'repay_withdraw' ? 'RAI Rapaid' : 'RAI Borrowed'}
+                {type === 'repay_withdraw' ? 'PRAI Repaid' : 'PRAI Borrowed'}
               </Label>{' '}
               <Value>{rightInput}</Value>
             </Item>
@@ -132,7 +132,7 @@ const ReviewTransaction = () => {
               <Value>{`${formatNumber(totalCollateral)}`}</Value>
             </Item>
             <Item>
-              <Label>{'Total RAI Debt'}</Label>{' '}
+              <Label>{'Total PRAI Debt'}</Label>{' '}
               <Value>{`${formatNumber(totalDebt)}`}</Value>
             </Item>
             <Item>
@@ -152,10 +152,10 @@ const ReviewTransaction = () => {
           {safeState.isUniSwapPoolChecked ? (
             <Block>
               <Item>
-                <Label>{'RAI per ETH'}</Label> <Value>{'$0.00'}</Value>
+                <Label>{'PRAI per ETH'}</Label> <Value>{'$0.00'}</Value>
               </Item>
               <Item>
-                <Label>{'ETH per RAI'}</Label> <Value>{'$0.00'}</Value>
+                <Label>{'ETH per PRAI'}</Label> <Value>{'$0.00'}</Value>
               </Item>
               <Item>
                 <Label>{'Share of Pool'}</Label> <Value>{'0.00%'}</Value>

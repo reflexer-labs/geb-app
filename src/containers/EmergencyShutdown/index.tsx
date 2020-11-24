@@ -63,7 +63,7 @@ const EmergencyShutdown = () => {
           <ClaimItem>
             <InnerContent>
               <Value>{safeState.totalRAI} ETH</Value>
-              <Label>{'Claimable RAI'}</Label>
+              <Label>{'Claimable PRAI'}</Label>
               <Actions>
                 <Button
                   dimmedWithArrow={Number(safeState.totalEth) > 0}

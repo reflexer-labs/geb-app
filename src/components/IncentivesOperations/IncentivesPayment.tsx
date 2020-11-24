@@ -87,7 +87,7 @@ const IncentivesPayment = ({ isChecked }: Props) => {
             disableMax
           />
           <DecimalInput
-            label={`${incentivesState.type} RAI (Avail 0.00)`}
+            label={`${incentivesState.type} PRAI (Avail 0.00)`}
             value={raiAmount}
             onChange={setRaiAmount}
             disableMax
@@ -100,8 +100,8 @@ const IncentivesPayment = ({ isChecked }: Props) => {
           <Item>
             <Label>
               {incentivesState.type === 'withdraw'
-                ? 'RAI Withdrawn'
-                : 'RAI per ETH'}
+                ? 'PRAI Withdrawn'
+                : 'PRAI per ETH'}
             </Label>{' '}
             <Value>{'0.12345678'}</Value>
           </Item>
@@ -109,7 +109,7 @@ const IncentivesPayment = ({ isChecked }: Props) => {
             <Label>
               {incentivesState.type === 'withdraw'
                 ? 'ETH Withdrawn'
-                : 'ETH per RAI'}
+                : 'ETH per PRAI'}
             </Label>{' '}
             <Value>{'432.1098'}</Value>
           </Item>

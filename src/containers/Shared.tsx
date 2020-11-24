@@ -8,7 +8,7 @@ import SideMenu from '../components/SideMenu';
 import { useStoreState, useStoreActions } from '../store';
 import ApplicationUpdater from '../services/ApplicationUpdater';
 import BalanceUpdater from '../services/BalanceUpdater';
-import { capitalizeName } from '../utils/helper';
+import { capitalizeName, timeout } from '../utils/helper';
 import WalletModal from '../components/WalletModal';
 import { ChainId } from '@uniswap/sdk';
 import { ETHERSCAN_PREFIXES } from '../utils/constants';
@@ -53,20 +53,26 @@ const Shared = ({ children }: Props) => {
 
   async function accountChecker() {
     if (!account || !chainId) return;
+    popupsActions.setWaitingPayload({
+      title: '',
+      status: 'loading',
+    });
     popupsActions.setIsWaitingModalOpen(true);
     const isUserCreated = await connectWalletActions.fetchUser(account);
+    const txs = localStorage.getItem(`${account}-${chainId}`);
+    if (txs) {
+      transactionsActions.setTransactions(JSON.parse(txs));
+    }
+    await timeout(200);
     if (isUserCreated && !connectWalletState.ctHash) {
       connectWalletActions.setStep(2);
-      const txs = localStorage.getItem(`${account}-${chainId}`);
-      if (txs) {
-        transactionsActions.setTransactions(JSON.parse(txs));
-      }
       safeActions.fetchUserSafes(account);
     } else {
       safeActions.setIsSafeCreated(false);
       connectWalletActions.setStep(1);
     }
-    setTimeout(() => popupsActions.setIsWaitingModalOpen(false), 1000);
+    await timeout(1000);
+    popupsActions.setIsWaitingModalOpen(false);
   }
 
   function accountChange() {

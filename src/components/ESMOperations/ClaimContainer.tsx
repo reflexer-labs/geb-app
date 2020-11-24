@@ -24,6 +24,7 @@ const INITIAL_SAFE_STATE = [
     liquidationPenalty: '1.11',
     liquidationPrice: '250.00',
     totalAnnualizedStabilityFee: '0',
+    currentRedemptionRate: '0',
   },
 ];
 
@@ -87,7 +88,7 @@ const ClaimContainer = ({ setClaimableSafe, setFLXToBurn }: Props) => {
       {popupsState.ESMOperationPayload.type === 'RAI' ? (
         <Content>
           <DecimalInput
-            label={'RAI Amount (Avail 0.00)'}
+            label={'PRAI Amount (Avail 0.00)'}
             value={value}
             onChange={setValue}
           />
@@ -122,7 +123,7 @@ const ClaimContainer = ({ setClaimableSafe, setFLXToBurn }: Props) => {
           {popupsState.ESMOperationPayload.type === 'RAI' ? (
             <>
               <Item>
-                <Label>{'RAI Price'}</Label> <Value>{'$120.00'}</Value>
+                <Label>{'PRAI Price'}</Label> <Value>{'$120.00'}</Value>
               </Item>
               <Item>
                 <Label>{'Collateral Price'}</Label> <Value>{'$300.00'}</Value>

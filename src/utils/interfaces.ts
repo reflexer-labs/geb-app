@@ -30,6 +30,9 @@ interface IColors {
   warningColor: string;
   warningBackground: string;
   warningBorder: string;
+  dimmedColor: string;
+  dimmedBackground: string;
+  dimmedBorder: string;
   placeholder: string;
   inputBorderColor: string;
 }
@@ -119,6 +122,7 @@ export interface ISafe {
   liquidationPenalty: string;
   liquidationPrice: string;
   totalAnnualizedStabilityFee: string;
+  currentRedemptionRate: string;
 }
 
 export interface LoadingPayload {
@@ -157,6 +161,8 @@ export interface ILiquidationData {
   totalAnnualizedStabilityFee: string;
   debtCeiling: string;
   globalDebt: string;
+  currentRedemptionRate: string;
+  perSafeDebtCeiling: string;
 }
 
 export interface ISafePayload {

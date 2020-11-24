@@ -106,6 +106,7 @@ export const formatUserSafe = (
     accumulatedRate,
     totalAnnualizedStabilityFee,
     liquidationPenalty,
+    currentRedemptionRate,
   } = liquidationData;
 
   return safes
@@ -150,6 +151,7 @@ export const formatUserSafe = (
         liquidationPenalty: liquidationPenalty || '1',
         liquidationPrice,
         totalAnnualizedStabilityFee: totalAnnualizedStabilityFee || '0',
+        currentRedemptionRate: currentRedemptionRate || '0',
       } as ISafe;
     })
     .sort((a, b) => Number(a.id) - Number(b.id));
@@ -376,7 +378,7 @@ export const formatHistoryArray = (
     if (deltaDebt > 0) {
       items.push({
         ...sharedObj,
-        title: 'Borrowed RAI',
+        title: 'Borrowed PRAI',
         amount: numeral(deltaDebt).multiply(item.accumulatedRate).value(),
         icon: 'ArrowUpCircle',
         color: 'green',
@@ -385,7 +387,7 @@ export const formatHistoryArray = (
     if (deltaDebt < 0) {
       items.push({
         ...sharedObj,
-        title: 'Repaid RAI',
+        title: 'Repaid PRAI',
         amount: numeral(deltaDebt)
           .multiply(-1)
           .multiply(item.accumulatedRate)

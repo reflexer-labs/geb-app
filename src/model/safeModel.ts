@@ -93,6 +93,8 @@ const safeModel: SafeModel = {
     safetyCRatio: '0',
     currentRedemptionPrice: '0',
     totalAnnualizedStabilityFee: '0',
+    currentRedemptionRate: '0',
+    perSafeDebtCeiling: '0',
   },
   uniSwapPool: DEFAULT_SAFE_STATE,
   historyList: [],
@@ -119,6 +121,10 @@ const safeModel: SafeModel = {
         hash: txResponse.hash,
         status: 'success',
       });
+
+      actions.setStage(0);
+      actions.setUniSwapPool(DEFAULT_SAFE_STATE);
+      actions.setSafeData(DEFAULT_SAFE_STATE);
       await txResponse.wait();
     }
   }),
@@ -146,6 +152,10 @@ const safeModel: SafeModel = {
           hash: txResponse.hash,
           status: 'success',
         });
+
+        actions.setStage(0);
+        actions.setUniSwapPool(DEFAULT_SAFE_STATE);
+        actions.setSafeData(DEFAULT_SAFE_STATE);
         await txResponse.wait();
       }
     }
@@ -194,6 +204,8 @@ const safeModel: SafeModel = {
       ...res.collateralType,
       currentRedemptionPrice: res.currentRedemptionPrice,
       globalDebt: res.globalDebt,
+      currentRedemptionRate: res.currentRedemptionRate,
+      perSafeDebtCeiling: res.perSafeDebtCeiling,
     });
     storeActions.connectWalletModel.updatePraiBalance({
       chainId: NETWORK_ID,

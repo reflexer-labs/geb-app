@@ -76,6 +76,8 @@ export const fetchSafeById = (safeId: string, address: string) => {
         ...res.data.data.collateralType,
         currentRedemptionPrice:
           res.data.data.systemState.currentRedemptionPrice.value,
+        currentRedemptionRate:
+          res.data.data.systemState.currentRedemptionRate.annualizedRate,
       });
       const safeHistory = formatHistoryArray(
         res.data.data.safes[0].modifySAFECollateralization,
@@ -101,6 +103,9 @@ export const fetchSafeById = (safeId: string, address: string) => {
         currentRedemptionPrice:
           res.data.data.systemState.currentRedemptionPrice.value,
         globalDebt: res.data.data.systemState.globalDebt,
+        currentRedemptionRate:
+          res.data.data.systemState.currentRedemptionRate.annualizedRate,
+        perSafeDebtCeiling: res.data.data.systemState.perSafeDebtCeiling,
       };
     },
     {
