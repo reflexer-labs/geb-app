@@ -97,5 +97,6 @@
   "recent_transactions": "Recent Transactions",
   "clear_all": "Clear All",
   "deposit_borrow": "Deposit & Borrow",
-  "repay_withdraw": "Repay & Withdraw"
+  "repay_withdraw": "Repay & Withdraw",
+  "confirmations_info": "Waiting for confirmations reduces the risk of your Safe address changing. We require users to wait 10 block confirmations to ensure it's been created successfully."
 }
