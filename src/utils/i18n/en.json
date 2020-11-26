@@ -99,6 +99,6 @@
   "deposit_borrow": "Deposit & Borrow",
   "repay_withdraw": "Repay & Withdraw",
   "confirmations_info": "Waiting for confirmations reduces the risk of your Safe address changing. We require users to wait 10 block confirmations to ensure it's been created successfully.",
-  "liquidation_text": "You have leftover collateral that can be claimed.",
+  "liquidation_text": "You have {{balance}} leftover collateral that can be claimed.",
   "collect_surplus": "Collect ETH"
 }

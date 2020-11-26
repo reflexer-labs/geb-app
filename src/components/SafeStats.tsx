@@ -165,7 +165,11 @@ const SafeStats = () => {
           <StatItem className="w100">
             <StateInner>
               <Inline>
-                <Text>{t('liquidation_text')}</Text>
+                <Text>
+                  {t('liquidation_text', {
+                    balance: formatNumber(singleSafe.internalCollateralBalance),
+                  })}
+                </Text>
                 <Button
                   text={'collect_surplus'}
                   onClick={handleCollectSurplus}

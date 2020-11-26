@@ -91,7 +91,7 @@ export const handleCollectETH = async (signer: JsonRpcSigner, safe: ISafe) => {
   if (!safeId) {
     throw new Error('No safe Id');
   }
-  if (internalCollateralBalance) {
+  if (!internalCollateralBalance) {
     throw new Error('No safe internalCollateralBalance');
   }
 
