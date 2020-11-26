@@ -14,8 +14,6 @@ export const handleDepositAndBorrow = async (
     return false;
   }
 
-  console.log(safeData);
-
   const collateralBN = ethersUtils.parseEther(safeData.leftInput);
   const debtBN = ethersUtils.parseEther(safeData.rightInput);
 
