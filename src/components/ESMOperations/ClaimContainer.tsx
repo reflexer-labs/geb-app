@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
+import { TICKER_NAME } from '../../utils/constants';
 import { ISafe } from '../../utils/interfaces';
 import Button from '../Button';
 import DecimalInput from '../DecimalInput';
@@ -12,7 +13,7 @@ const INITIAL_SAFE_STATE = [
     id: '2354',
     img: require('../../assets/box-ph.svg'),
     date: 'July 3, 2020',
-    riskState: 'low',
+    riskState: 1,
     collateral: '100.00',
     debt: '23.00',
     totalDebt: '',
@@ -24,6 +25,8 @@ const INITIAL_SAFE_STATE = [
     liquidationPenalty: '1.11',
     liquidationPrice: '250.00',
     totalAnnualizedStabilityFee: '0',
+    currentRedemptionRate: '0',
+    internalCollateralBalance: '0',
   },
 ];
 
@@ -87,7 +90,7 @@ const ClaimContainer = ({ setClaimableSafe, setFLXToBurn }: Props) => {
       {popupsState.ESMOperationPayload.type === 'RAI' ? (
         <Content>
           <DecimalInput
-            label={'RAI Amount (Avail 0.00)'}
+            label={`${TICKER_NAME} Amount (Avail 0.00)`}
             value={value}
             onChange={setValue}
           />
@@ -122,7 +125,8 @@ const ClaimContainer = ({ setClaimableSafe, setFLXToBurn }: Props) => {
           {popupsState.ESMOperationPayload.type === 'RAI' ? (
             <>
               <Item>
-                <Label>{'RAI Price'}</Label> <Value>{'$120.00'}</Value>
+                <Label>{`${TICKER_NAME} Price`}</Label>{' '}
+                <Value>{'$120.00'}</Value>
               </Item>
               <Item>
                 <Label>{'Collateral Price'}</Label> <Value>{'$300.00'}</Value>

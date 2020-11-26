@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import useWindowSize from '../hooks/useWindowSize';
+import { TICKER_NAME } from '../utils/constants';
 
 const IncentivesAssets = () => {
   const { t } = useTranslation();
@@ -48,8 +49,8 @@ const IncentivesAssets = () => {
           <Col>
             <img src={require('../assets/rai-logo.svg')} alt="" />
             <Label>
-              RAI
-              <Tag>RAI Token</Tag>
+              {TICKER_NAME}
+              <Tag>{TICKER_NAME} Token</Tag>
             </Label>
           </Col>
           <Col>250.00</Col>

@@ -21,7 +21,7 @@ import {
   toFixedString,
 } from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
-import { DEFAULT_SAFE_STATE } from '../../utils/constants';
+import { DEFAULT_SAFE_STATE, TICKER_NAME } from '../../utils/constants';
 
 interface Props {
   isChecked?: boolean;
@@ -56,6 +56,7 @@ const SafeBody = ({ isChecked }: Props) => {
     currentRedemptionPrice,
     debtCeiling,
     globalDebt,
+    perSafeDebtCeiling,
   } = safeState.liquidationData;
 
   const praiBalance = connectWalletState.praiBalance[NETWORK_ID];
@@ -96,8 +97,8 @@ const SafeBody = ({ isChecked }: Props) => {
     return defaultSafe.rightInput;
   };
 
-  const totalCollateral = getTotalCollateral();
-  const totalDebt = getTotalDebt();
+  const totalCollateral = getTotalCollateral() || '0';
+  const totalDebt = getTotalDebt() || '0';
 
   const getAvailableEth = () => {
     if (type === 'deposit_borrow') {
@@ -137,13 +138,13 @@ const SafeBody = ({ isChecked }: Props) => {
       return `Deposit ETH (Avail ${getAvailableEth()})`;
     }
     if (type === 'deposit_borrow' && !isLeft) {
-      return `Borrow RAI (Avail ${getAvailableRai()})`;
+      return `Borrow ${TICKER_NAME} (Avail ${getAvailableRai()})`;
     }
     if (type === 'repay_withdraw' && isLeft) {
       return `Withdraw ETH (Avail ${getAvailableEth()})`;
     }
     if (type === 'repay_withdraw' && singleSafe && !isLeft) {
-      return `Repay RAI (Owe: ${formatNumber(
+      return `Repay ${TICKER_NAME} (Owe: ${formatNumber(
         getAvailableRai()
       )}, Avail: ${formatNumber(praiBalance.toString())})`;
     }
@@ -189,6 +190,7 @@ const SafeBody = ({ isChecked }: Props) => {
 
     const debtFloorBN = BigNumber.from(toFixedString(debtFloor, 'WAD'));
     const totalDebtBN = BigNumber.from(toFixedString(totalDebt, 'WAD'));
+
     const accumlatedRateBN = BigNumber.from(
       toFixedString(accumulatedRate, 'RAY')
     );
@@ -201,7 +203,7 @@ const SafeBody = ({ isChecked }: Props) => {
         setError('Insufficient balance.');
         return false;
       } else if (rightInputBN.gt(availableRaiBN)) {
-        setError('RAI borrowed cannot exceed available amount.');
+        setError(`${TICKER_NAME} borrowed cannot exceed available amount.`);
         return false;
       } else if (isCreate) {
         if (leftInputBN.isZero()) {
@@ -211,7 +213,7 @@ const SafeBody = ({ isChecked }: Props) => {
       } else {
         if (leftInputBN.isZero() && rightInputBN.isZero()) {
           setError(
-            'Please enter the amount of ETH to be deposited or amount of RAI to be borrowed'
+            `Please enter the amount of ETH to be deposited or amount of ${TICKER_NAME} to be borrowed`
           );
           return false;
         }
@@ -220,7 +222,7 @@ const SafeBody = ({ isChecked }: Props) => {
     if (type === 'repay_withdraw') {
       if (leftInputBN.isZero() && rightInputBN.isZero()) {
         setError(
-          'Please enter the amount of ETH to free or the amount of RAI to be repay'
+          `Please enter the amount of ETH to free or the amount of ${TICKER_NAME} to be repay`
         );
         return false;
       } else if (leftInputBN.gt(availableEthBN)) {
@@ -228,7 +230,7 @@ const SafeBody = ({ isChecked }: Props) => {
         return false;
       }
       if (rightInputBN.gt(availableRaiBN)) {
-        setError('RAI to repay cannot exceed available amount.');
+        setError(`${TICKER_NAME} to repay cannot exceed owed amount.`);
         return false;
       }
 
@@ -243,7 +245,7 @@ const SafeBody = ({ isChecked }: Props) => {
           repayPercent > 95
         ) {
           setError(
-            `You can only repay a minimum of ${getAvailableRai()} RAI to avoid leaving residual values`
+            `You can only repay a minimum of ${getAvailableRai()} ${TICKER_NAME} to avoid leaving residual values`
           );
           return false;
         }
@@ -252,6 +254,18 @@ const SafeBody = ({ isChecked }: Props) => {
       if (!rightInputBN.isZero() && rightInputBN.gt(praiBalanceBN)) {
         setError(`ballance_issue`);
         return false;
+      }
+
+      if (!isCreate) {
+        const perSafeDebtCeilingBN = BigNumber.from(
+          toFixedString(perSafeDebtCeiling, 'WAD')
+        );
+        if (totalDebtBN.gte(perSafeDebtCeilingBN)) {
+          setError(
+            `Individual safe can't have more than ${perSafeDebtCeiling} ${TICKER_NAME} of debt.`
+          );
+          return;
+        }
       }
     }
 
@@ -262,7 +276,7 @@ const SafeBody = ({ isChecked }: Props) => {
       totalDebtBN.mul(accumlatedRateBN).lt(debtFloorBN.mul(gebUtils.RAY))
     ) {
       setError(
-        `The resulting debt should be at least ${debtFloor} RAI or zero.`
+        `The resulting debt should be at least ${debtFloor} ${TICKER_NAME} or zero.`
       );
       return false;
     }
@@ -274,14 +288,14 @@ const SafeBody = ({ isChecked }: Props) => {
       accumulatedRate
     );
 
-    if (!isSafe && (collateralRatio as number) > 0) {
+    if (!isSafe && (collateralRatio as number) >= 0) {
       setError(`Too much debt, below ${safetyCRatio} collateralization ratio`);
       return false;
     }
 
     if (globalDebtBN.add(totalDebtBN).gt(debtCeilingBN)) {
       setError(
-        'Debt ceiling too low, not possible to draw this amount of RAI.'
+        `Debt ceiling too low, not possible to draw this amount of ${TICKER_NAME}.`
       );
       return;
     }
@@ -314,14 +328,7 @@ const SafeBody = ({ isChecked }: Props) => {
       .wadToFixed(availableRaiBN.sub(praiBalanceBN))
       .toString();
 
-    return (
-      <>
-        Insufficient RAI balance, You can only repay a maximum of
-        <InlineBtn title={'Set Value'} onClick={() => onChangeRight(diff)}>
-          {diff}
-        </InlineBtn>
-      </>
-    );
+    return `Insufficient balance. You are ${diff} short`;
   };
 
   const submitDefaultValues = () => {
@@ -450,7 +457,7 @@ const SafeBody = ({ isChecked }: Props) => {
               onChange={() => {}}
             />
             <DecimalInput
-              label={`RAI on Uniswap (Avail ${getAvailableRai()})`}
+              label={`${TICKER_NAME} on Uniswap (Avail ${getAvailableRai()})`}
               value={uniSwapVal ? uniSwapVal.rightInput : ''}
               onChange={() => {}}
               disableMax
@@ -466,9 +473,18 @@ const SafeBody = ({ isChecked }: Props) => {
               <Value>{`${totalCollateral ? totalCollateral : 0}`}</Value>
             </Item>
             <Item>
-              <Label>{'Total RAI Debt'}</Label>{' '}
+              <Label>{`Total ${TICKER_NAME} Debt`}</Label>{' '}
               <Value>{`${totalDebt ? totalDebt : 0}`}</Value>
             </Item>
+            <Item>
+              <Label>{`ETH Price`}</Label>{' '}
+              <Value>{`$${formatNumber(currentPrice.value, 2)}`}</Value>
+            </Item>
+            <Item>
+              <Label>{`${TICKER_NAME} Price`}</Label>{' '}
+              <Value>{`$${formatNumber(currentRedemptionPrice, 3)}`}</Value>
+            </Item>
+
             <Item>
               <Label>
                 {!isCreate ? 'New Collateral Ratio' : 'Collateral Ratio'}
@@ -490,7 +506,7 @@ const SafeBody = ({ isChecked }: Props) => {
 
         {/*{isChecked ? null : (
           <UniSwapCheckContainer>
-            <Text>{t('uniswap_modal_check_text')}</Text>
+            <Text>{t('uniswap_modal_check_text',{ticker_name: TICKER_NAME})}</Text>
             <CheckBox
               checked={checkUniSwapPool}
               onChange={(state: boolean) => {
@@ -652,14 +668,14 @@ const Error = styled.p`
   margin: 16px 0;
 `;
 
-const InlineBtn = styled.button`
-  background: none;
-  box-shadow: none;
-  border: 0;
-  cursor: pointer;
-  outline: none;
-  &:hover {
-    text-decoration: undeline;
-    color: ${(props) => props.theme.colors.inputBorderColor};
-  }
-`;
+// const InlineBtn = styled.button`
+//   background: none;
+//   box-shadow: none;
+//   border: 0;
+//   cursor: pointer;
+//   outline: none;
+//   &:hover {
+//     text-decoration: undeline;
+//     color: ${(props) => props.theme.colors.inputBorderColor};
+//   }
+// `;

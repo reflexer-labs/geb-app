@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import { formatNumber } from '../utils/helper';
-import { jdenticonConfig } from '../utils/constants';
+import { jdenticonConfig, TICKER_NAME } from '../utils/constants';
 
 const SafeBlock = ({ ...props }) => {
   const { t } = useTranslation();
@@ -18,6 +18,18 @@ const SafeBlock = ({ ...props }) => {
     return { __html: toSvg(props.safeHandler + props.id, 40, jdenticonConfig) };
   }
 
+  const returnState = (state: number) => {
+    switch (state) {
+      case 1:
+        return 'Low';
+      case 2:
+        return 'Medium';
+      case 3:
+        return 'High';
+      default:
+        return '';
+    }
+  };
   return (
     <>
       <BlockContainer>
@@ -31,11 +43,16 @@ const SafeBlock = ({ ...props }) => {
               </Date>
             </SafeData>
           </SafeInfo>
-          {props.riskState ? (
-            <SafeState className={props.riskState.toLowerCase()}>
-              {t('risk')} <span>{props.riskState}</span>
-            </SafeState>
-          ) : null}
+
+          <SafeState
+            className={
+              returnState(props.riskState)
+                ? returnState(props.riskState).toLowerCase()
+                : 'dimmed'
+            }
+          >
+            {t('risk')} <span>{returnState(props.riskState) || 'None'}</span>
+          </SafeState>
         </BlockHeader>
         <Block>
           <Item>
@@ -43,7 +60,7 @@ const SafeBlock = ({ ...props }) => {
             <Value>{collateral}</Value>
           </Item>
           <Item>
-            <Label>{'RAI Borrowed'}</Label>
+            <Label>{`${TICKER_NAME} Borrowed`}</Label>
             <Value>{totalDebt}</Value>
           </Item>
           <Item>
@@ -120,6 +137,11 @@ const SafeState = styled.div`
   height: fit-content;
   span {
     text-transform: capitalize;
+  }
+  &.dimmed {
+    color: ${(props) => props.theme.colors.dimmedColor};
+    border: 1px solid ${(props) => props.theme.colors.dimmedBorder};
+    background: ${(props) => props.theme.colors.dimmedBackground};
   }
   &.medium {
     color: ${(props) => props.theme.colors.warningColor};

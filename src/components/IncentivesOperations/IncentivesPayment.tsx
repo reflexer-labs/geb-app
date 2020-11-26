@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
+import { TICKER_NAME } from '../../utils/constants';
 import Button from '../Button';
 import CheckBox from '../CheckBox';
 import DecimalInput from '../DecimalInput';
@@ -87,7 +88,7 @@ const IncentivesPayment = ({ isChecked }: Props) => {
             disableMax
           />
           <DecimalInput
-            label={`${incentivesState.type} RAI (Avail 0.00)`}
+            label={`${incentivesState.type} ${TICKER_NAME} (Avail 0.00)`}
             value={raiAmount}
             onChange={setRaiAmount}
             disableMax
@@ -100,8 +101,8 @@ const IncentivesPayment = ({ isChecked }: Props) => {
           <Item>
             <Label>
               {incentivesState.type === 'withdraw'
-                ? 'RAI Withdrawn'
-                : 'RAI per ETH'}
+                ? `${TICKER_NAME} Withdrawn`
+                : `${TICKER_NAME} per ETH`}
             </Label>{' '}
             <Value>{'0.12345678'}</Value>
           </Item>
@@ -109,7 +110,7 @@ const IncentivesPayment = ({ isChecked }: Props) => {
             <Label>
               {incentivesState.type === 'withdraw'
                 ? 'ETH Withdrawn'
-                : 'ETH per RAI'}
+                : `ETH per ${TICKER_NAME}`}
             </Label>{' '}
             <Value>{'432.1098'}</Value>
           </Item>

@@ -4,6 +4,7 @@ export const liquidationQuery = `
     currentPrice {
       liquidationPrice
       safetyPrice
+      value
     }
     debtFloor
     debtCeiling
@@ -14,6 +15,10 @@ export const liquidationQuery = `
   }
 systemState(id: "current") {
   globalDebt
+  perSafeDebtCeiling
+  currentRedemptionRate {
+    annualizedRate
+  }
   currentRedemptionPrice {
     value
   }
@@ -39,6 +44,9 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
     collateral
     createdAt
     debt
+    internalCollateralBalance{
+      balance
+    }
     modifySAFECollateralization {
       deltaDebt
       deltaCollateral

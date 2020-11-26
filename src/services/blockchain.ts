@@ -1,7 +1,7 @@
 import { utils as ethersUtils } from 'ethers';
 import { Geb, TransactionRequest, utils as gebUtils } from 'geb.js';
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
-import { ISafeData } from '../utils/interfaces';
+import { ISafe, ISafeData } from '../utils/interfaces';
 import { ETH_NETWORK } from '../utils/constants';
 import { handlePreTxGasEstimate } from '../hooks/TransactionHooks';
 
@@ -13,6 +13,8 @@ export const handleDepositAndBorrow = async (
   if (!signer || !safeData) {
     return false;
   }
+
+  console.log(safeData);
 
   const collateralBN = ethersUtils.parseEther(safeData.leftInput);
   const debtBN = ethersUtils.parseEther(safeData.rightInput);
@@ -60,19 +62,54 @@ export const handleRepayAndWithdraw = async (
   const geb = new Geb(ETH_NETWORK, signer.provider);
 
   const ethToFree = ethersUtils.parseEther(safeData.leftInput);
-  const raiToRepay = ethersUtils.parseEther(safeData.rightInput);
+  const praiToRepay = ethersUtils.parseEther(safeData.rightInput);
 
   const proxy = await geb.getProxyAction(signer._address);
 
   let txData: TransactionRequest = {};
 
-  if (ethToFree.isZero() && !raiToRepay.isZero()) {
-    txData = proxy.repayDebt(safeId, raiToRepay);
-  } else if (!ethToFree.isZero() && raiToRepay.isZero()) {
+  if (ethToFree.isZero() && !praiToRepay.isZero()) {
+    txData = proxy.repayDebt(safeId, praiToRepay);
+  } else if (!ethToFree.isZero() && praiToRepay.isZero()) {
     txData = proxy.freeETH(safeId, ethToFree);
   } else {
-    txData = proxy.repayDebtAndFreeETH(safeId, ethToFree, raiToRepay);
+    txData = proxy.repayDebtAndFreeETH(safeId, ethToFree, praiToRepay);
   }
+
+  if (!txData) throw new Error('No transaction request!');
+
+  const tx = await handlePreTxGasEstimate(signer, txData);
+
+  const txResponse = await signer.sendTransaction(tx);
+  return txResponse;
+};
+
+export const handleCollectETH = async (signer: JsonRpcSigner, safe: ISafe) => {
+  if (!signer || !safe) {
+    return false;
+  }
+  const { id: safeId, internalCollateralBalance } = safe;
+
+  if (!safeId) {
+    throw new Error('No safe Id');
+  }
+  if (!internalCollateralBalance) {
+    throw new Error('No safe internalCollateralBalance');
+  }
+
+  const internalCollateralBalanceBN = ethersUtils.parseEther(
+    internalCollateralBalance
+  );
+
+  if (internalCollateralBalanceBN.isZero()) {
+    throw new Error('internalCollateralBalance is zero');
+  }
+
+  const geb = new Geb(ETH_NETWORK, signer.provider);
+
+  const proxy = await geb.getProxyAction(signer._address);
+
+  const txData = proxy.exitETH(safeId, internalCollateralBalanceBN);
 
   if (!txData) throw new Error('No transaction request!');
 

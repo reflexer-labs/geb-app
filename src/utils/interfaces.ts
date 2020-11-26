@@ -30,6 +30,9 @@ interface IColors {
   warningColor: string;
   warningBackground: string;
   warningBorder: string;
+  dimmedColor: string;
+  dimmedBackground: string;
+  dimmedBorder: string;
   placeholder: string;
   inputBorderColor: string;
 }
@@ -107,7 +110,7 @@ export interface WalletInfo {
 export interface ISafe {
   id: string;
   date: string;
-  riskState: string;
+  riskState: number;
   collateral: string;
   debt: string;
   totalDebt: string;
@@ -115,10 +118,12 @@ export interface ISafe {
   collateralRatio: string;
   currentRedemptionPrice: string;
   currentLiquidationPrice: string;
+  internalCollateralBalance: string;
   liquidationCRatio: string;
   liquidationPenalty: string;
   liquidationPrice: string;
   totalAnnualizedStabilityFee: string;
+  currentRedemptionRate: string;
 }
 
 export interface LoadingPayload {
@@ -148,7 +153,11 @@ export interface IVotingTx {
 
 export interface ILiquidationData {
   accumulatedRate: string;
-  currentPrice: { liquidationPrice: string; safetyPrice: string };
+  currentPrice: {
+    liquidationPrice: string;
+    safetyPrice: string;
+    value: string;
+  };
   debtFloor: string;
   liquidationCRatio: string;
   liquidationPenalty: string;
@@ -157,6 +166,8 @@ export interface ILiquidationData {
   totalAnnualizedStabilityFee: string;
   debtCeiling: string;
   globalDebt: string;
+  currentRedemptionRate: string;
+  perSafeDebtCeiling: string;
 }
 
 export interface ISafePayload {

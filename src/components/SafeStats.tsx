@@ -1,42 +1,81 @@
-import React from 'react';
-import numeral from 'numeral';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
 import Button from './Button';
-import {
-  formatNumber,
-  getInterestOwed,
-  getRatePercentage,
-} from '../utils/helper';
+import { formatNumber, getRatePercentage, timeout } from '../utils/helper';
+import { TICKER_NAME } from '../utils/constants';
+import { useActiveWeb3React } from '../hooks';
+import { handleTransactionError } from '../hooks/TransactionHooks';
 
 const SafeStats = () => {
   const { t } = useTranslation();
-  const { popupsModel: popupsActions } = useStoreActions((state) => state);
+  const { library, account } = useActiveWeb3React();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    popupsModel: popupsActions,
+    safeModel: safeActions,
+  } = useStoreActions((state) => state);
   const { safeModel: safeState } = useStoreState((state) => state);
 
-  const { singleSafe } = safeState;
+  const { singleSafe, liquidationData } = safeState;
 
   const collateral = formatNumber(singleSafe?.collateral || '0');
   const totalDebt = formatNumber(singleSafe?.totalDebt || '0');
-  const interestOwed = singleSafe
-    ? getInterestOwed(singleSafe.debt, singleSafe.accumulatedRate)
-    : 0;
+  // const interestOwed = singleSafe
+  //   ? getInterestOwed(singleSafe.debt, singleSafe.accumulatedRate)
+  //   : 0;
 
   const liquidationPenalty = getRatePercentage(
     singleSafe?.liquidationPenalty || '1'
   );
 
-  const stabilityFees = numeral(
-    singleSafe?.totalAnnualizedStabilityFee.toString()
-  )
-    .subtract(1)
-    .multiply(100)
-    .value();
-  const totalAnnualizedStabilityFee = formatNumber(
-    stabilityFees.toString() || '0',
-    2
-  );
+  const raiPrice = singleSafe
+    ? formatNumber(singleSafe.currentRedemptionPrice, 3)
+    : '0';
+
+  const ethPrice = liquidationData
+    ? formatNumber(liquidationData.currentPrice.value, 2)
+    : '0';
+
+  // const stabilityFees = numeral(
+  //   singleSafe?.totalAnnualizedStabilityFee.toString()
+  // )
+  //   .subtract(1)
+  //   .multiply(100)
+  //   .value();
+  // const totalAnnualizedStabilityFee = formatNumber(
+  //   stabilityFees.toString() || '0',
+  //   2
+  // );
+
+  const currentRedemptionRate = singleSafe
+    ? getRatePercentage(singleSafe.currentRedemptionRate)
+    : '0';
+
+  const handleCollectSurplus = async () => {
+    if (!library || !account) throw new Error('No library or account');
+    if (!singleSafe) throw new Error('no safe');
+    setIsLoading(true);
+    try {
+      popupsActions.setIsWaitingModalOpen(true);
+      popupsActions.setWaitingPayload({
+        title: 'Waiting For Confirmation',
+        text: 'Collecting ETH',
+        hint: 'Confirm this transaction in your wallet',
+        status: 'loading',
+      });
+      const signer = library.getSigner(account);
+      await safeActions.collectETH({ signer, safe: singleSafe });
+      await timeout(3000);
+    } catch (e) {
+      handleTransactionError(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -50,8 +89,8 @@ const SafeStats = () => {
 
         <StatItem>
           <StateInner>
-            <Value>{`$${interestOwed}`}</Value>
-            <Label>{`Interest Owed (${totalAnnualizedStabilityFee}% APR)`}</Label>
+            <Value>{`%${currentRedemptionRate}`}</Value>
+            <Label>{`Annual Redemption Rate`}</Label>
           </StateInner>
         </StatItem>
 
@@ -66,6 +105,20 @@ const SafeStats = () => {
           <StateInner>
             <Value>{`${liquidationPenalty}%`}</Value>
             <Label>{'Liquidation Penalty'}</Label>
+          </StateInner>
+        </StatItem>
+
+        <StatItem className="w50">
+          <StateInner>
+            <Value>${ethPrice}</Value>
+            <Label>{'ETH Price'}</Label>
+          </StateInner>
+        </StatItem>
+
+        <StatItem className="w50">
+          <StateInner>
+            <Value>${raiPrice}</Value>
+            <Label>{`${TICKER_NAME} Price`}</Label>
           </StateInner>
         </StatItem>
 
@@ -91,8 +144,8 @@ const SafeStats = () => {
 
         <StatItem className="w50">
           <StateInner>
-            <Value>{`${totalDebt} RAI`}</Value>
-            <Label>{'RAI Debt'}</Label>
+            <Value>{`${totalDebt} ${TICKER_NAME}`}</Value>
+            <Label>{`${TICKER_NAME} Debt`}</Label>
             <Actions>
               <Button
                 withArrow
@@ -108,6 +161,24 @@ const SafeStats = () => {
             </Actions>
           </StateInner>
         </StatItem>
+        {singleSafe && Number(singleSafe.internalCollateralBalance) > 0 ? (
+          <StatItem className="w100">
+            <StateInner>
+              <Inline>
+                <Text>
+                  {t('liquidation_text', {
+                    balance: formatNumber(singleSafe.internalCollateralBalance),
+                  })}
+                </Text>
+                <Button
+                  text={'collect_surplus'}
+                  onClick={handleCollectSurplus}
+                  isLoading={isLoading}
+                />
+              </Inline>
+            </StateInner>
+          </StatItem>
+        ) : null}
       </StatsGrid>
     </>
   );
@@ -130,6 +201,9 @@ const StatItem = styled.div`
   margin-bottom: 15px;
   &.w50 {
     flex: 0 0 50%;
+  }
+  &.w100 {
+    flex: 0 0 100%;
   }
   ${({ theme }) => theme.mediaWidth.upToSmall`
     flex: 0 0 50%;
@@ -187,4 +261,14 @@ const Actions = styled.div`
   display: flex;
   margin-top: 1rem;
   justify-content: flex-end;
+`;
+
+const Text = styled.div`
+  font-size: ${(props) => props.theme.font.small};
+`;
+
+const Inline = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;

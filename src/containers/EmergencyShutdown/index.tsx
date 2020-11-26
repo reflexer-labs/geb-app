@@ -7,6 +7,7 @@ import PageHeader from '../../components/PageHeader';
 import SafeHistory from '../../components/SafeHistory';
 import StartShutdown from '../../components/StartShutdown';
 import { useStoreActions, useStoreState } from '../../store';
+import { TICKER_NAME } from '../../utils/constants';
 
 const EmergencyShutdown = () => {
   const { t } = useTranslation();
@@ -63,7 +64,7 @@ const EmergencyShutdown = () => {
           <ClaimItem>
             <InnerContent>
               <Value>{safeState.totalRAI} ETH</Value>
-              <Label>{'Claimable RAI'}</Label>
+              <Label>{`Claimable ${TICKER_NAME}`}</Label>
               <Actions>
                 <Button
                   dimmedWithArrow={Number(safeState.totalEth) > 0}
