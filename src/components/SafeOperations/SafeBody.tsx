@@ -230,7 +230,7 @@ const SafeBody = ({ isChecked }: Props) => {
         return false;
       }
       if (rightInputBN.gt(availableRaiBN)) {
-        setError(`${TICKER_NAME} to repay cannot exceed available amount.`);
+        setError(`${TICKER_NAME} to repay cannot exceed owed amount.`);
         return false;
       }
 
