@@ -14,6 +14,8 @@ export const handleDepositAndBorrow = async (
     return false;
   }
 
+  console.log(safeData);
+
   const collateralBN = ethersUtils.parseEther(safeData.leftInput);
   const debtBN = ethersUtils.parseEther(safeData.rightInput);
 
@@ -107,7 +109,7 @@ export const handleCollectETH = async (signer: JsonRpcSigner, safe: ISafe) => {
 
   const proxy = await geb.getProxyAction(signer._address);
 
-  const txData = proxy.freeETH(safeId, internalCollateralBalanceBN);
+  const txData = proxy.exitETH(safeId, internalCollateralBalanceBN);
 
   if (!txData) throw new Error('No transaction request!');
 
