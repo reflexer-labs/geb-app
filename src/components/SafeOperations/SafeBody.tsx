@@ -328,14 +328,7 @@ const SafeBody = ({ isChecked }: Props) => {
       .wadToFixed(availableRaiBN.sub(praiBalanceBN))
       .toString();
 
-    return (
-      <>
-        You only can repay the whole debt or a maximum of
-        <InlineBtn title={'Set Value'} onClick={() => onChangeRight(diff)}>
-          {diff}
-        </InlineBtn>
-      </>
-    );
+    return `Insufficient balance. You are ${diff} short`;
   };
 
   const submitDefaultValues = () => {
@@ -675,14 +668,14 @@ const Error = styled.p`
   margin: 16px 0;
 `;
 
-const InlineBtn = styled.button`
-  background: none;
-  box-shadow: none;
-  border: 0;
-  cursor: pointer;
-  outline: none;
-  &:hover {
-    text-decoration: undeline;
-    color: ${(props) => props.theme.colors.inputBorderColor};
-  }
-`;
+// const InlineBtn = styled.button`
+//   background: none;
+//   box-shadow: none;
+//   border: 0;
+//   cursor: pointer;
+//   outline: none;
+//   &:hover {
+//     text-decoration: undeline;
+//     color: ${(props) => props.theme.colors.inputBorderColor};
+//   }
+// `;
