@@ -54,4 +54,5 @@ export const walletlink = new WalletLinkConnector({
 
 // geb.js
 const provider = new ethers.providers.JsonRpcProvider(NETWORK_URL);
-export const geb = new Geb('kovan', provider);
+const network_name = NETWORK_ID === 1 ? 'mainnet' : 'kovan';
+export const geb = new Geb(network_name, provider);
