@@ -21,7 +21,7 @@ import {
   toFixedString,
 } from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
-import { DEFAULT_SAFE_STATE } from '../../utils/constants';
+import { DEFAULT_SAFE_STATE, TICKER_NAME } from '../../utils/constants';
 
 interface Props {
   isChecked?: boolean;
@@ -138,13 +138,13 @@ const SafeBody = ({ isChecked }: Props) => {
       return `Deposit ETH (Avail ${getAvailableEth()})`;
     }
     if (type === 'deposit_borrow' && !isLeft) {
-      return `Borrow PRAI (Avail ${getAvailableRai()})`;
+      return `Borrow ${TICKER_NAME} (Avail ${getAvailableRai()})`;
     }
     if (type === 'repay_withdraw' && isLeft) {
       return `Withdraw ETH (Avail ${getAvailableEth()})`;
     }
     if (type === 'repay_withdraw' && singleSafe && !isLeft) {
-      return `Repay PRAI (Owe: ${formatNumber(
+      return `Repay ${TICKER_NAME} (Owe: ${formatNumber(
         getAvailableRai()
       )}, Avail: ${formatNumber(praiBalance.toString())})`;
     }
@@ -198,16 +198,12 @@ const SafeBody = ({ isChecked }: Props) => {
     const globalDebtBN = BigNumber.from(toFixedString(globalDebt, 'RAD'));
     const debtCeilingBN = BigNumber.from(toFixedString(debtCeiling, 'RAD'));
 
-    const perSafeDebtCeilingBN = BigNumber.from(
-      toFixedString(perSafeDebtCeiling, 'WAD')
-    );
-
     if (type === 'deposit_borrow') {
       if (leftInputBN.gt(availableEthBN)) {
         setError('Insufficient balance.');
         return false;
       } else if (rightInputBN.gt(availableRaiBN)) {
-        setError('PRAI borrowed cannot exceed available amount.');
+        setError(`${TICKER_NAME} borrowed cannot exceed available amount.`);
         return false;
       } else if (isCreate) {
         if (leftInputBN.isZero()) {
@@ -217,7 +213,7 @@ const SafeBody = ({ isChecked }: Props) => {
       } else {
         if (leftInputBN.isZero() && rightInputBN.isZero()) {
           setError(
-            'Please enter the amount of ETH to be deposited or amount of PRAI to be borrowed'
+            `Please enter the amount of ETH to be deposited or amount of ${TICKER_NAME} to be borrowed`
           );
           return false;
         }
@@ -226,7 +222,7 @@ const SafeBody = ({ isChecked }: Props) => {
     if (type === 'repay_withdraw') {
       if (leftInputBN.isZero() && rightInputBN.isZero()) {
         setError(
-          'Please enter the amount of ETH to free or the amount of PRAI to be repay'
+          `Please enter the amount of ETH to free or the amount of ${TICKER_NAME} to be repay`
         );
         return false;
       } else if (leftInputBN.gt(availableEthBN)) {
@@ -234,7 +230,7 @@ const SafeBody = ({ isChecked }: Props) => {
         return false;
       }
       if (rightInputBN.gt(availableRaiBN)) {
-        setError('PRAI to repay cannot exceed available amount.');
+        setError(`${TICKER_NAME} to repay cannot exceed available amount.`);
         return false;
       }
 
@@ -249,7 +245,7 @@ const SafeBody = ({ isChecked }: Props) => {
           repayPercent > 95
         ) {
           setError(
-            `You can only repay a minimum of ${getAvailableRai()} PRAI to avoid leaving residual values`
+            `You can only repay a minimum of ${getAvailableRai()} ${TICKER_NAME} to avoid leaving residual values`
           );
           return false;
         }
@@ -260,11 +256,16 @@ const SafeBody = ({ isChecked }: Props) => {
         return false;
       }
 
-      if (totalDebtBN.gte(perSafeDebtCeilingBN)) {
-        setError(
-          `Individual safe can't have more than ${perSafeDebtCeiling} PRAI of debt.`
+      if (!isCreate) {
+        const perSafeDebtCeilingBN = BigNumber.from(
+          toFixedString(perSafeDebtCeiling, 'WAD')
         );
-        return;
+        if (totalDebtBN.gte(perSafeDebtCeilingBN)) {
+          setError(
+            `Individual safe can't have more than ${perSafeDebtCeiling} ${TICKER_NAME} of debt.`
+          );
+          return;
+        }
       }
     }
 
@@ -275,7 +276,7 @@ const SafeBody = ({ isChecked }: Props) => {
       totalDebtBN.mul(accumlatedRateBN).lt(debtFloorBN.mul(gebUtils.RAY))
     ) {
       setError(
-        `The resulting debt should be at least ${debtFloor} PRAI or zero.`
+        `The resulting debt should be at least ${debtFloor} ${TICKER_NAME} or zero.`
       );
       return false;
     }
@@ -294,7 +295,7 @@ const SafeBody = ({ isChecked }: Props) => {
 
     if (globalDebtBN.add(totalDebtBN).gt(debtCeilingBN)) {
       setError(
-        'Debt ceiling too low, not possible to draw this amount of PRAI.'
+        `Debt ceiling too low, not possible to draw this amount of ${TICKER_NAME}.`
       );
       return;
     }
@@ -329,7 +330,7 @@ const SafeBody = ({ isChecked }: Props) => {
 
     return (
       <>
-        Insufficient PRAI balance, You can only repay a maximum of
+        You only can repay the whole debt or a maximum of
         <InlineBtn title={'Set Value'} onClick={() => onChangeRight(diff)}>
           {diff}
         </InlineBtn>
@@ -463,7 +464,7 @@ const SafeBody = ({ isChecked }: Props) => {
               onChange={() => {}}
             />
             <DecimalInput
-              label={`PRAI on Uniswap (Avail ${getAvailableRai()})`}
+              label={`${TICKER_NAME} on Uniswap (Avail ${getAvailableRai()})`}
               value={uniSwapVal ? uniSwapVal.rightInput : ''}
               onChange={() => {}}
               disableMax
@@ -479,9 +480,18 @@ const SafeBody = ({ isChecked }: Props) => {
               <Value>{`${totalCollateral ? totalCollateral : 0}`}</Value>
             </Item>
             <Item>
-              <Label>{'Total PRAI Debt'}</Label>{' '}
+              <Label>{`Total ${TICKER_NAME} Debt`}</Label>{' '}
               <Value>{`${totalDebt ? totalDebt : 0}`}</Value>
             </Item>
+            <Item>
+              <Label>{`ETH Price`}</Label>{' '}
+              <Value>{`$${formatNumber(currentPrice.value, 2)}`}</Value>
+            </Item>
+            <Item>
+              <Label>{`${TICKER_NAME} Price`}</Label>{' '}
+              <Value>{`$${formatNumber(currentRedemptionPrice, 3)}`}</Value>
+            </Item>
+
             <Item>
               <Label>
                 {!isCreate ? 'New Collateral Ratio' : 'Collateral Ratio'}
@@ -503,7 +513,7 @@ const SafeBody = ({ isChecked }: Props) => {
 
         {/*{isChecked ? null : (
           <UniSwapCheckContainer>
-            <Text>{t('uniswap_modal_check_text')}</Text>
+            <Text>{t('uniswap_modal_check_text',{ticker_name: TICKER_NAME})}</Text>
             <CheckBox
               checked={checkUniSwapPool}
               onChange={(state: boolean) => {

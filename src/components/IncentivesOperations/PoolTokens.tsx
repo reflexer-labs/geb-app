@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions } from '../../store';
+import { TICKER_NAME } from '../../utils/constants';
 import Button from '../Button';
 import DecimalInput from '../DecimalInput';
 
@@ -43,7 +44,7 @@ const PoolTokens = () => {
         />
 
         <DecimalInput
-          label={`PRAI Received`}
+          label={`${TICKER_NAME} Received`}
           value={'4.2342'}
           onChange={() => {}}
           disabled

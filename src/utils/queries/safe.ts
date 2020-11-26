@@ -4,6 +4,7 @@ export const liquidationQuery = `
     currentPrice {
       liquidationPrice
       safetyPrice
+      value
     }
     debtFloor
     debtCeiling
@@ -43,6 +44,9 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
     collateral
     createdAt
     debt
+    internalCollateralBalance{
+      balance
+    }
     modifySAFECollateralization {
       deltaDebt
       deltaCollateral

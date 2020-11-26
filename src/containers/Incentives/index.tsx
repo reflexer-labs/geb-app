@@ -5,6 +5,7 @@ import GridContainer from '../../components/GridContainer';
 import IncentivesAssets from '../../components/IncentivesAssets';
 import IncentivesList from '../../components/IncentivesList';
 import PageHeader from '../../components/PageHeader';
+import { TICKER_NAME } from '../../utils/constants';
 
 const Incentives = () => {
   const { t } = useTranslation();
@@ -14,7 +15,7 @@ const Incentives = () => {
       <GridContainer>
         <PageHeader
           breadcrumbs={{ '/': t('incentives') }}
-          text={t('incentives_header_text')}
+          text={t('incentives_header_text', { ticker_name: TICKER_NAME })}
         />
         <IncentivesList />
         <AssetsContainer>

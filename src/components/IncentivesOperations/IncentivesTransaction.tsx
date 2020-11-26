@@ -6,6 +6,7 @@ import Button from '../Button';
 import TransactionOverview from '../TransactionOverview';
 import { useActiveWeb3React } from '../../hooks';
 import { returnConnectorName } from '../../utils/helper';
+import { TICKER_NAME } from '../../utils/constants';
 
 const IncentivesTransaction = () => {
   const { connector } = useActiveWeb3React();
@@ -50,8 +51,8 @@ const IncentivesTransaction = () => {
                 <Item>
                   <Label>
                     {incentivesState.type === 'withdraw'
-                      ? 'PRAI Withdrawn'
-                      : 'PRAI per ETH'}
+                      ? `${TICKER_NAME} Withdrawn`
+                      : `${TICKER_NAME} per ETH`}
                   </Label>{' '}
                   <Value>{'0.12345678'}</Value>
                 </Item>
@@ -59,7 +60,7 @@ const IncentivesTransaction = () => {
                   <Label>
                     {incentivesState.type === 'withdraw'
                       ? 'ETH Withdrawn'
-                      : 'ETH per PRAI'}
+                      : `ETH per ${TICKER_NAME}`}
                   </Label>{' '}
                   <Value>{'432.1098'}</Value>
                 </Item>

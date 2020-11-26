@@ -10,8 +10,17 @@ export enum Network {
   KOVAN = 'kovan',
 }
 
+export enum Ticker {
+  MAINNET = 'PRAI',
+  KOVAN = 'RAI',
+}
+
 export const ETH_NETWORK =
   REACT_APP_NETWORK_ID === '1' ? Network.MAINNET : Network.KOVAN;
+
+export const TICKER_NAME =
+  REACT_APP_NETWORK_ID === '1' ? Ticker.MAINNET : Ticker.KOVAN;
+
 export const GRAPH_API_URLS = REACT_APP_GRAPH_API_URLS
   ? REACT_APP_GRAPH_API_URLS.split(',')
   : [

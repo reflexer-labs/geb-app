@@ -6,14 +6,14 @@ import styled from 'styled-components';
 import { useActiveWeb3React } from '../../hooks';
 import { useTransactionAdder } from '../../hooks/TransactionHooks';
 import { useStoreActions, useStoreState } from '../../store';
-import { ETH_NETWORK } from '../../utils/constants';
+import { ETH_NETWORK, TICKER_NAME } from '../../utils/constants';
 import { timeout } from '../../utils/helper';
 import Button from '../Button';
 import Loader from '../Loader';
 
 const TEXT_PAYLOAD_DEFAULT_STATE = {
-  title: 'PRAI Allowance',
-  text: 'Allow your account to manage your PRAI',
+  title: `${TICKER_NAME} Allowance`,
+  text: `Allow your account to manage your ${TICKER_NAME}`,
   status: '',
 };
 
@@ -56,8 +56,8 @@ const ApprovePRAI = () => {
     const rightInputBN = ethersUtils.parseEther(rightInput);
     if (allowance && coinAllowanceBN.gte(rightInputBN)) {
       setTextPayload({
-        title: 'PRAI Unlocked',
-        text: 'PRAI unlocked successfully, proceeding to review transaction...',
+        title: `${TICKER_NAME} Unlocked`,
+        text: `${TICKER_NAME} unlocked successfully, proceeding to review transaction...`,
         status: 'success',
       });
       await timeout(2000);
@@ -102,11 +102,11 @@ const ApprovePRAI = () => {
       );
       const txResponse = await signer.sendTransaction(tx);
       setTextPayload({
-        title: 'Unlocking PRAI',
-        text: 'Confirming transaction and unlocking PRAI',
+        title: `Unlocking ${TICKER_NAME}`,
+        text: `Confirming transaction and unlocking ${TICKER_NAME}`,
         status: 'loading',
       });
-      addTransaction(txResponse, 'Unlocking PRAI');
+      addTransaction(txResponse, `Unlocking ${TICKER_NAME}`);
       await txResponse.wait();
       setIsPaid(true);
       await timeout(5000);

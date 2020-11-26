@@ -110,7 +110,7 @@ export interface WalletInfo {
 export interface ISafe {
   id: string;
   date: string;
-  riskState: string;
+  riskState: number;
   collateral: string;
   debt: string;
   totalDebt: string;
@@ -118,6 +118,7 @@ export interface ISafe {
   collateralRatio: string;
   currentRedemptionPrice: string;
   currentLiquidationPrice: string;
+  internalCollateralBalance: string;
   liquidationCRatio: string;
   liquidationPenalty: string;
   liquidationPrice: string;
@@ -152,7 +153,11 @@ export interface IVotingTx {
 
 export interface ILiquidationData {
   accumulatedRate: string;
-  currentPrice: { liquidationPrice: string; safetyPrice: string };
+  currentPrice: {
+    liquidationPrice: string;
+    safetyPrice: string;
+    value: string;
+  };
   debtFloor: string;
   liquidationCRatio: string;
   liquidationPenalty: string;

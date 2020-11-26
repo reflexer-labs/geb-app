@@ -7,6 +7,7 @@ import {
   ETHERSCAN_PREFIXES,
   floatsTypes,
   SUPPORTED_WALLETS,
+  TICKER_NAME,
 } from './constants';
 import {
   ILiquidationData,
@@ -146,6 +147,7 @@ export const formatUserSafe = (
         accumulatedRate: accumulatedRate,
         collateralRatio,
         currentRedemptionPrice,
+        internalCollateralBalance: s.internalCollateralBalance?.balance || '0',
         currentLiquidationPrice: currentPrice?.liquidationPrice,
         liquidationCRatio: liquidationCRatio || '1',
         liquidationPenalty: liquidationPenalty || '1',
@@ -154,7 +156,11 @@ export const formatUserSafe = (
         currentRedemptionRate: currentRedemptionRate || '0',
       } as ISafe;
     })
-    .sort((a, b) => Number(a.id) - Number(b.id));
+    .sort(
+      (a, b) =>
+        Number(a.collateral) - Number(b.collateral) &&
+        Number(b.riskState) - Number(a.riskState)
+    );
 };
 
 export const getCollateralRatio = (
@@ -224,13 +230,13 @@ export const safeIsSafe = (
 
 export const ratioChecker = (liquitdationRatio: number) => {
   if (liquitdationRatio >= 300) {
-    return 'Low';
+    return 1;
   } else if (liquitdationRatio < 300 && liquitdationRatio >= 200) {
-    return 'Medium';
+    return 2;
   } else if (liquitdationRatio < 200 && liquitdationRatio > 0) {
-    return 'High';
+    return 3;
   } else {
-    return '';
+    return 0;
   }
 };
 
@@ -352,7 +358,7 @@ export const formatHistoryArray = (
 
   for (let i of liquidationItems) {
     items.push({
-      title: 'Liquidation ETH',
+      title: 'Liquidated Safe',
       date: i.createdAt,
       amount: parseFloat(i.sellInitialAmount) - parseFloat(i.sellAmount),
       link: getEtherscanLink(networkId, i.createdAtTransaction, 'transaction'),
@@ -378,7 +384,7 @@ export const formatHistoryArray = (
     if (deltaDebt > 0) {
       items.push({
         ...sharedObj,
-        title: 'Borrowed PRAI',
+        title: `Borrowed ${TICKER_NAME}`,
         amount: numeral(deltaDebt).multiply(item.accumulatedRate).value(),
         icon: 'ArrowUpCircle',
         color: 'green',
@@ -387,7 +393,7 @@ export const formatHistoryArray = (
     if (deltaDebt < 0) {
       items.push({
         ...sharedObj,
-        title: 'Repaid PRAI',
+        title: `Repaid ${TICKER_NAME}`,
         amount: numeral(deltaDebt)
           .multiply(-1)
           .multiply(item.accumulatedRate)

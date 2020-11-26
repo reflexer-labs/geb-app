@@ -1,5 +1,6 @@
 import numeral from 'numeral';
 import { action, Action, thunk, Thunk } from 'easy-peasy';
+import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
 import {
   ISafeData,
   ISafePayload,
@@ -8,6 +9,7 @@ import {
   ISafeHistory,
 } from '../utils/interfaces';
 import {
+  handleCollectETH,
   handleDepositAndBorrow,
   handleRepayAndWithdraw,
 } from '../services/blockchain';
@@ -51,6 +53,12 @@ export interface SafeModel {
     StoreModel
   >;
   fetchUserSafes: Thunk<SafeModel, string, any, StoreModel>;
+  collectETH: Thunk<
+    SafeModel,
+    { signer: JsonRpcSigner; safe: ISafe },
+    any,
+    StoreModel
+  >;
   setIsSafeCreated: Action<SafeModel, boolean>;
   setList: Action<SafeModel, Array<ISafe>>;
   setSingleSafe: Action<SafeModel, ISafe | null>;
@@ -84,6 +92,7 @@ const safeModel: SafeModel = {
     currentPrice: {
       liquidationPrice: '0',
       safetyPrice: '',
+      value: '',
     },
     debtFloor: '0',
     debtCeiling: '0',
@@ -160,6 +169,28 @@ const safeModel: SafeModel = {
       }
     }
   ),
+  collectETH: thunk(async (actions, payload, { getStoreActions }) => {
+    const storeActions = getStoreActions();
+    const txResponse = await handleCollectETH(payload.signer, payload.safe);
+    if (txResponse) {
+      const { hash, chainId } = txResponse;
+      storeActions.transactionsModel.addTransaction({
+        chainId,
+        hash,
+        from: txResponse.from,
+        summary: 'Collecting ETH',
+        addedTime: new Date().getTime(),
+        originalTx: txResponse,
+      });
+      storeActions.popupsModel.setIsWaitingModalOpen(true);
+      storeActions.popupsModel.setWaitingPayload({
+        title: 'Transaction Submitted',
+        hash: txResponse.hash,
+        status: 'success',
+      });
+      await txResponse.wait();
+    }
+  }),
   fetchUserSafes: thunk(async (actions, payload, { getStoreActions }) => {
     const storeActions = getStoreActions();
     const fetched = await fetchUserSafes(payload.toLowerCase());

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import { formatNumber } from '../utils/helper';
-import { jdenticonConfig } from '../utils/constants';
+import { jdenticonConfig, TICKER_NAME } from '../utils/constants';
 
 const SafeBlock = ({ ...props }) => {
   const { t } = useTranslation();
@@ -18,6 +18,18 @@ const SafeBlock = ({ ...props }) => {
     return { __html: toSvg(props.safeHandler + props.id, 40, jdenticonConfig) };
   }
 
+  const returnState = (state: number) => {
+    switch (state) {
+      case 1:
+        return 'Low';
+      case 2:
+        return 'Medium';
+      case 3:
+        return 'High';
+      default:
+        return '';
+    }
+  };
   return (
     <>
       <BlockContainer>
@@ -34,10 +46,12 @@ const SafeBlock = ({ ...props }) => {
 
           <SafeState
             className={
-              props.riskState ? props.riskState.toLowerCase() : 'dimmed'
+              returnState(props.riskState)
+                ? returnState(props.riskState).toLowerCase()
+                : 'dimmed'
             }
           >
-            {t('risk')} <span>{props.riskState || 'None'}</span>
+            {t('risk')} <span>{returnState(props.riskState) || 'None'}</span>
           </SafeState>
         </BlockHeader>
         <Block>
@@ -46,7 +60,7 @@ const SafeBlock = ({ ...props }) => {
             <Value>{collateral}</Value>
           </Item>
           <Item>
-            <Label>{'PRAI Borrowed'}</Label>
+            <Label>{`${TICKER_NAME} Borrowed`}</Label>
             <Value>{totalDebt}</Value>
           </Item>
           <Item>
