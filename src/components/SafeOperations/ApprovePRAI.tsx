@@ -49,12 +49,15 @@ const ApprovePRAI = () => {
 
   const passedCheckForCoinAllowance = async (
     allowance: string,
+    rightInput: string,
     isPaid: boolean
   ) => {
     if (!isPaid) return;
-    const coinAllowanceBN = ethersUtils.parseEther(allowance);
+    const coinAllowanceBN = allowance
+      ? ethersUtils.parseEther(allowance)
+      : ethersUtils.parseEther('0');
     const rightInputBN = ethersUtils.parseEther(rightInput);
-    if (allowance && coinAllowanceBN.gte(rightInputBN)) {
+    if (coinAllowanceBN.gte(rightInputBN)) {
       setTextPayload({
         title: `${TICKER_NAME} Unlocked`,
         text: `${TICKER_NAME} unlocked successfully, proceeding to review transaction...`,
@@ -73,12 +76,13 @@ const ApprovePRAI = () => {
 
   const passedCheckCB = useCallback(passedCheckForCoinAllowance, [
     coinAllowance,
+    rightInput,
     isPaid,
   ]);
 
   useEffect(() => {
-    passedCheckCB(coinAllowance, isPaid);
-  }, [passedCheckCB, coinAllowance, isPaid]);
+    passedCheckCB(coinAllowance, rightInput, isPaid);
+  }, [passedCheckCB, coinAllowance, rightInput, isPaid]);
 
   const unlockPRAI = async () => {
     try {
