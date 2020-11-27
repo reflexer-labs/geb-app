@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import ReflexerIcon from './Icons/ReflexerIcon';
 
 interface Props {
   title: string;
@@ -11,7 +12,7 @@ const TransactionOverview = ({ title, description, isChecked }: Props) => {
   return (
     <>
       <IconsHolder>
-        <LogoIcon src={require('../assets/reflexer-icon.svg')} />
+        <ReflexerIcon />
         {isChecked ? (
           <>
             <img className="sep" src={require('../assets/arrow.svg')} alt="" />

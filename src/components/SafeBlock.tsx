@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import dayjs from 'dayjs';
 import { formatNumber } from '../utils/helper';
 import { jdenticonConfig, TICKER_NAME } from '../utils/constants';
+import Arrow from './Icons/Arrow';
 
 const SafeBlock = ({ ...props }) => {
   const { t } = useTranslation();
@@ -74,8 +75,7 @@ const SafeBlock = ({ ...props }) => {
         </Block>
         <BtnContainer>
           <Link to={`/safes/${props.id}`}>
-            {t('manage_safe')}{' '}
-            <img src={require('../assets/arrow.svg')} alt={''} />
+            <span>{t('manage_safe')}</span> <Arrow />
           </Link>
         </BtnContainer>
       </BlockContainer>
@@ -204,8 +204,11 @@ const BtnContainer = styled.div`
   margin-top: 10px;
   justify-content: flex-end;
   a {
-    display: flex;
-    align-items: center;
+    svg {
+      float: right;
+      position: relative;
+      top: 7px;
+    }
     border: 0;
     cursor: pointer;
     box-shadow: none;
