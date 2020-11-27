@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import AlertLabel from './AlertLabel';
 import { Link } from 'react-router-dom';
 import { IVotingTx } from '../utils/interfaces';
+import Arrow from './Icons/Arrow';
 
 interface Props {
   tx: IVotingTx;
@@ -45,8 +46,8 @@ const VotingTx = ({ tx }: Props) => {
 
       <BtnContainer className={tx.isCompleted ? 'disabled' : ''}>
         <Link to={`/voting/${tx.id}`}>
-          {t('delay_transaction')}{' '}
-          <img src={require('../assets/arrow.svg')} alt={''} />
+          <span>{t('delay_transaction')}</span>
+          <Arrow />
         </Link>
       </BtnContainer>
     </Container>
@@ -111,8 +112,11 @@ const BtnContainer = styled.div`
   margin-top: 10px;
   justify-content: flex-end;
   a {
-    display: flex;
-    align-items: center;
+    svg {
+      float: right;
+      position: relative;
+      top: 7px;
+    }
     border: 0;
     cursor: pointer;
     box-shadow: none;

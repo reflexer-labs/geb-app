@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import Arrow from './Icons/Arrow';
 import Loader from './Loader';
 
 interface Props {
@@ -58,8 +59,7 @@ const Button = ({
     } else if (withArrow) {
       return (
         <ArrowBtn disabled={disabled} onClick={onClick}>
-          {text && t(text)}{' '}
-          <img src={require('../assets/arrow.svg')} alt={''} />
+          <span>{text && t(text)}</span> <Arrow />
         </ArrowBtn>
       );
     } else if (isBordered) {
@@ -152,8 +152,6 @@ const DimmedBtn = styled.button`
 `;
 
 const ArrowBtn = styled.button`
-  display: flex;
-  align-items: center;
   border: 0;
   cursor: pointer;
   box-shadow: none;
@@ -169,6 +167,11 @@ const ArrowBtn = styled.button`
   font-weight: 600;
   line-height: 24px;
   letter-spacing: -0.18px;
+  svg {
+    float: right;
+    position: relative;
+    top: 7px;
+  }
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;

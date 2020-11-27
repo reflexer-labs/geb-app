@@ -176,9 +176,9 @@ const SafeBody = ({ isChecked }: Props) => {
       toFixedString(getAvailableRai().toString(), 'WAD')
     );
 
-    const praiBalanceBN = BigNumber.from(
-      toFixedString(praiBalance.toString(), 'WAD')
-    );
+    const praiBalanceBN = praiBalance
+      ? BigNumber.from(toFixedString(praiBalance.toString(), 'WAD'))
+      : BigNumber.from('0');
 
     const leftInputBN = defaultSafe.leftInput
       ? BigNumber.from(toFixedString(defaultSafe.leftInput, 'WAD'))
@@ -255,17 +255,17 @@ const SafeBody = ({ isChecked }: Props) => {
         setError(`ballance_issue`);
         return false;
       }
+    }
 
-      if (!isCreate) {
-        const perSafeDebtCeilingBN = BigNumber.from(
-          toFixedString(perSafeDebtCeiling, 'WAD')
+    if (!isCreate) {
+      const perSafeDebtCeilingBN = BigNumber.from(
+        toFixedString(perSafeDebtCeiling, 'WAD')
+      );
+      if (totalDebtBN.gte(perSafeDebtCeilingBN)) {
+        setError(
+          `Individual safe can't have more than ${perSafeDebtCeiling} ${TICKER_NAME} of debt.`
         );
-        if (totalDebtBN.gte(perSafeDebtCeilingBN)) {
-          setError(
-            `Individual safe can't have more than ${perSafeDebtCeiling} ${TICKER_NAME} of debt.`
-          );
-          return;
-        }
+        return;
       }
     }
 

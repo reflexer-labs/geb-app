@@ -59,14 +59,28 @@ export const handleRepayAndWithdraw = async (
 
   const geb = new Geb(ETH_NETWORK, signer.provider);
 
+  const totalDebtBN = ethersUtils.parseEther(safeData.totalDebt);
+  const totalCollateralBN = ethersUtils.parseEther(safeData.totalCollateral);
   const ethToFree = ethersUtils.parseEther(safeData.leftInput);
   const praiToRepay = ethersUtils.parseEther(safeData.rightInput);
-
   const proxy = await geb.getProxyAction(signer._address);
 
   let txData: TransactionRequest = {};
 
-  if (ethToFree.isZero() && !praiToRepay.isZero()) {
+  if (
+    !ethToFree.isZero() &&
+    !praiToRepay.isZero() &&
+    totalCollateralBN.isZero() &&
+    totalDebtBN.isZero()
+  ) {
+    txData = proxy.repayAllDebtAndFreeETH(safeId, ethToFree);
+  } else if (
+    ethToFree.isZero() &&
+    totalDebtBN.isZero() &&
+    !praiToRepay.isZero()
+  ) {
+    txData = proxy.repayAllDebt(safeId);
+  } else if (ethToFree.isZero() && !praiToRepay.isZero()) {
     txData = proxy.repayDebt(safeId, praiToRepay);
   } else if (!ethToFree.isZero() && praiToRepay.isZero()) {
     txData = proxy.freeETH(safeId, ethToFree);
