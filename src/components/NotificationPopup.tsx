@@ -98,7 +98,7 @@ const BellBtn = styled.div`
   svg {
     stop {
       transition: all 0.3s ease;
-      stop-color: gray;
+      stopcolor: gray;
     }
   }
 
@@ -106,9 +106,9 @@ const BellBtn = styled.div`
   &:hover {
     svg {
       stop {
-        stop-color: #78d8ff;
+        stopcolor: #78d8ff;
         &[offset='1'] {
-          stop-color: #4ce096;
+          stopcolor: #4ce096;
         }
       }
     }

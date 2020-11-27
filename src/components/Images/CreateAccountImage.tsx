@@ -17,7 +17,7 @@ const CreateAccountImage = () => {
         y2="741.25278"
         fill="none"
         stroke="#3f3d56"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <rect
         x="243"
@@ -35,7 +35,7 @@ const CreateAccountImage = () => {
         rx="19.39764"
         fill="none"
         stroke="#3f3d56"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <line
         x1="220.5"
@@ -44,7 +44,7 @@ const CreateAccountImage = () => {
         y2="144.09298"
         fill="none"
         stroke="#3f3d56"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <rect
         x="661"
@@ -90,7 +90,7 @@ const CreateAccountImage = () => {
         rx="7.09252"
         fill="none"
         stroke="#3f3d56"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <rect
         x="632.5"
@@ -100,7 +100,7 @@ const CreateAccountImage = () => {
         rx="7.09252"
         fill="none"
         stroke="#3f3d56"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <rect
         x="632.5"
@@ -110,7 +110,7 @@ const CreateAccountImage = () => {
         rx="7.09252"
         fill="none"
         stroke="#3f3d56"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <rect
         x="632.5"
@@ -120,7 +120,7 @@ const CreateAccountImage = () => {
         rx="7.09252"
         fill="none"
         stroke="#3f3d56"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <circle cx="276.5" cy="126.25278" r="15" fill="#4ce096" opacity="0.3" />
       <circle cx="318.5" cy="126.25278" r="15" fill="#4ce096" opacity="0.3" />
@@ -131,7 +131,7 @@ const CreateAccountImage = () => {
         r="15"
         fill="none"
         stroke="#3f3d56"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <circle
         cx="324.5"
@@ -139,7 +139,7 @@ const CreateAccountImage = () => {
         r="15"
         fill="none"
         stroke="#3f3d56"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <circle
         cx="366.5"
@@ -147,7 +147,7 @@ const CreateAccountImage = () => {
         r="15"
         fill="none"
         stroke="#3f3d56"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <path
         d="M537.854,653.37916c-2.51135-11.56848-3.17724-27.36932-2.33252-38.36047,0,0-12.69836-55.78644-22.68994-60.99133l-.00305.003c-.153.19678-5.00195,6.55383-5.61706,26.22443-.62452,19.98284-7.69971,33.09655-7.69971,33.09655s2.28955,24.90766.98047,40.02777Z"
@@ -167,7 +167,7 @@ const CreateAccountImage = () => {
         rx="23.77165"
         fill="none"
         stroke="#3f3d56"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <path
         d="M185.32419,400.757S176,398,174,401s2.72669,24.7477,2.72669,24.7477l20.54589,1.24859-7.17022-18.10653Z"
@@ -235,7 +235,7 @@ const CreateAccountImage = () => {
         transform="translate(-84.5 -79.12639)"
         fill="none"
         stroke="#3f3d56"
-        stroke-miterlimit="10"
+        strokeMiterlimit="10"
       />
       <ellipse cx="947.5" cy="8.5" rx="17.5" ry="8.5" fill="#4ce096" />
       <ellipse cx="961.5" cy="64.5" rx="17.5" ry="8.5" fill="#4ce096" />

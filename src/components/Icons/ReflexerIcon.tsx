@@ -199,8 +199,8 @@ const ReflexerIcon = () => {
           y2="32.0322"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint1_linear"
@@ -210,8 +210,8 @@ const ReflexerIcon = () => {
           y2="38.0654"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint2_linear"
@@ -221,8 +221,8 @@ const ReflexerIcon = () => {
           y2="51.0747"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint3_linear"
@@ -232,8 +232,8 @@ const ReflexerIcon = () => {
           y2="50.1551"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint4_linear"
@@ -243,8 +243,8 @@ const ReflexerIcon = () => {
           y2="48.1892"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint5_linear"
@@ -254,8 +254,8 @@ const ReflexerIcon = () => {
           y2="47.0474"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint6_linear"
@@ -265,8 +265,8 @@ const ReflexerIcon = () => {
           y2="46.0476"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint7_linear"
@@ -276,8 +276,8 @@ const ReflexerIcon = () => {
           y2="54.1375"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint8_linear"
@@ -287,8 +287,8 @@ const ReflexerIcon = () => {
           y2="56.6694"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint9_linear"
@@ -298,8 +298,8 @@ const ReflexerIcon = () => {
           y2="55.0795"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint10_linear"
@@ -309,8 +309,8 @@ const ReflexerIcon = () => {
           y2="45.1865"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint11_linear"
@@ -320,8 +320,8 @@ const ReflexerIcon = () => {
           y2="56.3647"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint12_linear"
@@ -331,8 +331,8 @@ const ReflexerIcon = () => {
           y2="53.98"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint13_linear"
@@ -342,8 +342,8 @@ const ReflexerIcon = () => {
           y2="55.8124"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint14_linear"
@@ -353,8 +353,8 @@ const ReflexerIcon = () => {
           y2="56.7864"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint15_linear"
@@ -364,8 +364,8 @@ const ReflexerIcon = () => {
           y2="56.8338"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint16_linear"
@@ -375,8 +375,8 @@ const ReflexerIcon = () => {
           y2="44.1835"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint17_linear"
@@ -386,8 +386,8 @@ const ReflexerIcon = () => {
           y2="55.8313"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint18_linear"
@@ -397,8 +397,8 @@ const ReflexerIcon = () => {
           y2="51.877"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint19_linear"
@@ -408,8 +408,8 @@ const ReflexerIcon = () => {
           y2="46.8134"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint20_linear"
@@ -419,8 +419,8 @@ const ReflexerIcon = () => {
           y2="43.4131"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint21_linear"
@@ -430,8 +430,8 @@ const ReflexerIcon = () => {
           y2="46.1024"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint22_linear"
@@ -441,8 +441,8 @@ const ReflexerIcon = () => {
           y2="43.8958"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint23_linear"
@@ -452,8 +452,8 @@ const ReflexerIcon = () => {
           y2="43.5124"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint24_linear"
@@ -463,8 +463,8 @@ const ReflexerIcon = () => {
           y2="53.0517"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint25_linear"
@@ -474,8 +474,8 @@ const ReflexerIcon = () => {
           y2="44.4634"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint26_linear"
@@ -485,8 +485,8 @@ const ReflexerIcon = () => {
           y2="68.2443"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint27_linear"
@@ -496,8 +496,8 @@ const ReflexerIcon = () => {
           y2="53.6491"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint28_linear"
@@ -507,8 +507,8 @@ const ReflexerIcon = () => {
           y2="55.8792"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint29_linear"
@@ -518,8 +518,8 @@ const ReflexerIcon = () => {
           y2="54.8904"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint30_linear"
@@ -529,8 +529,8 @@ const ReflexerIcon = () => {
           y2="50.7455"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint31_linear"
@@ -540,8 +540,8 @@ const ReflexerIcon = () => {
           y2="52.2346"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint32_linear"
@@ -551,8 +551,8 @@ const ReflexerIcon = () => {
           y2="44.0535"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint33_linear"
@@ -562,8 +562,8 @@ const ReflexerIcon = () => {
           y2="44.619"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint34_linear"
@@ -573,8 +573,8 @@ const ReflexerIcon = () => {
           y2="45.8927"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint35_linear"
@@ -584,8 +584,8 @@ const ReflexerIcon = () => {
           y2="45.2357"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint36_linear"
@@ -595,8 +595,8 @@ const ReflexerIcon = () => {
           y2="43.578"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint37_linear"
@@ -606,8 +606,8 @@ const ReflexerIcon = () => {
           y2="48.3273"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint38_linear"
@@ -617,8 +617,8 @@ const ReflexerIcon = () => {
           y2="56.554"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint39_linear"
@@ -628,8 +628,8 @@ const ReflexerIcon = () => {
           y2="56.865"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint40_linear"
@@ -639,8 +639,8 @@ const ReflexerIcon = () => {
           y2="56.8841"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint41_linear"
@@ -650,8 +650,8 @@ const ReflexerIcon = () => {
           y2="47.4062"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
         <linearGradient
           id="paint42_linear"
@@ -661,8 +661,8 @@ const ReflexerIcon = () => {
           y2="46.6059"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#78D8FF" />
-          <stop offset="1" stop-color="#4CE096" />
+          <stop stopColor="#78D8FF" />
+          <stop offset="1" stopColor="#4CE096" />
         </linearGradient>
       </defs>
     </svg>
