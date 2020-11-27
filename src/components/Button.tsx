@@ -58,7 +58,7 @@ const Button = ({
     } else if (withArrow) {
       return (
         <ArrowBtn disabled={disabled} onClick={onClick}>
-          {text && t(text)}{' '}
+          <span>{text && t(text)}</span>{' '}
           <img src={require('../assets/arrow.svg')} alt={''} />
         </ArrowBtn>
       );
@@ -152,8 +152,6 @@ const DimmedBtn = styled.button`
 `;
 
 const ArrowBtn = styled.button`
-  display: flex;
-  align-items: center;
   border: 0;
   cursor: pointer;
   box-shadow: none;
@@ -169,6 +167,11 @@ const ArrowBtn = styled.button`
   font-weight: 600;
   line-height: 24px;
   letter-spacing: -0.18px;
+  img {
+    float: right;
+    position: relative;
+    top: 7px;
+  }
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;

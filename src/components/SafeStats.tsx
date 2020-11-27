@@ -89,7 +89,7 @@ const SafeStats = () => {
 
         <StatItem>
           <StateInner>
-            <Value>{`%${currentRedemptionRate}`}</Value>
+            <Value>{`${currentRedemptionRate}%`}</Value>
             <Label>{`Annual Redemption Rate`}</Label>
           </StateInner>
         </StatItem>

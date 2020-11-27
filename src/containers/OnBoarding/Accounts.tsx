@@ -1,5 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import ConnectWalletImage from '../../components/Images/ConnectWalletImage';
+import CreateAccountImage from '../../components/Images/CreateAccountImage';
+import OpenSafeImage from '../../components/Images/OpenSafeImage';
 import Steps from '../../components/Steps';
 import { useStoreState } from '../../store';
 
@@ -13,26 +16,11 @@ const Accounts = () => {
   const returnImage = () => {
     switch (step) {
       case 1:
-        return (
-          <img
-            src={require('../../assets/create_reflexer_account_image.svg')}
-            alt="placeholder"
-          />
-        );
+        return <CreateAccountImage />;
       case 2:
-        return (
-          <img
-            src={require('../../assets/open_first_ever_safe_image.svg')}
-            alt="placeholder"
-          />
-        );
+        return <OpenSafeImage />;
       default:
-        return (
-          <img
-            src={require('../../assets/connect_wallet_image.svg')}
-            alt="placeholder"
-          />
-        );
+        return <ConnectWalletImage />;
     }
   };
   return (
@@ -61,8 +49,9 @@ const Content = styled.div`
 
 const ImgContainer = styled.div`
   text-align: center;
-  img {
+  svg {
     width: 100%;
     max-width: 350px;
+    height: auto !important;
   }
 `;

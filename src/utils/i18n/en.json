@@ -7,7 +7,7 @@
   "getting_started": "Getting Started",
   "getting_started_text": "Connect your wallet to start opening Safes",
   "create_account": "Create Account",
-  "create_account_text": "Your wallet is connected! Now lets create a Reflexer Account so you can start to deposit, borrow and earn rewards.",
+  "create_account_text": "Your wallet is connected! Now let's create a Reflexer Account so you can start to deposit, borrow and earn rewards.",
   "create_safe": "Create a Safe",
   "create_safe_text": "Your account was created! The final step is to create a Safe, deposit ETH and borrow some {{ticker_name}}.",
   "cancel": "Cancel",

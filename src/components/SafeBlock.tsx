@@ -104,11 +104,18 @@ const SafeInfo = styled.div`
   svg {
     border-radius: ${(props) => props.theme.global.borderRadius};
     border: 1px solid ${(props) => props.theme.colors.border};
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+    width: 35px;
+    height: 35px;
+  `}
   }
 `;
 
 const SafeData = styled.div`
   margin-left: 16px;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    margin-left: 10px;
+  `}
 `;
 
 const SafeTitle = styled.div`
@@ -155,6 +162,8 @@ const SafeState = styled.div`
   }
   ${({ theme }) => theme.mediaWidth.upToSmall`
     padding: 8px 10px;
+    font-size: ${(props) => props.theme.font.extraSmall};
+    text-align:center;
   `}
 `;
 
