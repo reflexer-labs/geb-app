@@ -6,14 +6,14 @@ import styled from 'styled-components';
 import { useActiveWeb3React } from '../../hooks';
 import { useTransactionAdder } from '../../hooks/TransactionHooks';
 import { useStoreActions, useStoreState } from '../../store';
-import { ETH_NETWORK, TICKER_NAME } from '../../utils/constants';
+import { ETH_NETWORK, COIN_TICKER } from '../../utils/constants';
 import { timeout } from '../../utils/helper';
 import Button from '../Button';
 import Loader from '../Loader';
 
 const TEXT_PAYLOAD_DEFAULT_STATE = {
-  title: `${TICKER_NAME} Allowance`,
-  text: `Allow your account to manage your ${TICKER_NAME}`,
+  title: `${COIN_TICKER} Allowance`,
+  text: `Allow your account to manage your ${COIN_TICKER}`,
   status: '',
 };
 
@@ -59,8 +59,8 @@ const ApprovePRAI = () => {
     const rightInputBN = ethersUtils.parseEther(rightInput);
     if (coinAllowanceBN.gte(rightInputBN)) {
       setTextPayload({
-        title: `${TICKER_NAME} Unlocked`,
-        text: `${TICKER_NAME} unlocked successfully, proceeding to review transaction...`,
+        title: `${COIN_TICKER} Unlocked`,
+        text: `${COIN_TICKER} unlocked successfully, proceeding to review transaction...`,
         status: 'success',
       });
       await timeout(2000);
@@ -106,11 +106,11 @@ const ApprovePRAI = () => {
       );
       const txResponse = await signer.sendTransaction(tx);
       setTextPayload({
-        title: `Unlocking ${TICKER_NAME}`,
-        text: `Confirming transaction and unlocking ${TICKER_NAME}`,
+        title: `Unlocking ${COIN_TICKER}`,
+        text: `Confirming transaction and unlocking ${COIN_TICKER}`,
         status: 'loading',
       });
-      addTransaction(txResponse, `Unlocking ${TICKER_NAME}`);
+      addTransaction(txResponse, `Unlocking ${COIN_TICKER}`);
       await txResponse.wait();
       setIsPaid(true);
       await timeout(5000);

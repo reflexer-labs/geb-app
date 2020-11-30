@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
-import { TICKER_NAME } from '../../utils/constants';
+import { COIN_TICKER } from '../../utils/constants';
 import { ISafe } from '../../utils/interfaces';
 import Button from '../Button';
 import DecimalInput from '../DecimalInput';
@@ -90,7 +90,7 @@ const ClaimContainer = ({ setClaimableSafe, setFLXToBurn }: Props) => {
       {popupsState.ESMOperationPayload.type === 'RAI' ? (
         <Content>
           <DecimalInput
-            label={`${TICKER_NAME} Amount (Avail 0.00)`}
+            label={`${COIN_TICKER} Amount (Avail 0.00)`}
             value={value}
             onChange={setValue}
           />
@@ -125,7 +125,7 @@ const ClaimContainer = ({ setClaimableSafe, setFLXToBurn }: Props) => {
           {popupsState.ESMOperationPayload.type === 'RAI' ? (
             <>
               <Item>
-                <Label>{`${TICKER_NAME} Price`}</Label>{' '}
+                <Label>{`${COIN_TICKER} Price`}</Label>{' '}
                 <Value>{'$120.00'}</Value>
               </Item>
               <Item>

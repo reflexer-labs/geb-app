@@ -6,7 +6,7 @@ import GridContainer from '../../components/GridContainer';
 import PageHeader from '../../components/PageHeader';
 import VotesList from '../../components/VotesList';
 import { useStoreState } from '../../store';
-import { TICKER_NAME } from '../../utils/constants';
+import { COIN_TICKER } from '../../utils/constants';
 import { IVotingTx } from '../../utils/interfaces';
 
 interface ParamsType {
@@ -44,7 +44,7 @@ const VoteDetails = () => {
         <VotesList />
 
         <InterestModel>
-          <ModelTitle>{`Upgrade ${TICKER_NAME} Interest Model`}</ModelTitle>
+          <ModelTitle>{`Upgrade ${COIN_TICKER} Interest Model`}</ModelTitle>
           <ModelDate>Created July 3, 2020</ModelDate>
           <ModelText>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras proin

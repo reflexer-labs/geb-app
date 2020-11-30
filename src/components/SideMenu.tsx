@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useWeb3React } from '@web3-react/core';
 import ConnectedWalletIcon from './ConnectedWalletIcon';
 import { CSSTransition } from 'react-transition-group';
-import { TICKER_NAME } from '../utils/constants';
+import { COIN_TICKER } from '../utils/constants';
 
 const SideMenu = () => {
   const { t } = useTranslation();
@@ -70,7 +70,7 @@ const SideMenu = () => {
                 <ConnectBtnContainer>
                   <Icon src={require('../assets/LogoIcon.png')} />
                   <Title>{t('welcome_reflexer')}</Title>
-                  <Text>{t('connect_text', { ticker_name: TICKER_NAME })}</Text>
+                  <Text>{t('connect_text', { coin_ticker: COIN_TICKER })}</Text>
                   <Button
                     onClick={handleWalletConnect}
                     text={'connect_wallet'}

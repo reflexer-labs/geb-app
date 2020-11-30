@@ -7,7 +7,7 @@ import {
   ETHERSCAN_PREFIXES,
   floatsTypes,
   SUPPORTED_WALLETS,
-  TICKER_NAME,
+  COIN_TICKER,
 } from './constants';
 import {
   ILiquidationData,
@@ -384,7 +384,7 @@ export const formatHistoryArray = (
     if (deltaDebt > 0) {
       items.push({
         ...sharedObj,
-        title: `Borrowed ${TICKER_NAME}`,
+        title: `Borrowed ${COIN_TICKER}`,
         amount: numeral(deltaDebt).multiply(item.accumulatedRate).value(),
         icon: 'ArrowUpCircle',
         color: 'green',
@@ -393,7 +393,7 @@ export const formatHistoryArray = (
     if (deltaDebt < 0) {
       items.push({
         ...sharedObj,
-        title: `Repaid ${TICKER_NAME}`,
+        title: `Repaid ${COIN_TICKER}`,
         amount: numeral(deltaDebt)
           .multiply(-1)
           .multiply(item.accumulatedRate)

@@ -2,31 +2,10 @@ import React from 'react';
 
 const Arrow = () => {
   return (
-    <svg
-      width="17"
-      height="11"
-      viewBox="0 0 17 11"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M12.0353 10.1293L16.6191 5.54545L12.0353 0.961647L11.0112 1.97585L13.84 4.80469H0.978516V6.28622H13.84L11.0112 9.10511L12.0353 10.1293Z"
-        fill="url(#paint0_linear)"
-      />
-      <defs>
-        <linearGradient
-          id="paint0_linear"
-          x1="18"
-          y1="-7"
-          x2="-5.35966"
-          y2="11.4931"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#78D8FF" />
-          <stop offset="1" stopColor="#4CE096" />
-        </linearGradient>
-      </defs>
-    </svg>
+    <img
+      src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTUuNjQxIiBoZWlnaHQ9IjkuMTY4IiB2aWV3Qm94PSIwIDAgMTUuNjQxIDkuMTY4Ij48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImEiIHgxPSIwLjk0OCIgeTE9IjAuNSIgeDI9IjAiIHkyPSIwLjUiIGdyYWRpZW50VW5pdHM9Im9iamVjdEJvdW5kaW5nQm94Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM3OGQ4ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0Y2UwOTYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cGF0aCBkPSJNMTIuMDM1LDEwLjEyOWw0LjU4NC00LjU4NEwxMi4wMzUuOTYyLDExLjAxMSwxLjk3NiwxMy44NCw0LjhILjk3OVY2LjI4NkgxMy44NEwxMS4wMTEsOS4xMDVaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMC45NzkgLTAuOTYyKSIgZmlsbD0idXJsKCNhKSIvPjwvc3ZnPg=="
+      alt=""
+    />
   );
 };
 

@@ -87,7 +87,7 @@ const Button = ({
   return returnType();
 };
 
-export default Button;
+export default React.memo(Button);
 
 const Container = styled.button<{ isLoading?: boolean }>`
   outline: none;
@@ -152,26 +152,26 @@ const DimmedBtn = styled.button`
 `;
 
 const ArrowBtn = styled.button`
+  span {
+    background: ${(props) => props.theme.colors.gradient};
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: ${(props) => props.theme.colors.inputBorderColor};
+  }
+  background: transparent;
   border: 0;
   cursor: pointer;
   box-shadow: none;
   outline: none;
   padding: 0;
   margin: 0;
-  background: ${(props) => props.theme.colors.gradient};
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: ${(props) => props.theme.colors.inputBorderColor};
   font-size: ${(props) => props.theme.font.small};
   font-weight: 600;
   line-height: 24px;
   letter-spacing: -0.18px;
-  svg {
-    float: right;
-    position: relative;
-    top: 7px;
-  }
+  transition: all 0.3s ease;
+
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
@@ -179,7 +179,6 @@ const ArrowBtn = styled.button`
       opacity: 0.5;
     }
   }
-  transition: all 0.3s ease;
   &:hover {
     opacity: 0.8;
   }
