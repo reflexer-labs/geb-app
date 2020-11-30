@@ -11,7 +11,7 @@ import {
 } from '../hooks/TransactionHooks';
 import { timeout } from '../utils/helper';
 import { useTranslation } from 'react-i18next';
-import { TICKER_NAME } from '../utils/constants';
+import { COIN_TICKER } from '../utils/constants';
 
 const Steps = () => {
   const { t } = useTranslation();
@@ -145,7 +145,7 @@ const Steps = () => {
         return (
           <StepsContent
             title={'create_safe'}
-            text={t('create_safe_text', { ticker_name: TICKER_NAME })}
+            text={t('create_safe_text', { coin_ticker: COIN_TICKER })}
             btnText={'create_safe'}
             handleClick={handleCreateSafe}
             isDisabled={isWrongNetwork}

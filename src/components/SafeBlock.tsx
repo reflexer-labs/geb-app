@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import { formatNumber } from '../utils/helper';
-import { jdenticonConfig, TICKER_NAME } from '../utils/constants';
+import { jdenticonConfig, COIN_TICKER } from '../utils/constants';
 import Arrow from './Icons/Arrow';
 
 const SafeBlock = ({ ...props }) => {
@@ -61,7 +61,7 @@ const SafeBlock = ({ ...props }) => {
             <Value>{collateral}</Value>
           </Item>
           <Item>
-            <Label>{`${TICKER_NAME} Borrowed`}</Label>
+            <Label>{`${COIN_TICKER} Borrowed`}</Label>
             <Value>{totalDebt}</Value>
           </Item>
           <Item>

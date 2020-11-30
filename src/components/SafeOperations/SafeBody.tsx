@@ -21,7 +21,7 @@ import {
   toFixedString,
 } from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
-import { DEFAULT_SAFE_STATE, TICKER_NAME } from '../../utils/constants';
+import { DEFAULT_SAFE_STATE, COIN_TICKER } from '../../utils/constants';
 
 interface Props {
   isChecked?: boolean;
@@ -138,13 +138,13 @@ const SafeBody = ({ isChecked }: Props) => {
       return `Deposit ETH (Avail ${getAvailableEth()})`;
     }
     if (type === 'deposit_borrow' && !isLeft) {
-      return `Borrow ${TICKER_NAME} (Avail ${getAvailableRai()})`;
+      return `Borrow ${COIN_TICKER} (Avail ${getAvailableRai()})`;
     }
     if (type === 'repay_withdraw' && isLeft) {
       return `Withdraw ETH (Avail ${getAvailableEth()})`;
     }
     if (type === 'repay_withdraw' && singleSafe && !isLeft) {
-      return `Repay ${TICKER_NAME} (Owe: ${formatNumber(
+      return `Repay ${COIN_TICKER} (Owe: ${formatNumber(
         getAvailableRai()
       )}, Avail: ${formatNumber(praiBalance.toString())})`;
     }
@@ -203,7 +203,7 @@ const SafeBody = ({ isChecked }: Props) => {
         setError('Insufficient balance.');
         return false;
       } else if (rightInputBN.gt(availableRaiBN)) {
-        setError(`${TICKER_NAME} borrowed cannot exceed available amount.`);
+        setError(`${COIN_TICKER} borrowed cannot exceed available amount.`);
         return false;
       } else if (isCreate) {
         if (leftInputBN.isZero()) {
@@ -213,7 +213,7 @@ const SafeBody = ({ isChecked }: Props) => {
       } else {
         if (leftInputBN.isZero() && rightInputBN.isZero()) {
           setError(
-            `Please enter the amount of ETH to be deposited or amount of ${TICKER_NAME} to be borrowed`
+            `Please enter the amount of ETH to be deposited or amount of ${COIN_TICKER} to be borrowed`
           );
           return false;
         }
@@ -222,7 +222,7 @@ const SafeBody = ({ isChecked }: Props) => {
     if (type === 'repay_withdraw') {
       if (leftInputBN.isZero() && rightInputBN.isZero()) {
         setError(
-          `Please enter the amount of ETH to free or the amount of ${TICKER_NAME} to be repay`
+          `Please enter the amount of ETH to free or the amount of ${COIN_TICKER} to be repay`
         );
         return false;
       } else if (leftInputBN.gt(availableEthBN)) {
@@ -230,7 +230,7 @@ const SafeBody = ({ isChecked }: Props) => {
         return false;
       }
       if (rightInputBN.gt(availableRaiBN)) {
-        setError(`${TICKER_NAME} to repay cannot exceed owed amount.`);
+        setError(`${COIN_TICKER} to repay cannot exceed owed amount.`);
         return false;
       }
 
@@ -245,7 +245,7 @@ const SafeBody = ({ isChecked }: Props) => {
           repayPercent > 95
         ) {
           setError(
-            `You can only repay a minimum of ${getAvailableRai()} ${TICKER_NAME} to avoid leaving residual values`
+            `You can only repay a minimum of ${getAvailableRai()} ${COIN_TICKER} to avoid leaving residual values`
           );
           return false;
         }
@@ -263,7 +263,7 @@ const SafeBody = ({ isChecked }: Props) => {
       );
       if (totalDebtBN.gte(perSafeDebtCeilingBN)) {
         setError(
-          `Individual safe can't have more than ${perSafeDebtCeiling} ${TICKER_NAME} of debt.`
+          `Individual safe can't have more than ${perSafeDebtCeiling} ${COIN_TICKER} of debt.`
         );
         return;
       }
@@ -276,7 +276,7 @@ const SafeBody = ({ isChecked }: Props) => {
       totalDebtBN.mul(accumlatedRateBN).lt(debtFloorBN.mul(gebUtils.RAY))
     ) {
       setError(
-        `The resulting debt should be at least ${debtFloor} ${TICKER_NAME} or zero.`
+        `The resulting debt should be at least ${debtFloor} ${COIN_TICKER} or zero.`
       );
       return false;
     }
@@ -295,7 +295,7 @@ const SafeBody = ({ isChecked }: Props) => {
 
     if (globalDebtBN.add(totalDebtBN).gt(debtCeilingBN)) {
       setError(
-        `Debt ceiling too low, not possible to draw this amount of ${TICKER_NAME}.`
+        `Debt ceiling too low, not possible to draw this amount of ${COIN_TICKER}.`
       );
       return;
     }
@@ -457,7 +457,7 @@ const SafeBody = ({ isChecked }: Props) => {
               onChange={() => {}}
             />
             <DecimalInput
-              label={`${TICKER_NAME} on Uniswap (Avail ${getAvailableRai()})`}
+              label={`${COIN_TICKER} on Uniswap (Avail ${getAvailableRai()})`}
               value={uniSwapVal ? uniSwapVal.rightInput : ''}
               onChange={() => {}}
               disableMax
@@ -473,7 +473,7 @@ const SafeBody = ({ isChecked }: Props) => {
               <Value>{`${totalCollateral ? totalCollateral : 0}`}</Value>
             </Item>
             <Item>
-              <Label>{`Total ${TICKER_NAME} Debt`}</Label>{' '}
+              <Label>{`Total ${COIN_TICKER} Debt`}</Label>{' '}
               <Value>{`${totalDebt ? totalDebt : 0}`}</Value>
             </Item>
             <Item>
@@ -481,7 +481,7 @@ const SafeBody = ({ isChecked }: Props) => {
               <Value>{`$${formatNumber(currentPrice.value, 2)}`}</Value>
             </Item>
             <Item>
-              <Label>{`${TICKER_NAME} Price`}</Label>{' '}
+              <Label>{`${COIN_TICKER} Price`}</Label>{' '}
               <Value>{`$${formatNumber(currentRedemptionPrice, 3)}`}</Value>
             </Item>
 
@@ -506,7 +506,7 @@ const SafeBody = ({ isChecked }: Props) => {
 
         {/*{isChecked ? null : (
           <UniSwapCheckContainer>
-            <Text>{t('uniswap_modal_check_text',{ticker_name: TICKER_NAME})}</Text>
+            <Text>{t('uniswap_modal_check_text',{coin_ticker: COIN_TICKER})}</Text>
             <CheckBox
               checked={checkUniSwapPool}
               onChange={(state: boolean) => {

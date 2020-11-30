@@ -5,7 +5,7 @@ import { useStoreActions, useStoreState } from '../../store';
 import SafeContent from './SafeContent';
 import Button from '../Button';
 import TransactionOverview from '../TransactionOverview';
-import { DEFAULT_SAFE_STATE, TICKER_NAME } from '../../utils/constants';
+import { DEFAULT_SAFE_STATE, COIN_TICKER } from '../../utils/constants';
 import { useActiveWeb3React } from '../../hooks';
 import { handleTransactionError } from '../../hooks/TransactionHooks';
 import { formatNumber, returnConnectorName } from '../../utils/helper';
@@ -124,8 +124,8 @@ const ReviewTransaction = () => {
             <Item>
               <Label>
                 {type === 'repay_withdraw'
-                  ? `${TICKER_NAME} Repaid`
-                  : `${TICKER_NAME} Borrowed`}
+                  ? `${COIN_TICKER} Repaid`
+                  : `${COIN_TICKER} Borrowed`}
               </Label>{' '}
               <Value>{rightInput}</Value>
             </Item>
@@ -134,7 +134,7 @@ const ReviewTransaction = () => {
               <Value>{`${formatNumber(totalCollateral)}`}</Value>
             </Item>
             <Item>
-              <Label>{`Total ${TICKER_NAME} Debt`}</Label>{' '}
+              <Label>{`Total ${COIN_TICKER} Debt`}</Label>{' '}
               <Value>{`${formatNumber(totalDebt)}`}</Value>
             </Item>
             <Item>
@@ -145,7 +145,7 @@ const ReviewTransaction = () => {
               )}`}</Value>
             </Item>
             <Item>
-              <Label>{`${TICKER_NAME} Price`}</Label>{' '}
+              <Label>{`${COIN_TICKER} Price`}</Label>{' '}
               <Value>{`$${formatNumber(
                 safeState.liquidationData.currentRedemptionPrice,
                 3
@@ -168,11 +168,11 @@ const ReviewTransaction = () => {
           {safeState.isUniSwapPoolChecked ? (
             <Block>
               <Item>
-                <Label>{`${TICKER_NAME} per ETH`}</Label>{' '}
+                <Label>{`${COIN_TICKER} per ETH`}</Label>{' '}
                 <Value>{'$0.00'}</Value>
               </Item>
               <Item>
-                <Label>{`ETH per ${TICKER_NAME}`}</Label>{' '}
+                <Label>{`ETH per ${COIN_TICKER}`}</Label>{' '}
                 <Value>{'$0.00'}</Value>
               </Item>
               <Item>

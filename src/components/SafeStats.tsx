@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
 import Button from './Button';
 import { formatNumber, getRatePercentage, timeout } from '../utils/helper';
-import { TICKER_NAME } from '../utils/constants';
+import { COIN_TICKER } from '../utils/constants';
 import { useActiveWeb3React } from '../hooks';
 import { handleTransactionError } from '../hooks/TransactionHooks';
 
@@ -118,7 +118,7 @@ const SafeStats = () => {
         <StatItem className="w50">
           <StateInner>
             <Value>${raiPrice}</Value>
-            <Label>{`${TICKER_NAME} Price`}</Label>
+            <Label>{`${COIN_TICKER} Price`}</Label>
           </StateInner>
         </StatItem>
 
@@ -144,8 +144,8 @@ const SafeStats = () => {
 
         <StatItem className="w50">
           <StateInner>
-            <Value>{`${totalDebt} ${TICKER_NAME}`}</Value>
-            <Label>{`${TICKER_NAME} Debt`}</Label>
+            <Value>{`${totalDebt} ${COIN_TICKER}`}</Value>
+            <Label>{`${COIN_TICKER} Debt`}</Label>
             <Actions>
               <Button
                 withArrow

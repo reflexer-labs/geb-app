@@ -3,23 +3,25 @@ import { css } from 'styled-components';
 import { injected, walletconnect, walletlink } from '../connectors';
 import { WalletInfo } from './interfaces';
 
-const { REACT_APP_GRAPH_API_URLS, REACT_APP_NETWORK_ID } = process.env;
+const {
+  REACT_APP_GRAPH_API_URLS,
+  REACT_APP_NETWORK_ID,
+  REACT_APP_COIN_TICKER_PRODUCTION,
+  REACT_APP_COIN_TICKER_KOVAN,
+} = process.env;
 
 export enum Network {
   MAINNET = 'mainnet',
   KOVAN = 'kovan',
 }
 
-export enum Ticker {
-  MAINNET = 'PRAI',
-  KOVAN = 'RAI',
-}
-
 export const ETH_NETWORK =
   REACT_APP_NETWORK_ID === '1' ? Network.MAINNET : Network.KOVAN;
 
-export const TICKER_NAME =
-  REACT_APP_NETWORK_ID === '1' ? Ticker.MAINNET : Ticker.KOVAN;
+export const COIN_TICKER =
+  REACT_APP_NETWORK_ID === '1'
+    ? REACT_APP_COIN_TICKER_PRODUCTION
+    : REACT_APP_COIN_TICKER_KOVAN ?? 'RAI';
 
 export const GRAPH_API_URLS = REACT_APP_GRAPH_API_URLS
   ? REACT_APP_GRAPH_API_URLS.split(',')
