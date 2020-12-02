@@ -57,8 +57,9 @@ const Steps = () => {
     const diff = currentBlockNumber - txBlockNumber;
     setBlocksSinceCheck(diff >= 10 ? 10 : diff);
     if (diff > 10) {
-      await timeout(3000);
+      await timeout(1000);
       safeActions.fetchUserSafes(account as string);
+      await timeout(2000);
       connectWalletActions.setIsStepLoading(false);
       connectWalletActions.setStep(2);
       localStorage.removeItem('ctHash');
