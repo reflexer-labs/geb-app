@@ -1,29 +1,29 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import Alerts from '../components/Alerts';
 import ConnectedWalletModal from '../components/Modals/ConnectedWalletModal';
-import CreateAccountModal from '../components/Modals/CreateAccountModal';
+import CreateAccountModal from '../components/Modals/SafeOperationsModel';
 import ScreenLoader from '../components/Modals/ScreenLoader';
-import SettingsModal from '../components/Modals/SettingsModal';
 import Navbar from '../components/Navbar';
 import SideMenu from '../components/SideMenu';
-import SideToast from '../components/SideToast';
 import { useStoreState, useStoreActions } from '../store';
 import ApplicationUpdater from '../services/ApplicationUpdater';
 import BalanceUpdater from '../services/BalanceUpdater';
-import { capitalizeName } from '../utils/helper';
+import { capitalizeName, timeout } from '../utils/helper';
 import WalletModal from '../components/WalletModal';
 import { ChainId } from '@uniswap/sdk';
 import { ETHERSCAN_PREFIXES } from '../utils/constants';
 import { useActiveWeb3React } from '../hooks';
 import LoadingModal from '../components/Modals/LoadingModal';
-import SafeOperationsModal from '../components/Modals/SafeOperationsModal';
-import ESMOperationModal from '../components/Modals/ESMOperationModal';
-import VotingOperationModal from '../components/Modals/VotingOperationModal';
-import Footer from '../components/Footer';
 import styled from 'styled-components';
-import useWindowSize from '../hooks/useWindowSize';
 import { NETWORK_ID } from '../connectors';
+import CookieBanner from '../components/CookieBanner';
+import BlockBodyContainer from '../components/BlockBodyContainer';
+import { toast } from 'react-toastify';
+import ToastPayload from '../components/ToastPayload';
+import WaitingModal from '../components/Modals/WaitingModal';
+import TransactionUpdater from '../services/TransactionUpdater';
+import usePrevious from '../hooks/usePrevious';
+import { useHistory } from 'react-router-dom';
 
 interface Props {
   children: ReactNode;
@@ -31,88 +31,131 @@ interface Props {
 
 const Shared = ({ children }: Props) => {
   const { t } = useTranslation();
-  const footerRef = React.useRef<HTMLDivElement>(null);
-  const navbarRef = React.useRef<HTMLDivElement>(null);
   const { chainId, account } = useActiveWeb3React();
-  const [contentHeight, setContentHeight] = useState('auto');
-  const windowSize = useWindowSize();
-  const { popupsModel: popupsState } = useStoreState((state) => state);
+  const history = useHistory();
+  const previousAccount = usePrevious(account);
   const {
-    popupsModel: popupsActions,
-    walletModel: walletActions,
-  } = useStoreActions((state) => state);
-  const { sideToastPayload, alertPayload } = popupsState;
+    settingsModel: settingsState,
+    connectWalletModel: connectWalletState,
+  } = useStoreState((state) => state);
 
-  const networkChecker = (id: ChainId) => {
+  const {
+    settingsModel: settingsActions,
+    connectWalletModel: connectWalletActions,
+    popupsModel: popupsActions,
+    transactionsModel: transactionsActions,
+    safeModel: safeActions,
+  } = useStoreActions((state) => state);
+  const toastId = 'networdToastHash';
+
+  async function accountChecker() {
+    if (!account || !chainId) return;
+    popupsActions.setWaitingPayload({
+      title: '',
+      status: 'loading',
+    });
+    popupsActions.setIsWaitingModalOpen(true);
+    const isUserCreated = await connectWalletActions.fetchUser(account);
+    const txs = localStorage.getItem(`${account}-${chainId}`);
+    if (txs) {
+      transactionsActions.setTransactions(JSON.parse(txs));
+    }
+    await timeout(200);
+    if (isUserCreated && !connectWalletState.ctHash) {
+      connectWalletActions.setStep(2);
+      safeActions.fetchUserSafes(account);
+    } else {
+      safeActions.setIsSafeCreated(false);
+      connectWalletActions.setStep(1);
+    }
+    await timeout(1000);
+    popupsActions.setIsWaitingModalOpen(false);
+  }
+
+  function accountChange() {
+    const isAccountSwitched =
+      account && previousAccount && account !== previousAccount;
+    if (!account) {
+      connectWalletActions.setStep(0);
+      safeActions.setIsSafeCreated(false);
+      connectWalletActions.setIsUserCreated(false);
+      transactionsActions.setTransactions({});
+    }
+    if (isAccountSwitched) {
+      history.push('/');
+      transactionsActions.setTransactions({});
+    }
+  }
+
+  function networkChecker() {
+    accountChange();
+    const id: ChainId = NETWORK_ID;
     if (chainId && chainId !== id) {
       const chainName = ETHERSCAN_PREFIXES[id];
-      popupsActions.setAlertPayload({
-        type: 'danger',
-        text: `${t('wrong_network')} ${capitalizeName(
-          chainName === '' ? 'Mainnet' : chainName
-        )}`,
-      });
+      connectWalletActions.setIsWrongNetwork(true);
+      settingsActions.setBlockBody(true);
+      toast(
+        <ToastPayload
+          icon={'AlertTriangle'}
+          iconSize={40}
+          iconColor={'orange'}
+          text={`${t('wrong_network')} ${capitalizeName(
+            chainName === '' ? 'Mainnet' : chainName
+          )}`}
+        />,
+        { autoClose: false, type: 'warning', toastId }
+      );
     } else {
-      popupsActions.setAlertPayload(null);
+      toast.update(toastId, { autoClose: 1 });
+      settingsActions.setBlockBody(false);
+      connectWalletActions.setIsWrongNetwork(false);
+      if (account) {
+        toast(
+          <ToastPayload
+            icon={'Check'}
+            iconColor={'green'}
+            text={t('wallet_connected')}
+          />,
+          {
+            type: 'success',
+          }
+        );
+        connectWalletActions.setStep(1);
+        accountChecker();
+      }
     }
-  };
+  }
+
+  const networkCheckerCallBack = useCallback(networkChecker, [
+    account,
+    chainId,
+  ]);
 
   useEffect(() => {
-    if (chainId) {
-      networkChecker(NETWORK_ID);
-    }
-    if (account) {
-      walletActions.setStep(1);
-    } else {
-      walletActions.setStep(0);
-    }
-    // eslint-disable-next-line
-  }, [chainId, account]);
-
-  useEffect(() => {
-    if (
-      windowSize.height &&
-      navbarRef &&
-      navbarRef.current &&
-      footerRef &&
-      footerRef.current
-    ) {
-      const footerHeight = footerRef.current.clientHeight;
-      const navbarHeight = navbarRef.current.clientHeight;
-      const height =
-        windowSize.height - (footerHeight + navbarHeight) - 20 + 'px';
-      setContentHeight(height);
-    }
-  }, [navbarRef, footerRef, windowSize.height]);
+    networkCheckerCallBack();
+  }, [networkCheckerCallBack]);
 
   return (
     <Container>
+      {settingsState.blockBody ? <BlockBodyContainer /> : null}
       <SideMenu />
-      <SideToast {...sideToastPayload} />
       <WalletModal />
       <ApplicationUpdater />
       <BalanceUpdater />
-      <SettingsModal />
+      <TransactionUpdater />
       <LoadingModal />
-      <VotingOperationModal />
-      <ESMOperationModal />
-      <SafeOperationsModal />
+
       <CreateAccountModal />
       <ConnectedWalletModal />
+
       <ScreenLoader />
-      <EmptyDiv ref={navbarRef}>
+      <WaitingModal />
+      <EmptyDiv>
         <Navbar />
       </EmptyDiv>
-      {alertPayload ? (
-        <Alerts
-          text={alertPayload.text}
-          margin={'10px auto 0 auto'}
-          type={alertPayload.type}
-        />
-      ) : null}
-      <Content minHeight={contentHeight}>{children}</Content>
-      <EmptyDiv ref={footerRef}>
-        <Footer slapToBottom />
+      <Content>{children}</Content>
+      <EmptyDiv>
+        <CookieBanner />
       </EmptyDiv>
     </Container>
   );
@@ -122,9 +165,41 @@ export default Shared;
 
 const Container = styled.div`
   min-height: 100vh;
+  .CookieConsent {
+    z-index: 999 !important;
+    bottom: 20px !important;
+    width: 90% !important;
+    max-width: 1280px;
+    margin: 0 auto;
+    right: 0;
+    border-radius: ${(props) => props.theme.global.borderRadius};
+    padding: 10px 20px;
+
+    button {
+      background: ${(props) => props.theme.colors.gradient} !important;
+      color: ${(props) => props.theme.colors.neutral} !important;
+      padding: 8px 15px !important;
+      background: ${(props) => props.theme.colors.gradient};
+      border-radius: ${(props) => props.theme.global.borderRadius} !important;
+      font-size: ${(props) => props.theme.font.small};
+      font-weight: 600;
+      cursor: pointer;
+      flex: 0 0 auto;
+      margin: 0px 15px 0px 0px !important;
+      text-align: center;
+      outline: none;
+      position: relative;
+      top: -5px;
+    }
+
+    @media (max-width: 991px) {
+      display: block !important;
+      button {
+        margin-left: 10px !important;
+      }
+    }
+  }
 `;
 
-const Content = styled.div<{ minHeight: string }>`
-  min-height: ${({ minHeight }) => minHeight};
-`;
+const Content = styled.div``;
 const EmptyDiv = styled.div``;

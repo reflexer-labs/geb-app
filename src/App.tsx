@@ -19,15 +19,17 @@ import GlobalStyle from './GlobalStyle';
 import Shared from './containers/Shared';
 import Web3ReactManager from './components/Web3ReactManager';
 import SafeDetails from './containers/OnBoarding/SafeDetails';
-import EmergencyShutdown from './containers/EmergencyShutdown';
-import Voting from './containers/Voting';
-import VoteDetails from './containers/Voting/VoteDetails';
+
+import Privacy from './containers/Privacy';
+import CustomToast from './components/CustomToast';
+
+// Toast css
 
 declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}
 }
 
-function App() {
+const App = () => {
   const { settingsModel: settingsState } = useStoreState((state) => state);
 
   const { isLightTheme, lang, bodyOverflow } = settingsState;
@@ -40,15 +42,14 @@ function App() {
     <I18nextProvider i18n={i18next}>
       <ThemeProvider theme={isLightTheme ? lightTheme : darkTheme}>
         <GlobalStyle bodyOverflow={bodyOverflow} />
+        <CustomToast />
         <ErrorBoundary>
           <Router>
             <Shared>
               <Suspense fallback={null}>
                 <Web3ReactManager>
                   <Switch>
-                    <Route exact component={VoteDetails} path={'/voting/:id'} />
-                    <Route exact component={Voting} path={'/voting'} />
-                    <Route exact component={EmergencyShutdown} path={'/esm'} />
+                    <Route exact component={Privacy} path={'/privacy'} />
                     <Route exact component={SafeDetails} path={'/safes/:id'} />
                     <Route exact component={OnBoarding} path={'/'} />
                     <Redirect from="*" to="/" />
@@ -61,6 +62,6 @@ function App() {
       </ThemeProvider>
     </I18nextProvider>
   );
-}
+};
 
 export default App;

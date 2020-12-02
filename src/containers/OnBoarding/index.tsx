@@ -11,7 +11,12 @@ import Button from '../../components/Button';
 
 const OnBoarding = () => {
   const { t } = useTranslation();
-  const { safeModel: safeState } = useStoreState((state) => state);
+
+  const {
+    connectWalletModel: connectWalletState,
+    safeModel: safeState,
+    popupsModel: popupsState,
+  } = useStoreState((state) => state);
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
 
   return (
@@ -19,13 +24,26 @@ const OnBoarding = () => {
       <GridContainer>
         <Content>
           <PageHeader
-            breadcrumbs={{ '/': t('accounts') }}
-            text={t('accounts_header_text')}
+            breadcrumbs={{
+              '/': t(safeState.safeCreated ? 'accounts' : 'onboarding'),
+            }}
+            text={t(
+              safeState.safeCreated
+                ? 'accounts_header_text'
+                : 'onboarding_header_text'
+            )}
           />
           {safeState.safeCreated ? (
             <BtnContainer>
               <Button
-                onClick={() => popupsActions.setIsCreateAccountModalOpen(true)}
+                disabled={connectWalletState.isWrongNetwork}
+                onClick={() =>
+                  popupsActions.setSafeOperationPayload({
+                    isOpen: true,
+                    type: 'deposit_borrow',
+                    isCreate: true,
+                  })
+                }
               >
                 <BtnInner>
                   <Plus size={18} />
@@ -34,7 +52,11 @@ const OnBoarding = () => {
               </Button>
             </BtnContainer>
           ) : null}
-          {safeState.safeCreated ? <SafeList /> : <Accounts />}
+          {safeState.safeCreated ? (
+            <SafeList />
+          ) : popupsState.isWaitingModalOpen ? null : (
+            <Accounts />
+          )}
         </Content>
       </GridContainer>
     </Container>

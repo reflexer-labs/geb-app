@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
-import { amountToFiat, returnWalletAddres } from '../utils/helper';
+import { amountToFiat, returnWalletAddress } from '../utils/helper';
 import Button from './Button';
 import NavLinks from './NavLinks';
 import { useTranslation } from 'react-i18next';
 import { useWeb3React } from '@web3-react/core';
 import ConnectedWalletIcon from './ConnectedWalletIcon';
 import { CSSTransition } from 'react-transition-group';
+import { COIN_TICKER } from '../utils/constants';
 
 const SideMenu = () => {
   const { t } = useTranslation();
@@ -61,15 +62,15 @@ const SideMenu = () => {
                 >
                   <ConnectedWalletIcon size={40} />
                   <AccountData>
-                    <Address>{returnWalletAddres(account)}</Address>
+                    <Address>{returnWalletAddress(account)}</Address>
                     <Balance>{`$ ${renderBalance()}`}</Balance>
                   </AccountData>
                 </Account>
               ) : (
                 <ConnectBtnContainer>
-                  <Icon src={process.env.PUBLIC_URL + '/img/LogoIcon.png'} />
+                  <Icon src={require('../assets/LogoIcon.png')} />
                   <Title>{t('welcome_reflexer')}</Title>
-                  <Text>{t('connect_text')}</Text>
+                  <Text>{t('connect_text', { coin_ticker: COIN_TICKER })}</Text>
                   <Button
                     onClick={handleWalletConnect}
                     text={'connect_wallet'}

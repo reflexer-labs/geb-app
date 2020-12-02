@@ -1,13 +1,23 @@
 import { action, Action, Thunk, thunk } from 'easy-peasy';
 import api from '../services/api';
-import { IBlockNumber, IEthBalance } from '../utils/interfaces';
+import { fetchUser } from '../services/graphql';
+import { IBlockNumber, ITokenBalance } from '../utils/interfaces';
 
 export interface ConnectWalletModel {
   blockNumber: IBlockNumber;
   fiatPrice: number;
-  ethBalance: IEthBalance;
+  step: number;
+  isUserCreated: boolean;
+  proxyAddress: string;
+  coinAllowance: string;
+  ctHash: string;
+  ethBalance: ITokenBalance;
+  praiBalance: ITokenBalance;
+  isWrongNetwork: boolean;
+  isStepLoading: boolean;
   fetchFiatPrice: Thunk<ConnectWalletModel>;
   setFiatPrice: Action<ConnectWalletModel, number>;
+  setIsWrongNetwork: Action<ConnectWalletModel, boolean>;
   updateBlockNumber: Action<
     ConnectWalletModel,
     { chainId: number; blockNumber: number }
@@ -16,19 +26,56 @@ export interface ConnectWalletModel {
     ConnectWalletModel,
     { chainId: number; balance: number }
   >;
+  updatePraiBalance: Action<
+    ConnectWalletModel,
+    { chainId: number; balance: number }
+  >;
+  fetchUser: Thunk<ConnectWalletModel, string>;
+  setStep: Action<ConnectWalletModel, number>;
+  setIsUserCreated: Action<ConnectWalletModel, boolean>;
+  setProxyAddress: Action<ConnectWalletModel, string>;
+  setCoinAllowance: Action<ConnectWalletModel, string>;
+  setIsStepLoading: Action<ConnectWalletModel, boolean>;
+  setCtHash: Action<ConnectWalletModel, string>;
 }
+
+const ctHashState = localStorage.getItem('ctHash');
 
 const connectWalletModel: ConnectWalletModel = {
   blockNumber: {},
   ethBalance: {},
+  praiBalance: {},
   fiatPrice: 0,
+  step: 0,
+  proxyAddress: '',
+  coinAllowance: '',
+  ctHash: ctHashState || '',
+  isStepLoading: false,
+  isWrongNetwork: false,
+  isUserCreated: false,
   fetchFiatPrice: thunk(async (actions, payload) => {
     const fiatPrice = await api.fetchFiatPrice();
     actions.setFiatPrice(fiatPrice);
   }),
+
+  fetchUser: thunk(async (actions, payload) => {
+    const user = await fetchUser(payload.toLowerCase());
+    if (user) {
+      actions.setIsUserCreated(true);
+      return true;
+    } else {
+      actions.setIsUserCreated(false);
+      return false;
+    }
+  }),
   setFiatPrice: action((state, payload) => {
     state.fiatPrice = payload;
   }),
+
+  setIsWrongNetwork: action((state, payload) => {
+    state.isWrongNetwork = payload;
+  }),
+
   updateBlockNumber: action((state, payload) => {
     const { chainId, blockNumber } = payload;
     if (typeof state.blockNumber[chainId] !== 'number') {
@@ -40,9 +87,35 @@ const connectWalletModel: ConnectWalletModel = {
       );
     }
   }),
+
   updateEthBalance: action((state, payload) => {
     const { chainId, balance } = payload;
     state.ethBalance[chainId] = balance;
+  }),
+  updatePraiBalance: action((state, payload) => {
+    const { chainId, balance } = payload;
+    state.praiBalance[chainId] = balance;
+  }),
+  setStep: action((state, payload) => {
+    state.step = payload;
+    state.isStepLoading = false;
+  }),
+  setIsUserCreated: action((state, payload) => {
+    state.isUserCreated = payload;
+  }),
+  setProxyAddress: action((state, payload) => {
+    state.proxyAddress = payload;
+  }),
+  setCoinAllowance: action((state, payload) => {
+    state.coinAllowance = payload;
+  }),
+  setIsStepLoading: action((state, payload) => {
+    state.isStepLoading = payload;
+  }),
+
+  setCtHash: action((state, payload) => {
+    state.ctHash = payload;
+    localStorage.setItem('ctHash', payload);
   }),
 };
 

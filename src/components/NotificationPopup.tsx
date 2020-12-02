@@ -33,7 +33,7 @@ const NotificationPopup = () => {
       </BellBtn>
       {isOpen ? (
         <>
-          <CaretImg src={process.env.PUBLIC_URL + '/img/caret-up.svg'} />
+          <CaretImg src={require('../assets/caret-up.svg')} />
 
           <Menu>
             <Scrollbars
@@ -52,10 +52,7 @@ const NotificationPopup = () => {
                     <Value>0.000</Value>
                     <ExternalLink href="">
                       Etherscan{' '}
-                      <img
-                        src={process.env.PUBLIC_URL + '/img/arrow-up.svg'}
-                        alt=""
-                      />
+                      <img src={require('../assets/arrow-up.svg')} alt="" />
                     </ExternalLink>
                   </Right>
                 </NotificationItem>
@@ -101,7 +98,7 @@ const BellBtn = styled.div`
   svg {
     stop {
       transition: all 0.3s ease;
-      stop-color: gray;
+      stopcolor: gray;
     }
   }
 
@@ -109,9 +106,9 @@ const BellBtn = styled.div`
   &:hover {
     svg {
       stop {
-        stop-color: #78d8ff;
+        stopcolor: #78d8ff;
         &[offset='1'] {
-          stop-color: #4ce096;
+          stopcolor: #4ce096;
         }
       }
     }

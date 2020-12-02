@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import Scrollbars from 'react-custom-scrollbars';
 import styled from 'styled-components';
 
+type Item = string | { item: string; img: string };
 interface Props {
-  itemSelected: string;
-  items: Array<string>;
+  itemSelected: Item;
+  items: Array<Item>;
   getSelectedItem?: (item: string) => void;
   padding?: string;
   minWidth?: string;
@@ -27,11 +28,15 @@ const Dropdown = (props: Props) => {
     label,
   } = props;
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(itemSelected);
-  const handleItemClick = (item: string) => {
+  const [selectedItem, setSelectedItem] = useState<Item>(itemSelected);
+  const handleItemClick = (selected: Item) => {
     setIsOpen(!isOpen);
-    setSelectedItem(item);
-    getSelectedItem && getSelectedItem(item);
+    setSelectedItem(selected);
+    if (typeof selected === 'string') {
+      getSelectedItem && getSelectedItem(selected);
+    } else {
+      getSelectedItem && getSelectedItem(selected.item);
+    }
   };
 
   const handleClickOutside = (event: any) => {
@@ -65,16 +70,24 @@ const Dropdown = (props: Props) => {
           style={{
             padding: padding || '20px',
             fontSize: fontSize || '16px',
+            pointerEvents: items.length > 0 ? 'auto' : 'none',
           }}
           onClick={() => setIsOpen(!isOpen)}
         >
           <span className="text">
-            <span>{extraWord}</span> {selectedItem}
+            <span>{extraWord}</span>{' '}
+            {typeof selectedItem === 'string' ? (
+              selectedItem
+            ) : (
+              <ItemImg>
+                <img src={selectedItem.img} alt="" /> {selectedItem.item}
+              </ItemImg>
+            )}
           </span>
 
           {items.length > 0 ? (
             <CaretIcon
-              src={process.env.PUBLIC_URL + '/img/caret.png'}
+              src={require('../assets/caret.png')}
               className={isOpen ? 'up' : ''}
             />
           ) : null}
@@ -91,9 +104,15 @@ const Dropdown = (props: Props) => {
               autoHeight
               autoHeightMax={185}
             >
-              {items.map((item: string, index: number) => (
+              {items.map((item: Item, index: number) => (
                 <DropDownItem key={index} onClick={() => handleItemClick(item)}>
-                  {item}
+                  {typeof item === 'string' ? (
+                    item
+                  ) : (
+                    <ItemImg>
+                      <img src={item.img} alt="" /> {item.item}
+                    </ItemImg>
+                  )}
                 </DropDownItem>
               ))}
             </Scrollbars>
@@ -173,4 +192,12 @@ const Label = styled.div`
   letter-spacing: -0.09px;
   margin-bottom: 4px;
   text-transform: capitalize;
+`;
+
+const ItemImg = styled.div`
+  display: flex;
+  align-items: center;
+  img {
+    margin-right: 10px;
+  }
 `;

@@ -31,7 +31,7 @@ const SettingsPopup = () => {
         </SettingsButton>
         {isOpen ? (
           <>
-            <CaretImg src={process.env.PUBLIC_URL + '/img/caret-up.svg'} />
+            <CaretImg src={require('../assets/caret-up.svg')} />
             <Menu>
               <SettingsContent />
             </Menu>

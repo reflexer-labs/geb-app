@@ -86,12 +86,9 @@ const Content = styled.div`
   border: 1px solid ${(props) => props.theme.colors.border};
   border-radius: ${(props) => props.theme.global.borderRadius};
   transition: all 0.3s ease;
-  &:hover {
-    background: ${(props) => props.theme.colors.foreground};
-  }
+
   &.disabled {
     cursor: not-allowed;
-    background: ${(props) => props.theme.colors.foreground};
   }
 `;
 
@@ -112,9 +109,9 @@ const CustomInput = styled.input`
   color: ${(props) => props.theme.colors.primary};
   line-height: 24px;
   outline: none;
+  
   &:disabled {
     cursor: not-allowed;
-    background: ${(props) => props.theme.colors.foreground};
   }
 `;
 

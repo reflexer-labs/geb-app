@@ -1,66 +1,140 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { useStoreActions } from '../store';
+import { useStoreActions, useStoreState } from '../store';
 import Button from './Button';
+import { formatNumber, getRatePercentage, timeout } from '../utils/helper';
+import { COIN_TICKER } from '../utils/constants';
+import { useActiveWeb3React } from '../hooks';
+import { handleTransactionError } from '../hooks/TransactionHooks';
 
 const SafeStats = () => {
   const { t } = useTranslation();
-  const { popupsModel: popupsActions } = useStoreActions((state) => state);
+  const { library, account } = useActiveWeb3React();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    popupsModel: popupsActions,
+    safeModel: safeActions,
+  } = useStoreActions((state) => state);
+  const { safeModel: safeState } = useStoreState((state) => state);
+
+  const { singleSafe, liquidationData } = safeState;
+
+  const collateral = formatNumber(singleSafe?.collateral || '0');
+  const totalDebt = formatNumber(singleSafe?.totalDebt || '0');
+  // const interestOwed = singleSafe
+  //   ? getInterestOwed(singleSafe.debt, singleSafe.accumulatedRate)
+  //   : 0;
+
+  const liquidationPenalty = getRatePercentage(
+    singleSafe?.liquidationPenalty || '1'
+  );
+
+  const raiPrice = singleSafe
+    ? formatNumber(singleSafe.currentRedemptionPrice, 3)
+    : '0';
+
+  const ethPrice = liquidationData
+    ? formatNumber(liquidationData.currentPrice.value, 2)
+    : '0';
+
+  // const stabilityFees = numeral(
+  //   singleSafe?.totalAnnualizedStabilityFee.toString()
+  // )
+  //   .subtract(1)
+  //   .multiply(100)
+  //   .value();
+  // const totalAnnualizedStabilityFee = formatNumber(
+  //   stabilityFees.toString() || '0',
+  //   2
+  // );
+
+  const currentRedemptionRate = singleSafe
+    ? getRatePercentage(singleSafe.currentRedemptionRate)
+    : '0';
+
+  const handleCollectSurplus = async () => {
+    if (!library || !account) throw new Error('No library or account');
+    if (!singleSafe) throw new Error('no safe');
+    setIsLoading(true);
+    try {
+      popupsActions.setIsWaitingModalOpen(true);
+      popupsActions.setWaitingPayload({
+        title: 'Waiting For Confirmation',
+        text: 'Collecting ETH',
+        hint: 'Confirm this transaction in your wallet',
+        status: 'loading',
+      });
+      const signer = library.getSigner(account);
+      await safeActions.collectETH({ signer, safe: singleSafe });
+      await timeout(3000);
+    } catch (e) {
+      handleTransactionError(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
       <StatsGrid>
         <StatItem>
           <StateInner>
-            <Value>291.39%</Value>
+            <Value>{`${singleSafe?.collateralRatio}%`}</Value>
             <Label>{'Collateralization Ratio'}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem>
           <StateInner>
-            <Value>$25.01</Value>
-            <Label>{'Interest Owed (2.50% APR)'}</Label>
+            <Value>{`${currentRedemptionRate}%`}</Value>
+            <Label>{`Annual Redemption Rate`}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem>
           <StateInner>
-            <Value>$197.37</Value>
+            <Value>{`$${singleSafe?.liquidationPrice}`}</Value>
             <Label>{'Liquidation Price'}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem>
           <StateInner>
-            <Value>11.00%</Value>
+            <Value>{`${liquidationPenalty}%`}</Value>
             <Label>{'Liquidation Penalty'}</Label>
           </StateInner>
         </StatItem>
 
         <StatItem className="w50">
           <StateInner>
-            <Value>100.0000 ETH</Value>
-            <Label>{'ETH Deposited'}</Label>
+            <Value>${ethPrice}</Value>
+            <Label>{'ETH Price'}</Label>
+          </StateInner>
+        </StatItem>
+
+        <StatItem className="w50">
+          <StateInner>
+            <Value>${raiPrice}</Value>
+            <Label>{`${COIN_TICKER} Price`}</Label>
+          </StateInner>
+        </StatItem>
+
+        <StatItem className="w50">
+          <StateInner>
+            <Value>{`${collateral} ETH`}</Value>
+            <Label>{'ETH Collateral'}</Label>
             <Actions>
               <Button
-                dimmed
-                text={t('withdraw')}
-                onClick={() =>
-                  popupsActions.setSafeOperationPayload({
-                    isOpen: true,
-                    type: 'withdraw',
-                  })
-                }
-              />
-              <Button
                 withArrow
-                text={t('deposit')}
+                text={t('deposit_borrow')}
                 onClick={() =>
                   popupsActions.setSafeOperationPayload({
                     isOpen: true,
-                    type: 'deposit',
+                    type: 'deposit_borrow',
+                    isCreate: false,
                   })
                 }
               />
@@ -70,32 +144,41 @@ const SafeStats = () => {
 
         <StatItem className="w50">
           <StateInner>
-            <Value>12,5000 RAI</Value>
-            <Label>{'RAI Borrowed'}</Label>
+            <Value>{`${totalDebt} ${COIN_TICKER}`}</Value>
+            <Label>{`${COIN_TICKER} Debt`}</Label>
             <Actions>
               <Button
-                dimmed
-                text={t('repay')}
-                onClick={() =>
-                  popupsActions.setSafeOperationPayload({
-                    isOpen: true,
-                    type: 'repay',
-                  })
-                }
-              />
-              <Button
                 withArrow
-                text={t('borrow')}
+                text={t('repay_withdraw')}
                 onClick={() =>
                   popupsActions.setSafeOperationPayload({
                     isOpen: true,
-                    type: 'borrow',
+                    type: 'repay_withdraw',
+                    isCreate: false,
                   })
                 }
               />
             </Actions>
           </StateInner>
         </StatItem>
+        {singleSafe && Number(singleSafe.internalCollateralBalance) > 0 ? (
+          <StatItem className="w100">
+            <StateInner>
+              <Inline>
+                <Text>
+                  {t('liquidation_text', {
+                    balance: formatNumber(singleSafe.internalCollateralBalance),
+                  })}
+                </Text>
+                <Button
+                  text={'collect_surplus'}
+                  onClick={handleCollectSurplus}
+                  isLoading={isLoading}
+                />
+              </Inline>
+            </StateInner>
+          </StatItem>
+        ) : null}
       </StatsGrid>
     </>
   );
@@ -118,6 +201,9 @@ const StatItem = styled.div`
   margin-bottom: 15px;
   &.w50 {
     flex: 0 0 50%;
+  }
+  &.w100 {
+    flex: 0 0 100%;
   }
   ${({ theme }) => theme.mediaWidth.upToSmall`
     flex: 0 0 50%;
@@ -174,5 +260,15 @@ const Label = styled.div`
 const Actions = styled.div`
   display: flex;
   margin-top: 1rem;
+  justify-content: flex-end;
+`;
+
+const Text = styled.div`
+  font-size: ${(props) => props.theme.font.small};
+`;
+
+const Inline = styled.div`
+  display: flex;
+  align-items: center;
   justify-content: space-between;
 `;

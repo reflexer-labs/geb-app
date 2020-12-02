@@ -1,17 +1,32 @@
 import React from 'react';
 import styled from 'styled-components';
+import ConnectWalletImage from '../../components/Images/ConnectWalletImage';
+import CreateAccountImage from '../../components/Images/CreateAccountImage';
+import OpenSafeImage from '../../components/Images/OpenSafeImage';
 import Steps from '../../components/Steps';
+import { useStoreState } from '../../store';
 
 const Accounts = () => {
+  const { connectWalletModel: connectWalletState } = useStoreState(
+    (state) => state
+  );
+
+  const { step } = connectWalletState;
+
+  const returnImage = () => {
+    switch (step) {
+      case 1:
+        return <CreateAccountImage />;
+      case 2:
+        return <OpenSafeImage />;
+      default:
+        return <ConnectWalletImage />;
+    }
+  };
   return (
     <Container>
       <Content>
-        <ImgContainer>
-          <img
-            src={process.env.PUBLIC_URL + '/img/placeholder.png'}
-            alt="placeholder"
-          />{' '}
-        </ImgContainer>
+        <ImgContainer>{returnImage()}</ImgContainer>
         <Steps />
       </Content>
     </Container>
@@ -33,7 +48,10 @@ const Content = styled.div`
 `;
 
 const ImgContainer = styled.div`
-  img {
+  text-align: center;
+  svg {
     width: 100%;
+    max-width: 350px;
+    height: auto !important;
   }
 `;

@@ -1,43 +1,81 @@
 import React from 'react';
+import { toSvg } from 'jdenticon';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import dayjs from 'dayjs';
+import { formatNumber } from '../utils/helper';
+import { jdenticonConfig, COIN_TICKER } from '../utils/constants';
+import Arrow from './Icons/Arrow';
 
 const SafeBlock = ({ ...props }) => {
   const { t } = useTranslation();
+
+  const collateral = formatNumber(props.collateral);
+  const totalDebt = formatNumber(props.totalDebt);
+  const createdAt = dayjs.unix(props.date).format('MMM D, YYYY h:mm A');
+
+  function createImage() {
+    return { __html: toSvg(props.safeHandler + props.id, 40, jdenticonConfig) };
+  }
+
+  const returnState = (state: number) => {
+    switch (state) {
+      case 1:
+        return 'Low';
+      case 2:
+        return 'Medium';
+      case 3:
+        return 'High';
+      default:
+        return '';
+    }
+  };
   return (
     <>
       <BlockContainer>
         <BlockHeader>
           <SafeInfo>
-            <img src={props.img} alt="" />
+            {<div dangerouslySetInnerHTML={createImage()} />}
             <SafeData>
               <SafeTitle>{`Safe #${props.id}`}</SafeTitle>
               <Date>
-                {t('created')} {props.date}
+                {t('created')} {createdAt}
               </Date>
             </SafeData>
           </SafeInfo>
-          <SafeState className={props.riskState === 'high' ? 'high' : ''}>
-            {t('risk')} <span>{props.riskState}</span>
+
+          <SafeState
+            className={
+              returnState(props.riskState)
+                ? returnState(props.riskState).toLowerCase()
+                : 'dimmed'
+            }
+          >
+            {t('risk')} <span>{returnState(props.riskState) || 'None'}</span>
           </SafeState>
         </BlockHeader>
         <Block>
           <Item>
-            <Label>{'ETH Deposited'}</Label> <Value>{props.depositedEth}</Value>
+            <Label>{'ETH Deposited'}</Label>
+            <Value>{collateral}</Value>
           </Item>
           <Item>
-            <Label>{'RAI Borrowed'}</Label> <Value>{props.borrowedRAI}</Value>
+            <Label>{`${COIN_TICKER} Borrowed`}</Label>
+            <Value>{totalDebt}</Value>
           </Item>
           <Item>
-            <Label>{'Liquidation Price'}</Label>{' '}
-            <Value>{props.liquidationPrice}</Value>
+            <Label>{'Collateralization Ratio'}</Label>
+            <Value>{`${props.collateralRatio}%`}</Value>
+          </Item>
+          <Item>
+            <Label>{'Liquidation Price'}</Label>
+            <Value>${props.liquidationPrice}</Value>
           </Item>
         </Block>
         <BtnContainer>
           <Link to={`/safes/${props.id}`}>
-            {t('manage_safe')}{' '}
-            <img src={process.env.PUBLIC_URL + '/img/arrow.svg'} alt={''} />
+            <span>{t('manage_safe')}</span> <Arrow />
           </Link>
         </BtnContainer>
       </BlockContainer>
@@ -63,15 +101,21 @@ const BlockHeader = styled.div`
 const SafeInfo = styled.div`
   display: flex;
   align-items: center;
-  img {
+  svg {
     border-radius: ${(props) => props.theme.global.borderRadius};
-    width: 40px;
-    height: 40px;
+    border: 1px solid ${(props) => props.theme.colors.border};
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+    width: 35px;
+    height: 35px;
+  `}
   }
 `;
 
 const SafeData = styled.div`
   margin-left: 16px;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    margin-left: 10px;
+  `}
 `;
 
 const SafeTitle = styled.div`
@@ -101,11 +145,26 @@ const SafeState = styled.div`
   span {
     text-transform: capitalize;
   }
+  &.dimmed {
+    color: ${(props) => props.theme.colors.dimmedColor};
+    border: 1px solid ${(props) => props.theme.colors.dimmedBorder};
+    background: ${(props) => props.theme.colors.dimmedBackground};
+  }
+  &.medium {
+    color: ${(props) => props.theme.colors.warningColor};
+    border: 1px solid ${(props) => props.theme.colors.warningBorder};
+    background: ${(props) => props.theme.colors.warningBackground};
+  }
   &.high {
     color: ${(props) => props.theme.colors.dangerColor};
     border: 1px solid ${(props) => props.theme.colors.dangerBorder};
     background: ${(props) => props.theme.colors.dangerBackground};
   }
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    padding: 8px 10px;
+    font-size: ${(props) => props.theme.font.extraSmall};
+    text-align:center;
+  `}
 `;
 
 const Block = styled.div`
@@ -145,8 +204,11 @@ const BtnContainer = styled.div`
   margin-top: 10px;
   justify-content: flex-end;
   a {
-    display: flex;
-    align-items: center;
+    svg {
+      float: right;
+      position: relative;
+      top: 7px;
+    }
     border: 0;
     cursor: pointer;
     box-shadow: none;

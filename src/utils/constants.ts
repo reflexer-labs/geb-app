@@ -3,11 +3,31 @@ import { css } from 'styled-components';
 import { injected, walletconnect, walletlink } from '../connectors';
 import { WalletInfo } from './interfaces';
 
-const { REACT_APP_GRAPH_API_URL } = process.env;
+const {
+  REACT_APP_GRAPH_API_URLS,
+  REACT_APP_NETWORK_ID,
+  REACT_APP_COIN_TICKER_PRODUCTION,
+  REACT_APP_COIN_TICKER_KOVAN,
+} = process.env;
 
-export const GRAPH_API_URL =
-  REACT_APP_GRAPH_API_URL ??
-  'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai';
+export enum Network {
+  MAINNET = 'mainnet',
+  KOVAN = 'kovan',
+}
+
+export const ETH_NETWORK =
+  REACT_APP_NETWORK_ID === '1' ? Network.MAINNET : Network.KOVAN;
+
+export const COIN_TICKER =
+  REACT_APP_NETWORK_ID === '1'
+    ? REACT_APP_COIN_TICKER_PRODUCTION
+    : REACT_APP_COIN_TICKER_KOVAN ?? 'RAI';
+
+export const GRAPH_API_URLS = REACT_APP_GRAPH_API_URLS
+  ? REACT_APP_GRAPH_API_URLS.split(',')
+  : [
+      'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai',
+    ];
 
 export const MAILCHIMP_URL =
   'https://finance.us20.list-manage.com/subscribe/post-json?u=a3b1b26a531e341b4e086da36&id=b5976e4e32';
@@ -85,3 +105,31 @@ export const mediaWidthTemplates: {
   `;
   return accumulator;
 }, {}) as any;
+
+export const DEFAULT_SAFE_STATE = {
+  totalCollateral: '',
+  totalDebt: '',
+  leftInput: '',
+  rightInput: '',
+  collateralRatio: 0,
+  liquidationPrice: 0,
+};
+
+export const floatsTypes = {
+  WAD: 18,
+  RAY: 27,
+  RAD: 45,
+};
+
+export const jdenticonConfig = {
+  hues: [103],
+  lightness: {
+    color: [0.84, 0.84],
+    grayscale: [0.84, 0.84],
+  },
+  saturation: {
+    color: 0.48,
+    grayscale: 0.48,
+  },
+  backColor: '#50ccd5',
+};
