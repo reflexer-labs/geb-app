@@ -24,6 +24,7 @@ const Steps = () => {
   const {
     popupsModel: popupsActions,
     connectWalletModel: connectWalletActions,
+    safeModel: safeActions,
   } = useStoreActions((state) => state);
 
   const addTransaction = useTransactionAdder();
@@ -40,6 +41,7 @@ const Steps = () => {
 
   const returnConfirmations = async () => {
     if (
+      !account ||
       !chainId ||
       !blockNumber[chainId] ||
       !ctHash ||
@@ -56,6 +58,7 @@ const Steps = () => {
     setBlocksSinceCheck(diff >= 10 ? 10 : diff);
     if (diff > 10) {
       await timeout(3000);
+      safeActions.fetchUserSafes(account as string);
       connectWalletActions.setIsStepLoading(false);
       connectWalletActions.setStep(2);
       localStorage.removeItem('ctHash');
