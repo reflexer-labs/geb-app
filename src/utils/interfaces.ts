@@ -214,3 +214,26 @@ export interface ISafeHistory {
   icon: IconName;
   color: string;
 }
+
+export interface IIncentivesCampaignData {
+  campaign: {
+    duration: string;
+    id: string;
+    instantExitPercentage: string;
+    reward: string;
+    rewardDelay: string;
+    startTime: string;
+    totalSupply: string;
+    rewardRate: string;
+  };
+  systemState: {
+    coinAddress: string;
+    wethAddress: string;
+    coinUniswapPair: {
+      totalSupply: string;
+      reserve0: string;
+      reserve1: string;
+    };
+  };
+  stakedBalance: string;
+}

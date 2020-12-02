@@ -6,6 +6,7 @@ import Button from './Button';
 import { newTransactionsFirst, returnWalletAddress } from '../utils/helper';
 import { useWeb3React } from '@web3-react/core';
 import { isTransactionRecent } from '../hooks/TransactionHooks';
+import NavLinks from './NavLinks';
 
 const Navbar = () => {
   const { transactionsModel: transactionsState } = useStoreState(
@@ -39,9 +40,9 @@ const Navbar = () => {
       <Left>
         <Brand />
       </Left>
-      {/* <HideMobile>
+      <HideMobile>
         <NavLinks />
-      </HideMobile> */}
+      </HideMobile>
       <RightSide>
         <BtnContainer>
           <Button
@@ -139,11 +140,11 @@ const RightSide = styled.div`
   align-items: center;
 `;
 
-// const HideMobile = styled.div`
-//   ${({ theme }) => theme.mediaWidth.upToSmall`
-//     display: none;
-//   `}
-// `;
+const HideMobile = styled.div`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    display: none;
+  `}
+`;
 
 const Left = styled.div`
   min-width: 194px;

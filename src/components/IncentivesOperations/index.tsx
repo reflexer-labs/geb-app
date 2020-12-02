@@ -16,7 +16,7 @@ const IncentivesOperations = () => {
   const returnBody = () => {
     switch (incentivesState.operation) {
       case 0:
-        return incentivesState.type !== 'redeem_rewards' ? (
+        return incentivesState.type !== 'claim' ? (
           <IncentivesPayment
             isChecked={incentivesState.isLeaveLiquidityChecked}
           />

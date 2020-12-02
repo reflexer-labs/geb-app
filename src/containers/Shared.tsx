@@ -70,6 +70,7 @@ const Shared = ({ children }: Props) => {
     } else {
       safeActions.setIsSafeCreated(false);
       connectWalletActions.setStep(1);
+      history.push('/');
     }
     await timeout(1000);
     popupsActions.setIsWaitingModalOpen(false);

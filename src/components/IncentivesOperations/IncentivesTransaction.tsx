@@ -46,7 +46,7 @@ const IncentivesTransaction = () => {
         />
         <Result>
           <Block>
-            {incentivesState.type !== 'redeem_rewards' ? (
+            {incentivesState.type !== 'claim' ? (
               <>
                 <Item>
                   <Label>
@@ -101,12 +101,6 @@ const IncentivesTransaction = () => {
               <>
                 <Item>
                   <Label>{'Claimable FLX'}</Label> <Value>{'50.00'}</Value>
-                </Item>
-                <Item>
-                  <Label>{'FLX to Unlock'}</Label> <Value>{'12.00'}</Value>
-                </Item>
-                <Item>
-                  <Label>{'Unlock Time'}</Label> <Value>{'0.00'}</Value>
                 </Item>
               </>
             )}

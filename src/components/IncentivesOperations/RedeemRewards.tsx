@@ -7,7 +7,6 @@ import DecimalInput from '../DecimalInput';
 import Dropdown from '../Dropdown';
 
 type Campaign = { id: string; climable_flex: string };
-type Stash = { id: string; flx_unlock: string };
 
 const INITITAL_STATE_CAMPAIGN: Array<Campaign> = [
   {
@@ -24,36 +23,15 @@ const INITITAL_STATE_CAMPAIGN: Array<Campaign> = [
   },
 ];
 
-const INITITAL_STATE_STASH: Array<Stash> = [
-  {
-    id: '3456',
-    flx_unlock: '12.00',
-  },
-  {
-    id: '5668',
-    flx_unlock: '15.00',
-  },
-  {
-    id: '2338',
-    flx_unlock: '18.00',
-  },
-];
-
 const RedeemRewards = () => {
   const { t } = useTranslation();
 
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign>(
     INITITAL_STATE_CAMPAIGN[0]
   );
-  const [selectedStash, setSelectedStash] = useState<Stash>(
-    INITITAL_STATE_STASH[0]
-  );
 
   const [flxAmount, setFLXAmount] = useState(
     INITITAL_STATE_CAMPAIGN[0].climable_flex
-  );
-  const [flxToUnLock, setFLXToUnLock] = useState(
-    INITITAL_STATE_STASH[0].flx_unlock
   );
 
   const {
@@ -82,16 +60,6 @@ const RedeemRewards = () => {
     }
   };
 
-  const handleSelectedStash = (selected: string) => {
-    const id = selected.split('#').pop();
-
-    const stash = INITITAL_STATE_STASH.find((stash: Stash) => stash.id === id);
-    if (stash) {
-      setSelectedStash(stash);
-      setFLXToUnLock(stash.flx_unlock);
-    }
-  };
-
   return (
     <Body>
       <DropdownContainer>
@@ -105,31 +73,34 @@ const RedeemRewards = () => {
         />
       </DropdownContainer>
 
-      <DropdownContainer>
-        <Dropdown
-          items={INITITAL_STATE_STASH.map(
-            (stash: Stash) => `Stash #${stash.id}`
-          )}
-          getSelectedItem={handleSelectedStash}
-          itemSelected={`Stash #${selectedStash.id} - ${selectedStash.flx_unlock} FLX Unlocked`}
-          label={'Select Stash'}
-        />
-      </DropdownContainer>
+      <DecimalInput
+        label={'Claimable FLX'}
+        value={flxAmount}
+        onChange={setFLXAmount}
+        disabled
+      />
 
-      <DoubleInputs>
-        <DecimalInput
-          label={'Claimable FLX'}
-          value={flxAmount}
-          onChange={setFLXAmount}
-          disabled
-        />
-        <DecimalInput
-          label={'FLX to Unlock'}
-          value={flxToUnLock}
-          onChange={setFLXToUnLock}
-          disabled
-        />
-      </DoubleInputs>
+      <Result>
+        <Block>
+          <Item>
+            <Label>{'Claimable Reward'}</Label> <Value>{'50.00'}</Value>
+          </Item>
+
+          <Item>
+            <Label>{'Vested Reward'}</Label> <Value>{'50.00'}</Value>
+          </Item>
+
+          <Item>
+            <Label>{'Start of Vesting Period'}</Label>{' '}
+            <Value>{'20/20/2020'}</Value>
+          </Item>
+
+          <Item>
+            <Label>{'End of Vesting Period'}</Label>{' '}
+            <Value>{'25/12/2020'}</Value>
+          </Item>
+        </Block>
+      </Result>
 
       <Footer>
         <Button dimmed text={t('cancel')} onClick={handleCancel} />
@@ -159,23 +130,43 @@ const DropdownContainer = styled.div`
   margin-bottom: 30px;
 `;
 
-const DoubleInputs = styled.div`
-  display: flex;
-  margin: 0 -10px 20px -10px;
-  > div {
-    flex: 0 0 50%;
-    padding: 0 10px;
-  }
+const Result = styled.div`
+  border-radius: ${(props) => props.theme.global.borderRadius};
+  border: 1px solid ${(props) => props.theme.colors.border};
+  background: ${(props) => props.theme.colors.foreground};
+  margin-top: 20px;
+`;
 
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    flex-direction: column;
-    > div {
-      flex: 0 0 100%;
-      max-width: 100%;
-      &:last-child {
-        margin-left: 0;
-        margin-top: 20px;
-      }
-    }
-  `}
+const Block = styled.div`
+  border-bottom: 1px solid;
+  padding: 16px 20px;
+  border-bottom: 1px solid ${(props) => props.theme.colors.border};
+  &:last-child {
+    border-bottom: 0;
+  }
+`;
+
+const Item = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const Label = styled.div`
+  font-size: ${(props) => props.theme.font.small};
+  color: ${(props) => props.theme.colors.secondary};
+  letter-spacing: -0.09px;
+  line-height: 21px;
+`;
+
+const Value = styled.div`
+  font-size: ${(props) => props.theme.font.small};
+  color: ${(props) => props.theme.colors.primary};
+  letter-spacing: -0.09px;
+  line-height: 21px;
+  font-weight: 600;
 `;

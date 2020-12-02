@@ -4,6 +4,8 @@ import { getSafeByIdQuery, getUserSafesListQuery } from '../utils/queries/safe';
 import { GRAPH_API_URLS } from '../utils/constants';
 import { formatUserSafe, formatHistoryArray } from '../utils/helper';
 import { getUserQuery } from '../utils/queries/user';
+import { incentiveCampaignsQuery } from '../utils/queries/incentives';
+import { IIncentivesCampaignData } from '../utils/interfaces';
 
 export const fetchUser = (address: string) => {
   return retry(
@@ -107,6 +109,40 @@ export const fetchSafeById = (safeId: string, address: string) => {
           res.data.data.systemState.currentRedemptionRate.annualizedRate,
         perSafeDebtCeiling: res.data.data.systemState.perSafeDebtCeiling,
       };
+    },
+    {
+      retries: GRAPH_API_URLS.length - 1,
+    }
+  );
+};
+
+export const fetchIncentivesCampaigns = (address: string) => {
+  return retry(
+    async (bail, attempt) => {
+      const res = await axios.post(
+        GRAPH_API_URLS[attempt - 1],
+        JSON.stringify({ query: incentiveCampaignsQuery(address) })
+      );
+
+      if (!res.data.data && attempt < GRAPH_API_URLS.length) {
+        throw new Error('retry');
+      }
+
+      const response = res.data.data;
+
+      const campaign: IIncentivesCampaignData = {
+        campaign:
+          response.incentiveCampaigns.length > 0
+            ? response.incentiveCampaigns[0]
+            : null,
+        systemState: response.systemState,
+        stakedBalance:
+          response.incentiveBalances.length > 0
+            ? response.incentiveBalances[0].stakedBalance
+            : '0',
+      };
+
+      return campaign;
     },
     {
       retries: GRAPH_API_URLS.length - 1,

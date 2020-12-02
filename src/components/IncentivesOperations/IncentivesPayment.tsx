@@ -13,7 +13,7 @@ const INITITAL_STATE = [
     item: 'Uniswap',
     img: require('../../assets/uni-icon.svg'),
   },
-  { item: 'RAI/ETH', img: require('../../assets/ref-icon.svg') },
+  { item: 'RAI/ETH', img: require('../../assets/rai.png') },
 ];
 
 interface Props {

@@ -64,7 +64,7 @@ const IncentivesAssets = () => {
         </Row>
         <Row>
           <Col>
-            <img src={require('../assets/flx-logo.svg')} alt="" />
+            <img src={require('../assets/logo192.png')} alt="" />
             <Label>
               FLX
               <Tag>Flex Token</Tag>
