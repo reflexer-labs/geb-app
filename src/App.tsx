@@ -19,10 +19,7 @@ import GlobalStyle from './GlobalStyle';
 import Shared from './containers/Shared';
 import Web3ReactManager from './components/Web3ReactManager';
 import SafeDetails from './containers/OnBoarding/SafeDetails';
-import EmergencyShutdown from './containers/EmergencyShutdown';
-import Voting from './containers/Voting';
-import VoteDetails from './containers/Voting/VoteDetails';
-import Incentives from './containers/Incentives';
+
 import Privacy from './containers/Privacy';
 import CustomToast from './components/CustomToast';
 
@@ -52,11 +49,7 @@ const App = () => {
               <Suspense fallback={null}>
                 <Web3ReactManager>
                   <Switch>
-                    <Route exact component={Incentives} path={'/incentives'} />
                     <Route exact component={Privacy} path={'/privacy'} />
-                    <Route exact component={VoteDetails} path={'/voting/:id'} />
-                    <Route exact component={Voting} path={'/voting'} />
-                    <Route exact component={EmergencyShutdown} path={'/esm'} />
                     <Route exact component={SafeDetails} path={'/safes/:id'} />
                     <Route exact component={OnBoarding} path={'/'} />
                     <Redirect from="*" to="/" />
@@ -69,6 +62,6 @@ const App = () => {
       </ThemeProvider>
     </I18nextProvider>
   );
-}
+};
 
 export default App;

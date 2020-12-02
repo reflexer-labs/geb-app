@@ -14,11 +14,8 @@ import { ChainId } from '@uniswap/sdk';
 import { ETHERSCAN_PREFIXES } from '../utils/constants';
 import { useActiveWeb3React } from '../hooks';
 import LoadingModal from '../components/Modals/LoadingModal';
-import ESMOperationModal from '../components/Modals/ESMOperationModal';
-import VotingOperationModal from '../components/Modals/VotingOperationModal';
 import styled from 'styled-components';
 import { NETWORK_ID } from '../connectors';
-import IncentivesModal from '../components/Modals/IncentivesModal';
 import CookieBanner from '../components/CookieBanner';
 import BlockBodyContainer from '../components/BlockBodyContainer';
 import { toast } from 'react-toastify';
@@ -147,11 +144,10 @@ const Shared = ({ children }: Props) => {
       <BalanceUpdater />
       <TransactionUpdater />
       <LoadingModal />
-      <VotingOperationModal />
-      <ESMOperationModal />
+
       <CreateAccountModal />
       <ConnectedWalletModal />
-      <IncentivesModal />
+
       <ScreenLoader />
       <WaitingModal />
       <EmptyDiv>
