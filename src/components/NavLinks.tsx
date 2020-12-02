@@ -1,5 +1,4 @@
 import React from 'react';
-import { DollarSign, Search, ThumbsUp } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
@@ -20,20 +19,6 @@ const NavLinks = () => {
   };
   return (
     <Nav>
-      <NavBarLink to="/incentives" onClick={(e) => handleLinkClick(e, false)}>
-        <DollarSign size="18" /> {t('incentives')}
-      </NavBarLink>
-      <NavBarLink to="/voting" onClick={(e) => handleLinkClick(e, false)}>
-        <ThumbsUp size="18" /> {t('voting')}
-      </NavBarLink>
-      <NavBarLink to="" onClick={(e) => handleLinkClick(e, true)}>
-        <Search size="18" />
-        {t('analytics')}
-      </NavBarLink>
-      <NavBarLink to="/esm" onClick={(e) => handleLinkClick(e, false)}>
-        {t('ESM')}
-      </NavBarLink>
-
       <SepBlock className="disableDesktop">
         <NavBarLink to="" onClick={(e) => handleLinkClick(e, false)}>
           {t('request_features')}
