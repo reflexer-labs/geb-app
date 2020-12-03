@@ -2,18 +2,16 @@ import settingsModel, { SettingsModel } from './settingsModel';
 import popupsModel, { PopupsModel } from './popupsModel';
 import connectWalletModel, { ConnectWalletModel } from './connectWalletModel';
 import safeModel, { SafeModel } from './safeModel';
-import votingModel, { VotingModel } from './votingModel';
-import incentivesModel, { IncentivesModel } from './IncentivesModel';
 import transactionsModel, { TransactionsModel } from './transactionsModel';
+import incentivesModel, { IncentivesModel } from './IncentivesModel';
 
 export interface StoreModel {
   settingsModel: SettingsModel;
   popupsModel: PopupsModel;
   connectWalletModel: ConnectWalletModel;
   safeModel: SafeModel;
-  votingModel: VotingModel;
-  incentivesModel: IncentivesModel;
   transactionsModel: TransactionsModel;
+  incentivesModel: IncentivesModel;
 }
 
 const model: StoreModel = {
@@ -21,9 +19,8 @@ const model: StoreModel = {
   popupsModel,
   connectWalletModel,
   safeModel,
-  votingModel,
-  incentivesModel,
   transactionsModel,
+  incentivesModel,
 };
 
 export default model;

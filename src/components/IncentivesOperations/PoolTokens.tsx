@@ -84,6 +84,7 @@ const Footer = styled.div`
 const InputsContainer = styled.div`
   display: flex;
   margin: 30px -10px;
+
   > div {
     flex: 0 0 50%;
     padding: 0 10px;
