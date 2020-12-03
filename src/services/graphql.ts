@@ -130,7 +130,8 @@ export const fetchIncentivesCampaigns = (address: string) => {
 
       const response = res.data.data;
 
-      const campaign: IIncentivesCampaignData = {
+      const payload: IIncentivesCampaignData = {
+        user: response.user ? response.user.id : null,
         campaign:
           response.incentiveCampaigns.length > 0
             ? response.incentiveCampaigns[0]
@@ -142,7 +143,7 @@ export const fetchIncentivesCampaigns = (address: string) => {
             : '0',
       };
 
-      return campaign;
+      return payload;
     },
     {
       retries: GRAPH_API_URLS.length - 1,

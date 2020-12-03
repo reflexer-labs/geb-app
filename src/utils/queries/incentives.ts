@@ -1,4 +1,7 @@
+import { userQuery } from './user';
+
 export const incentiveCampaignsQuery = (address: string) => `{
+    ${userQuery(address)}
     incentiveCampaigns(orderBy: id, orderDirection: desc, first: 1) {
         id
         startTime

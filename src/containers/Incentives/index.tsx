@@ -20,8 +20,17 @@ const Incentives = () => {
   );
 
   useEffect(() => {
+    if (!account || !chainId) {
+      history.push('/');
+      return;
+    }
     async function fetchIncentivesCampaigns() {
-      await incentivesActions.fetchIncentivesCampaigns(account as string);
+      const res = await incentivesActions.fetchIncentivesCampaigns(
+        account as string
+      );
+      if (!res.user) {
+        history.push('/');
+      }
     }
     fetchIncentivesCampaigns();
     const interval = setInterval(() => {

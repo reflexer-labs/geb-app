@@ -24,6 +24,7 @@ const incentivesModel: IncentivesModel = {
   fetchIncentivesCampaigns: thunk(async (actions, payload) => {
     const res = await fetchIncentivesCampaigns(payload.toLowerCase());
     actions.setIncentivesCampaignData(res);
+    return res;
   }),
   setType: action((state, payload) => {
     state.type = payload;

@@ -216,6 +216,7 @@ export interface ISafeHistory {
 }
 
 export interface IIncentivesCampaignData {
+  user: string | null;
   campaign: {
     duration: string;
     id: string;
