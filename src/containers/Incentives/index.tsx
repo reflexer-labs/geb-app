@@ -7,30 +7,19 @@ import IncentivesAssets from '../../components/IncentivesAssets';
 import IncentivesStats from '../../components/IncentivesStats';
 import PageHeader from '../../components/PageHeader';
 import { useActiveWeb3React } from '../../hooks';
-import { useStoreActions, useStoreState } from '../../store';
+import { useStoreActions } from '../../store';
 import { COIN_TICKER } from '../../utils/constants';
 
 const Incentives = () => {
   const { t } = useTranslation();
   const history = useHistory();
   const { account, chainId } = useActiveWeb3React();
-  const { connectWalletModel: connectWalletState } = useStoreState(
-    (state) => state
-  );
 
   const { incentivesModel: incentivesActions } = useStoreActions(
     (state) => state
   );
 
   useEffect(() => {
-    if (!account || !chainId) {
-      history.push('/');
-    }
-    setTimeout(() => {
-      if (!connectWalletState.isUserCreated) {
-        history.push('/');
-      }
-    }, 5000);
     async function fetchIncentivesCampaigns() {
       await incentivesActions.fetchIncentivesCampaigns(account as string);
     }
@@ -40,7 +29,7 @@ const Incentives = () => {
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [account, chainId, history, incentivesActions, connectWalletState]);
+  }, [account, chainId, history, incentivesActions]);
 
   return (
     <>
