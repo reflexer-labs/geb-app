@@ -149,7 +149,7 @@ const IncentivesStats = () => {
   };
 
   const returnRewardUnlockTooltip = () => {
-    return `This is the share of the earned reward which is claimable immediately. The reminder is locked until the end of the campaign. After the end of the campaign, these reward are unlocked linearly until the ${unlockUntil}`;
+    return `This is the share of the earned reward which is claimable immediately. The remainder is locked until the end of the campaign. After the end of the campaign, these reward are unlocked linearly until the ${unlockUntil}`;
   };
 
   return (
