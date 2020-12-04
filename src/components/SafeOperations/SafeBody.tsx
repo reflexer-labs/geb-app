@@ -477,7 +477,7 @@ const SafeBody = ({ isChecked }: Props) => {
               <Value>{`${totalDebt ? totalDebt : 0}`}</Value>
             </Item>
             <Item>
-              <Label>{`ETH Price`}</Label>{' '}
+              <Label>{`ETH Market Price`}</Label>{' '}
               <Value>{`$${formatNumber(currentPrice.value, 2)}`}</Value>
             </Item>
             <Item>
