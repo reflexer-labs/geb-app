@@ -7,6 +7,8 @@ import { formatNumber, getRatePercentage, timeout } from '../utils/helper';
 import { COIN_TICKER } from '../utils/constants';
 import { useActiveWeb3React } from '../hooks';
 import { handleTransactionError } from '../hooks/TransactionHooks';
+import { Info } from 'react-feather';
+import ReactTooltip from 'react-tooltip';
 
 const SafeStats = () => {
   const { t } = useTranslation();
@@ -24,9 +26,6 @@ const SafeStats = () => {
 
   const collateral = formatNumber(singleSafe?.collateral || '0');
   const totalDebt = formatNumber(singleSafe?.totalDebt || '0');
-  // const interestOwed = singleSafe
-  //   ? getInterestOwed(singleSafe.debt, singleSafe.accumulatedRate)
-  //   : 0;
 
   const liquidationPenalty = getRatePercentage(
     singleSafe?.liquidationPenalty || '1'
@@ -39,17 +38,6 @@ const SafeStats = () => {
   const ethPrice = liquidationData
     ? formatNumber(liquidationData.currentPrice.value, 2)
     : '0';
-
-  // const stabilityFees = numeral(
-  //   singleSafe?.totalAnnualizedStabilityFee.toString()
-  // )
-  //   .subtract(1)
-  //   .multiply(100)
-  //   .value();
-  // const totalAnnualizedStabilityFee = formatNumber(
-  //   stabilityFees.toString() || '0',
-  //   2
-  // );
 
   const currentRedemptionRate = singleSafe
     ? getRatePercentage(singleSafe.currentRedemptionRate)
@@ -89,6 +77,9 @@ const SafeStats = () => {
 
         <StatItem>
           <StateInner>
+            <InfoIcon data-tip={t('annual_redemption_tip')}>
+              <Info size="16" />
+            </InfoIcon>
             <Value>{`${currentRedemptionRate}%`}</Value>
             <Label>{`Annual Redemption Rate`}</Label>
           </StateInner>
@@ -96,6 +87,9 @@ const SafeStats = () => {
 
         <StatItem>
           <StateInner>
+            <InfoIcon data-tip={t('liquidation_price_tip')}>
+              <Info size="16" />
+            </InfoIcon>
             <Value>{`$${singleSafe?.liquidationPrice}`}</Value>
             <Label>{'Liquidation Price'}</Label>
           </StateInner>
@@ -103,6 +97,9 @@ const SafeStats = () => {
 
         <StatItem>
           <StateInner>
+            <InfoIcon data-tip={t('liquidation_penalty_tip')}>
+              <Info size="16" />
+            </InfoIcon>
             <Value>{`${liquidationPenalty}%`}</Value>
             <Label>{'Liquidation Penalty'}</Label>
           </StateInner>
@@ -179,6 +176,7 @@ const SafeStats = () => {
             </StateInner>
           </StatItem>
         ) : null}
+        <ReactTooltip multiline type="light" data-effect="solid" />
       </StatsGrid>
     </>
   );
@@ -234,6 +232,7 @@ const StateInner = styled.div`
   background: ${(props) => props.theme.colors.background};
   text-align: center;
   padding: 20px;
+  position: relative;
 `;
 
 const Value = styled.div`
@@ -271,4 +270,15 @@ const Inline = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+`;
+
+const InfoIcon = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  svg {
+    fill: ${(props) => props.theme.colors.secondary};
+    color: ${(props) => props.theme.colors.neutral};
+  }
 `;
