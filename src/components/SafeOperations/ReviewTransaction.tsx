@@ -145,7 +145,7 @@ const ReviewTransaction = () => {
               )}`}</Value>
             </Item>
             <Item>
-              <Label>{`${COIN_TICKER} Price`}</Label>{' '}
+              <Label>{`${COIN_TICKER} Redemption Price`}</Label>{' '}
               <Value>{`$${formatNumber(
                 safeState.liquidationData.currentRedemptionPrice,
                 3

@@ -481,7 +481,7 @@ const SafeBody = ({ isChecked }: Props) => {
               <Value>{`$${formatNumber(currentPrice.value, 2)}`}</Value>
             </Item>
             <Item>
-              <Label>{`${COIN_TICKER} Price`}</Label>{' '}
+              <Label>{`${COIN_TICKER} Redemption Price`}</Label>{' '}
               <Value>{`$${formatNumber(currentRedemptionPrice, 3)}`}</Value>
             </Item>
 
