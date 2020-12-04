@@ -112,6 +112,17 @@ const popupsModel: PopupsModel = {
   }),
   setIsWaitingModalOpen: action((state, payload) => {
     state.isWaitingModalOpen = payload;
+    if (!payload) {
+      setTimeout(() => {
+        state.waitingPayload = {
+          title: '',
+          text: '',
+          hint: '',
+          status: 'loading',
+          isCreate: false,
+        };
+      }, 400);
+    }
   }),
   setWaitingPayload: action((state, payload) => {
     state.waitingPayload = payload;
