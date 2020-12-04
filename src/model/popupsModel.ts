@@ -47,7 +47,13 @@ const popupsModel: PopupsModel = {
   isScreenModalOpen: false,
   isIncentivesModalOpen: false,
   isWaitingModalOpen: false,
-  waitingPayload: { title: '', text: '', hint: '', status: 'loading' },
+  waitingPayload: {
+    title: '',
+    text: '',
+    hint: '',
+    status: 'loading',
+    isCreate: false,
+  },
   safeOperationPayload: {
     isOpen: false,
     type: '',
