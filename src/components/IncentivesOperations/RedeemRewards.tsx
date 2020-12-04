@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
 import { useStoreActions } from '../../store';
 import Button from '../Button';
@@ -83,23 +84,30 @@ const RedeemRewards = () => {
       <Result>
         <Block>
           <Item>
-            <Label>{'Claimable Reward'}</Label> <Value>{'50.00'}</Value>
+            <Label>
+              {'Claimable Reward'}{' '}
+              <InfoIcon data-tip="These rewards will be unlocked linearly between the end of the campaign and the end date of the locking period.">
+                ?
+              </InfoIcon>
+            </Label>{' '}
+            <Value>{'50.00'}</Value>
           </Item>
 
           <Item>
-            <Label>{'Vested Reward'}</Label> <Value>{'50.00'}</Value>
+            <Label>{'Locked Reward'}</Label> <Value>{'50.00'}</Value>
           </Item>
 
           <Item>
-            <Label>{'Start of Vesting Period'}</Label>{' '}
+            <Label>{'Start of Unlock Period'}</Label>{' '}
             <Value>{'20/20/2020'}</Value>
           </Item>
 
           <Item>
-            <Label>{'End of Vesting Period'}</Label>{' '}
+            <Label>{'End of Unlock Period'}</Label>{' '}
             <Value>{'25/12/2020'}</Value>
           </Item>
         </Block>
+        <ReactTooltip multiline type="light" data-effect="solid" />
       </Result>
 
       <Footer>
@@ -161,6 +169,8 @@ const Label = styled.div`
   color: ${(props) => props.theme.colors.secondary};
   letter-spacing: -0.09px;
   line-height: 21px;
+  display: flex;
+  align-items: center;
 `;
 
 const Value = styled.div`
@@ -169,4 +179,18 @@ const Value = styled.div`
   letter-spacing: -0.09px;
   line-height: 21px;
   font-weight: 600;
+`;
+
+const InfoIcon = styled.div`
+  background: ${(props) => props.theme.colors.secondary};
+  color: ${(props) => props.theme.colors.neutral};
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 7px;
+  cursor: pointer;
 `;

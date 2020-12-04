@@ -41,6 +41,16 @@ const GlobalStyle = createGlobalStyle`
    
   }
 }
+.__react_component_tooltip {
+    max-width: 250px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-radius: 5px;
+    opacity: 1 !important;
+    background: ${(props) => props.theme.colors.neutral};
+    border: ${(props) => props.theme.colors.border};
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.16);
+  }
         }
 `;
 

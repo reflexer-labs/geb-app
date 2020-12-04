@@ -10,6 +10,7 @@ import ReactTooltip from 'react-tooltip';
 import { Info } from 'react-feather';
 import { BigNumber } from 'ethers';
 import { formatNumber } from '../utils/helper';
+import Arrow from './Icons/Arrow';
 
 const IncentivesStats = () => {
   const { t } = useTranslation();
@@ -82,11 +83,13 @@ const IncentivesStats = () => {
     startTime && startTime
       ? dayjs
           .unix(Number(startTime) + Number(duration) + Number(rewardDelay))
-          .format('MMM D, YYYY')
+          .format('MMM D, YYYY h:mm A')
       : '';
   const campaignEndTime =
     startTime && startTime && rewardDelay
-      ? dayjs.unix(Number(startTime) + Number(duration)).format('MMM D, YYYY')
+      ? dayjs
+          .unix(Number(startTime) + Number(duration))
+          .format('MMM D, YYYY h:mm A')
       : '';
 
   const remainingFLX = numeral(3600)
@@ -128,29 +131,33 @@ const IncentivesStats = () => {
     ) as string;
   }
 
-  const myRewardRate =
-    formatNumber(
-      numeral(stakedBalance)
-        .divide(totalSupply)
-        .multiply(rewardRate)
-        .multiply(3600)
-        .multiply(24)
-        .value()
-        .toString(),
-      2
-    ) || 0;
+  const myRewardRate = () => {
+    if (Date.now() > numeral(startTime).add(duration).multiply(1000).value()) {
+      return '0';
+    } else {
+      return formatNumber(
+        numeral(stakedBalance)
+          .divide(totalSupply)
+          .multiply(rewardRate)
+          .multiply(3600)
+          .multiply(24)
+          .value()
+          .toString(),
+        2
+      );
+    }
+  };
+
+  const returnRewardUnlockTooltip = () => {
+    return `This is the share of the earned reward which is claimable immediately. The reminder is locked until the end of the campaign. After the end of the campaign, these reward are unlocked linearly until the ${unlockUntil}`;
+  };
 
   return (
     <>
       <StatsGrid>
         <StatItem>
           <StateInner>
-            <Label className="top">
-              {'Campaign'}{' '}
-              <InfoIcon data-tip={'tooltip goes here'}>
-                <Info size="20" />
-              </InfoIcon>
-            </Label>
+            <Label className="top">{'Campaign'} </Label>
             <Value>{`#${id}`}</Value>
             <Label className="small">{`Ending on ${campaignEndTime}`}</Label>
           </StateInner>
@@ -159,7 +166,7 @@ const IncentivesStats = () => {
         <StatItem>
           <StateInner>
             <Label className="top">{'My Reward Rate'}</Label>
-            <Value>{`${myRewardRate} FLX/Day`}</Value>
+            <Value>{`${myRewardRate()} FLX/Day`}</Value>
             <Label className="small">{`Out of ${remainingFLX} FLX/Day`}</Label>
           </StateInner>
         </StatItem>
@@ -170,7 +177,7 @@ const IncentivesStats = () => {
             <Value>{`${ethStake} ETH + ${raiStake} RAI`}</Value>
             <Label className="small">
               <a href={uniSwapLink} target="_blank" rel="noopener noreferrer">
-                {'Uniswap Market'}
+                {'Uniswap Market'} <Arrow />
               </a>
             </Label>
           </StateInner>
@@ -178,7 +185,12 @@ const IncentivesStats = () => {
 
         <StatItem>
           <StateInner>
-            <Label className="top">{'Reward Unlock'}</Label>
+            <Label className="top">
+              {'Reward Unlock'}{' '}
+              <InfoIcon data-tip={returnRewardUnlockTooltip()}>
+                <Info size="20" />
+              </InfoIcon>
+            </Label>
             <Value>{`${instantExitPercentage * 100}% Instant`}</Value>
             <Label className="small">
               {`${
@@ -227,16 +239,6 @@ const StatsGrid = styled.div`
   ${({ theme }) => theme.mediaWidth.upToSmall`
     margin: 0;
   `}
-  .__react_component_tooltip {
-    max-width: 250px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    border-radius: 5px;
-    opacity: 1 !important;
-    background: ${(props) => props.theme.colors.neutral};
-    border: ${(props) => props.theme.colors.border};
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.16);
-  }
 `;
 
 const StatItem = styled.div`
@@ -279,6 +281,7 @@ const StateInner = styled.div`
   text-align: center;
   padding: 20px;
   text-align: left;
+  height: 100%;
 `;
 
 const Value = styled.div`
@@ -312,12 +315,15 @@ const Label = styled.div`
     color: ${(props) => props.theme.colors.secondary};
     a {
       color: inherit;
+      filter: grayscale(100%);
+
       &:hover {
         background: ${(props) => props.theme.colors.gradient};
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         color: ${(props) => props.theme.colors.inputBorderColor};
+        filter: grayscale(0%);
       }
     }
   }
