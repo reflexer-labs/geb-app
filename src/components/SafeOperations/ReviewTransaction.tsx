@@ -138,7 +138,7 @@ const ReviewTransaction = () => {
               <Value>{`${formatNumber(totalDebt)}`}</Value>
             </Item>
             <Item>
-              <Label>{`ETH Market Price`}</Label>{' '}
+              <Label>{`ETH Price (OSM)`}</Label>{' '}
               <Value>{`$${formatNumber(
                 safeState.liquidationData.currentPrice.value,
                 2

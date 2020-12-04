@@ -108,7 +108,7 @@ const SafeStats = () => {
         <StatItem className="w50">
           <StateInner>
             <Value>${ethPrice}</Value>
-            <Label>{'ETH OSM Price'}</Label>
+            <Label>{'ETH Price (OSM)'}</Label>
           </StateInner>
         </StatItem>
 
