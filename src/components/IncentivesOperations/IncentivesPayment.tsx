@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
+import { BigNumber } from 'ethers';
+import { utils as gebUtils } from 'geb.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
 import { COIN_TICKER } from '../../utils/constants';
+import _ from '../../utils/lodash';
 import Button from '../Button';
 import CheckBox from '../CheckBox';
 import DecimalInput from '../DecimalInput';
 import Dropdown from '../Dropdown';
+import { formatNumber, toFixedString } from '../../utils/helper';
+import { NETWORK_ID } from '../../connectors';
 
 const INITITAL_STATE = [
   {
@@ -28,12 +33,41 @@ const IncentivesPayment = ({ isChecked }: Props) => {
   const [cashRewardsCheck, setCashRewardsCheck] = useState(false);
   const [leaveLiquidity, setLeaveLiquidity] = useState(isChecked || false);
 
-  const { incentivesModel: incentivesState } = useStoreState((state) => state);
+  const {
+    incentivesModel: incentivesState,
+    connectWalletModel: connectWalletState,
+  } = useStoreState((state) => state);
 
   const {
     incentivesModel: incentivesActions,
     popupsModel: popupsActions,
   } = useStoreActions((state) => state);
+
+  const { incentivesCampaignData } = incentivesState;
+
+  const ethBalance = connectWalletState.ethBalance[NETWORK_ID];
+  const praiBalance = connectWalletState.praiBalance[NETWORK_ID];
+
+  const coinAddress = _.get(
+    incentivesCampaignData,
+    'systemState.coinAddress',
+    ''
+  );
+  const token0 = _.get(
+    incentivesCampaignData,
+    'systemState.coinUniswapPair.token0',
+    ''
+  );
+  const token0Price = _.get(
+    incentivesCampaignData,
+    'systemState.coinUniswapPair.token0Price',
+    '0'
+  );
+  const token1Price = _.get(
+    incentivesCampaignData,
+    'systemState.coinUniswapPair.token1Price',
+    '0'
+  );
 
   const handleCancel = () => {
     popupsActions.setIsIncentivesModalOpen(false);
@@ -51,6 +85,54 @@ const IncentivesPayment = ({ isChecked }: Props) => {
   const handleLeaveLiquidityCheck = (state: boolean) => {
     setLeaveLiquidity(state);
     incentivesActions.setIsLeaveLiquidityChecked(state);
+  };
+
+  const handleEthChange = (val: string) => {
+    if (!val) {
+      setEthAmount('');
+      setRaiAmount('');
+      return;
+    }
+    if (!coinAddress || !token0 || !token1Price || !token0Price) return;
+
+    const raiPrice = coinAddress === token0 ? token0Price : token1Price;
+    const ethValueBN = BigNumber.from(toFixedString(val, 'WAD'));
+    const raiAmountBN = BigNumber.from(toFixedString(raiPrice, 'RAD')).div(
+      gebUtils.RAY
+    );
+
+    const value = formatNumber(
+      gebUtils
+        .wadToFixed(ethValueBN.mul(raiAmountBN).div(gebUtils.WAD))
+        .toString()
+    ) as string;
+
+    setRaiAmount(value);
+    setEthAmount(val);
+  };
+
+  const handleRaiChange = (val: string) => {
+    if (!val) {
+      setEthAmount('');
+      setRaiAmount('');
+      return;
+    }
+    if (!coinAddress || !token0 || !token1Price || !token0Price) return;
+
+    const ethPrice = coinAddress === token0 ? token1Price : token0Price;
+    const raiValueBN = BigNumber.from(toFixedString(val, 'WAD'));
+    const ethAmountBN = BigNumber.from(toFixedString(ethPrice, 'RAD')).div(
+      gebUtils.RAY
+    );
+
+    const value = formatNumber(
+      gebUtils
+        .wadToFixed(raiValueBN.mul(ethAmountBN).div(gebUtils.WAD))
+        .toString()
+    ) as string;
+
+    setRaiAmount(val);
+    setEthAmount(value);
   };
 
   return (
@@ -82,15 +164,19 @@ const IncentivesPayment = ({ isChecked }: Props) => {
       ) : (
         <DoubleInput>
           <DecimalInput
-            label={`${incentivesState.type} ETH (Avail 0.00)`}
+            label={`${incentivesState.type} ETH (Avail ${formatNumber(
+              ethBalance.toString()
+            )})`}
             value={ethAmount}
-            onChange={setEthAmount}
+            onChange={handleEthChange}
             disableMax
           />
           <DecimalInput
-            label={`${incentivesState.type} ${COIN_TICKER} (Avail 0.00)`}
+            label={`${
+              incentivesState.type
+            } ${COIN_TICKER} (Avail ${formatNumber(praiBalance.toString())})`}
             value={raiAmount}
-            onChange={setRaiAmount}
+            onChange={handleRaiChange}
             disableMax
           />
         </DoubleInput>

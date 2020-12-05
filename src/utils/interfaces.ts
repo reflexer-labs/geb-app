@@ -215,18 +215,21 @@ export interface ISafeHistory {
   color: string;
 }
 
+export interface IncentivesCampaign {
+  duration: string;
+  id: string;
+  instantExitPercentage: string;
+  reward: string;
+  rewardDelay: string;
+  startTime: string;
+  totalSupply: string;
+  rewardRate: string;
+}
+
 export interface IIncentivesCampaignData {
   user: string | null;
-  campaign: {
-    duration: string;
-    id: string;
-    instantExitPercentage: string;
-    reward: string;
-    rewardDelay: string;
-    startTime: string;
-    totalSupply: string;
-    rewardRate: string;
-  };
+  allCampaigns: Array<IncentivesCampaign>;
+  campaign: IncentivesCampaign;
   systemState: {
     coinAddress: string;
     wethAddress: string;
@@ -234,7 +237,15 @@ export interface IIncentivesCampaignData {
       totalSupply: string;
       reserve0: string;
       reserve1: string;
+      token0: string;
+      token0Price: string;
+      token1Price: string;
     };
   };
   stakedBalance: string;
+}
+
+export interface IIncentivesFields {
+  ethAmount: string;
+  raiAmount: string;
 }

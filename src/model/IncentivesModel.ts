@@ -1,10 +1,18 @@
 import { action, Action, thunk, Thunk } from 'easy-peasy';
 import { fetchIncentivesCampaigns } from '../services/graphql';
-import { IIncentivesCampaignData } from '../utils/interfaces';
+import {
+  IIncentivesCampaignData,
+  IIncentivesFields,
+} from '../utils/interfaces';
 
+const INITIAL_STATE = {
+  ethAmount: '',
+  raiAmount: '',
+};
 export interface IncentivesModel {
   operation: number;
   type: string;
+  incentivesFields: IIncentivesFields;
   incentivesCampaignData: IIncentivesCampaignData | null;
   isLeaveLiquidityChecked: boolean;
   fetchIncentivesCampaigns: Thunk<IncentivesModel, string>;
@@ -12,10 +20,12 @@ export interface IncentivesModel {
   setType: Action<IncentivesModel, string>;
   setIsLeaveLiquidityChecked: Action<IncentivesModel, boolean>;
   setIncentivesCampaignData: Action<IncentivesModel, IIncentivesCampaignData>;
+  setIncentivesFields: Action<IncentivesModel, IIncentivesFields>;
 }
 const incentivesModel: IncentivesModel = {
   operation: 0,
   type: 'withdraw',
+  incentivesFields: INITIAL_STATE,
   incentivesCampaignData: null,
   isLeaveLiquidityChecked: false,
   setOperation: action((state, payload) => {
@@ -34,6 +44,9 @@ const incentivesModel: IncentivesModel = {
   }),
   setIncentivesCampaignData: action((state, payload) => {
     state.incentivesCampaignData = payload;
+  }),
+  setIncentivesFields: action((state, payload) => {
+    state.incentivesFields = payload;
   }),
 };
 

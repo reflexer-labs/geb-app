@@ -132,6 +132,7 @@ export const fetchIncentivesCampaigns = (address: string) => {
 
       const payload: IIncentivesCampaignData = {
         user: response.user ? response.user.id : null,
+        allCampaigns: response.incentiveCampaigns,
         campaign:
           response.incentiveCampaigns.length > 0
             ? response.incentiveCampaigns[0]

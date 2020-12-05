@@ -2,7 +2,7 @@ import { userQuery } from './user';
 
 export const incentiveCampaignsQuery = (address: string) => `{
     ${userQuery(address)}
-    incentiveCampaigns(orderBy: id, orderDirection: desc, first: 1) {
+    incentiveCampaigns(orderBy: id, orderDirection: desc) {
         id
         startTime
         duration
@@ -19,6 +19,9 @@ export const incentiveCampaignsQuery = (address: string) => `{
           totalSupply
           reserve0
           reserve1
+          token0      
+          token0Price
+          token1Price
          }
       }
     incentiveBalances(where: {owner: "${address}"}, orderBy: campaignId, orderDirection: desc) {
