@@ -29,6 +29,7 @@ const IncentivesPayment = ({ isChecked }: Props) => {
   const { t } = useTranslation();
   const [ethAmount, setEthAmount] = useState('');
   const [raiAmount, setRaiAmount] = useState('');
+  const [error, setError] = useState('');
   const [uniPool, setUniPool] = useState('');
   const [cashRewardsCheck, setCashRewardsCheck] = useState(false);
   const [leaveLiquidity, setLeaveLiquidity] = useState(isChecked || false);
@@ -43,7 +44,7 @@ const IncentivesPayment = ({ isChecked }: Props) => {
     popupsModel: popupsActions,
   } = useStoreActions((state) => state);
 
-  const { incentivesCampaignData } = incentivesState;
+  const { incentivesCampaignData, type } = incentivesState;
 
   const ethBalance = connectWalletState.ethBalance[NETWORK_ID];
   const praiBalance = connectWalletState.praiBalance[NETWORK_ID];
@@ -69,16 +70,59 @@ const IncentivesPayment = ({ isChecked }: Props) => {
     '0'
   );
 
+  const validationChecker = () => {
+    if (type === 'deposit') {
+      const ethAmountBN = ethAmount
+        ? BigNumber.from(toFixedString(ethAmount, 'WAD'))
+        : BigNumber.from('0');
+      const raiAmountBN = raiAmount
+        ? BigNumber.from(toFixedString(raiAmount, 'WAD'))
+        : BigNumber.from('0');
+
+      const ethBalanceBN = ethBalance
+        ? BigNumber.from(toFixedString(ethBalance.toString(), 'WAD'))
+        : BigNumber.from('0');
+
+      const praiBalanceBN = praiBalance
+        ? BigNumber.from(toFixedString(praiBalance.toString(), 'WAD'))
+        : BigNumber.from('0');
+
+      if (
+        ethAmountBN.isZero() ||
+        raiAmountBN.isZero() ||
+        (ethAmountBN.isZero() && raiAmountBN.isZero)
+      ) {
+        setError(
+          `Please enter the amount of ETH/${COIN_TICKER} to be deposited`
+        );
+        return;
+      }
+      if (ethAmountBN.gt(ethBalanceBN)) {
+        setError(`Deposited ETH cannot exceed available amount.`);
+        return;
+      }
+      if (raiAmountBN.gt(praiBalanceBN)) {
+        setError(`Deposited ${COIN_TICKER} cannot exceed available amount.`);
+        return;
+      }
+    }
+
+    return true;
+  };
+
   const handleCancel = () => {
     popupsActions.setIsIncentivesModalOpen(false);
     incentivesActions.setOperation(0);
   };
 
   const handleSubmit = () => {
-    if (leaveLiquidity) {
-      incentivesActions.setOperation(1);
-    } else {
-      incentivesActions.setOperation(2);
+    const isPassedValidation = validationChecker();
+    if (isPassedValidation) {
+      if (leaveLiquidity) {
+        incentivesActions.setOperation(1);
+      } else {
+        incentivesActions.setOperation(2);
+      }
     }
   };
 
@@ -87,52 +131,36 @@ const IncentivesPayment = ({ isChecked }: Props) => {
     incentivesActions.setIsLeaveLiquidityChecked(state);
   };
 
-  const handleEthChange = (val: string) => {
+  const handleChange = (val: string, isEth = true) => {
+    setError('');
     if (!val) {
       setEthAmount('');
       setRaiAmount('');
       return;
     }
-    if (!coinAddress || !token0 || !token1Price || !token0Price) return;
+    if (!coinAddress || !token0) return;
 
-    const raiPrice = coinAddress === token0 ? token0Price : token1Price;
-    const ethValueBN = BigNumber.from(toFixedString(val, 'WAD'));
-    const raiAmountBN = BigNumber.from(toFixedString(raiPrice, 'RAD')).div(
-      gebUtils.RAY
-    );
+    let priveValue: string;
 
-    const value = formatNumber(
-      gebUtils
-        .wadToFixed(ethValueBN.mul(raiAmountBN).div(gebUtils.WAD))
-        .toString()
-    ) as string;
-
-    setRaiAmount(value);
-    setEthAmount(val);
-  };
-
-  const handleRaiChange = (val: string) => {
-    if (!val) {
-      setEthAmount('');
-      setRaiAmount('');
-      return;
+    if (isEth) {
+      priveValue = coinAddress === token0 ? token0Price : token1Price;
+    } else {
+      priveValue = coinAddress === token0 ? token1Price : token0Price;
     }
-    if (!coinAddress || !token0 || !token1Price || !token0Price) return;
 
-    const ethPrice = coinAddress === token0 ? token1Price : token0Price;
-    const raiValueBN = BigNumber.from(toFixedString(val, 'WAD'));
-    const ethAmountBN = BigNumber.from(toFixedString(ethPrice, 'RAD')).div(
+    const valueBN = BigNumber.from(toFixedString(val, 'WAD'));
+    const priveValueBN = BigNumber.from(toFixedString(priveValue, 'RAD')).div(
       gebUtils.RAY
     );
 
-    const value = formatNumber(
+    const reflectValue = formatNumber(
       gebUtils
-        .wadToFixed(raiValueBN.mul(ethAmountBN).div(gebUtils.WAD))
+        .wadToFixed(valueBN.mul(priveValueBN).div(gebUtils.WAD))
         .toString()
     ) as string;
 
-    setRaiAmount(val);
-    setEthAmount(value);
+    setRaiAmount(isEth ? reflectValue : val);
+    setEthAmount(isEth ? val : reflectValue);
   };
 
   return (
@@ -168,20 +196,20 @@ const IncentivesPayment = ({ isChecked }: Props) => {
               ethBalance.toString()
             )})`}
             value={ethAmount}
-            onChange={handleEthChange}
-            disableMax
+            onChange={handleChange}
+            handleMaxClick={() => handleChange(ethBalance.toString())}
           />
           <DecimalInput
             label={`${
               incentivesState.type
             } ${COIN_TICKER} (Avail ${formatNumber(praiBalance.toString())})`}
             value={raiAmount}
-            onChange={handleRaiChange}
-            disableMax
+            onChange={(val: string) => handleChange(val, false)}
+            handleMaxClick={() => handleChange(praiBalance.toString(), false)}
           />
         </DoubleInput>
       )}
-
+      {error && <Error>{error}</Error>}
       <Result>
         <Block>
           <Item>
@@ -320,13 +348,11 @@ const DoubleDropdown = styled.div`
   margin-bottom: 20px;
   > div {
     &:last-child {
-      flex: 0 0 calc(57% + 10px);
-      margin-left: -10px;
+      flex: 0 0 calc(50% + 5px);
+      margin-left: -5px;
     }
     &:first-child {
-      flex: 0 0 44%;
-      input {
-      }
+      flex: 0 0 50%;
     }
   }
 
@@ -348,13 +374,11 @@ const DoubleInput = styled.div`
   margin-bottom: 20px;
   > div {
     &:last-child {
-      flex: 0 0 calc(57% + 10px);
-      margin-left: -10px;
+      flex: 0 0 calc(50% + 5px);
+      margin-left: -5px;
     }
     &:first-child {
-      flex: 0 0 44%;
-      input {
-      }
+      flex: 0 0 50%;
     }
   }
 
@@ -389,4 +413,11 @@ const Text = styled.div`
 
 const SingleInput = styled.div`
   margin: 20px 0;
+`;
+
+const Error = styled.p`
+  color: ${(props) => props.theme.colors.dangerColor};
+  font-size: ${(props) => props.theme.font.extraSmall};
+  width: 100%;
+  margin: 16px 0;
 `;
