@@ -249,3 +249,27 @@ export interface IIncentivesFields {
   ethAmount: string;
   raiAmount: string;
 }
+
+export interface IIncentiveHook {
+  id: string;
+  duration: string;
+  startTime: string;
+  reward: string;
+  rewardRate: string;
+  rewardDelay: string;
+  totalSupply: string;
+  instantExitPercentage: string;
+  coinAddress: string;
+  wethAddress: string;
+  reserve0: string;
+  reserve1: string;
+  coinTotalSupply: string;
+  stakedBalance: string;
+  unlockUntil: string;
+  campaignEndTime: string;
+  remainingFLX: number;
+  uniSwapLink: string;
+  ethStake: string;
+  raiStake: string;
+  myRewardRate: string;
+}
