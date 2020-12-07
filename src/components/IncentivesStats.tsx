@@ -148,10 +148,6 @@ const IncentivesStats = () => {
     }
   };
 
-  const returnRewardUnlockTooltip = () => {
-    return `This is the share of the earned reward which is claimable immediately. The remainder is locked until the end of the campaign. After the end of the campaign, these reward are unlocked linearly until the ${unlockUntil}`;
-  };
-
   return (
     <>
       <StatsGrid>
@@ -187,7 +183,7 @@ const IncentivesStats = () => {
           <StateInner>
             <Label className="top">
               {'Reward Unlock'}{' '}
-              <InfoIcon data-tip={returnRewardUnlockTooltip()}>
+              <InfoIcon data-tip={t('my_stake_tip', { date: unlockUntil })}>
                 <Info size="20" />
               </InfoIcon>
             </Label>
@@ -341,16 +337,17 @@ const BtnContainer = styled.div`
   border: 1px solid ${(props) => props.theme.colors.border};
   border-radius: ${(props) => props.theme.global.borderRadius};
   background: ${(props) => props.theme.colors.background};
-  margin: 0 auto;
+  margin: 20px auto 35px;
 
   div {
     flex: 0 0 33.3%;
     text-align: center;
-    padding: 15px 0;
-    &:first-child {
-      button {
-        display: inline-block;
-      }
+
+    button {
+      display: block;
+      width: 100%;
+      height: 100%;
+      padding: 15px 0;
     }
   }
 
