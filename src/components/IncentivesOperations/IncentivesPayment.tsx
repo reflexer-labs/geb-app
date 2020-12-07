@@ -141,24 +141,22 @@ const IncentivesPayment = ({ isChecked }: Props) => {
     }
     if (!coinAddress || !token0) return;
 
-    let priveValue: string;
+    let praiValue: string;
 
     if (isEth) {
-      priveValue = coinAddress === token0 ? token0Price : token1Price;
+      praiValue = coinAddress === token0 ? token0Price : token1Price;
     } else {
-      priveValue = coinAddress === token0 ? token1Price : token0Price;
+      praiValue = coinAddress === token0 ? token1Price : token0Price;
     }
 
     const valueBN = BigNumber.from(toFixedString(val, 'WAD'));
-    const priveValueBN = BigNumber.from(toFixedString(priveValue, 'RAD')).div(
+    const praiValueBN = BigNumber.from(toFixedString(praiValue, 'RAD')).div(
       gebUtils.RAY
     );
 
-    const reflectValue = formatNumber(
-      gebUtils
-        .wadToFixed(valueBN.mul(priveValueBN).div(gebUtils.WAD))
-        .toString()
-    ) as string;
+    const reflectValue = gebUtils
+      .wadToFixed(valueBN.mul(praiValueBN).div(gebUtils.WAD))
+      .toString();
 
     const raiVal = isEth ? reflectValue : val;
     const ethVal = isEth ? val : reflectValue;

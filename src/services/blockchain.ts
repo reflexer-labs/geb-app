@@ -139,6 +139,7 @@ export const handleIncentiveDeposit = async (
   if (!signer || !incentiveFields) {
     return false;
   }
+
   const { ethAmount, raiAmount } = incentiveFields;
 
   const ethAmountBN = ethersUtils.parseEther(ethAmount);
@@ -148,7 +149,7 @@ export const handleIncentiveDeposit = async (
 
   const proxy = await geb.getProxyAction(signer._address);
 
-  const minTokenAmounts: [BigNumberish, BigNumberish] = isCoinLessThanWeth
+  const minTokenAmounts: [BigNumberish, BigNumberish] = !isCoinLessThanWeth
     ? [raiAmountBN.mul(9).div(10), ethAmountBN.mul(9).div(10)]
     : [ethAmountBN.mul(9).div(10), raiAmountBN.mul(9).div(10)];
 
