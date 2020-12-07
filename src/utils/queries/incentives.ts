@@ -2,6 +2,12 @@ import { userQuery } from './user';
 
 export const incentiveCampaignsQuery = (address: string) => `{
     ${userQuery(address)}
+    userProxies(where: {owner: "${address}"}) {
+      address
+      coinAllowance {
+        amount
+      }
+    }
     incentiveCampaigns(orderBy: id, orderDirection: desc) {
         id
         startTime

@@ -2,7 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import styled from 'styled-components';
-import { useStoreState } from '../../store';
+import { useStoreActions, useStoreState } from '../../store';
+import ApprovePRAI from '../ApprovePRAI';
 import IncentivesPayment from './IncentivesPayment';
 import IncentivesTransaction from './IncentivesTransaction';
 import PoolTokens from './PoolTokens';
@@ -12,7 +13,9 @@ const IncentivesOperations = () => {
   const { t } = useTranslation();
   const nodeRef = React.useRef(null);
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
-
+  const { incentivesModel: incentivesActions } = useStoreActions(
+    (state) => state
+  );
   const returnBody = () => {
     switch (incentivesState.operation) {
       case 0:
@@ -25,7 +28,7 @@ const IncentivesOperations = () => {
         );
       case 1:
         return <PoolTokens />;
-      case 2:
+      case 3:
         return <IncentivesTransaction />;
       default:
         break;
@@ -47,15 +50,23 @@ const IncentivesOperations = () => {
             maxWidth: '720px',
           }}
         >
-          <ModalContent
-            style={{
-              width: '100%',
-              maxWidth: '720px',
-            }}
-          >
-            <Header>{t(incentivesState.type)}</Header>
-            {returnBody()}
-          </ModalContent>
+          {incentivesState.operation === 2 ? (
+            <ApprovePRAI
+              handleBackBtn={() => incentivesActions.setOperation(0)}
+              handleSuccess={() => incentivesActions.setOperation(3)}
+              raiValue={incentivesState.incentivesFields.raiAmount}
+            />
+          ) : (
+            <ModalContent
+              style={{
+                width: '100%',
+                maxWidth: '720px',
+              }}
+            >
+              <Header>{t(incentivesState.type)}</Header>
+              {returnBody()}
+            </ModalContent>
+          )}
         </Fade>
       </CSSTransition>
     </SwitchTransition>

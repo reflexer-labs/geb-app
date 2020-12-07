@@ -1,7 +1,7 @@
-import { utils as ethersUtils } from 'ethers';
+import { BigNumberish, utils as ethersUtils } from 'ethers';
 import { Geb, TransactionRequest, utils as gebUtils } from 'geb.js';
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
-import { ISafe, ISafeData } from '../utils/interfaces';
+import { IIncentivesFields, ISafe, ISafeData } from '../utils/interfaces';
 import { ETH_NETWORK } from '../utils/constants';
 import { handlePreTxGasEstimate } from '../hooks/TransactionHooks';
 
@@ -122,6 +122,41 @@ export const handleCollectETH = async (signer: JsonRpcSigner, safe: ISafe) => {
   const proxy = await geb.getProxyAction(signer._address);
 
   const txData = proxy.exitETH(safeId, internalCollateralBalanceBN);
+
+  if (!txData) throw new Error('No transaction request!');
+
+  const tx = await handlePreTxGasEstimate(signer, txData);
+
+  const txResponse = await signer.sendTransaction(tx);
+  return txResponse;
+};
+
+export const handleIncentiveDeposit = async (
+  signer: JsonRpcSigner,
+  incentiveFields: IIncentivesFields,
+  isCoinLessThanWeth: boolean
+) => {
+  if (!signer || !incentiveFields) {
+    return false;
+  }
+  const { ethAmount, raiAmount } = incentiveFields;
+
+  const ethAmountBN = ethersUtils.parseEther(ethAmount);
+  const raiAmountBN = ethersUtils.parseEther(raiAmount);
+
+  const geb = new Geb(ETH_NETWORK, signer.provider);
+
+  const proxy = await geb.getProxyAction(signer._address);
+
+  const minTokenAmounts: [BigNumberish, BigNumberish] = isCoinLessThanWeth
+    ? [raiAmountBN.mul(9).div(10), ethAmountBN.mul(9).div(10)]
+    : [ethAmountBN.mul(9).div(10), raiAmountBN.mul(9).div(10)];
+
+  const txData = proxy.provideLiquidityStake(
+    ethAmountBN,
+    raiAmountBN,
+    minTokenAmounts
+  );
 
   if (!txData) throw new Error('No transaction request!');
 

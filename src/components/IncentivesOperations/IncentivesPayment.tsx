@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BigNumber } from 'ethers';
 import { utils as gebUtils } from 'geb.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
 import { COIN_TICKER } from '../../utils/constants';
-import _ from '../../utils/lodash';
 import Button from '../Button';
 import CheckBox from '../CheckBox';
 import DecimalInput from '../DecimalInput';
 import Dropdown from '../Dropdown';
 import { formatNumber, toFixedString } from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
+import Results from './Results';
+import useIncentives from '../../hooks/useIncentives';
 
 const INITITAL_STATE = [
   {
@@ -27,6 +28,7 @@ interface Props {
 
 const IncentivesPayment = ({ isChecked }: Props) => {
   const { t } = useTranslation();
+  const { token0, token1Price, token0Price, coinAddress } = useIncentives();
   const [ethAmount, setEthAmount] = useState('');
   const [raiAmount, setRaiAmount] = useState('');
   const [error, setError] = useState('');
@@ -44,31 +46,10 @@ const IncentivesPayment = ({ isChecked }: Props) => {
     popupsModel: popupsActions,
   } = useStoreActions((state) => state);
 
-  const { incentivesCampaignData, type } = incentivesState;
+  const { type, incentivesFields } = incentivesState;
 
   const ethBalance = connectWalletState.ethBalance[NETWORK_ID];
   const praiBalance = connectWalletState.praiBalance[NETWORK_ID];
-
-  const coinAddress = _.get(
-    incentivesCampaignData,
-    'systemState.coinAddress',
-    ''
-  );
-  const token0 = _.get(
-    incentivesCampaignData,
-    'systemState.coinUniswapPair.token0',
-    ''
-  );
-  const token0Price = _.get(
-    incentivesCampaignData,
-    'systemState.coinUniswapPair.token0Price',
-    '0'
-  );
-  const token1Price = _.get(
-    incentivesCampaignData,
-    'systemState.coinUniswapPair.token1Price',
-    '0'
-  );
 
   const validationChecker = () => {
     if (type === 'deposit') {
@@ -115,13 +96,29 @@ const IncentivesPayment = ({ isChecked }: Props) => {
     incentivesActions.setOperation(0);
   };
 
+  const passedCheckForCoinAllowance = () => {
+    const coinAllowance = connectWalletState.coinAllowance;
+    const raiAmountBN = raiAmount
+      ? BigNumber.from(toFixedString(raiAmount, 'WAD'))
+      : BigNumber.from('0');
+    if (coinAllowance) {
+      const coinAllowanceBN = BigNumber.from(
+        toFixedString(coinAllowance, 'WAD')
+      );
+      return coinAllowanceBN.gte(raiAmountBN);
+    }
+    return false;
+  };
+
   const handleSubmit = () => {
     const isPassedValidation = validationChecker();
     if (isPassedValidation) {
       if (leaveLiquidity) {
         incentivesActions.setOperation(1);
-      } else {
+      } else if (type === 'deposit' && !passedCheckForCoinAllowance()) {
         incentivesActions.setOperation(2);
+      } else {
+        incentivesActions.setOperation(3);
       }
     }
   };
@@ -136,6 +133,10 @@ const IncentivesPayment = ({ isChecked }: Props) => {
     if (!val) {
       setEthAmount('');
       setRaiAmount('');
+      incentivesActions.setIncentivesFields({
+        raiAmount: '',
+        ethAmount: '',
+      });
       return;
     }
     if (!coinAddress || !token0) return;
@@ -159,9 +160,21 @@ const IncentivesPayment = ({ isChecked }: Props) => {
         .toString()
     ) as string;
 
-    setRaiAmount(isEth ? reflectValue : val);
-    setEthAmount(isEth ? val : reflectValue);
+    const raiVal = isEth ? reflectValue : val;
+    const ethVal = isEth ? val : reflectValue;
+
+    incentivesActions.setIncentivesFields({
+      raiAmount: raiVal,
+      ethAmount: ethVal,
+    });
+    setRaiAmount(raiVal);
+    setEthAmount(ethVal);
   };
+
+  useEffect(() => {
+    setEthAmount(incentivesFields.ethAmount);
+    setRaiAmount(incentivesFields.raiAmount);
+  }, [incentivesFields]);
 
   return (
     <Body>
@@ -210,54 +223,8 @@ const IncentivesPayment = ({ isChecked }: Props) => {
         </DoubleInput>
       )}
       {error && <Error>{error}</Error>}
-      <Result>
-        <Block>
-          <Item>
-            <Label>
-              {incentivesState.type === 'withdraw'
-                ? `${COIN_TICKER} Withdrawn`
-                : `${COIN_TICKER} per ETH`}
-            </Label>{' '}
-            <Value>{'0.12345678'}</Value>
-          </Item>
-          <Item>
-            <Label>
-              {incentivesState.type === 'withdraw'
-                ? 'ETH Withdrawn'
-                : `ETH per ${COIN_TICKER}`}
-            </Label>{' '}
-            <Value>{'432.1098'}</Value>
-          </Item>
-          <Item>
-            <Label>{'Share of Uniswap Pool'}</Label> <Value>{'0.00'}</Value>
-          </Item>
-          <Item>
-            <Label>{'Share of Incentives Pool'}</Label> <Value>{'0.00'}</Value>
-          </Item>
-          {incentivesState.type === 'withdraw' ? (
-            <>
-              <Item>
-                <Label>{'Rewards Received Now'}</Label> <Value>{'0.00'}</Value>
-              </Item>
-              <Item>
-                <Label>{'Rewards to Unlock'}</Label> <Value>{'0.00'}</Value>
-              </Item>
-              <Item>
-                <Label>{'Unlock Time'}</Label> <Value>{'0.00'}</Value>
-              </Item>
-            </>
-          ) : (
-            <>
-              <Item>
-                <Label>{'Campaign #'}</Label> <Value>{'1234'}</Value>
-              </Item>
-              <Item>
-                <Label>{'FLX per Block'}</Label> <Value>{'12.00'}</Value>
-              </Item>
-            </>
-          )}
-        </Block>
-      </Result>
+
+      <Results />
 
       {incentivesState.type === 'withdraw' ? (
         <>
@@ -277,7 +244,6 @@ const IncentivesPayment = ({ isChecked }: Props) => {
           </CheckBoxcontainer>
         </>
       ) : null}
-
       <Footer>
         <Button dimmed text={t('cancel')} onClick={handleCancel} />
         <Button
@@ -294,47 +260,6 @@ export default IncentivesPayment;
 
 const Body = styled.div`
   padding: 20px;
-`;
-
-const Result = styled.div`
-  margin-top: 20px;
-  border-radius: ${(props) => props.theme.global.borderRadius};
-  border: 1px solid ${(props) => props.theme.colors.border};
-  background: ${(props) => props.theme.colors.foreground};
-`;
-
-const Block = styled.div`
-  border-bottom: 1px solid;
-  padding: 16px 20px;
-  border-bottom: 1px solid ${(props) => props.theme.colors.border};
-  &:last-child {
-    border-bottom: 0;
-  }
-`;
-
-const Item = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const Label = styled.div`
-  font-size: ${(props) => props.theme.font.small};
-  color: ${(props) => props.theme.colors.secondary};
-  letter-spacing: -0.09px;
-  line-height: 21px;
-`;
-
-const Value = styled.div`
-  font-size: ${(props) => props.theme.font.small};
-  color: ${(props) => props.theme.colors.primary};
-  letter-spacing: -0.09px;
-  line-height: 21px;
-  font-weight: 600;
 `;
 
 const Footer = styled.div`

@@ -14,7 +14,7 @@ const IncentivesStats = () => {
     id,
     campaignEndTime,
     myRewardRate,
-    remainingFLX,
+    dailyFLX,
     ethStake,
     raiStake,
     unlockUntil,
@@ -46,7 +46,7 @@ const IncentivesStats = () => {
           <StateInner>
             <Label className="top">{'My Reward Rate'}</Label>
             <Value>{`${myRewardRate} FLX/Day`}</Value>
-            <Label className="small">{`Out of ${remainingFLX} FLX/Day`}</Label>
+            <Label className="small">{`Out of ${dailyFLX} FLX/Day`}</Label>
           </StateInner>
         </StatItem>
 

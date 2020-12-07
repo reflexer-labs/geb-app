@@ -243,6 +243,10 @@ export interface IIncentivesCampaignData {
     };
   };
   stakedBalance: string;
+  proxyData: {
+    address: string;
+    coinAllowance: { amount: string };
+  };
 }
 
 export interface IIncentivesFields {
@@ -261,15 +265,26 @@ export interface IIncentiveHook {
   instantExitPercentage: string;
   coinAddress: string;
   wethAddress: string;
-  reserve0: string;
-  reserve1: string;
   coinTotalSupply: string;
   stakedBalance: string;
   unlockUntil: string;
   campaignEndTime: string;
-  remainingFLX: number;
+  dailyFLX: number;
   uniSwapLink: string;
   ethStake: string;
   raiStake: string;
   myRewardRate: string;
+  reserveRAI: string;
+  reserveETH: string;
+  token0: string;
+  token0Price: string;
+  token1Price: string;
+  isOngoingCampaign: boolean;
+  isCoinLessThanWeth: boolean;
+}
+
+export interface IIncentivePayload {
+  incentivesFields: IIncentivesFields;
+  signer: JsonRpcSigner;
+  isCoinLessThanWeth: boolean;
 }

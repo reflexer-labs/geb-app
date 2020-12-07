@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import styled from 'styled-components';
-import { useStoreState } from '../../store';
+import { useStoreActions, useStoreState } from '../../store';
 import Safe from './Safe';
 import ReviewTransaction from './ReviewTransaction';
 import UniSwapPool from './UniSwapPool';
-import ApprovePRAI from './ApprovePRAI';
+import ApprovePRAI from '../ApprovePRAI';
 
 interface Props {
   width?: string;
@@ -17,6 +17,7 @@ const SafeContainer = ({ width, maxWidth }: Props) => {
 
   const [stageNo, setStageNo] = useState(0);
   const { safeModel: safeState } = useStoreState((state) => state);
+  const { safeModel: safeActions } = useStoreActions((state) => state);
   const { stage, isUniSwapPoolChecked } = safeState;
 
   useEffect(() => {
@@ -28,7 +29,13 @@ const SafeContainer = ({ width, maxWidth }: Props) => {
       case 1:
         return <UniSwapPool isChecked={isUniSwapPoolChecked} />;
       case 2:
-        return <ApprovePRAI />;
+        return (
+          <ApprovePRAI
+            handleBackBtn={() => safeActions.setStage(0)}
+            handleSuccess={() => safeActions.setStage(3)}
+            raiValue={safeState.safeData.rightInput}
+          />
+        );
       case 3:
         return <ReviewTransaction />;
       default:

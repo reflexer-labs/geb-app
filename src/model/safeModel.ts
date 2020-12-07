@@ -27,7 +27,6 @@ export interface SafeModel {
   totalEth: string;
   totalRAI: string;
   isES: boolean;
-  blockBackdrop: boolean;
   isUniSwapPoolChecked: boolean;
   stage: number;
   safeData: ISafeData;
@@ -72,7 +71,6 @@ export interface SafeModel {
   setIsUniSwapPoolChecked: Action<SafeModel, boolean>;
   setStage: Action<SafeModel, number>;
   setSafeHistoryList: Action<SafeModel, Array<ISafeHistory>>;
-  setBlockBackdrop: Action<SafeModel, boolean>;
 }
 
 const safeModel: SafeModel = {
@@ -82,7 +80,6 @@ const safeModel: SafeModel = {
   singleSafe: null,
   totalEth: '0.00',
   totalRAI: '0.00',
-  blockBackdrop: false,
   isES: true,
   isUniSwapPoolChecked: true,
   stage: 0,
@@ -295,9 +292,6 @@ const safeModel: SafeModel = {
   }),
   setSafeHistoryList: action((state, payload) => {
     state.historyList = payload;
-  }),
-  setBlockBackdrop: action((state, payload) => {
-    state.blockBackdrop = payload;
   }),
 };
 

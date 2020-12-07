@@ -6,10 +6,13 @@ import Button from '../Button';
 import TransactionOverview from '../TransactionOverview';
 import { useActiveWeb3React } from '../../hooks';
 import { returnConnectorName } from '../../utils/helper';
-import { COIN_TICKER } from '../../utils/constants';
+import Results from './Results';
+import useIncentives from '../../hooks/useIncentives';
+import { handleTransactionError } from '../../hooks/TransactionHooks';
 
 const IncentivesTransaction = () => {
-  const { connector } = useActiveWeb3React();
+  const { connector, account, library } = useActiveWeb3React();
+  const { isCoinLessThanWeth } = useIncentives();
   const { t } = useTranslation();
 
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
@@ -19,16 +22,56 @@ const IncentivesTransaction = () => {
     incentivesModel: incentivesActions,
   } = useStoreActions((state) => state);
 
+  const { type, incentivesFields } = incentivesState;
+
   const handleBack = () => {
     incentivesState.isLeaveLiquidityChecked
       ? incentivesActions.setOperation(1)
       : incentivesActions.setOperation(0);
   };
 
-  const handleConfirm = () => {
+  const handleWaitingTitle = () => {
+    switch (type) {
+      case 'deposit':
+        return 'Incentive Deposit';
+      default:
+        return '';
+    }
+  };
+
+  const reset = () => {
     popupsActions.setIsIncentivesModalOpen(false);
     incentivesActions.setOperation(0);
     incentivesActions.setIsLeaveLiquidityChecked(false);
+  };
+
+  const handleConfirm = async () => {
+    if (account && library) {
+      popupsActions.setIsIncentivesModalOpen(false);
+      popupsActions.setIsWaitingModalOpen(true);
+      popupsActions.setWaitingPayload({
+        title: 'Waiting For Confirmation',
+        text: handleWaitingTitle(),
+        hint: 'Confirm this transaction in your wallet',
+        status: 'loading',
+      });
+      const signer = library.getSigner(account);
+      try {
+        if (type === 'deposit') {
+          await incentivesActions.incentiveDeposit({
+            signer,
+            incentivesFields,
+            isCoinLessThanWeth,
+          });
+        }
+
+        reset();
+      } catch (e) {
+        handleTransactionError(e);
+      } finally {
+        reset();
+      }
+    }
   };
 
   return (
@@ -44,7 +87,9 @@ const IncentivesTransaction = () => {
               : '')
           }
         />
-        <Result>
+
+        <Results />
+        {/* <Result>
           <Block>
             {incentivesState.type !== 'claim' ? (
               <>
@@ -105,7 +150,7 @@ const IncentivesTransaction = () => {
               </>
             )}
           </Block>
-        </Result>
+        </Result> */}
 
         <UniSwapCheckContainer>
           <Text>{t('confirm_text')}</Text>
@@ -146,44 +191,4 @@ const Footer = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 20px;
-`;
-
-const Result = styled.div`
-  border-radius: ${(props) => props.theme.global.borderRadius};
-  border: 1px solid ${(props) => props.theme.colors.border};
-  background: ${(props) => props.theme.colors.foreground};
-`;
-
-const Block = styled.div`
-  border-bottom: 1px solid;
-  padding: 16px 20px;
-  border-bottom: 1px solid ${(props) => props.theme.colors.border};
-  &:last-child {
-    border-bottom: 0;
-  }
-`;
-
-const Item = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const Label = styled.div`
-  font-size: ${(props) => props.theme.font.small};
-  color: ${(props) => props.theme.colors.secondary};
-  letter-spacing: -0.09px;
-  line-height: 21px;
-`;
-
-const Value = styled.div`
-  font-size: ${(props) => props.theme.font.small};
-  color: ${(props) => props.theme.colors.primary};
-  letter-spacing: -0.09px;
-  line-height: 21px;
-  font-weight: 600;
 `;

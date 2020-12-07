@@ -19,17 +19,22 @@ const INITIAL_STATE = {
   instantExitPercentage: '',
   coinAddress: '',
   wethAddress: '',
-  reserve0: '',
-  reserve1: '',
   coinTotalSupply: '',
   stakedBalance: '',
   unlockUntil: '',
   campaignEndTime: '',
-  remainingFLX: 0,
+  dailyFLX: 0,
   uniSwapLink: '',
   ethStake: '',
   raiStake: '',
   myRewardRate: '',
+  reserveRAI: '',
+  reserveETH: '',
+  token0: '',
+  token0Price: '',
+  token1Price: '',
+  isOngoingCampaign: true,
+  isCoinLessThanWeth: true,
 };
 
 export default function useIncentives() {
@@ -85,12 +90,13 @@ export default function useIncentives() {
       const reserve0 = _.get(
         incentivesCampaignData,
         'systemState.coinUniswapPair.reserve0',
-        ''
+        '0'
       );
+
       const reserve1 = _.get(
         incentivesCampaignData,
         'systemState.coinUniswapPair.reserve1',
-        ''
+        '0'
       );
 
       const coinTotalSupply = _.get(
@@ -98,6 +104,9 @@ export default function useIncentives() {
         'systemState.coinUniswapPair.totalSupply',
         '0'
       );
+
+      const isOngoingCampaign = () =>
+        Date.now() < numeral(startTime).add(duration).multiply(1000).value();
 
       const stakedBalance = _.get(incentivesCampaignData, 'stakedBalance', '0');
 
@@ -114,50 +123,46 @@ export default function useIncentives() {
               .format('MMM D, YYYY h:mm A')
           : '';
 
-      const remainingFLX =
-        numeral(3600).multiply(24).multiply(reward).divide(duration).value() ||
-        0;
+      const dailyFLX = isOngoingCampaign()
+        ? numeral(3600).multiply(24).multiply(reward).divide(duration).value()
+        : 0;
 
-      const uniSwapLink = `https://app.uniswap.org/#/swap?inputCurrency=${wethAddress}&outputCurrency=${coinAddress}`;
+      const uniSwapLink = ` https://app.uniswap.org/#/swap?outputCurrency=${coinAddress}`;
 
-      let ethStake = '0';
-      let raiStake = '0';
+      const isCoinLessThanWeth = () => {
+        if (!coinAddress || !wethAddress) return false;
+        return BigNumber.from(coinAddress).lt(BigNumber.from(wethAddress));
+      };
 
-      if (coinAddress && wethAddress) {
-        let reserveRAI = '0';
-        let reserveETH = '0';
-        if (BigNumber.from(coinAddress).lt(BigNumber.from(wethAddress))) {
-          reserveRAI = reserve0;
-          reserveETH = reserve1;
-        } else {
-          reserveRAI = reserve1;
-          reserveETH = reserve0;
-        }
+      let reserveRAI = '0';
+      let reserveETH = '0';
 
-        ethStake = formatNumber(
-          numeral(reserveETH)
-            .multiply(stakedBalance)
-            .divide(coinTotalSupply)
-            .value()
-            .toString()
-        ) as string;
-
-        raiStake = formatNumber(
-          numeral(reserveRAI)
-            .multiply(stakedBalance)
-            .divide(coinTotalSupply)
-            .value()
-            .toString()
-        ) as string;
+      if (isCoinLessThanWeth()) {
+        reserveRAI = reserve0;
+        reserveETH = reserve1;
+      } else {
+        reserveRAI = reserve1;
+        reserveETH = reserve0;
       }
 
-      const rewardRateValue = () => {
-        if (
-          Date.now() > numeral(startTime).add(duration).multiply(1000).value()
-        ) {
-          return '0';
-        } else {
-          return formatNumber(
+      const ethStake = formatNumber(
+        numeral(reserveETH)
+          .multiply(stakedBalance)
+          .divide(coinTotalSupply)
+          .value()
+          .toString()
+      ) as string;
+
+      const raiStake = formatNumber(
+        numeral(reserveRAI)
+          .multiply(stakedBalance)
+          .divide(coinTotalSupply)
+          .value()
+          .toString()
+      ) as string;
+
+      const myRewardRate = isOngoingCampaign()
+        ? (formatNumber(
             numeral(stakedBalance)
               .divide(totalSupply)
               .multiply(rewardRate)
@@ -166,11 +171,24 @@ export default function useIncentives() {
               .value()
               .toString(),
             2
-          ) as string;
-        }
-      };
+          ) as string)
+        : '0';
 
-      const myRewardRate = rewardRateValue();
+      const token0 = _.get(
+        incentivesCampaignData,
+        'systemState.coinUniswapPair.token0',
+        ''
+      );
+      const token0Price = _.get(
+        incentivesCampaignData,
+        'systemState.coinUniswapPair.token0Price',
+        '0'
+      );
+      const token1Price = _.get(
+        incentivesCampaignData,
+        'systemState.coinUniswapPair.token1Price',
+        '0'
+      );
 
       setState({
         id,
@@ -183,17 +201,22 @@ export default function useIncentives() {
         instantExitPercentage,
         coinAddress,
         wethAddress,
-        reserve0,
-        reserve1,
         coinTotalSupply,
         stakedBalance,
         unlockUntil,
         campaignEndTime,
-        remainingFLX,
+        dailyFLX,
         uniSwapLink,
         ethStake,
         raiStake,
         myRewardRate,
+        reserveRAI,
+        reserveETH,
+        token0,
+        token0Price,
+        token1Price,
+        isOngoingCampaign: isOngoingCampaign(),
+        isCoinLessThanWeth: isCoinLessThanWeth(),
       });
     }
     returnValues();

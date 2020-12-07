@@ -19,7 +19,7 @@ const IncentivesModal = () => {
     <Modal
       isModalOpen={popupsState.isIncentivesModalOpen}
       handleModalContent
-      backDropClose
+      backDropClose={!popupsState.blockBackdrop}
       closeModal={handleCancel}
     >
       <IncentivesOperations />
