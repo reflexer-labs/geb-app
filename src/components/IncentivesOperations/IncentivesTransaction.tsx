@@ -7,12 +7,10 @@ import TransactionOverview from '../TransactionOverview';
 import { useActiveWeb3React } from '../../hooks';
 import { returnConnectorName } from '../../utils/helper';
 import Results from './Results';
-import useIncentives from '../../hooks/useIncentives';
 import { handleTransactionError } from '../../hooks/TransactionHooks';
 
 const IncentivesTransaction = () => {
   const { connector, account, library } = useActiveWeb3React();
-  const { isCoinLessThanWeth } = useIncentives();
   const { t } = useTranslation();
 
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
@@ -61,7 +59,6 @@ const IncentivesTransaction = () => {
           await incentivesActions.incentiveDeposit({
             signer,
             incentivesFields,
-            isCoinLessThanWeth,
           });
         }
 

@@ -53,7 +53,7 @@ const IncentivesStats = () => {
         <StatItem>
           <StateInner>
             <Label className="top">{'My Stake'}</Label>
-            <Value>{`${ethStake} ETH + ${raiStake} RAI`}</Value>
+            <Value>{`${ethStake || 0} ETH + ${raiStake || 0} RAI`}</Value>
             <Label className="small">
               <a href={uniSwapLink} target="_blank" rel="noopener noreferrer">
                 {'Uniswap Market'} <Arrow />

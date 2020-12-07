@@ -60,8 +60,7 @@ const incentivesModel: IncentivesModel = {
     const storeActions = getStoreActions();
     const txResponse = await handleIncentiveDeposit(
       payload.signer,
-      payload.incentivesFields,
-      payload.isCoinLessThanWeth
+      payload.incentivesFields
     );
     if (txResponse) {
       const { hash, chainId } = txResponse;

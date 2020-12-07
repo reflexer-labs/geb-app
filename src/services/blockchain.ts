@@ -133,8 +133,7 @@ export const handleCollectETH = async (signer: JsonRpcSigner, safe: ISafe) => {
 
 export const handleIncentiveDeposit = async (
   signer: JsonRpcSigner,
-  incentiveFields: IIncentivesFields,
-  isCoinLessThanWeth: boolean
+  incentiveFields: IIncentivesFields
 ) => {
   if (!signer || !incentiveFields) {
     return false;
@@ -149,9 +148,10 @@ export const handleIncentiveDeposit = async (
 
   const proxy = await geb.getProxyAction(signer._address);
 
-  const minTokenAmounts: [BigNumberish, BigNumberish] = !isCoinLessThanWeth
-    ? [raiAmountBN.mul(9).div(10), ethAmountBN.mul(9).div(10)]
-    : [ethAmountBN.mul(9).div(10), raiAmountBN.mul(9).div(10)];
+  const minTokenAmounts: [BigNumberish, BigNumberish] = [
+    raiAmountBN.mul(9).div(10),
+    ethAmountBN.mul(9).div(10),
+  ];
 
   const txData = proxy.provideLiquidityStake(
     ethAmountBN,

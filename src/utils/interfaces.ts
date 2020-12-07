@@ -286,5 +286,4 @@ export interface IIncentiveHook {
 export interface IIncentivePayload {
   incentivesFields: IIncentivesFields;
   signer: JsonRpcSigner;
-  isCoinLessThanWeth: boolean;
 }
