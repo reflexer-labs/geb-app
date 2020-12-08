@@ -17,6 +17,8 @@ export const incentiveCampaignsQuery = (address: string) => `{
         instantExitPercentage
         rewardDelay
         rewardRate
+        lastUpdatedTime
+        rewardPerTokenStored
       }
     systemState(id: "current") {
         coinAddress
@@ -33,7 +35,6 @@ export const incentiveCampaignsQuery = (address: string) => `{
     incentiveBalances(where: {owner: "${address}"}, orderBy: campaignId, orderDirection: desc) {
           stakedBalance
           reward
-          stakedBalance
           userRewardPerTokenPaid
           delayedRewardTotalAmount
           delayedRewardExitedAmount

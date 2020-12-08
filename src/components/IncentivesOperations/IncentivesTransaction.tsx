@@ -20,7 +20,11 @@ const IncentivesTransaction = () => {
     incentivesModel: incentivesActions,
   } = useStoreActions((state) => state);
 
-  const { type, incentivesFields } = incentivesState;
+  const {
+    type,
+    incentivesFields,
+    selectedCampaignId: campaignId,
+  } = incentivesState;
 
   const handleBack = () => {
     incentivesState.isLeaveLiquidityChecked
@@ -60,6 +64,15 @@ const IncentivesTransaction = () => {
           await incentivesActions.incentiveDeposit({
             signer,
             incentivesFields,
+          });
+        }
+        if (type === 'claim') {
+          if (!campaignId) {
+            throw new Error('No CampaignId specified');
+          }
+          await incentivesActions.incentiveClaim({
+            signer,
+            campaignId,
           });
         }
 

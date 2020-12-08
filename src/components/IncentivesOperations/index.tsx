@@ -26,7 +26,7 @@ const IncentivesOperations = () => {
         ) : (
           <RedeemRewards />
         );
-      case 1:
+      case 2:
         return <PoolTokens />;
       case 3:
         return <IncentivesTransaction />;

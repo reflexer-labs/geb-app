@@ -34,9 +34,16 @@ const INITIAL_STATE = [
     token0: '',
     token0Price: '',
     token1Price: '',
+    lastUpdatedTime: '',
+    rewardPerTokenStored: '',
     isOngoingCampaign: true,
     isCoinLessThanWeth: true,
     user: '' || null,
+    IB_reward: '',
+    IB_delayedRewardTotalAmount: '',
+    IB_userRewardPerTokenPaid: '',
+    IB_delayedRewardExitedAmount: '',
+    IB_delayedRewardLatestExitTime: '',
   },
 ];
 
@@ -58,6 +65,12 @@ export default function useIncentives() {
           const rewardRate = _.get(campaign, 'rewardRate', '0');
           const rewardDelay = _.get(campaign, 'rewardDelay', '0');
           const totalSupply = _.get(campaign, 'totalSupply', '0');
+          const lastUpdatedTime = _.get(campaign, 'lastUpdateTime', '0');
+          const rewardPerTokenStored = _.get(
+            campaign,
+            'rewardPerTokenStored',
+            '0'
+          );
           const instantExitPercentage = _.get(
             campaign,
             'instantExitPercentage',
@@ -101,6 +114,32 @@ export default function useIncentives() {
           const stakedBalance = _.get(
             incentivesCampaignData,
             `incentiveBalances[${i}].stakedBalance`,
+            '0'
+          );
+          const IB_reward = _.get(
+            incentivesCampaignData,
+            `incentiveBalances[${i}].reward`,
+            '0'
+          );
+          const IB_userRewardPerTokenPaid = _.get(
+            incentivesCampaignData,
+            `incentiveBalances[${i}].delayedRewardTotalAmount`,
+            '0'
+          );
+          const IB_delayedRewardTotalAmount = _.get(
+            incentivesCampaignData,
+            `incentiveBalances[${i}].delayedRewardTotalAmount`,
+            '0'
+          );
+
+          const IB_delayedRewardExitedAmount = _.get(
+            incentivesCampaignData,
+            `incentiveBalances[${i}].delayedRewardExitedAmount`,
+            '0'
+          );
+          const IB_delayedRewardLatestExitTime = _.get(
+            incentivesCampaignData,
+            `incentiveBalances[${i}].delayedRewardLatestExitTime`,
             '0'
           );
 
@@ -220,9 +259,16 @@ export default function useIncentives() {
             token0,
             token0Price,
             token1Price,
+            lastUpdatedTime,
+            rewardPerTokenStored,
             isOngoingCampaign: isOngoingCampaign(),
             isCoinLessThanWeth: isCoinLessThanWeth(),
             user,
+            IB_reward,
+            IB_delayedRewardTotalAmount,
+            IB_userRewardPerTokenPaid,
+            IB_delayedRewardExitedAmount,
+            IB_delayedRewardLatestExitTime,
           };
         }
       );

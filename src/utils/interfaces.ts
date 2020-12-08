@@ -224,6 +224,8 @@ export interface IncentivesCampaign {
   startTime: string;
   totalSupply: string;
   rewardRate: string;
+  lastUpdateTime: string;
+  rewardPerTokenStored: string;
 }
 
 export interface IncentiveBalance {
@@ -284,15 +286,26 @@ export interface IIncentiveHook {
   myRewardRate: string;
   reserveRAI: string;
   reserveETH: string;
+  lastUpdatedTime: string;
+  rewardPerTokenStored: string;
   token0: string;
   token0Price: string;
   token1Price: string;
   isOngoingCampaign: boolean;
   isCoinLessThanWeth: boolean;
   user: '' | null;
+  IB_reward: string;
+  IB_delayedRewardTotalAmount: string;
+  IB_userRewardPerTokenPaid: string;
+  IB_delayedRewardExitedAmount: string;
+  IB_delayedRewardLatestExitTime: string;
 }
 
 export interface IIncentivePayload {
   incentivesFields: IIncentivesFields;
   signer: JsonRpcSigner;
+}
+export interface IIncentiveClaim {
+  signer: JsonRpcSigner;
+  campaignId: string;
 }

@@ -123,7 +123,6 @@ export const fetchIncentivesCampaigns = (address: string) => {
         GRAPH_API_URLS[attempt - 1],
         JSON.stringify({ query: incentiveCampaignsQuery(address) })
       );
-
       if (!res.data.data && attempt < GRAPH_API_URLS.length) {
         throw new Error('retry');
       }
@@ -131,9 +130,7 @@ export const fetchIncentivesCampaigns = (address: string) => {
       const response = res.data.data;
 
       const proxyData =
-        res.data.data.userProxies.length > 0
-          ? res.data.data.userProxies[0]
-          : null;
+        response.userProxies.length > 0 ? response.userProxies[0] : null;
 
       const payload: IIncentivesCampaignData = {
         user: response.user ? response.user.id : null,

@@ -15,7 +15,7 @@ const Results = () => {
     rewardRate,
   } = useIncentives()[0];
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
-  const { type, incentivesFields } = incentivesState;
+  const { type, incentivesFields, claimableFLX } = incentivesState;
 
   const returnCoinPerCoin = useCallback(
     (isEth = true) => {
@@ -67,46 +67,60 @@ const Results = () => {
 
   return (
     <Result>
-      <Block>
-        <Item>
-          <Label>{`${COIN_TICKER} per ETH`}</Label>
-          <Value>{returnCoinPerCoin(false)}</Value>
-        </Item>
-        <Item>
-          <Label>{`ETH per ${COIN_TICKER}`}</Label>{' '}
-          <Value>{returnCoinPerCoin()}</Value>
-        </Item>
-        <Item>
-          <Label>{'Share of Uniswap Pool'}</Label>{' '}
-          <Value>{returnShareOfUniswapPool()}</Value>
-        </Item>
-        <Item>
-          <Label>{'Share of Incentives Pool'}</Label>{' '}
-          <Value>{returnShareOfIncentivePool()}</Value>
-        </Item>
-        {type === 'withdraw' ? (
-          <>
+      {type === 'claim' ? (
+        <Block>
+          <Item>
+            <Label>{`Claimable FLX`}</Label>
+            <Value>{claimableFLX}</Value>
+          </Item>
+        </Block>
+      ) : (
+        <>
+          <Block>
             <Item>
-              <Label>{'Rewards Received Now'}</Label> <Value>{'0.00'}</Value>
+              <Label>{`${COIN_TICKER} per ETH`}</Label>
+              <Value>{returnCoinPerCoin(false)}</Value>
             </Item>
             <Item>
-              <Label>{'Rewards to Unlock'}</Label> <Value>{'0.00'}</Value>
+              <Label>{`ETH per ${COIN_TICKER}`}</Label>{' '}
+              <Value>{returnCoinPerCoin()}</Value>
             </Item>
             <Item>
-              <Label>{'Unlock Time'}</Label> <Value>{'0.00'}</Value>
-            </Item>
-          </>
-        ) : (
-          <>
-            <Item>
-              <Label>{'Campaign #'}</Label> <Value>{id}</Value>
+              <Label>{'Share of Uniswap Pool'}</Label>{' '}
+              <Value>{returnShareOfUniswapPool()}</Value>
             </Item>
             <Item>
-              <Label>{'FLX per Day'}</Label> <Value>{returnFLXPerDay()}</Value>
+              <Label>{'Share of Incentives Pool'}</Label>{' '}
+              <Value>{returnShareOfIncentivePool()}</Value>
             </Item>
-          </>
-        )}
-      </Block>
+
+            {type === 'withdraw' ? (
+              <>
+                <Item>
+                  <Label>{'Rewards Received Now'}</Label>{' '}
+                  <Value>{'0.00'}</Value>
+                </Item>
+                <Item>
+                  <Label>{'Rewards to Unlock'}</Label> <Value>{'0.00'}</Value>
+                </Item>
+                <Item>
+                  <Label>{'Unlock Time'}</Label> <Value>{'0.00'}</Value>
+                </Item>
+              </>
+            ) : (
+              <>
+                <Item>
+                  <Label>{'Campaign #'}</Label> <Value>{id}</Value>
+                </Item>
+                <Item>
+                  <Label>{'FLX per Day'}</Label>{' '}
+                  <Value>{returnFLXPerDay()}</Value>
+                </Item>
+              </>
+            )}
+          </Block>
+        </>
+      )}
     </Result>
   );
 };

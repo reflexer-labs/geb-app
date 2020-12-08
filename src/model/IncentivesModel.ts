@@ -1,11 +1,15 @@
 import { action, Action, thunk, Thunk } from 'easy-peasy';
 import { StoreModel } from '.';
-import { handleIncentiveDeposit } from '../services/blockchain';
+import {
+  handleIncentiveClaim,
+  handleIncentiveDeposit,
+} from '../services/blockchain';
 import { fetchIncentivesCampaigns } from '../services/graphql';
 import {
   IIncentivePayload,
   IIncentivesCampaignData,
   IIncentivesFields,
+  IIncentiveClaim,
 } from '../utils/interfaces';
 
 const INITIAL_STATE = {
@@ -15,22 +19,29 @@ const INITIAL_STATE = {
 export interface IncentivesModel {
   operation: number;
   type: string;
+  claimableFLX: string;
+  selectedCampaignId: string;
   incentivesFields: IIncentivesFields;
   incentivesCampaignData: IIncentivesCampaignData | null;
   isLeaveLiquidityChecked: boolean;
   fetchIncentivesCampaigns: Thunk<IncentivesModel, string, any, StoreModel>;
   incentiveDeposit: Thunk<IncentivesModel, IIncentivePayload, any, StoreModel>;
+  incentiveClaim: Thunk<IncentivesModel, IIncentiveClaim, any, StoreModel>;
   setOperation: Action<IncentivesModel, number>;
   setType: Action<IncentivesModel, string>;
   setIsLeaveLiquidityChecked: Action<IncentivesModel, boolean>;
   setIncentivesCampaignData: Action<IncentivesModel, IIncentivesCampaignData>;
   setIncentivesFields: Action<IncentivesModel, IIncentivesFields>;
+  setClaimableFLX: Action<IncentivesModel, string>;
+  setSelectedCampaignId: Action<IncentivesModel, string>;
 }
 const incentivesModel: IncentivesModel = {
   operation: 0,
   type: 'withdraw',
   incentivesFields: INITIAL_STATE,
+  claimableFLX: '0.00',
   incentivesCampaignData: null,
+  selectedCampaignId: '',
   isLeaveLiquidityChecked: false,
   setOperation: action((state, payload) => {
     state.operation = payload;
@@ -83,6 +94,33 @@ const incentivesModel: IncentivesModel = {
       await txResponse.wait();
     }
   }),
+  incentiveClaim: thunk(async (actions, payload, { getStoreActions }) => {
+    const storeActions = getStoreActions();
+    const txResponse = await handleIncentiveClaim(
+      payload.signer,
+      payload.campaignId
+    );
+    if (txResponse) {
+      const { hash, chainId } = txResponse;
+      storeActions.transactionsModel.addTransaction({
+        chainId,
+        hash,
+        from: txResponse.from,
+        summary: 'Incentive Claim',
+        addedTime: new Date().getTime(),
+        originalTx: txResponse,
+      });
+      storeActions.popupsModel.setIsWaitingModalOpen(true);
+      storeActions.popupsModel.setWaitingPayload({
+        title: 'Transaction Submitted',
+        hash: txResponse.hash,
+        status: 'success',
+      });
+
+      actions.setClaimableFLX('');
+      await txResponse.wait();
+    }
+  }),
   setType: action((state, payload) => {
     state.type = payload;
   }),
@@ -94,6 +132,12 @@ const incentivesModel: IncentivesModel = {
   }),
   setIncentivesFields: action((state, payload) => {
     state.incentivesFields = payload;
+  }),
+  setClaimableFLX: action((state, payload) => {
+    state.claimableFLX = payload;
+  }),
+  setSelectedCampaignId: action((state, payload) => {
+    state.selectedCampaignId = payload;
   }),
 };
 

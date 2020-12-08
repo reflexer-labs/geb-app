@@ -1,25 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
-import { useStoreActions, useStoreState } from '../../store';
-import { IIncentiveHook, IncentivesCampaign } from '../../utils/interfaces';
+import { useStoreActions } from '../../store';
+import { IIncentiveHook } from '../../utils/interfaces';
 import Button from '../Button';
 import DecimalInput from '../DecimalInput';
 import Dropdown from '../Dropdown';
 import useIncentives from '../../hooks/useIncentives';
+import { useOnceCall } from '../../hooks/useOnceCall';
+import { formatNumber } from '../../utils/helper';
 
+interface ResultData {
+  flxAmount: string;
+  lockedReward: string;
+  start: string;
+  end: string;
+}
 const RedeemRewards = () => {
   const { t } = useTranslation();
-  const [campaigns, setCampaigns] = useState<Array<IncentivesCampaign>>([]);
+  const [error, setError] = useState('');
+  const campaigns = useIncentives();
 
-  const modifiedCampaigns = useIncentives();
-
-  const [flxAmount, setFLXAmount] = useState('0');
-
-  const { incentivesModel: incentivesState } = useStoreState((state) => state);
-
-  const { incentivesCampaignData } = incentivesState;
+  const [resultData, setResultData] = useState<ResultData>({
+    flxAmount: '',
+    lockedReward: '0',
+    start: 'N/A',
+    end: 'N/A',
+  });
 
   const {
     incentivesModel: incentivesActions,
@@ -32,29 +39,100 @@ const RedeemRewards = () => {
   };
 
   const handleSubmit = () => {
-    incentivesActions.setOperation(2);
+    if (Number(resultData.flxAmount) > 0) {
+      incentivesActions.setOperation(3);
+    } else {
+      setError('No reward to claim');
+      return;
+    }
   };
 
-  const returnFLX = (selectedCampaign: IncentivesCampaign) => {
-    if (!selectedCampaign) return 0;
-    const foundCampaign = modifiedCampaigns.find(
-      (cam: IIncentiveHook) => cam.id === selectedCampaign.id
+  const rewardPerToken = (incentiveCampaign: IIncentiveHook) => {
+    if (!incentiveCampaign) return 0;
+    const now = Math.floor(Date.now() / 1000);
+    const finish = Number(
+      incentiveCampaign.startTime + incentiveCampaign.duration
     );
-    console.log('====================================');
-    console.log(modifiedCampaigns);
-    console.log('====================================');
 
-    if (foundCampaign) {
+    const lastTimeRewardApplicable = Math.min(
+      Math.max(now, Number(incentiveCampaign.startTime)),
+      finish
+    );
+
+    if (
+      Number(incentiveCampaign.totalSupply) === 0 ||
+      Number(incentiveCampaign.lastUpdatedTime) === lastTimeRewardApplicable
+    ) {
+      return Number(incentiveCampaign.rewardPerTokenStored);
     }
 
-    setFLXAmount('30');
+    return (
+      Number(incentiveCampaign.rewardPerTokenStored) +
+      ((lastTimeRewardApplicable - Number(incentiveCampaign.lastUpdatedTime)) * // Delta time
+        Number(incentiveCampaign.rewardRate)) /
+        Number(incentiveCampaign.totalSupply)
+    );
+  };
+
+  const earned = (incentiveCampaign: IIncentiveHook) => {
+    return (
+      Number(incentiveCampaign.IB_reward) +
+      (Number(rewardPerToken(incentiveCampaign)) -
+        Number(incentiveCampaign.IB_userRewardPerTokenPaid)) *
+        Number(incentiveCampaign.stakedBalance)
+    );
+  };
+
+  const currentlyClaimableReward = (incentiveCampaign: IIncentiveHook) => {
+    const now = Math.floor(Date.now() / 1000);
+    return (
+      earned(incentiveCampaign) *
+        Number(incentiveCampaign.instantExitPercentage) + // Part accruing during the campaign (instant claim part)
+      (Math.max(
+        now - Number(incentiveCampaign.IB_delayedRewardLatestExitTime),
+        0
+      ) * // Total already unlocked from the vesting
+        Number(incentiveCampaign.IB_delayedRewardTotalAmount)) /
+        Number(incentiveCampaign.rewardDelay) -
+      Number(incentiveCampaign.IB_delayedRewardExitedAmount) // Locked part already paid out
+    );
+  };
+
+  const currentlyLockedReward = (incentiveCampaign: IIncentiveHook) => {
+    return (
+      earned(incentiveCampaign) *
+        (1 - Number(incentiveCampaign.instantExitPercentage)) + // Part accruing during the campaign
+      Number(incentiveCampaign.IB_delayedRewardTotalAmount) - // Part locked already accounted
+      Number(incentiveCampaign.IB_delayedRewardExitedAmount)
+    ); // Subtracts locked tokens already claimed
+  };
+
+  const returnFLX = (campaign: IIncentiveHook) => {
+    if (!campaign) return;
+
+    const selectedCampaign = campaigns.find(
+      (cam: IIncentiveHook) => cam.id === campaign.id
+    );
+
+    if (selectedCampaign) {
+      setResultData({
+        flxAmount: currentlyClaimableReward(selectedCampaign).toString(),
+        lockedReward: currentlyLockedReward(selectedCampaign).toString(),
+        start: selectedCampaign.unlockUntil,
+        end: selectedCampaign.campaignEndTime,
+      });
+      incentivesActions.setClaimableFLX(
+        currentlyClaimableReward(selectedCampaign).toString()
+      );
+      incentivesActions.setSelectedCampaignId(selectedCampaign.id);
+    }
   };
 
   const handleSelectedCampaign = (selected: string) => {
     const id = selected.split('#').pop();
     if (campaigns.length > 0) {
       const campaign = campaigns.find(
-        (campaign: IncentivesCampaign) => campaign.id === id
+        (campaign: IIncentiveHook) => campaign.id === id
       );
       if (campaign) {
         returnFLX(campaign);
@@ -62,18 +140,16 @@ const RedeemRewards = () => {
     }
   };
 
-  useEffect(() => {
-    if (incentivesCampaignData) {
-      setCampaigns(incentivesCampaignData.allCampaigns);
-    }
-  }, [incentivesCampaignData]);
+  useOnceCall(() => {
+    returnFLX(campaigns[0]);
+  }, campaigns[0].id !== '');
 
   return (
     <Body>
       <DropdownContainer>
         <Dropdown
           items={campaigns.map(
-            (campaign: IncentivesCampaign) => `Campaign #${campaign.id}`
+            (campaign: IIncentiveHook) => `Campaign #${campaign.id}`
           )}
           getSelectedItem={handleSelectedCampaign}
           itemSelected={
@@ -87,38 +163,28 @@ const RedeemRewards = () => {
 
       <DecimalInput
         label={'Claimable FLX'}
-        value={flxAmount}
+        value={formatNumber(resultData.flxAmount).toString()}
         onChange={() => {}}
         disabled
       />
-
+      {error && <Error>{error}</Error>}
       <Result>
         <Block>
           <Item>
-            <Label>
-              {'Claimable Reward'}{' '}
-              <InfoIcon data-tip="These rewards will be unlocked linearly between the end of the campaign and the end date of the locking period.">
-                ?
-              </InfoIcon>
-            </Label>{' '}
-            <Value>{'50.00'}</Value>
-          </Item>
-
-          <Item>
-            <Label>{'Locked Reward'}</Label> <Value>{'50.00'}</Value>
+            <Label>{'Locked Reward'}</Label>{' '}
+            <Value>{formatNumber(resultData.lockedReward).toString()}</Value>
           </Item>
 
           <Item>
             <Label>{'Start of Unlock Period'}</Label>{' '}
-            <Value>{'20/20/2020'}</Value>
+            <Value>{resultData.start}</Value>
           </Item>
 
           <Item>
             <Label>{'End of Unlock Period'}</Label>{' '}
-            <Value>{'25/12/2020'}</Value>
+            <Value>{resultData.end}</Value>
           </Item>
         </Block>
-        <ReactTooltip multiline type="light" data-effect="solid" />
       </Result>
 
       <Footer>
@@ -192,16 +258,9 @@ const Value = styled.div`
   font-weight: 600;
 `;
 
-const InfoIcon = styled.div`
-  background: ${(props) => props.theme.colors.secondary};
-  color: ${(props) => props.theme.colors.neutral};
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  font-size: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 7px;
-  cursor: pointer;
+const Error = styled.p`
+  color: ${(props) => props.theme.colors.dangerColor};
+  font-size: ${(props) => props.theme.font.extraSmall};
+  width: 100%;
+  margin: 16px 0;
 `;

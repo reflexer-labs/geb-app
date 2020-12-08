@@ -166,3 +166,25 @@ export const handleIncentiveDeposit = async (
   const txResponse = await signer.sendTransaction(tx);
   return txResponse;
 };
+
+export const handleIncentiveClaim = async (
+  signer: JsonRpcSigner,
+  camaignId: string
+) => {
+  if (!signer || !camaignId) {
+    return false;
+  }
+
+  const geb = new Geb(ETH_NETWORK, signer.provider);
+
+  const proxy = await geb.getProxyAction(signer._address);
+
+  const txData = proxy.getRewards(camaignId);
+
+  if (!txData) throw new Error('No transaction request!');
+
+  const tx = await handlePreTxGasEstimate(signer, txData);
+
+  const txResponse = await signer.sendTransaction(tx);
+  return txResponse;
+};
