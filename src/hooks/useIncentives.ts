@@ -123,7 +123,7 @@ export default function useIncentives() {
           );
           const IB_userRewardPerTokenPaid = _.get(
             incentivesCampaignData,
-            `incentiveBalances[${i}].delayedRewardTotalAmount`,
+            `incentiveBalances[${i}].userRewardPerTokenPaid`,
             '0'
           );
           const IB_delayedRewardTotalAmount = _.get(

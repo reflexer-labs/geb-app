@@ -135,6 +135,8 @@ const RedeemRewards = () => {
         (campaign: IIncentiveHook) => campaign.id === id
       );
       if (campaign) {
+        console.log(campaign);
+
         returnFLX(campaign);
       }
     }
