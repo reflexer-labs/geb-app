@@ -65,7 +65,7 @@ export default function useIncentives() {
           const rewardRate = _.get(campaign, 'rewardRate', '0');
           const rewardDelay = _.get(campaign, 'rewardDelay', '0');
           const totalSupply = _.get(campaign, 'totalSupply', '0');
-          const lastUpdatedTime = _.get(campaign, 'lastUpdateTime', '0');
+          const lastUpdatedTime = _.get(campaign, 'lastUpdatedTime', '0');
           const rewardPerTokenStored = _.get(
             campaign,
             'rewardPerTokenStored',
