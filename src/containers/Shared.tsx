@@ -25,6 +25,7 @@ import TransactionUpdater from '../services/TransactionUpdater';
 import usePrevious from '../hooks/usePrevious';
 import { useHistory } from 'react-router-dom';
 import IncentivesModal from '../components/Modals/IncentivesModal';
+import ProxyModal from '../components/Modals/ProxyModal';
 
 interface Props {
   children: ReactNode;
@@ -148,6 +149,7 @@ const Shared = ({ children }: Props) => {
       <LoadingModal />
       <IncentivesModal />
       <CreateAccountModal />
+      <ProxyModal />
       <ConnectedWalletModal />
 
       <ScreenLoader />

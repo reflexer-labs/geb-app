@@ -20,16 +20,9 @@ const Incentives = () => {
   );
 
   useEffect(() => {
-    if (!account || !chainId) {
-      history.push('/');
-      return;
-    }
     async function fetchIncentivesCampaigns() {
-      const res = await incentivesActions.fetchIncentivesCampaigns(
-        account as string
-      );
-      if (!res.user) {
-        history.push('/');
+      if (account && chainId) {
+        await incentivesActions.fetchIncentivesCampaigns(account as string);
       }
     }
     fetchIncentivesCampaigns();

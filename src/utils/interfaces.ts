@@ -226,10 +226,18 @@ export interface IncentivesCampaign {
   rewardRate: string;
 }
 
+export interface IncentiveBalance {
+  reward: string;
+  stakedBalance: string;
+  userRewardPerTokenPaid: string;
+  delayedRewardTotalAmount: string;
+  delayedRewardExitedAmount: string;
+  delayedRewardLatestExitTime: string;
+}
+
 export interface IIncentivesCampaignData {
   user: string | null;
   allCampaigns: Array<IncentivesCampaign>;
-  campaign: IncentivesCampaign;
   systemState: {
     coinAddress: string;
     wethAddress: string;
@@ -242,7 +250,7 @@ export interface IIncentivesCampaignData {
       token1Price: string;
     };
   };
-  stakedBalance: string;
+  incentiveBalances: Array<IncentiveBalance>;
   proxyData: {
     address: string;
     coinAllowance: { amount: string };
@@ -281,6 +289,7 @@ export interface IIncentiveHook {
   token1Price: string;
   isOngoingCampaign: boolean;
   isCoinLessThanWeth: boolean;
+  user: '' | null;
 }
 
 export interface IIncentivePayload {

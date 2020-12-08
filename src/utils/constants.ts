@@ -29,6 +29,7 @@ export const GRAPH_API_URLS = REACT_APP_GRAPH_API_URLS
   ? REACT_APP_GRAPH_API_URLS.split(',')
   : [
       'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai',
+      'https://api.thegraph.com/subgraphs/name/reflexer-labs/rai-kovan',
     ];
 
 export const MAILCHIMP_URL =

@@ -13,7 +13,7 @@ const Results = () => {
     reserveRAI,
     totalSupply,
     rewardRate,
-  } = useIncentives();
+  } = useIncentives()[0];
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
   const { type, incentivesFields } = incentivesState;
 
@@ -43,7 +43,12 @@ const Results = () => {
 
   const returnShareOfIncentivePool = useCallback(() => {
     const shareOfUniSwapPool = returnShareOfUniswapPool();
-    if (!totalSupply || !shareOfUniSwapPool || shareOfUniSwapPool === 0)
+    if (
+      !totalSupply ||
+      totalSupply === '0' ||
+      !shareOfUniSwapPool ||
+      shareOfUniSwapPool === 0
+    )
       return 0;
     return formatNumber(
       numeral(shareOfUniSwapPool).divide(totalSupply).value().toString()

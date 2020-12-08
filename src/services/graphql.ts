@@ -137,17 +137,10 @@ export const fetchIncentivesCampaigns = (address: string) => {
 
       const payload: IIncentivesCampaignData = {
         user: response.user ? response.user.id : null,
-        allCampaigns: response.incentiveCampaigns,
         proxyData,
-        campaign:
-          response.incentiveCampaigns.length > 0
-            ? response.incentiveCampaigns[0]
-            : null,
+        allCampaigns: response.incentiveCampaigns,
         systemState: response.systemState,
-        stakedBalance:
-          response.incentiveBalances.length > 0
-            ? response.incentiveBalances[0].stakedBalance
-            : '0',
+        incentiveBalances: response.incentiveBalances,
       };
 
       return payload;

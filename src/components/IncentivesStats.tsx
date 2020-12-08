@@ -7,9 +7,11 @@ import ReactTooltip from 'react-tooltip';
 import { Info } from 'react-feather';
 import Arrow from './Icons/Arrow';
 import useIncentives from '../hooks/useIncentives';
+import { useActiveWeb3React } from '../hooks';
 
 const IncentivesStats = () => {
   const { t } = useTranslation();
+  const { account } = useActiveWeb3React();
   const {
     id,
     campaignEndTime,
@@ -20,13 +22,22 @@ const IncentivesStats = () => {
     unlockUntil,
     uniSwapLink,
     instantExitPercentage,
-  } = useIncentives();
+    user,
+  } = useIncentives()[0];
   const {
     popupsModel: popupsActions,
     incentivesModel: incentivesActions,
   } = useStoreActions((state) => state);
 
   const handleClick = (type: string) => {
+    if (!account) {
+      popupsActions.setIsConnectorsWalletOpen(true);
+      return;
+    }
+    if (!user) {
+      popupsActions.setIsProxyModalOpen(true);
+      return;
+    }
     popupsActions.setIsIncentivesModalOpen(true);
     incentivesActions.setType(type);
   };

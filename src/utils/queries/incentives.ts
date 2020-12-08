@@ -32,6 +32,12 @@ export const incentiveCampaignsQuery = (address: string) => `{
       }
     incentiveBalances(where: {owner: "${address}"}, orderBy: campaignId, orderDirection: desc) {
           stakedBalance
+          reward
+          stakedBalance
+          userRewardPerTokenPaid
+          delayedRewardTotalAmount
+          delayedRewardExitedAmount
+          delayedRewardLatestExitTime
       }
       
 }`;

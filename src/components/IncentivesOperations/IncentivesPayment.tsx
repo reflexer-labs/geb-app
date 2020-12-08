@@ -28,7 +28,7 @@ interface Props {
 
 const IncentivesPayment = ({ isChecked }: Props) => {
   const { t } = useTranslation();
-  const { token0, token1Price, token0Price, coinAddress } = useIncentives();
+  const { token0, token1Price, token0Price, coinAddress } = useIncentives()[0];
   const [ethAmount, setEthAmount] = useState('');
   const [raiAmount, setRaiAmount] = useState('');
   const [error, setError] = useState('');

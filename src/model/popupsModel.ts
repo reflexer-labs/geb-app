@@ -13,6 +13,7 @@ export interface PopupsModel {
   isConnectorsWalletOpen: boolean;
   showSideMenu: boolean;
   blockBackdrop: boolean;
+  isProxyModalOpen: boolean;
   isScreenModalOpen: boolean;
   isVotingModalOpen: boolean;
   isIncentivesModalOpen: boolean;
@@ -40,12 +41,14 @@ export interface PopupsModel {
   setIsWaitingModalOpen: Action<PopupsModel, boolean>;
   setWaitingPayload: Action<PopupsModel, IWaitingPayload>;
   setBlockBackdrop: Action<PopupsModel, boolean>;
+  setIsProxyModalOpen: Action<PopupsModel, boolean>;
 }
 
 const popupsModel: PopupsModel = {
   blockBackdrop: false,
   isSettingsModalOpen: false,
   isConnectModalOpen: false,
+  isProxyModalOpen: false,
   isConnectedWalletModalOpen: false,
   isScreenModalOpen: false,
   isIncentivesModalOpen: false,
@@ -115,6 +118,9 @@ const popupsModel: PopupsModel = {
   }),
   setBlockBackdrop: action((state, payload) => {
     state.blockBackdrop = payload;
+  }),
+  setIsProxyModalOpen: action((state, payload) => {
+    state.isProxyModalOpen = payload;
   }),
 };
 

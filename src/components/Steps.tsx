@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import ReactTooltip from 'react-tooltip';
 import { useStoreActions, useStoreState } from '../store';
@@ -9,22 +9,22 @@ import {
   handleTransactionError,
   useTransactionAdder,
 } from '../hooks/TransactionHooks';
-import { timeout } from '../utils/helper';
 import { useTranslation } from 'react-i18next';
 import { COIN_TICKER } from '../utils/constants';
+import { use10BlocksConfirmations } from '../hooks/useBlocksConfirmations';
 
 const Steps = () => {
   const { t } = useTranslation();
   const { account, library, chainId } = useActiveWeb3React();
-  const [blocksSinceCheck, setBlocksSinceCheck] = useState<number>();
-  const {
-    connectWalletModel: connectWalletState,
-    transactionsModel: transactionsState,
-  } = useStoreState((state) => state);
+  const blocksSinceCheck = use10BlocksConfirmations();
+
+  const { connectWalletModel: connectWalletState } = useStoreState(
+    (state) => state
+  );
+
   const {
     popupsModel: popupsActions,
     connectWalletModel: connectWalletActions,
-    safeModel: safeActions,
   } = useStoreActions((state) => state);
 
   const addTransaction = useTransactionAdder();
@@ -36,47 +36,6 @@ const Steps = () => {
     blockNumber,
     ctHash,
   } = connectWalletState;
-
-  const { transactions } = transactionsState;
-
-  const returnConfirmations = async () => {
-    if (
-      !account ||
-      !chainId ||
-      !blockNumber[chainId] ||
-      !ctHash ||
-      !transactions[ctHash] ||
-      step !== 1
-    ) {
-      return null;
-    }
-    connectWalletActions.setIsStepLoading(true);
-    const currentBlockNumber = blockNumber[chainId];
-    const txBlockNumber = transactions[ctHash].originalTx.blockNumber;
-    if (!txBlockNumber || !currentBlockNumber) return null;
-    const diff = currentBlockNumber - txBlockNumber;
-    setBlocksSinceCheck(diff >= 10 ? 10 : diff);
-    if (diff > 10) {
-      await timeout(1000);
-      safeActions.fetchUserSafes(account as string);
-      await timeout(2000);
-      connectWalletActions.setIsStepLoading(false);
-      connectWalletActions.setStep(2);
-      localStorage.removeItem('ctHash');
-      return null;
-    }
-  };
-
-  const returnConfCallback = useCallback(returnConfirmations, [
-    chainId,
-    blockNumber,
-    ctHash,
-    step,
-  ]);
-
-  useEffect(() => {
-    returnConfCallback();
-  }, [returnConfCallback]);
 
   const handleConnectWallet = () =>
     popupsActions.setIsConnectorsWalletOpen(true);

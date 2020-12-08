@@ -1,39 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
-import { useStoreActions } from '../../store';
+import { useStoreActions, useStoreState } from '../../store';
+import { IIncentiveHook, IncentivesCampaign } from '../../utils/interfaces';
 import Button from '../Button';
 import DecimalInput from '../DecimalInput';
 import Dropdown from '../Dropdown';
-
-type Campaign = { id: string; climable_flex: string };
-
-const INITITAL_STATE_CAMPAIGN: Array<Campaign> = [
-  {
-    id: '2354',
-    climable_flex: '50.00',
-  },
-  {
-    id: '1234',
-    climable_flex: '20.00',
-  },
-  {
-    id: '1523',
-    climable_flex: '80.00',
-  },
-];
+import useIncentives from '../../hooks/useIncentives';
 
 const RedeemRewards = () => {
   const { t } = useTranslation();
+  const [campaigns, setCampaigns] = useState<Array<IncentivesCampaign>>([]);
 
-  const [selectedCampaign, setSelectedCampaign] = useState<Campaign>(
-    INITITAL_STATE_CAMPAIGN[0]
-  );
+  const modifiedCampaigns = useIncentives();
 
-  const [flxAmount, setFLXAmount] = useState(
-    INITITAL_STATE_CAMPAIGN[0].climable_flex
-  );
+  const [flxAmount, setFLXAmount] = useState('0');
+
+  const { incentivesModel: incentivesState } = useStoreState((state) => state);
+
+  const { incentivesCampaignData } = incentivesState;
 
   const {
     incentivesModel: incentivesActions,
@@ -49,27 +35,52 @@ const RedeemRewards = () => {
     incentivesActions.setOperation(2);
   };
 
+  const returnFLX = (selectedCampaign: IncentivesCampaign) => {
+    if (!selectedCampaign) return 0;
+    const foundCampaign = modifiedCampaigns.find(
+      (cam: IIncentiveHook) => cam.id === selectedCampaign.id
+    );
+    console.log('====================================');
+    console.log(modifiedCampaigns);
+    console.log('====================================');
+
+    if (foundCampaign) {
+    }
+
+    setFLXAmount('30');
+  };
+
   const handleSelectedCampaign = (selected: string) => {
     const id = selected.split('#').pop();
-
-    const campaign = INITITAL_STATE_CAMPAIGN.find(
-      (campaign: Campaign) => campaign.id === id
-    );
-    if (campaign) {
-      setSelectedCampaign(campaign);
-      setFLXAmount(campaign.climable_flex);
+    if (campaigns.length > 0) {
+      const campaign = campaigns.find(
+        (campaign: IncentivesCampaign) => campaign.id === id
+      );
+      if (campaign) {
+        returnFLX(campaign);
+      }
     }
   };
+
+  useEffect(() => {
+    if (incentivesCampaignData) {
+      setCampaigns(incentivesCampaignData.allCampaigns);
+    }
+  }, [incentivesCampaignData]);
 
   return (
     <Body>
       <DropdownContainer>
         <Dropdown
-          items={INITITAL_STATE_CAMPAIGN.map(
-            (campaign: Campaign) => `Campaign #${campaign.id}`
+          items={campaigns.map(
+            (campaign: IncentivesCampaign) => `Campaign #${campaign.id}`
           )}
           getSelectedItem={handleSelectedCampaign}
-          itemSelected={`Campaign #${selectedCampaign.id}`}
+          itemSelected={
+            campaigns.length > 0
+              ? `Campaign #${campaigns[0].id}`
+              : 'Fetching Campaigns...'
+          }
           label={'Select Campaign'}
         />
       </DropdownContainer>
@@ -77,7 +88,7 @@ const RedeemRewards = () => {
       <DecimalInput
         label={'Claimable FLX'}
         value={flxAmount}
-        onChange={setFLXAmount}
+        onChange={() => {}}
         disabled
       />
 
