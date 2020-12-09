@@ -8,10 +8,13 @@ import { useActiveWeb3React } from '../../hooks';
 import { returnConnectorName } from '../../utils/helper';
 import Results from './Results';
 import { handleTransactionError } from '../../hooks/TransactionHooks';
+import useIncentives from '../../hooks/useIncentives';
 
 const IncentivesTransaction = () => {
   const { connector, account, library } = useActiveWeb3React();
   const { t } = useTranslation();
+
+  const { id, reserveRAI, reserveETH, coinTotalSupply } = useIncentives()[0];
 
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
 
@@ -24,12 +27,11 @@ const IncentivesTransaction = () => {
     type,
     incentivesFields,
     selectedCampaignId: campaignId,
+    uniPoolAmount,
   } = incentivesState;
 
   const handleBack = () => {
-    incentivesState.isLeaveLiquidityChecked
-      ? incentivesActions.setOperation(1)
-      : incentivesActions.setOperation(0);
+    incentivesActions.setOperation(0);
   };
 
   const handleWaitingTitle = () => {
@@ -44,7 +46,6 @@ const IncentivesTransaction = () => {
   const reset = () => {
     popupsActions.setIsIncentivesModalOpen(false);
     incentivesActions.setOperation(0);
-    incentivesActions.setIsLeaveLiquidityChecked(false);
     incentivesActions.setIncentivesFields({ ethAmount: '', raiAmount: '' });
   };
 
@@ -73,6 +74,20 @@ const IncentivesTransaction = () => {
           await incentivesActions.incentiveClaim({
             signer,
             campaignId,
+          });
+        }
+
+        if (type === 'withdraw') {
+          if (!id) {
+            throw new Error('No CampaignId specified');
+          }
+          await incentivesActions.incentiveWithdraw({
+            signer,
+            campaignId: id,
+            uniPoolAmount,
+            reserveRAI,
+            reserveETH,
+            coinTotalSupply,
           });
         }
 

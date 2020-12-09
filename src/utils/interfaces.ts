@@ -309,3 +309,11 @@ export interface IIncentiveClaim {
   signer: JsonRpcSigner;
   campaignId: string;
 }
+export interface IIncentiveWithdraw {
+  signer: JsonRpcSigner;
+  campaignId: string;
+  uniPoolAmount: string;
+  reserveRAI: string;
+  reserveETH: string;
+  coinTotalSupply: string;
+}

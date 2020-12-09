@@ -15,7 +15,6 @@ const PoolTokens = () => {
     (state) => state
   );
   const handleCancel = () => {
-    incentivesActions.setIsLeaveLiquidityChecked(false);
     incentivesActions.setOperation(0);
   };
 

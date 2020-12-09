@@ -6,7 +6,7 @@ import { IIncentiveHook } from '../../utils/interfaces';
 import Button from '../Button';
 import DecimalInput from '../DecimalInput';
 import Dropdown from '../Dropdown';
-import useIncentives from '../../hooks/useIncentives';
+import useIncentives, { returnFLX } from '../../hooks/useIncentives';
 import { useOnceCall } from '../../hooks/useOnceCall';
 import { formatNumber } from '../../utils/helper';
 
@@ -47,85 +47,12 @@ const RedeemRewards = () => {
     }
   };
 
-  const rewardPerToken = (incentiveCampaign: IIncentiveHook) => {
-    if (!incentiveCampaign) return 0;
-    const now = Math.floor(Date.now() / 1000);
-    const finish = Number(
-      incentiveCampaign.startTime + incentiveCampaign.duration
-    );
-
-    const lastTimeRewardApplicable = Math.min(
-      Math.max(now, Number(incentiveCampaign.startTime)),
-      finish
-    );
-
-    if (
-      Number(incentiveCampaign.totalSupply) === 0 ||
-      Number(incentiveCampaign.lastUpdatedTime) === lastTimeRewardApplicable
-    ) {
-      return Number(incentiveCampaign.rewardPerTokenStored);
-    }
-
-    return (
-      Number(incentiveCampaign.rewardPerTokenStored) +
-      ((lastTimeRewardApplicable - Number(incentiveCampaign.lastUpdatedTime)) * // Delta time
-        Number(incentiveCampaign.rewardRate)) /
-        Number(incentiveCampaign.totalSupply)
-    );
-  };
-
-  const earned = (incentiveCampaign: IIncentiveHook) => {
-    return (
-      Number(incentiveCampaign.IB_reward) +
-      (Number(rewardPerToken(incentiveCampaign)) -
-        Number(incentiveCampaign.IB_userRewardPerTokenPaid)) *
-        Number(incentiveCampaign.stakedBalance)
-    );
-  };
-
-  const currentlyClaimableReward = (incentiveCampaign: IIncentiveHook) => {
-    const now = Math.floor(Date.now() / 1000);
-    return (
-      earned(incentiveCampaign) *
-        Number(incentiveCampaign.instantExitPercentage) + // Part accruing during the campaign (instant claim part)
-      (Math.max(
-        now - Number(incentiveCampaign.IB_delayedRewardLatestExitTime),
-        0
-      ) * // Total already unlocked from the vesting
-        Number(incentiveCampaign.IB_delayedRewardTotalAmount)) /
-        Number(incentiveCampaign.rewardDelay) -
-      Number(incentiveCampaign.IB_delayedRewardExitedAmount) // Locked part already paid out
-    );
-  };
-
-  const currentlyLockedReward = (incentiveCampaign: IIncentiveHook) => {
-    return (
-      earned(incentiveCampaign) *
-        (1 - Number(incentiveCampaign.instantExitPercentage)) + // Part accruing during the campaign
-      Number(incentiveCampaign.IB_delayedRewardTotalAmount) - // Part locked already accounted
-      Number(incentiveCampaign.IB_delayedRewardExitedAmount)
-    ); // Subtracts locked tokens already claimed
-  };
-
-  const returnFLX = (campaign: IIncentiveHook) => {
+  const getResultData = (campaign: IIncentiveHook) => {
     if (!campaign) return;
-
-    const selectedCampaign = campaigns.find(
-      (cam: IIncentiveHook) => cam.id === campaign.id
-    );
-
-    if (selectedCampaign) {
-      setResultData({
-        flxAmount: currentlyClaimableReward(selectedCampaign).toString(),
-        lockedReward: currentlyLockedReward(selectedCampaign).toString(),
-        start: selectedCampaign.unlockUntil,
-        end: selectedCampaign.campaignEndTime,
-      });
-      incentivesActions.setClaimableFLX(
-        currentlyClaimableReward(selectedCampaign).toString()
-      );
-      incentivesActions.setSelectedCampaignId(selectedCampaign.id);
-    }
+    const result = returnFLX(campaign);
+    setResultData(result);
+    incentivesActions.setClaimableFLX(result.flxAmount);
+    incentivesActions.setSelectedCampaignId(campaign.id);
   };
 
   const handleSelectedCampaign = (selected: string) => {
@@ -135,13 +62,13 @@ const RedeemRewards = () => {
         (campaign: IIncentiveHook) => campaign.id === id
       );
       if (campaign) {
-        returnFLX(campaign);
+        getResultData(campaign);
       }
     }
   };
 
   useOnceCall(() => {
-    returnFLX(campaigns[0]);
+    getResultData(campaigns[0]);
   }, campaigns[0].id !== '');
 
   return (

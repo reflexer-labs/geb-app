@@ -20,9 +20,7 @@ const IncentivesOperations = () => {
     switch (incentivesState.operation) {
       case 0:
         return incentivesState.type !== 'claim' ? (
-          <IncentivesPayment
-            isChecked={incentivesState.isLeaveLiquidityChecked}
-          />
+          <IncentivesPayment />
         ) : (
           <RedeemRewards />
         );

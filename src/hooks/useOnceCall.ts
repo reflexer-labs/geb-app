@@ -1,9 +1,8 @@
-import React from 'react';
+import { useEffect, useRef } from 'react';
 
 export function useOnceCall(cb: () => void, condition = true) {
-  const isCalledRef = React.useRef(false);
-
-  React.useEffect(() => {
+  const isCalledRef = useRef(false);
+  useEffect(() => {
     if (condition && !isCalledRef.current) {
       isCalledRef.current = true;
       cb();

@@ -3,6 +3,7 @@ import { StoreModel } from '.';
 import {
   handleIncentiveClaim,
   handleIncentiveDeposit,
+  handleIncentiveWithdraw,
 } from '../services/blockchain';
 import { fetchIncentivesCampaigns } from '../services/graphql';
 import {
@@ -10,6 +11,7 @@ import {
   IIncentivesCampaignData,
   IIncentivesFields,
   IIncentiveClaim,
+  IIncentiveWithdraw,
 } from '../utils/interfaces';
 
 const INITIAL_STATE = {
@@ -21,28 +23,34 @@ export interface IncentivesModel {
   type: string;
   claimableFLX: string;
   selectedCampaignId: string;
+  uniPoolAmount: string;
   incentivesFields: IIncentivesFields;
   incentivesCampaignData: IIncentivesCampaignData | null;
-  isLeaveLiquidityChecked: boolean;
   fetchIncentivesCampaigns: Thunk<IncentivesModel, string, any, StoreModel>;
   incentiveDeposit: Thunk<IncentivesModel, IIncentivePayload, any, StoreModel>;
   incentiveClaim: Thunk<IncentivesModel, IIncentiveClaim, any, StoreModel>;
+  incentiveWithdraw: Thunk<
+    IncentivesModel,
+    IIncentiveWithdraw,
+    any,
+    StoreModel
+  >;
   setOperation: Action<IncentivesModel, number>;
   setType: Action<IncentivesModel, string>;
-  setIsLeaveLiquidityChecked: Action<IncentivesModel, boolean>;
   setIncentivesCampaignData: Action<IncentivesModel, IIncentivesCampaignData>;
   setIncentivesFields: Action<IncentivesModel, IIncentivesFields>;
   setClaimableFLX: Action<IncentivesModel, string>;
   setSelectedCampaignId: Action<IncentivesModel, string>;
+  setUniPoolAmount: Action<IncentivesModel, string>;
 }
 const incentivesModel: IncentivesModel = {
   operation: 0,
   type: 'withdraw',
   incentivesFields: INITIAL_STATE,
   claimableFLX: '0.00',
+  uniPoolAmount: '',
   incentivesCampaignData: null,
   selectedCampaignId: '',
-  isLeaveLiquidityChecked: false,
   setOperation: action((state, payload) => {
     state.operation = payload;
   }),
@@ -121,11 +129,31 @@ const incentivesModel: IncentivesModel = {
       await txResponse.wait();
     }
   }),
+  incentiveWithdraw: thunk(async (actions, payload, { getStoreActions }) => {
+    const storeActions = getStoreActions();
+    const txResponse = await handleIncentiveWithdraw(payload);
+    if (txResponse) {
+      const { hash, chainId } = txResponse;
+      storeActions.transactionsModel.addTransaction({
+        chainId,
+        hash,
+        from: txResponse.from,
+        summary: 'Incentive Withdraw',
+        addedTime: new Date().getTime(),
+        originalTx: txResponse,
+      });
+      storeActions.popupsModel.setIsWaitingModalOpen(true);
+      storeActions.popupsModel.setWaitingPayload({
+        title: 'Transaction Submitted',
+        hash: txResponse.hash,
+        status: 'success',
+      });
+      actions.setUniPoolAmount('');
+      await txResponse.wait();
+    }
+  }),
   setType: action((state, payload) => {
     state.type = payload;
-  }),
-  setIsLeaveLiquidityChecked: action((state, payload) => {
-    state.isLeaveLiquidityChecked = payload;
   }),
   setIncentivesCampaignData: action((state, payload) => {
     state.incentivesCampaignData = payload;
@@ -138,6 +166,9 @@ const incentivesModel: IncentivesModel = {
   }),
   setSelectedCampaignId: action((state, payload) => {
     state.selectedCampaignId = payload;
+  }),
+  setUniPoolAmount: action((state, payload) => {
+    state.uniPoolAmount = payload;
   }),
 };
 

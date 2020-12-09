@@ -1,7 +1,12 @@
 import { BigNumberish, utils as ethersUtils } from 'ethers';
 import { Geb, TransactionRequest, utils as gebUtils } from 'geb.js';
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
-import { IIncentivesFields, ISafe, ISafeData } from '../utils/interfaces';
+import {
+  IIncentivesFields,
+  IIncentiveWithdraw,
+  ISafe,
+  ISafeData,
+} from '../utils/interfaces';
 import { ETH_NETWORK } from '../utils/constants';
 import { handlePreTxGasEstimate } from '../hooks/TransactionHooks';
 
@@ -169,9 +174,9 @@ export const handleIncentiveDeposit = async (
 
 export const handleIncentiveClaim = async (
   signer: JsonRpcSigner,
-  camaignId: string
+  campaignId: string
 ) => {
-  if (!signer || !camaignId) {
+  if (!signer || !campaignId) {
     return false;
   }
 
@@ -179,12 +184,64 @@ export const handleIncentiveClaim = async (
 
   const proxy = await geb.getProxyAction(signer._address);
 
-  const txData = proxy.getRewards(camaignId);
+  const txData = proxy.getRewards(campaignId);
 
   if (!txData) throw new Error('No transaction request!');
 
   const tx = await handlePreTxGasEstimate(signer, txData);
 
+  const txResponse = await signer.sendTransaction(tx);
+  return txResponse;
+};
+
+export const handleIncentiveWithdraw = async ({
+  signer,
+  campaignId,
+  uniPoolAmount,
+  reserveRAI,
+  reserveETH,
+  coinTotalSupply,
+}: IIncentiveWithdraw) => {
+  if (
+    !signer ||
+    !campaignId ||
+    !uniPoolAmount ||
+    !reserveRAI ||
+    !reserveETH ||
+    !coinTotalSupply
+  ) {
+    console.log(uniPoolAmount);
+    console.log(reserveRAI);
+    console.log(reserveETH);
+    console.log(coinTotalSupply);
+    return false;
+  }
+  const uniPoolAmountBN = ethersUtils.parseEther(uniPoolAmount);
+  const coinTotalSupplyBN = ethersUtils.parseEther(coinTotalSupply);
+  const reserveRAIBN = ethersUtils.parseEther(reserveRAI);
+  const reserveETHBN = ethersUtils.parseEther(reserveETH);
+
+  const geb = new Geb(ETH_NETWORK, signer.provider);
+  const proxy = await geb.getProxyAction(signer._address);
+
+  const left = uniPoolAmountBN
+    .mul(reserveRAIBN.div(coinTotalSupplyBN))
+    .mul(9)
+    .div(10);
+  const right = uniPoolAmountBN
+    .mul(reserveETHBN.div(coinTotalSupplyBN))
+    .mul(9)
+    .div(10);
+
+  const minTokenAmounts: [BigNumberish, BigNumberish] = [left, right];
+
+  const txData = proxy.withdrawHarvestRemoveLiquidity(
+    uniPoolAmountBN,
+    campaignId,
+    minTokenAmounts
+  );
+  if (!txData) throw new Error('No transaction request!');
+  const tx = await handlePreTxGasEstimate(signer, txData);
   const txResponse = await signer.sendTransaction(tx);
   return txResponse;
 };

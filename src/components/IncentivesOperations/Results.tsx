@@ -1,19 +1,29 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import numeral from 'numeral';
 import styled from 'styled-components';
-import useIncentives from '../../hooks/useIncentives';
+import useIncentives, { returnFLX } from '../../hooks/useIncentives';
 import { useStoreState } from '../../store';
 import { COIN_TICKER } from '../../utils/constants';
 import { formatNumber } from '../../utils/helper';
+import { useOnceCall } from '../../hooks/useOnceCall';
 
 const Results = () => {
+  const campaign = useIncentives()[0];
   const {
     id,
     reserveETH,
     reserveRAI,
     totalSupply,
     rewardRate,
-  } = useIncentives()[0];
+    coinTotalSupply,
+  } = campaign;
+  const [resultData, setResultData] = useState({
+    flxAmount: '',
+    lockedReward: '0',
+    start: 'N/A',
+    end: 'N/A',
+  });
+
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
   const { type, incentivesFields, claimableFLX } = incentivesState;
 
@@ -65,6 +75,34 @@ const Results = () => {
     );
   }, [returnShareOfIncentivePool, rewardRate]);
 
+  const returnRAIWithdrawn = useCallback(() => {
+    if (
+      !reserveRAI ||
+      !coinTotalSupply ||
+      Number(reserveRAI) === 0 ||
+      Number(coinTotalSupply) === 0
+    )
+      return 0;
+    const value = numeral(reserveRAI).divide(coinTotalSupply).value();
+    return formatNumber(value.toString());
+  }, [reserveRAI, coinTotalSupply]);
+
+  const returnETHWithdrawn = useCallback(() => {
+    if (
+      !reserveETH ||
+      !coinTotalSupply ||
+      Number(reserveETH) === 0 ||
+      Number(coinTotalSupply) === 0
+    )
+      return 0;
+    const value = numeral(reserveETH).divide(coinTotalSupply).value();
+    return formatNumber(value.toString());
+  }, [reserveETH, coinTotalSupply]);
+
+  useOnceCall(() => {
+    setResultData(returnFLX(campaign));
+  }, campaign.id !== '');
+
   return (
     <Result>
       {type === 'claim' ? (
@@ -77,40 +115,42 @@ const Results = () => {
       ) : (
         <>
           <Block>
-            <Item>
-              <Label>{`${COIN_TICKER} per ETH`}</Label>
-              <Value>{returnCoinPerCoin(false)}</Value>
-            </Item>
-            <Item>
-              <Label>{`ETH per ${COIN_TICKER}`}</Label>{' '}
-              <Value>{returnCoinPerCoin()}</Value>
-            </Item>
-            <Item>
-              <Label>{'Share of Uniswap Pool'}</Label>{' '}
-              <Value>{returnShareOfUniswapPool()}</Value>
-            </Item>
-            <Item>
-              <Label>{'Share of Incentives Pool'}</Label>{' '}
-              <Value>{returnShareOfIncentivePool()}</Value>
-            </Item>
-
             {type === 'withdraw' ? (
               <>
                 <Item>
-                  <Label>{'Rewards Received Now'}</Label>{' '}
-                  <Value>{'0.00'}</Value>
+                  <Label>{'ETH Withdrawn'}</Label>{' '}
+                  <Value>{returnETHWithdrawn()}</Value>
                 </Item>
                 <Item>
-                  <Label>{'Rewards to Unlock'}</Label> <Value>{'0.00'}</Value>
+                  <Label>{'RAI Withdrawn'}</Label>{' '}
+                  <Value>{returnRAIWithdrawn()}</Value>
                 </Item>
                 <Item>
-                  <Label>{'Unlock Time'}</Label> <Value>{'0.00'}</Value>
+                  <Label>{'FLX Rewards Claimed Now'}</Label>{' '}
+                  <Value>{formatNumber(resultData.flxAmount)}</Value>
+                </Item>
+                <Item>
+                  <Label>{'Locked Rewards'}</Label>{' '}
+                  <Value>{formatNumber(resultData.lockedReward)}</Value>
                 </Item>
               </>
             ) : (
               <>
                 <Item>
-                  <Label>{'Campaign #'}</Label> <Value>{id}</Value>
+                  <Label>{`${COIN_TICKER} per ETH`}</Label>
+                  <Value>{returnCoinPerCoin(false)}</Value>
+                </Item>
+                <Item>
+                  <Label>{`ETH per ${COIN_TICKER}`}</Label>{' '}
+                  <Value>{returnCoinPerCoin()}</Value>
+                </Item>
+                <Item>
+                  <Label>{'Share of Uniswap Pool'}</Label>{' '}
+                  <Value>{returnShareOfUniswapPool()}</Value>
+                </Item>
+                <Item>
+                  <Label>{'Share of Incentives Pool'}</Label>{' '}
+                  <Value>{returnShareOfIncentivePool()}</Value>
                 </Item>
                 <Item>
                   <Label>{'FLX per Day'}</Label>{' '}
@@ -118,6 +158,9 @@ const Results = () => {
                 </Item>
               </>
             )}
+            <Item>
+              <Label>{'Campaign #'}</Label> <Value>{id}</Value>
+            </Item>
           </Block>
         </>
       )}

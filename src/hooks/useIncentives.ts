@@ -282,3 +282,81 @@ export default function useIncentives() {
 
   return state;
 }
+
+export const rewardPerToken = (incentiveCampaign: IIncentiveHook) => {
+  if (!incentiveCampaign) return 0;
+  const now = Math.floor(Date.now() / 1000);
+  const finish = Number(
+    incentiveCampaign.startTime + incentiveCampaign.duration
+  );
+
+  const lastTimeRewardApplicable = Math.min(
+    Math.max(now, Number(incentiveCampaign.startTime)),
+    finish
+  );
+
+  if (
+    Number(incentiveCampaign.totalSupply) === 0 ||
+    Number(incentiveCampaign.lastUpdatedTime) === lastTimeRewardApplicable
+  ) {
+    return Number(incentiveCampaign.rewardPerTokenStored);
+  }
+
+  return (
+    Number(incentiveCampaign.rewardPerTokenStored) +
+    ((lastTimeRewardApplicable - Number(incentiveCampaign.lastUpdatedTime)) * // Delta time
+      Number(incentiveCampaign.rewardRate)) /
+      Number(incentiveCampaign.totalSupply)
+  );
+};
+
+export const earned = (incentiveCampaign: IIncentiveHook) => {
+  return (
+    Number(incentiveCampaign.IB_reward) +
+    (Number(rewardPerToken(incentiveCampaign)) -
+      Number(incentiveCampaign.IB_userRewardPerTokenPaid)) *
+      Number(incentiveCampaign.stakedBalance)
+  );
+};
+
+export const currentlyClaimableReward = (incentiveCampaign: IIncentiveHook) => {
+  const now = Math.floor(Date.now() / 1000);
+  return (
+    earned(incentiveCampaign) *
+      Number(incentiveCampaign.instantExitPercentage) + // Part accruing during the campaign (instant claim part)
+    (Math.max(
+      now - Number(incentiveCampaign.IB_delayedRewardLatestExitTime),
+      0
+    ) * // Total already unlocked from the vesting
+      Number(incentiveCampaign.IB_delayedRewardTotalAmount)) /
+      Number(incentiveCampaign.rewardDelay) -
+    Number(incentiveCampaign.IB_delayedRewardExitedAmount) // Locked part already paid out
+  );
+};
+
+export const currentlyLockedReward = (incentiveCampaign: IIncentiveHook) => {
+  return (
+    earned(incentiveCampaign) *
+      (1 - Number(incentiveCampaign.instantExitPercentage)) + // Part accruing during the campaign
+    Number(incentiveCampaign.IB_delayedRewardTotalAmount) - // Part locked already accounted
+    Number(incentiveCampaign.IB_delayedRewardExitedAmount)
+  ); // Subtracts locked tokens already claimed
+};
+
+export const returnFLX = (campaign: IIncentiveHook) => {
+  if (!campaign) {
+    return {
+      flxAmount: '',
+      lockedReward: '0',
+      start: 'N/A',
+      end: 'N/A',
+    };
+  }
+
+  return {
+    flxAmount: currentlyClaimableReward(campaign).toString(),
+    lockedReward: currentlyLockedReward(campaign).toString(),
+    start: campaign.unlockUntil,
+    end: campaign.campaignEndTime,
+  };
+};

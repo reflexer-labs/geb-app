@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
 import { COIN_TICKER } from '../../utils/constants';
 import Button from '../Button';
-import CheckBox from '../CheckBox';
 import DecimalInput from '../DecimalInput';
 import Dropdown from '../Dropdown';
 import { formatNumber, toFixedString } from '../../utils/helper';
@@ -22,19 +21,19 @@ const INITITAL_STATE = [
   { item: 'RAI/ETH', img: require('../../assets/rai.png') },
 ];
 
-interface Props {
-  isChecked?: boolean;
-}
-
-const IncentivesPayment = ({ isChecked }: Props) => {
+const IncentivesPayment = () => {
   const { t } = useTranslation();
-  const { token0, token1Price, token0Price, coinAddress } = useIncentives()[0];
+  const {
+    token0,
+    token1Price,
+    token0Price,
+    coinAddress,
+    stakedBalance,
+  } = useIncentives()[0];
   const [ethAmount, setEthAmount] = useState('');
   const [raiAmount, setRaiAmount] = useState('');
   const [error, setError] = useState('');
   const [uniPool, setUniPool] = useState('');
-  const [cashRewardsCheck, setCashRewardsCheck] = useState(false);
-  const [leaveLiquidity, setLeaveLiquidity] = useState(isChecked || false);
 
   const {
     incentivesModel: incentivesState,
@@ -46,7 +45,7 @@ const IncentivesPayment = ({ isChecked }: Props) => {
     popupsModel: popupsActions,
   } = useStoreActions((state) => state);
 
-  const { type, incentivesFields } = incentivesState;
+  const { type, incentivesFields, uniPoolAmount } = incentivesState;
 
   const ethBalance = connectWalletState.ethBalance[NETWORK_ID];
   const praiBalance = connectWalletState.praiBalance[NETWORK_ID];
@@ -88,6 +87,27 @@ const IncentivesPayment = ({ isChecked }: Props) => {
       }
     }
 
+    if (type === 'withdraw') {
+      const uniPoolBN = uniPool
+        ? BigNumber.from(toFixedString(uniPool, 'WAD'))
+        : BigNumber.from('0');
+      const stakedBalanceBN = stakedBalance
+        ? BigNumber.from(toFixedString(stakedBalance, 'WAD'))
+        : BigNumber.from('0');
+
+      if (uniPoolBN.isZero()) {
+        setError(`Please enter the amount of UniPool to withdraw`);
+        return;
+      }
+
+      if (uniPoolBN.gt(stakedBalanceBN)) {
+        setError(
+          `UniPool withdrawn amount cannot exceed available Staked Balance, Click on Max to get the available Staked Balance to be withdrawn`
+        );
+        return;
+      }
+    }
+
     return true;
   };
 
@@ -113,19 +133,12 @@ const IncentivesPayment = ({ isChecked }: Props) => {
   const handleSubmit = () => {
     const isPassedValidation = validationChecker();
     if (isPassedValidation) {
-      if (leaveLiquidity) {
-        incentivesActions.setOperation(1);
-      } else if (type === 'deposit' && !passedCheckForCoinAllowance()) {
+      if (type === 'deposit' && !passedCheckForCoinAllowance()) {
         incentivesActions.setOperation(2);
       } else {
         incentivesActions.setOperation(3);
       }
     }
-  };
-
-  const handleLeaveLiquidityCheck = (state: boolean) => {
-    setLeaveLiquidity(state);
-    incentivesActions.setIsLeaveLiquidityChecked(state);
   };
 
   const handleChange = (val: string, isEth = true) => {
@@ -169,10 +182,19 @@ const IncentivesPayment = ({ isChecked }: Props) => {
     setEthAmount(ethVal);
   };
 
+  const handleUniPoolChange = (val: string) => {
+    setUniPool(val);
+    incentivesActions.setUniPoolAmount(val);
+  };
+
   useEffect(() => {
     setEthAmount(incentivesFields.ethAmount);
     setRaiAmount(incentivesFields.raiAmount);
   }, [incentivesFields]);
+
+  useEffect(() => {
+    setUniPool(uniPoolAmount);
+  }, [uniPoolAmount]);
 
   return (
     <Body>
@@ -194,10 +216,10 @@ const IncentivesPayment = ({ isChecked }: Props) => {
       {incentivesState.type === 'withdraw' ? (
         <SingleInput>
           <DecimalInput
-            label={`UNI Pool Tokens (Avail 0)`}
+            label={`UNI Pool Tokens (Avail ${formatNumber(stakedBalance)})`}
             value={uniPool}
-            onChange={setUniPool}
-            disableMax
+            onChange={handleUniPoolChange}
+            handleMaxClick={() => handleUniPoolChange(stakedBalance)}
           />
         </SingleInput>
       ) : (
@@ -224,30 +246,12 @@ const IncentivesPayment = ({ isChecked }: Props) => {
 
       <Results />
 
-      {incentivesState.type === 'withdraw' ? (
-        <>
-          <CheckBoxcontainer>
-            <Text>{t('checkout_rewards')}</Text>
-            <CheckBox
-              checked={cashRewardsCheck}
-              onChange={setCashRewardsCheck}
-            />
-          </CheckBoxcontainer>
-          <CheckBoxcontainer className={'adjust-margin'}>
-            <Text>{t('leave_liquidity')}</Text>
-            <CheckBox
-              checked={leaveLiquidity}
-              onChange={handleLeaveLiquidityCheck}
-            />
-          </CheckBoxcontainer>
-        </>
-      ) : null}
       <Footer>
         <Button dimmed text={t('cancel')} onClick={handleCancel} />
         <Button
           withArrow
           onClick={handleSubmit}
-          text={t(leaveLiquidity ? 'pool_tokens' : 'review_transaction')}
+          text={t('review_transaction')}
         />
       </Footer>
     </Body>
@@ -316,22 +320,6 @@ const DoubleInput = styled.div`
       }
     }
   `}
-`;
-
-const CheckBoxcontainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  &.adjust-margin {
-    margin-top: 5px;
-  }
-`;
-
-const Text = styled.div`
-  line-height: 18px;
-  letter-spacing: -0.18px;
-  color: ${(props) => props.theme.colors.secondary};
-  font-size: ${(props) => props.theme.font.extraSmall};
 `;
 
 const SingleInput = styled.div`
