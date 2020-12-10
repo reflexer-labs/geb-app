@@ -317,3 +317,7 @@ export interface IIncentiveWithdraw {
   reserveETH: string;
   coinTotalSupply: string;
 }
+
+export interface NumberMap {
+  [key: string]: number;
+}

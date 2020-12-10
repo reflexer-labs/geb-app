@@ -4,11 +4,15 @@ import numeral from 'numeral';
 import { useEffect, useState } from 'react';
 import { useActiveWeb3React } from '.';
 import { useStoreState } from '../store';
-import { formatNumber } from '../utils/helper';
-import { IIncentiveHook, IncentivesCampaign } from '../utils/interfaces';
+import { formatNumber, numberizeString } from '../utils/helper';
+import {
+  IIncentiveHook,
+  IncentivesCampaign,
+  NumberMap,
+} from '../utils/interfaces';
 import _ from '../utils/lodash';
 
-const INITIAL_STATE = [
+export const INITIAL_INCENTIVE_STATE = [
   {
     id: '',
     duration: '',
@@ -49,7 +53,9 @@ const INITIAL_STATE = [
 
 export default function useIncentives() {
   const { account, chainId } = useActiveWeb3React();
-  const [state, setState] = useState<Array<IIncentiveHook>>(INITIAL_STATE);
+  const [state, setState] = useState<Array<IIncentiveHook>>(
+    INITIAL_INCENTIVE_STATE
+  );
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
   const { incentivesCampaignData } = incentivesState;
 
@@ -283,67 +289,232 @@ export default function useIncentives() {
   return state;
 }
 
-export const rewardPerToken = (incentiveCampaign: IIncentiveHook) => {
-  if (!incentiveCampaign) return 0;
+const rewardPerToken = (incentiveCampaign: NumberMap) => {
   const now = Math.floor(Date.now() / 1000);
-  const finish = Number(
-    incentiveCampaign.startTime + incentiveCampaign.duration
-  );
-
+  const finish = incentiveCampaign.startTime + incentiveCampaign.duration;
   const lastTimeRewardApplicable = Math.min(
-    Math.max(now, Number(incentiveCampaign.startTime)),
+    Math.max(now, incentiveCampaign.startTime),
     finish
   );
 
   if (
-    Number(incentiveCampaign.totalSupply) === 0 ||
-    Number(incentiveCampaign.lastUpdatedTime) === lastTimeRewardApplicable
+    incentiveCampaign.totalSupply === 0 ||
+    incentiveCampaign.lastUpdatedTime === lastTimeRewardApplicable
   ) {
-    return Number(incentiveCampaign.rewardPerTokenStored);
+    return incentiveCampaign.rewardPerTokenStored;
   }
 
   return (
-    Number(incentiveCampaign.rewardPerTokenStored) +
-    ((lastTimeRewardApplicable - Number(incentiveCampaign.lastUpdatedTime)) * // Delta time
-      Number(incentiveCampaign.rewardRate)) /
-      Number(incentiveCampaign.totalSupply)
+    incentiveCampaign.rewardPerTokenStored +
+    ((lastTimeRewardApplicable - incentiveCampaign.lastUpdatedTime) * // Delta time
+      incentiveCampaign.rewardRate) /
+      incentiveCampaign.totalSupply
   );
 };
 
-export const earned = (incentiveCampaign: IIncentiveHook) => {
+// JS implementation of:
+// https://github.com/reflexer-labs/geb-incentives/blob/1c3ad62bdf8af205eaf2f120e1bbfaafcdb08e9e/src%2Funiswap%2FRollingDistributionIncentives.sol#L251
+const earned = (incentiveCampaign: NumberMap, incentiveBalance: NumberMap) => {
   return (
-    Number(incentiveCampaign.IB_reward) +
-    (Number(rewardPerToken(incentiveCampaign)) -
-      Number(incentiveCampaign.IB_userRewardPerTokenPaid)) *
-      Number(incentiveCampaign.stakedBalance)
+    incentiveBalance.reward +
+    (rewardPerToken(incentiveCampaign) -
+      incentiveBalance.userRewardPerTokenPaid) *
+      incentiveBalance.stakedBalance
   );
 };
 
-export const currentlyClaimableReward = (incentiveCampaign: IIncentiveHook) => {
+// Gets the value that this function would transfer
+// https://github.com/reflexer-labs/geb-incentives/blob/226436659295ba5fb485ffea5fa734606538e354/src%2Funiswap%2FRollingDistributionIncentives.sol#L309
+const getLockedReward = (
+  incentiveCampaign: NumberMap,
+  incentiveBalance: NumberMap
+) => {
+  const finish = incentiveCampaign.startTime + incentiveCampaign.duration;
   const now = Math.floor(Date.now() / 1000);
-  return (
-    earned(incentiveCampaign) *
-      Number(incentiveCampaign.instantExitPercentage) + // Part accruing during the campaign (instant claim part)
-    (Math.max(
-      now - Number(incentiveCampaign.IB_delayedRewardLatestExitTime),
-      0
-    ) * // Total already unlocked from the vesting
-      Number(incentiveCampaign.IB_delayedRewardTotalAmount)) /
-      Number(incentiveCampaign.rewardDelay) -
-    Number(incentiveCampaign.IB_delayedRewardExitedAmount) // Locked part already paid out
-  );
+  const timeElapsedSinceLastExit =
+    now - incentiveBalance.delayedRewardLatestExitTime;
+
+  if (now < finish) {
+    // Note: The equivalent solidity function would throw here
+    return 0;
+  } else if (now >= finish + incentiveCampaign.rewardDelay) {
+    return (
+      incentiveBalance.delayedRewardTotalAmount -
+      incentiveBalance.delayedRewardExitedAmount
+    );
+  } else {
+    return (
+      (incentiveBalance.delayedRewardTotalAmount * timeElapsedSinceLastExit) /
+      incentiveCampaign.rewardDelay
+    );
+  }
 };
 
-export const currentlyLockedReward = (incentiveCampaign: IIncentiveHook) => {
-  return (
-    earned(incentiveCampaign) *
-      (1 - Number(incentiveCampaign.instantExitPercentage)) + // Part accruing during the campaign
-    Number(incentiveCampaign.IB_delayedRewardTotalAmount) - // Part locked already accounted
-    Number(incentiveCampaign.IB_delayedRewardExitedAmount)
-  ); // Subtracts locked tokens already claimed
+// Get the approximate amount of reward that can be claimed if we would call proxy.getReward.
+// https://github.com/reflexer-labs/geb-incentives/blob/226436659295ba5fb485ffea5fa734606538e354/src%2Funiswap%2FRollingDistributionIncentives.sol#L344
+const getReward = (
+  incentiveCampaign: NumberMap,
+  incentiveBalance: NumberMap
+) => {
+  const now = Math.floor(Date.now() / 1000);
+  const totalReward = earned(incentiveCampaign, incentiveBalance);
+  const instantReward = totalReward * incentiveCampaign.instantExitPercentage;
+  const totalDelayedReward = totalReward - instantReward;
+
+  let ret = 0;
+
+  if (totalDelayedReward > 0) {
+    const finish = incentiveCampaign.startTime + incentiveCampaign.duration;
+
+    // We make a shallow copy because we need to alter the balance
+    const incentiveBalanceCopy: NumberMap = {
+      ...incentiveBalance,
+    };
+
+    if (incentiveBalance.delayedRewardTotalAmount === 0) {
+      incentiveBalanceCopy.delayedRewardLatestExitTime = finish;
+    }
+    incentiveBalanceCopy.delayedRewardTotalAmount += totalDelayedReward;
+
+    if (finish < now) {
+      ret += getLockedReward(incentiveCampaign, incentiveBalanceCopy);
+    }
+  }
+
+  if (instantReward > 0) {
+    ret += instantReward;
+  }
+  return ret;
+};
+
+// Copy of the proxy action
+// https://github.com/reflexer-labs/geb-proxy-actions/blob/ba5d0bf20dea2c955f1498395d920df77fa315de/src%2FGebProxyActions.sol#L1819
+const currentlyClaimableReward = (
+  incentiveCampaign: NumberMap,
+  incentiveBalance: NumberMap
+) => {
+  if (earned(incentiveCampaign, incentiveBalance) > 0) {
+    return getReward(incentiveCampaign, incentiveBalance);
+  } else {
+    return getLockedReward(incentiveCampaign, incentiveBalance);
+  }
+};
+
+// Get the currently lock amount to be unlock overtime
+const currentlyLockedReward = (
+  incentiveCampaign: NumberMap,
+  incentiveBalance: NumberMap
+) => {
+  const finish = incentiveCampaign.startTime + incentiveCampaign.duration;
+  const now = Math.floor(Date.now() / 1000);
+
+  const earn = earned(incentiveCampaign, incentiveBalance);
+  const earnDelayedReward =
+    earn * (1 - incentiveCampaign.instantExitPercentage);
+
+  if (now >= finish + incentiveCampaign.rewardDelay) {
+    // We are fully vested
+    return 0;
+  } else if (now < finish) {
+    // We are before any vesting started (campaign still ongoing)
+    return earnDelayedReward + incentiveBalance.delayedRewardTotalAmount;
+  } else {
+    // In the middle of vesting
+    const totalDelayedReward =
+      earnDelayedReward + incentiveBalance.delayedRewardTotalAmount;
+    const vestedDelayedReward =
+      ((now - finish) * totalDelayedReward) / incentiveCampaign.rewardDelay;
+    return totalDelayedReward - vestedDelayedReward;
+  }
+};
+
+export const destructureCampaign = (campaign: NumberMap) => {
+  const {
+    duration,
+    id,
+    instantExitPercentage,
+    lastUpdatedTime,
+    reward,
+    rewardDelay,
+    rewardPerTokenStored,
+    rewardRate,
+    startTime,
+    totalSupply,
+    IB_delayedRewardExitedAmount,
+    IB_delayedRewardLatestExitTime,
+    IB_delayedRewardTotalAmount,
+    IB_reward,
+    stakedBalance,
+    IB_userRewardPerTokenPaid,
+  } = campaign;
+
+  const incentiveCampaignStructure = {
+    duration,
+    id,
+    instantExitPercentage,
+    lastUpdatedTime,
+    reward,
+    rewardDelay,
+    rewardPerTokenStored,
+    rewardRate,
+    startTime,
+    totalSupply,
+  };
+  const IncentiveBalanceStructure = {
+    delayedRewardExitedAmount: IB_delayedRewardExitedAmount,
+    delayedRewardLatestExitTime: IB_delayedRewardLatestExitTime,
+    delayedRewardTotalAmount: IB_delayedRewardTotalAmount,
+    reward: IB_reward,
+    stakedBalance,
+    userRewardPerTokenPaid: IB_userRewardPerTokenPaid,
+  };
+  return {
+    incentiveCampaignStructure,
+    IncentiveBalanceStructure,
+  };
 };
 
 export const returnFLX = (campaign: IIncentiveHook) => {
+  const {
+    duration,
+    id,
+    instantExitPercentage,
+    lastUpdatedTime,
+    reward,
+    rewardDelay,
+    rewardPerTokenStored,
+    rewardRate,
+    startTime,
+    totalSupply,
+    IB_delayedRewardExitedAmount,
+    IB_delayedRewardLatestExitTime,
+    IB_delayedRewardTotalAmount,
+    IB_reward,
+    stakedBalance,
+    IB_userRewardPerTokenPaid,
+  } = campaign;
+
+  const res = numberizeString({
+    camp: {
+      duration,
+      id,
+      instantExitPercentage,
+      lastUpdatedTime,
+      reward,
+      rewardDelay,
+      rewardPerTokenStored,
+      rewardRate,
+      startTime,
+      totalSupply,
+      IB_delayedRewardExitedAmount,
+      IB_delayedRewardLatestExitTime,
+      IB_delayedRewardTotalAmount,
+      IB_reward,
+      stakedBalance,
+      IB_userRewardPerTokenPaid,
+    },
+  });
+
   if (!campaign) {
     return {
       flxAmount: '',
@@ -353,9 +524,19 @@ export const returnFLX = (campaign: IIncentiveHook) => {
     };
   }
 
+  const incentiveCampaign = destructureCampaign(res.camp)
+    .incentiveCampaignStructure;
+  const incentiveBalance = destructureCampaign(res.camp)
+    .IncentiveBalanceStructure;
   return {
-    flxAmount: currentlyClaimableReward(campaign).toString(),
-    lockedReward: currentlyLockedReward(campaign).toString(),
+    flxAmount: currentlyClaimableReward(
+      incentiveCampaign,
+      incentiveBalance
+    ).toString(),
+    lockedReward: currentlyLockedReward(
+      incentiveCampaign,
+      incentiveBalance
+    ).toString(),
     start: campaign.unlockUntil,
     end: campaign.campaignEndTime,
   };

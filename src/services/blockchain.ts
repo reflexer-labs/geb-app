@@ -179,7 +179,6 @@ export const handleIncentiveClaim = async (
   if (!signer || !campaignId) {
     return false;
   }
-
   const geb = new Geb(ETH_NETWORK, signer.provider);
 
   const proxy = await geb.getProxyAction(signer._address);
