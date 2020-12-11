@@ -79,11 +79,19 @@ export default function useIncentives() {
             Date.now() <
             numeral(startTime).add(duration).multiply(1000).value();
 
-          const stakedBalance = _.get(
+          let stakedBalance = _.get(
             incentivesCampaignData,
             `incentiveBalances[${i}].stakedBalance`,
             '0'
           );
+
+          if (incentivesCampaignData?.allCampaigns.length > 1 && i > 0) {
+            stakedBalance = _.get(
+              incentivesCampaignData,
+              `incentiveBalances[${i - 1}].stakedBalance`,
+              '0'
+            );
+          }
           const IB_reward = _.get(
             incentivesCampaignData,
             `incentiveBalances[${i}].reward`,
@@ -342,11 +350,11 @@ export function useIncentivesAssets() {
 
       // ETH token Data
       const totalEth = ethBalance[NETWORK_ID];
-      const ethPriceDiff = numeral(totalEth)
+      const ethPrice = fiatPrice;
+      const ethPriceDiff = numeral(ethPrice)
         .multiply(ethPriceChange)
         .divide(100)
         .value();
-      const ethPrice = fiatPrice;
       const ethVolValue = numeral(totalEth).multiply(ethPrice).value();
       const ethDiffPercentage = ethPriceChange;
 
