@@ -130,7 +130,9 @@ export const fetchIncentivesCampaigns = async (
       const response = res.data.data;
 
       const proxyData =
-        response.userProxies.length > 0 ? response.userProxies[0] : null;
+        response.userProxies && response.userProxies.length > 0
+          ? response.userProxies[0]
+          : null;
 
       const payload: IIncentivesCampaignData = {
         user: response.user ? response.user.id : null,
