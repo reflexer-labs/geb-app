@@ -1,11 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { useIncentivesAssets } from '../hooks/useIncentives';
 import useWindowSize from '../hooks/useWindowSize';
-import { COIN_TICKER } from '../utils/constants';
+import { formatNumber } from '../utils/helper';
+import { AssetData } from '../utils/interfaces';
 
 const IncentivesAssets = () => {
   const { t } = useTranslation();
+  const assets = useIncentivesAssets();
+
   const [colWidth, setColWidth] = useState('100%');
   const { width } = useWindowSize();
   const ref = useRef<HTMLDivElement>(null);
@@ -15,6 +19,7 @@ const IncentivesAssets = () => {
       setColWidth(String(ref.current.clientWidth) + 'px');
     }
   }, [ref, width]);
+
   return (
     <Container>
       <Title>{t('assets')}</Title>
@@ -27,58 +32,39 @@ const IncentivesAssets = () => {
       </Header>
 
       <List>
-        <Row ref={ref}>
-          <Col>
-            <img src={require('../assets/eth-logo.svg')} alt="" />
-            <Label>
-              ETH
-              <Tag>Ethereum</Tag>
-            </Label>
-          </Col>
-          <Col>100.00</Col>
-          <Col>
-            $831.21 <Diff className="green">+1.234</Diff>
-          </Col>
-          <Col>
-            $83,100.00
-            <Diff className="red">-0.91%</Diff>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col>
-            <img src={require('../assets/rai-logo.svg')} alt="" />
-            <Label>
-              {COIN_TICKER}
-              <Tag>{COIN_TICKER} Token</Tag>
-            </Label>
-          </Col>
-          <Col>250.00</Col>
-          <Col>
-            $4.39 <Diff className="red">-1.23%</Diff>
-          </Col>
-          <Col>
-            $1,097.50
-            <Diff className="green">+2.59%</Diff>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <img src={require('../assets/logo192.png')} alt="" />
-            <Label>
-              FLX
-              <Tag>Flex Token</Tag>
-            </Label>
-          </Col>
-          <Col>2500.00</Col>
-          <Col>
-            $34.21 <Diff className="green">+3.12%</Diff>
-          </Col>
-          <Col>
-            $85,525
-            <Diff className="red">-5.39%</Diff>
-          </Col>
-        </Row>
+        {assets
+          ? Object.values(assets).map((obj: AssetData) => {
+              return (
+                <Row ref={ref} key={obj.name}>
+                  <Col>
+                    <img src={obj.img} alt="" />
+                    <Label>
+                      {obj.name}
+                      <Tag>{obj.token}</Tag>
+                    </Label>
+                  </Col>
+                  <Col>
+                    {obj.amount && formatNumber(obj.amount.toString(), 3)}
+                  </Col>
+                  <Col>
+                    ${obj.price}{' '}
+                    <Diff className={obj.diff >= 0 ? 'green' : 'red'}>
+                      {obj.diff > 0 ? `+` : ''}
+                      {obj.diff && formatNumber(obj.diff.toString(), 3)}
+                    </Diff>
+                  </Col>
+                  <Col>
+                    ${obj.value && formatNumber(obj.value.toString(), 3)}
+                    <Diff className={obj.diffPercentage >= 0 ? 'green' : 'red'}>
+                      {obj.diffPercentage &&
+                        formatNumber(obj.diffPercentage.toString(), 3)}
+                      %
+                    </Diff>
+                  </Col>{' '}
+                </Row>
+              );
+            })
+          : null}
       </List>
     </Container>
   );

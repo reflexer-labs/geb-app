@@ -93,6 +93,7 @@ const Shared = ({ children }: Props) => {
   function networkChecker() {
     accountChange();
     const id: ChainId = NETWORK_ID;
+    connectWalletActions.fetchFiatPrice();
     if (chainId && chainId !== id) {
       const chainName = ETHERSCAN_PREFIXES[id];
       connectWalletActions.setIsWrongNetwork(true);

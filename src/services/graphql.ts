@@ -116,16 +116,16 @@ export const fetchSafeById = (safeId: string, address: string) => {
   );
 };
 
-export const fetchIncentivesCampaigns = (address: string) => {
+export const fetchIncentivesCampaigns = async (
+  address: string,
+  blockNumber: number
+) => {
   return retry(
     async (bail, attempt) => {
       const res = await axios.post(
         GRAPH_API_URLS[attempt - 1],
-        JSON.stringify({ query: incentiveCampaignsQuery(address) })
+        JSON.stringify({ query: incentiveCampaignsQuery(address, blockNumber) })
       );
-      if (!res.data.data && attempt < GRAPH_API_URLS.length) {
-        throw new Error('retry');
-      }
 
       const response = res.data.data;
 
@@ -135,6 +135,7 @@ export const fetchIncentivesCampaigns = (address: string) => {
       const payload: IIncentivesCampaignData = {
         user: response.user ? response.user.id : null,
         proxyData,
+        tokens24HPrices: res.data.data.tokens24HPrices,
         allCampaigns: response.incentiveCampaigns,
         systemState: response.systemState,
         incentiveBalances: response.incentiveBalances,

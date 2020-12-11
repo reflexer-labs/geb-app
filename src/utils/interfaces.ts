@@ -251,6 +251,15 @@ export interface IIncentivesCampaignData {
       token0Price: string;
       token1Price: string;
     };
+    currentRedemptionPrice: {
+      value: string;
+    };
+  };
+  tokens24HPrices: {
+    coinUniswapPair: {
+      token0Price: string;
+      token1Price: string;
+    };
   };
   incentiveBalances: Array<IncentiveBalance>;
   proxyData: {
@@ -320,4 +329,20 @@ export interface IIncentiveWithdraw {
 
 export interface NumberMap {
   [key: string]: number;
+}
+
+export interface AssetData {
+  img: string;
+  token: string;
+  name: string;
+  amount: number;
+  price: number;
+  value: number;
+  diff: number;
+  diffPercentage: number;
+}
+export interface IIncentiveAssets {
+  eth: AssetData;
+  rai: AssetData;
+  flx: AssetData;
 }

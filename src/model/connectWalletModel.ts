@@ -7,6 +7,7 @@ export interface ConnectWalletModel {
   blockNumber: IBlockNumber;
   fiatPrice: number;
   step: number;
+  ethPriceChange: number;
   isUserCreated: boolean;
   proxyAddress: string;
   coinAllowance: string;
@@ -37,15 +38,19 @@ export interface ConnectWalletModel {
   setCoinAllowance: Action<ConnectWalletModel, string>;
   setIsStepLoading: Action<ConnectWalletModel, boolean>;
   setCtHash: Action<ConnectWalletModel, string>;
+  setEthPriceChange: Action<ConnectWalletModel, number>;
 }
 
 const ctHashState = localStorage.getItem('ctHash');
 
+const blockNumberState = localStorage.getItem('blockNumber');
+
 const connectWalletModel: ConnectWalletModel = {
-  blockNumber: {},
+  blockNumber: blockNumberState ? JSON.parse(blockNumberState) : {},
   ethBalance: {},
   praiBalance: {},
   fiatPrice: 0,
+  ethPriceChange: 0,
   step: 0,
   proxyAddress: '',
   coinAllowance: '',
@@ -54,8 +59,9 @@ const connectWalletModel: ConnectWalletModel = {
   isWrongNetwork: false,
   isUserCreated: false,
   fetchFiatPrice: thunk(async (actions, payload) => {
-    const fiatPrice = await api.fetchFiatPrice();
-    actions.setFiatPrice(fiatPrice);
+    const res = await api.fetchFiatPrice();
+    actions.setFiatPrice(res.usd);
+    actions.setEthPriceChange(res.usd_24h_change);
   }),
 
   fetchUser: thunk(async (actions, payload) => {
@@ -86,6 +92,7 @@ const connectWalletModel: ConnectWalletModel = {
         state.blockNumber[chainId]
       );
     }
+    localStorage.setItem('blockNumber', JSON.stringify(state.blockNumber));
   }),
 
   updateEthBalance: action((state, payload) => {
@@ -116,6 +123,9 @@ const connectWalletModel: ConnectWalletModel = {
   setCtHash: action((state, payload) => {
     state.ctHash = payload;
     localStorage.setItem('ctHash', payload);
+  }),
+  setEthPriceChange: action((state, payload) => {
+    state.ethPriceChange = payload;
   }),
 };
 

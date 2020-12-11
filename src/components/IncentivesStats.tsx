@@ -24,6 +24,7 @@ const IncentivesStats = () => {
     instantExitPercentage,
     user,
   } = useIncentives()[0];
+
   const {
     popupsModel: popupsActions,
     incentivesModel: incentivesActions,
@@ -56,7 +57,7 @@ const IncentivesStats = () => {
         <StatItem>
           <StateInner>
             <Label className="top">{'My Reward Rate'}</Label>
-            <Value>{`${myRewardRate} FLX/Day`}</Value>
+            <Value>{`${account ? myRewardRate : 0} FLX/Day`}</Value>
             <Label className="small">{`Out of ${dailyFLX} FLX/Day`}</Label>
           </StateInner>
         </StatItem>

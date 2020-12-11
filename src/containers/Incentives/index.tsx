@@ -21,9 +21,7 @@ const Incentives = () => {
 
   useEffect(() => {
     async function fetchIncentivesCampaigns() {
-      if (account && chainId) {
-        await incentivesActions.fetchIncentivesCampaigns(account as string);
-      }
+      await incentivesActions.fetchIncentivesCampaigns(account as string);
     }
     fetchIncentivesCampaigns();
     const interval = setInterval(() => {

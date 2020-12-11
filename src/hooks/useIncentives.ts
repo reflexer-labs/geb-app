@@ -2,65 +2,27 @@ import dayjs from 'dayjs';
 import { BigNumber } from 'ethers';
 import numeral from 'numeral';
 import { useEffect, useState } from 'react';
-import { useActiveWeb3React } from '.';
+import { NETWORK_ID } from '../connectors';
 import { useStoreState } from '../store';
+import { COIN_TICKER, INITIAL_INCENTIVE_STATE } from '../utils/constants';
 import { formatNumber, numberizeString } from '../utils/helper';
 import {
+  IIncentiveAssets,
   IIncentiveHook,
   IncentivesCampaign,
   NumberMap,
 } from '../utils/interfaces';
 import _ from '../utils/lodash';
 
-export const INITIAL_INCENTIVE_STATE = [
-  {
-    id: '',
-    duration: '',
-    startTime: '',
-    reward: '',
-    rewardRate: '',
-    rewardDelay: '',
-    totalSupply: '',
-    instantExitPercentage: '',
-    coinAddress: '',
-    wethAddress: '',
-    coinTotalSupply: '',
-    stakedBalance: '',
-    unlockUntil: '',
-    campaignEndTime: '',
-    dailyFLX: 0,
-    uniSwapLink: '',
-    ethStake: '',
-    raiStake: '',
-    myRewardRate: '',
-    reserveRAI: '',
-    reserveETH: '',
-    token0: '',
-    token0Price: '',
-    token1Price: '',
-    lastUpdatedTime: '',
-    rewardPerTokenStored: '',
-    isOngoingCampaign: true,
-    isCoinLessThanWeth: true,
-    user: '' || null,
-    IB_reward: '',
-    IB_delayedRewardTotalAmount: '',
-    IB_userRewardPerTokenPaid: '',
-    IB_delayedRewardExitedAmount: '',
-    IB_delayedRewardLatestExitTime: '',
-  },
-];
-
 export default function useIncentives() {
-  const { account, chainId } = useActiveWeb3React();
   const [state, setState] = useState<Array<IIncentiveHook>>(
     INITIAL_INCENTIVE_STATE
   );
+
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
   const { incentivesCampaignData } = incentivesState;
 
   useEffect(() => {
-    if (!account || !chainId) return;
     function returnValues() {
       const campaignData = incentivesCampaignData?.allCampaigns.map(
         (campaign: IncentivesCampaign, i: number) => {
@@ -284,7 +246,144 @@ export default function useIncentives() {
       }
     }
     returnValues();
-  }, [account, chainId, incentivesCampaignData]);
+  }, [incentivesCampaignData]);
+
+  return state;
+}
+
+export function useIncentivesAssets() {
+  const [state, setState] = useState<IIncentiveAssets>();
+
+  const {
+    incentivesModel: incentivesState,
+    connectWalletModel: connectWalletState,
+  } = useStoreState((state) => state);
+  const { incentivesCampaignData } = incentivesState;
+  const {
+    praiBalance,
+    ethBalance,
+    fiatPrice,
+    ethPriceChange,
+  } = connectWalletState;
+
+  useEffect(() => {
+    function returnAssetsData() {
+      // RAI token Data
+      const token0Price = _.get(
+        incentivesCampaignData,
+        'systemState.coinUniswapPair.token0Price',
+        '0'
+      );
+      const token1Price = _.get(
+        incentivesCampaignData,
+        'systemState.coinUniswapPair.token1Price',
+        '0'
+      );
+
+      const token0_24HPrice = _.get(
+        incentivesCampaignData,
+        'tokens24HPrices.coinUniswapPair.token0Price',
+        '0'
+      );
+      const token1_24HPrice = _.get(
+        incentivesCampaignData,
+        'tokens24HPrices.coinUniswapPair.token1Price',
+        '0'
+      );
+      const coinAddress = _.get(
+        incentivesCampaignData,
+        'systemState.coinAddress',
+        ''
+      );
+
+      const wethAddress = _.get(
+        incentivesCampaignData,
+        'systemState.wethAddress',
+        ''
+      );
+
+      const raiRedemptionPrice = _.get(
+        incentivesCampaignData,
+        'systemState.currentRedemptionPrice.value',
+        '0'
+      );
+
+      const isCoinLessThanWeth = () => {
+        if (!coinAddress || !wethAddress) return false;
+        return BigNumber.from(coinAddress).lt(BigNumber.from(wethAddress));
+      };
+
+      const rai24HPrice = isCoinLessThanWeth()
+        ? token0_24HPrice
+        : token1_24HPrice;
+      const raiCurrentPrice = isCoinLessThanWeth() ? token0Price : token1Price;
+
+      const raiBalance = praiBalance[NETWORK_ID];
+      const raiPrice = numeral(raiRedemptionPrice).value();
+      const raiPriceDiff = numeral(raiCurrentPrice)
+        .subtract(rai24HPrice)
+        .value();
+      const raiVolValue = numeral(raiBalance).multiply(raiPrice).value();
+      const raiDiffPercentage = numeral(rai24HPrice)
+        .divide(raiCurrentPrice)
+        .multiply(100)
+        .value();
+
+      const rai = {
+        img: require('../assets/rai-logo.svg'),
+        token: 'RAI Token',
+        name: COIN_TICKER || 'RAI',
+        amount: raiBalance || 0,
+        price: raiPrice,
+        diff: raiPriceDiff,
+        value: raiVolValue,
+        diffPercentage: raiDiffPercentage === 100 ? 0 : raiDiffPercentage,
+      };
+
+      // ETH token Data
+      const totalEth = ethBalance[NETWORK_ID];
+      const ethPriceDiff = numeral(totalEth)
+        .multiply(ethPriceChange)
+        .divide(100)
+        .value();
+      const ethPrice = fiatPrice;
+      const ethVolValue = numeral(totalEth).multiply(ethPrice).value();
+      const ethDiffPercentage = ethPriceChange;
+
+      const eth = {
+        img: require('../assets/eth-logo.svg'),
+        name: 'ETH',
+        token: 'Ethereum',
+        amount: totalEth || 0,
+        price: ethPrice,
+        diff: ethPriceDiff,
+        value: ethVolValue,
+        diffPercentage: ethDiffPercentage,
+      };
+
+      // TODO: FLX
+
+      const flx = {
+        name: 'FLX',
+        token: 'Flex Token',
+        img: require('../assets/logo192.png'),
+        amount: 0,
+        price: 0,
+        diff: 0,
+        value: 0,
+        diffPercentage: 0,
+      };
+
+      setState({ eth, rai, flx });
+    }
+    returnAssetsData();
+  }, [
+    incentivesCampaignData,
+    fiatPrice,
+    praiBalance,
+    ethBalance,
+    ethPriceChange,
+  ]);
 
   return state;
 }

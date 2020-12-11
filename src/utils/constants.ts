@@ -136,3 +136,58 @@ export const jdenticonConfig = {
   },
   backColor: '#50ccd5',
 };
+
+export const INITIAL_INCENTIVE_STATE = [
+  {
+    id: '',
+    duration: '',
+    startTime: '',
+    reward: '',
+    rewardRate: '',
+    rewardDelay: '',
+    totalSupply: '',
+    instantExitPercentage: '',
+    coinAddress: '',
+    wethAddress: '',
+    coinTotalSupply: '',
+    stakedBalance: '',
+    unlockUntil: '',
+    campaignEndTime: '',
+    dailyFLX: 0,
+    uniSwapLink: '',
+    ethStake: '',
+    raiStake: '',
+    myRewardRate: '',
+    reserveRAI: '',
+    reserveETH: '',
+    token0: '',
+    token0Price: '',
+    token1Price: '',
+    lastUpdatedTime: '',
+    rewardPerTokenStored: '',
+    isOngoingCampaign: true,
+    isCoinLessThanWeth: true,
+    user: '' || null,
+    IB_reward: '',
+    IB_delayedRewardTotalAmount: '',
+    IB_userRewardPerTokenPaid: '',
+    IB_delayedRewardExitedAmount: '',
+    IB_delayedRewardLatestExitTime: '',
+  },
+];
+
+const INIT_VALUES = {
+  name: 'FLX',
+  img: require('../assets/logo192.png'),
+  amount: 0,
+  price: 0,
+  diff: 0,
+  value: 0,
+  diffPercentage: 0,
+};
+
+export const INITIAL_INCENTIVE_ASSETS_STATE = {
+  eth: INIT_VALUES,
+  rai: INIT_VALUES,
+  flx: INIT_VALUES,
+};

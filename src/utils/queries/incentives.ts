@@ -1,6 +1,11 @@
 import { userQuery } from './user';
 
-export const incentiveCampaignsQuery = (address: string) => `{
+const past24HBlocks = (blockNumber: number) => blockNumber - (24 * 3600) / 15;
+
+export const incentiveCampaignsQuery = (
+  address: string,
+  blockNumber: number
+) => `{
     ${userQuery(address)}
     userProxies(where: {owner: "${address}"}) {
       address
@@ -31,6 +36,9 @@ export const incentiveCampaignsQuery = (address: string) => `{
           token0Price
           token1Price
          }
+         currentRedemptionPrice {
+          value
+        }
       }
     incentiveBalances(where: {owner: "${address}"}, orderBy: campaignId, orderDirection: desc) {
           stakedBalance
@@ -40,5 +48,16 @@ export const incentiveCampaignsQuery = (address: string) => `{
           delayedRewardExitedAmount
           delayedRewardLatestExitTime
       }
+
+     
+      tokens24HPrices:systemState(id: "current", block: {number: ${past24HBlocks(
+        blockNumber
+      )}}) {
+          coinUniswapPair { 
+            token0Price
+            token1Price
+           }
+        }
+    
       
 }`;

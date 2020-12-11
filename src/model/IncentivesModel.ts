@@ -1,5 +1,6 @@
 import { action, Action, thunk, Thunk } from 'easy-peasy';
 import { StoreModel } from '.';
+import { NETWORK_ID } from '../connectors';
 import {
   handleIncentiveClaim,
   handleIncentiveDeposit,
@@ -55,9 +56,16 @@ const incentivesModel: IncentivesModel = {
     state.operation = payload;
   }),
   fetchIncentivesCampaigns: thunk(
-    async (actions, payload, { getStoreActions }) => {
+    async (actions, payload, { getStoreActions, getStoreState }) => {
       const storeActions = getStoreActions();
-      const res = await fetchIncentivesCampaigns(payload.toLowerCase());
+      const storeState = getStoreState();
+
+      const blockNumber = storeState.connectWalletModel.blockNumber[NETWORK_ID];
+
+      const res = await fetchIncentivesCampaigns(
+        payload ? payload.toLowerCase() : '',
+        blockNumber
+      );
       actions.setIncentivesCampaignData(res);
       if (res.proxyData) {
         const { address, coinAllowance } = res.proxyData;
