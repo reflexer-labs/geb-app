@@ -41,6 +41,7 @@ export const incentiveCampaignsQuery = (
         }
       }
     incentiveBalances(where: {owner: "${address}"}, orderBy: campaignId, orderDirection: desc) {
+          campaignId
           stakedBalance
           reward
           userRewardPerTokenPaid

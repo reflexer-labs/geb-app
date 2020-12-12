@@ -9,6 +9,7 @@ import { formatNumber, numberizeString } from '../utils/helper';
 import {
   IIncentiveAssets,
   IIncentiveHook,
+  IncentiveBalance,
   IncentivesCampaign,
   NumberMap,
 } from '../utils/interfaces';
@@ -79,43 +80,36 @@ export default function useIncentives() {
             Date.now() <
             numeral(startTime).add(duration).multiply(1000).value();
 
-          let stakedBalance = _.get(
+          const incentiveBalance = incentivesCampaignData.incentiveBalances.find(
+            (x: IncentiveBalance) => x.campaignId === id
+          );
+
+          const stakedBalance = _.get(
             incentivesCampaignData,
-            `incentiveBalances[${i}].stakedBalance`,
+            `incentiveBalances[0].stakedBalance`,
             '0'
           );
 
-          if (incentivesCampaignData?.allCampaigns.length > 1 && i > 0) {
-            stakedBalance = _.get(
-              incentivesCampaignData,
-              `incentiveBalances[${i - 1}].stakedBalance`,
-              '0'
-            );
-          }
-          const IB_reward = _.get(
-            incentivesCampaignData,
-            `incentiveBalances[${i}].reward`,
-            '0'
-          );
+          const IB_reward = _.get(incentiveBalance, `reward`, '0');
           const IB_userRewardPerTokenPaid = _.get(
-            incentivesCampaignData,
-            `incentiveBalances[${i}].userRewardPerTokenPaid`,
+            incentiveBalance,
+            `userRewardPerTokenPaid`,
             '0'
           );
           const IB_delayedRewardTotalAmount = _.get(
-            incentivesCampaignData,
-            `incentiveBalances[${i}].delayedRewardTotalAmount`,
+            incentiveBalance,
+            `delayedRewardTotalAmount`,
             '0'
           );
 
           const IB_delayedRewardExitedAmount = _.get(
-            incentivesCampaignData,
-            `incentiveBalances[${i}].delayedRewardExitedAmount`,
+            incentiveBalance,
+            `delayedRewardExitedAmount`,
             '0'
           );
           const IB_delayedRewardLatestExitTime = _.get(
-            incentivesCampaignData,
-            `incentiveBalances[${i}].delayedRewardLatestExitTime`,
+            incentiveBalance,
+            `delayedRewardLatestExitTime`,
             '0'
           );
 
@@ -582,6 +576,14 @@ export const destructureCampaign = (campaign: NumberMap) => {
 };
 
 export const returnFLX = (campaign: IIncentiveHook) => {
+  if (!campaign) {
+    return {
+      flxAmount: '',
+      lockedReward: '0',
+      start: 'N/A',
+      end: 'N/A',
+    };
+  }
   const {
     duration,
     id,
@@ -621,15 +623,6 @@ export const returnFLX = (campaign: IIncentiveHook) => {
       IB_userRewardPerTokenPaid,
     },
   });
-
-  if (!campaign) {
-    return {
-      flxAmount: '',
-      lockedReward: '0',
-      start: 'N/A',
-      end: 'N/A',
-    };
-  }
 
   const incentiveCampaign = destructureCampaign(res.camp)
     .incentiveCampaignStructure;

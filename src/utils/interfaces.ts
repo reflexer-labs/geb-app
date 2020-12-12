@@ -229,6 +229,7 @@ export interface IncentivesCampaign {
 }
 
 export interface IncentiveBalance {
+  campaignId: string;
   reward: string;
   stakedBalance: string;
   userRewardPerTokenPaid: string;
