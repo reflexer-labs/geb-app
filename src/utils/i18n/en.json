@@ -98,7 +98,10 @@
   "clear_all": "Clear All",
   "deposit_borrow": "Deposit & Borrow",
   "repay_withdraw": "Repay & Withdraw",
-  "confirmations_info": "Waiting for confirmations reduces the risk of your Safe address changing. We require users to wait 10 block confirmations to ensure it's been created successfully.",
+  "confirmations_info": "You need to wait for 10 block confirmations to make sure that your Safe address does not change.",
   "liquidation_text": "You have {{balance}} leftover collateral that can be claimed.",
-  "collect_surplus": "Collect ETH"
+  "collect_surplus": "Collect ETH",
+  "annual_redemption_tip": "Rate at which RAI is devalue or revalued annually.",
+  "liquidation_price_tip": "ETH price under which this Safe can get liquidated.",
+  "liquidation_penalty_tip": "This is a fee you pay in case your Safe gets liquidated. The fee is added on top of your Safe's debt during liquidation, resulting in more Safe collateral being sold."
 }

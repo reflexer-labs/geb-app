@@ -34,6 +34,8 @@ const DecimalInput = ({
       if (val.startsWith('0') && val.charAt(1) !== '.') {
         const returnedVal = val.replace(/(\d)(?=(\d))/, '$1.');
         onChange(returnedVal);
+      } else if (val.startsWith('.')) {
+        onChange('0' + val);
       } else if (val.length === 6 && Number(val) === 0) {
         onChange('');
       } else {
@@ -109,7 +111,7 @@ const CustomInput = styled.input`
   color: ${(props) => props.theme.colors.primary};
   line-height: 24px;
   outline: none;
-  
+
   &:disabled {
     cursor: not-allowed;
   }
