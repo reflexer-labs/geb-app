@@ -6,6 +6,7 @@ import Button from './Button';
 import { newTransactionsFirst, returnWalletAddress } from '../utils/helper';
 import { useWeb3React } from '@web3-react/core';
 import { isTransactionRecent } from '../hooks/TransactionHooks';
+import NavLinks from './NavLinks';
 
 const Navbar = () => {
   const { transactionsModel: transactionsState } = useStoreState(
@@ -39,9 +40,9 @@ const Navbar = () => {
       <Left>
         <Brand />
       </Left>
-      {/* <HideMobile>
+      <HideMobile>
         <NavLinks />
-      </HideMobile> */}
+      </HideMobile>
       <RightSide>
         <BtnContainer>
           <Button
@@ -57,13 +58,13 @@ const Navbar = () => {
           />
         </BtnContainer>
 
-        {/* <MenuBtn onClick={() => popupsActions.setShowSideMenu(true)}>
+        <MenuBtn onClick={() => popupsActions.setShowSideMenu(true)}>
           <RectContainer>
             <Rect />
             <Rect />
             <Rect />
           </RectContainer>
-        </MenuBtn> */}
+        </MenuBtn>
       </RightSide>
     </Container>
   );
@@ -86,26 +87,26 @@ const Container = styled.div`
   `}
 `;
 
-// const MenuBtn = styled.div`
-//   margin-right: -20px;
-//   width: 60px;
-//   height: 60px;
-//   align-items: center;
-//   justify-content: center;
-//   display: none;
-//   border-left: 1px solid ${(props) => props.theme.colors.border};
-//   cursor: pointer;
-//   &:hover {
-//     div {
-//       div {
-//         background: ${(props) => props.theme.colors.gradient};
-//       }
-//     }
-//   }
-//   ${({ theme }) => theme.mediaWidth.upToSmall`
-//     display: flex;
-//   `}
-// `;
+const MenuBtn = styled.div`
+  margin-right: -20px;
+  width: 60px;
+  height: 60px;
+  align-items: center;
+  justify-content: center;
+  display: none;
+  border-left: 1px solid ${(props) => props.theme.colors.border};
+  cursor: pointer;
+  &:hover {
+    div {
+      div {
+        background: ${(props) => props.theme.colors.gradient};
+      }
+    }
+  }
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    display: flex;
+  `}
+`;
 
 const BtnContainer = styled.div`
   ${({ theme }) => theme.mediaWidth.upToSmall`
@@ -120,30 +121,30 @@ const BtnContainer = styled.div`
   }
 `;
 
-// const RectContainer = styled.div``;
+const RectContainer = styled.div``;
 
-// const Rect = styled.div`
-//   width: 15px;
-//   border-radius: 12px;
-//   height: 3px;
-//   margin-bottom: 2px;
-//   background: ${(props) => props.theme.colors.secondary};
-//   transition: all 0.3s ease;
-//   &:last-child {
-//     margin-bottom: 0;
-//   }
-// `;
+const Rect = styled.div`
+  width: 15px;
+  border-radius: 12px;
+  height: 3px;
+  margin-bottom: 2px;
+  background: ${(props) => props.theme.colors.secondary};
+  transition: all 0.3s ease;
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
 
 const RightSide = styled.div`
   display: flex;
   align-items: center;
 `;
 
-// const HideMobile = styled.div`
-//   ${({ theme }) => theme.mediaWidth.upToSmall`
-//     display: none;
-//   `}
-// `;
+const HideMobile = styled.div`
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    display: none;
+  `}
+`;
 
 const Left = styled.div`
   min-width: 194px;

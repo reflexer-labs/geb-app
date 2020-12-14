@@ -1,8 +1,8 @@
 import React from 'react';
 
-const SafeIcon = () => {
+const SafeIcon = ({ ...rest }) => {
   return (
-    <svg viewBox="0 0 54 60" xmlns="http://www.w3.org/2000/svg">
+    <svg {...rest} viewBox="0 0 54 60" xmlns="http://www.w3.org/2000/svg">
       <g id="Page-1" fill="none" fillRule="evenodd">
         <g id="003---Safe" fill="rgb(0,0,0)" fillRule="nonzero">
           <path
