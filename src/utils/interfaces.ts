@@ -181,6 +181,7 @@ export interface IWaitingPayload {
   hint?: string;
   status: string;
   hash?: string;
+  isCreate?: boolean;
 }
 
 export interface SerializableTransactionReceipt {

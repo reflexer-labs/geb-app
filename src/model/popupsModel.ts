@@ -53,7 +53,13 @@ const popupsModel: PopupsModel = {
   isScreenModalOpen: false,
   isIncentivesModalOpen: false,
   isWaitingModalOpen: false,
-  waitingPayload: { title: '', text: '', hint: '', status: 'loading' },
+  waitingPayload: {
+    title: '',
+    text: '',
+    hint: '',
+    status: 'loading',
+    isCreate: false,
+  },
   safeOperationPayload: {
     isOpen: false,
     type: '',
@@ -112,6 +118,15 @@ const popupsModel: PopupsModel = {
   }),
   setIsWaitingModalOpen: action((state, payload) => {
     state.isWaitingModalOpen = payload;
+    if (!payload) {
+      state.waitingPayload = {
+        title: '',
+        text: '',
+        hint: '',
+        status: 'loading',
+        isCreate: false,
+      };
+    }
   }),
   setWaitingPayload: action((state, payload) => {
     state.waitingPayload = payload;

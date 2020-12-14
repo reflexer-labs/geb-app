@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AlertTriangle, CheckCircle } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -12,10 +12,29 @@ import Modal from './Modal';
 
 const WaitingModal = () => {
   const { t } = useTranslation();
-  const { popupsModel: popupsState } = useStoreState((state) => state);
+
+  const { popupsModel: popupsState, safeModel: safeState } = useStoreState(
+    (state) => state
+  );
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
   const { chainId } = useActiveWeb3React();
-  const { title, text, hint, status, hash } = popupsState.waitingPayload;
+  const {
+    title,
+    text,
+    hint,
+    status,
+    hash,
+    isCreate,
+  } = popupsState.waitingPayload;
+
+  const { list } = safeState;
+
+  useEffect(() => {
+    if (isCreate) {
+      popupsActions.setIsWaitingModalOpen(false);
+    }
+    // eslint-disable-next-line
+  }, [list.length]);
 
   const returnStatusIcon = (status: string) => {
     switch (status) {
@@ -37,7 +56,7 @@ const WaitingModal = () => {
         {returnStatusIcon(status)}
         {<Title className={status}>{title ? title : t('initializing')}</Title>}
 
-        {text || status === 'success' ? (
+        {text || (status === 'success' && !isCreate) ? (
           <Text className={status}>
             {status === 'success' && chainId && hash ? (
               <a
@@ -47,6 +66,10 @@ const WaitingModal = () => {
               >
                 {t('view_etherscan')}
               </a>
+            ) : status === 'success' && isCreate ? (
+              <CreateNew>
+                <Loader width={'14px'} /> {text}
+              </CreateNew>
             ) : (
               text
             )}
@@ -54,7 +77,7 @@ const WaitingModal = () => {
         ) : null}
         {hint && <Hint>{hint}</Hint>}
 
-        {status !== 'loading' ? (
+        {status !== 'loading' && !isCreate ? (
           <BtnContainer>
             <Button
               text={status === 'success' ? 'close' : 'dismiss'}
@@ -120,4 +143,13 @@ const BtnContainer = styled.div`
   background-color: rgb(247, 248, 250);
   border-radius: 0 0 20px 20px;
   text-align: center;
+`;
+
+const CreateNew = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  svg {
+    margin-right: 5px;
+  }
 `;

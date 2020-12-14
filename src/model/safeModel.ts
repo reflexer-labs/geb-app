@@ -122,11 +122,20 @@ const safeModel: SafeModel = {
         originalTx: txResponse,
       });
       storeActions.popupsModel.setIsWaitingModalOpen(true);
-      storeActions.popupsModel.setWaitingPayload({
-        title: 'Transaction Submitted',
-        hash: txResponse.hash,
-        status: 'success',
-      });
+      if (!payload.safeId) {
+        storeActions.popupsModel.setWaitingPayload({
+          title: 'Transaction Submitted',
+          text: 'Adding a new safe...',
+          status: 'success',
+          isCreate: true,
+        });
+      } else {
+        storeActions.popupsModel.setWaitingPayload({
+          title: 'Transaction Submitted',
+          hash: txResponse.hash,
+          status: 'success',
+        });
+      }
 
       actions.setStage(0);
       actions.setUniSwapPool(DEFAULT_SAFE_STATE);
