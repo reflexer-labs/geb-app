@@ -29,14 +29,11 @@ const NavLinks = () => {
 
   return (
     <Nav>
-<<<<<<< HEAD
-      <NavBarLink to="/incentives" onClick={(e) => handleLinkClick(e, false)}>
-        <DollarSign size="18" /> {t('incentives')}
-      </NavBarLink>
-      <SepBlock className="disableDesktop">
-=======
       <NavBarLink to="/" onClick={(e) => handleLinkClick(e, false)}>
         <SafeIcon className="opacity" /> {t('app')}
+      </NavBarLink>
+      <NavBarLink to="/incentives" onClick={(e) => handleLinkClick(e, false)}>
+        <DollarSign size="18" /> {t('incentives')}
       </NavBarLink>
 
       <NavBarLink
@@ -55,7 +52,6 @@ const NavLinks = () => {
       </NavBarLink>
 
       {/* <SepBlock className="disableDesktop">
->>>>>>> c7a936dc239a69a6dceb7eb490595533fd69caf2
         <NavBarLink to="" onClick={(e) => handleLinkClick(e, false)}>
           {t('request_features')}
         </NavBarLink>
