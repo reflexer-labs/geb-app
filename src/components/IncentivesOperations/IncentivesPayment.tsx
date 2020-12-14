@@ -96,14 +96,12 @@ const IncentivesPayment = () => {
         : BigNumber.from('0');
 
       if (uniPoolBN.isZero()) {
-        setError(`Please enter the amount of UniPool to withdraw`);
+        setError(`Cannot withdraw nothing`);
         return;
       }
 
       if (uniPoolBN.gt(stakedBalanceBN)) {
-        setError(
-          `UniPool withdrawn amount cannot exceed available Staked Balance, Click on Max to get the available Staked Balance to be withdrawn`
-        );
+        setError(`Cannot exceed max amount staked`);
         return;
       }
     }
@@ -112,6 +110,7 @@ const IncentivesPayment = () => {
   };
 
   const handleCancel = () => {
+    incentivesActions.setUniPoolAmount('');
     popupsActions.setIsIncentivesModalOpen(false);
     incentivesActions.setOperation(0);
   };
@@ -238,7 +237,7 @@ const IncentivesPayment = () => {
             } ${COIN_TICKER} (Avail ${formatNumber(praiBalance.toString())})`}
             value={raiAmount}
             onChange={(val: string) => handleChange(val, false)}
-            handleMaxClick={() => handleChange(praiBalance.toString(), false)}
+            disableMax
           />
         </DoubleInput>
       )}

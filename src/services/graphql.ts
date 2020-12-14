@@ -137,7 +137,7 @@ export const fetchIncentivesCampaigns = async (
       const payload: IIncentivesCampaignData = {
         user: response.user ? response.user.id : null,
         proxyData,
-        tokens24HPrices: res.data.data.tokens24HPrices,
+        old24hRaiPrice: res.data.data.old24hRaiPrice,
         allCampaigns: response.incentiveCampaigns,
         systemState: response.systemState,
         incentiveBalances: response.incentiveBalances,

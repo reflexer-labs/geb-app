@@ -36,7 +36,7 @@ export const incentiveCampaignsQuery = (
           token0Price
           token1Price
          }
-         currentRedemptionPrice {
+         currentCoinMedianizerUpdate{
           value
         }
       }
@@ -51,13 +51,12 @@ export const incentiveCampaignsQuery = (
       }
 
      
-      tokens24HPrices:systemState(id: "current", block: {number: ${past24HBlocks(
+      old24hRaiPrice:systemState(id: "current", block: {number: ${past24HBlocks(
         blockNumber
       )}}) {
-          coinUniswapPair { 
-            token0Price
-            token1Price
-           }
+        currentCoinMedianizerUpdate{
+          value
+        }
         }
     
       

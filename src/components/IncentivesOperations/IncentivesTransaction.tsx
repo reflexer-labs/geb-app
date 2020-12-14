@@ -46,6 +46,7 @@ const IncentivesTransaction = () => {
   const reset = () => {
     popupsActions.setIsIncentivesModalOpen(false);
     incentivesActions.setOperation(0);
+    incentivesActions.setUniPoolAmount('');
     incentivesActions.setIncentivesFields({ ethAmount: '', raiAmount: '' });
   };
 

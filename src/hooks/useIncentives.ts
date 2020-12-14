@@ -121,8 +121,9 @@ export default function useIncentives() {
                   )
                   .format('MMM D, YYYY h:mm A')
               : '';
+
           const campaignEndTime =
-            startTime && startTime && rewardDelay
+            startTime && startTime
               ? dayjs
                   .unix(Number(startTime) + Number(duration))
                   .format('MMM D, YYYY h:mm A')
@@ -271,64 +272,27 @@ export function useIncentivesAssets() {
   useEffect(() => {
     function returnAssetsData() {
       // RAI token Data
-      const token0Price = _.get(
+      const raiCurrentPrice = _.get(
         incentivesCampaignData,
-        'systemState.coinUniswapPair.token0Price',
-        '0'
-      );
-      const token1Price = _.get(
-        incentivesCampaignData,
-        'systemState.coinUniswapPair.token1Price',
+        'systemState.currentCoinMedianizerUpdate.value',
         '0'
       );
 
-      const token0_24HPrice = _.get(
+      const raiOld24HPrice = _.get(
         incentivesCampaignData,
-        'tokens24HPrices.coinUniswapPair.token0Price',
+        'old24hRaiPrice.currentCoinMedianizerUpdate.value',
         '0'
       );
-      const token1_24HPrice = _.get(
-        incentivesCampaignData,
-        'tokens24HPrices.coinUniswapPair.token1Price',
-        '0'
-      );
-      const coinAddress = _.get(
-        incentivesCampaignData,
-        'systemState.coinAddress',
-        ''
-      );
-
-      const wethAddress = _.get(
-        incentivesCampaignData,
-        'systemState.wethAddress',
-        ''
-      );
-
-      const raiRedemptionPrice = _.get(
-        incentivesCampaignData,
-        'systemState.currentRedemptionPrice.value',
-        '0'
-      );
-
-      const isCoinLessThanWeth = () => {
-        if (!coinAddress || !wethAddress) return false;
-        return BigNumber.from(coinAddress).lt(BigNumber.from(wethAddress));
-      };
-
-      const rai24HPrice = isCoinLessThanWeth()
-        ? token0_24HPrice
-        : token1_24HPrice;
-      const raiCurrentPrice = isCoinLessThanWeth() ? token0Price : token1Price;
 
       const raiBalance = praiBalance[NETWORK_ID];
-      const raiPrice = numeral(raiRedemptionPrice).value();
+      const raiPrice = numeral(raiCurrentPrice).value();
       const raiPriceDiff = numeral(raiCurrentPrice)
-        .subtract(rai24HPrice)
+        .subtract(raiOld24HPrice)
         .value();
       const raiVolValue = numeral(raiBalance).multiply(raiPrice).value();
-      const raiDiffPercentage = numeral(rai24HPrice)
-        .divide(raiCurrentPrice)
-        .multiply(100)
+      const raiDiffPercentage = numeral(raiCurrentPrice)
+        .multiply(raiPriceDiff)
+        .divide(100)
         .value();
 
       const rai = {
@@ -637,7 +601,7 @@ export const returnFLX = (campaign: IIncentiveHook) => {
       incentiveCampaign,
       incentiveBalance
     ).toString(),
-    start: campaign.unlockUntil,
-    end: campaign.campaignEndTime,
+    start: campaign.campaignEndTime,
+    end: campaign.unlockUntil,
   };
 };

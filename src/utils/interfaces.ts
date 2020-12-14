@@ -253,14 +253,13 @@ export interface IIncentivesCampaignData {
       token0Price: string;
       token1Price: string;
     };
-    currentRedemptionPrice: {
+    currentCoinMedianizerUpdate: {
       value: string;
     };
   };
-  tokens24HPrices: {
-    coinUniswapPair: {
-      token0Price: string;
-      token1Price: string;
+  old24hRaiPrice: {
+    currentCoinMedianizerUpdate: {
+      value: string;
     };
   };
   incentiveBalances: Array<IncentiveBalance>;

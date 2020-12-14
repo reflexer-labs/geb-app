@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useIncentivesAssets } from '../hooks/useIncentives';
+
 import useWindowSize from '../hooks/useWindowSize';
 import { formatNumber } from '../utils/helper';
 import { AssetData } from '../utils/interfaces';
@@ -44,20 +45,26 @@ const IncentivesAssets = () => {
                     </Label>
                   </Col>
                   <Col>
-                    {obj.amount && formatNumber(obj.amount.toString(), 3)}
+                    {obj.amount
+                      ? formatNumber(obj.amount.toString(), 3)
+                      : '0.00'}
                   </Col>
                   <Col>
-                    ${obj.price}{' '}
+                    $
+                    {obj.price ? formatNumber(obj.price.toString(), 3) : '0.00'}{' '}
                     <Diff className={obj.diff >= 0 ? 'green' : 'red'}>
                       {obj.diff > 0 ? `+` : ''}
-                      {obj.diff && formatNumber(obj.diff.toString(), 3)}
+                      {obj.diff ? formatNumber(obj.diff.toString(), 3) : '0.00'}
                     </Diff>
                   </Col>
                   <Col>
-                    ${obj.value && formatNumber(obj.value.toString(), 3)}
+                    $
+                    {obj.value ? formatNumber(obj.value.toString(), 3) : '0.00'}
                     <Diff className={obj.diffPercentage >= 0 ? 'green' : 'red'}>
-                      {obj.diffPercentage &&
-                        formatNumber(obj.diffPercentage.toString(), 3)}
+                      {obj.diffPercentage > 0 ? `+` : ''}
+                      {obj.diffPercentage
+                        ? formatNumber(obj.diffPercentage.toString(), 3)
+                        : '0.00'}
                       %
                     </Diff>
                   </Col>{' '}
@@ -97,16 +104,13 @@ const Header = styled.div`
 const Thead = styled.div`
   flex: 0 0 20%;
   text-align: right;
+  font-size: ${(props) => props.theme.font.small};
   &:first-child {
     flex: 0 0 40%;
     text-align: left;
   }
   color: ${(props) => props.theme.colors.secondary};
   letter-spacing: 0.01px;
-  &:first-child,
-  &:last-child {
-    font-size: ${(props) => props.theme.font.extraSmall};
-  }
   font-weight: normal;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     &:nth-child(2),
