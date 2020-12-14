@@ -289,7 +289,11 @@ const SafeBody = ({ isChecked }: Props) => {
     );
 
     if (!isSafe && (collateralRatio as number) >= 0) {
-      setError(`Too much debt, below ${safetyCRatio} collateralization ratio`);
+      setError(
+        `Too much debt, below ${
+          Number(safetyCRatio) * 100
+        }% collateralization ratio`
+      );
       return false;
     }
 
