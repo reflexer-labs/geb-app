@@ -107,6 +107,7 @@ const incentivesModel: IncentivesModel = {
       });
 
       actions.setIncentivesFields(INITIAL_STATE);
+      storeActions.incentivesModel.setOperation(0);
       await txResponse.wait();
     }
   }),
@@ -134,6 +135,7 @@ const incentivesModel: IncentivesModel = {
       });
 
       actions.setClaimableFLX('');
+      storeActions.incentivesModel.setOperation(0);
       await txResponse.wait();
     }
   }),
@@ -157,6 +159,7 @@ const incentivesModel: IncentivesModel = {
         status: 'success',
       });
       actions.setUniPoolAmount('');
+      storeActions.incentivesModel.setOperation(0);
       await txResponse.wait();
     }
   }),
