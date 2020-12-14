@@ -77,7 +77,7 @@ export const fetchSafeById = (safeId: string, address: string) => {
         currentRedemptionPrice:
           res.data.data.systemState.currentRedemptionPrice.value,
         currentRedemptionRate:
-          res.data.data.systemState.currentRedemptionRate.annualizedRate,
+          res.data.data.systemState.currentRedemptionRate.eightHourlyRate,
       });
       const safeHistory = formatHistoryArray(
         res.data.data.safes[0].modifySAFECollateralization,
