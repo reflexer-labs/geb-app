@@ -6,7 +6,7 @@ import { IIncentiveHook } from '../../utils/interfaces';
 import Button from '../Button';
 import DecimalInput from '../DecimalInput';
 import Dropdown from '../Dropdown';
-import useIncentives, { returnFLX } from '../../hooks/useIncentives';
+import { returnFLX, useUserCampaigns } from '../../hooks/useIncentives';
 import { useOnceCall } from '../../hooks/useOnceCall';
 import { formatNumber } from '../../utils/helper';
 
@@ -19,7 +19,7 @@ interface ResultData {
 const RedeemRewards = () => {
   const { t } = useTranslation();
   const [error, setError] = useState('');
-  const campaigns = useIncentives();
+  const userCampaigns = useUserCampaigns();
 
   const [resultData, setResultData] = useState<ResultData>({
     flxAmount: '',
@@ -57,8 +57,8 @@ const RedeemRewards = () => {
 
   const handleSelectedCampaign = (selected: string) => {
     const id = selected.split('#').pop();
-    if (campaigns.length > 0) {
-      const campaign = campaigns.find(
+    if (userCampaigns.length > 0) {
+      const campaign = userCampaigns.find(
         (campaign: IIncentiveHook) => campaign.id === id
       );
       if (campaign) {
@@ -68,20 +68,20 @@ const RedeemRewards = () => {
   };
 
   useOnceCall(() => {
-    getResultData(campaigns[0]);
-  }, campaigns[0].id !== '');
+    getResultData(userCampaigns[0]);
+  }, userCampaigns[0].id !== '');
 
   return (
     <Body>
       <DropdownContainer>
         <Dropdown
-          items={campaigns.map(
+          items={userCampaigns.map(
             (campaign: IIncentiveHook) => `Campaign #${campaign.id}`
           )}
           getSelectedItem={handleSelectedCampaign}
           itemSelected={
-            campaigns.length > 0
-              ? `Campaign #${campaigns[0].id}`
+            userCampaigns.length > 0
+              ? `Campaign #${userCampaigns[0].id}`
               : 'Fetching Campaigns...'
           }
           label={'Select Campaign'}

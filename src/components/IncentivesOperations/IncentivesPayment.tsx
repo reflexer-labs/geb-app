@@ -12,6 +12,7 @@ import { formatNumber, toFixedString } from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
 import Results from './Results';
 import useIncentives from '../../hooks/useIncentives';
+import _ from '../../utils/lodash';
 
 const INITITAL_STATE = [
   {
@@ -48,7 +49,11 @@ const IncentivesPayment = () => {
   const { type, incentivesFields, uniPoolAmount } = incentivesState;
 
   const ethBalance = connectWalletState.ethBalance[NETWORK_ID];
-  const praiBalance = connectWalletState.praiBalance[NETWORK_ID];
+  const praiBalance = _.get(
+    incentivesState.incentivesCampaignData,
+    'praiBalance',
+    '0'
+  );
 
   const validationChecker = () => {
     if (type === 'deposit') {

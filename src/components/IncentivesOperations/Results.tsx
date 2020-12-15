@@ -25,7 +25,12 @@ const Results = () => {
   });
 
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
-  const { type, incentivesFields, claimableFLX } = incentivesState;
+  const {
+    type,
+    incentivesFields,
+    claimableFLX,
+    uniPoolAmount,
+  } = incentivesState;
 
   const returnCoinPerCoin = useCallback(
     (isEth = true) => {
@@ -67,7 +72,12 @@ const Results = () => {
 
   const returnFLXPerDay = useCallback(() => {
     const shareOfIncentivePool = returnShareOfIncentivePool();
-    if (!rewardRate || !shareOfIncentivePool || shareOfIncentivePool === 0)
+    if (
+      !rewardRate ||
+      Number(rewardRate) === 0 ||
+      !shareOfIncentivePool ||
+      shareOfIncentivePool === 0
+    )
       return 0;
     const rateVal = numeral(rewardRate).multiply(3600).multiply(24).value();
     return formatNumber(
@@ -77,27 +87,37 @@ const Results = () => {
 
   const returnRAIWithdrawn = useCallback(() => {
     if (
+      !uniPoolAmount ||
       !reserveRAI ||
       !coinTotalSupply ||
+      Number(uniPoolAmount) === 0 ||
       Number(reserveRAI) === 0 ||
       Number(coinTotalSupply) === 0
     )
       return 0;
-    const value = numeral(reserveRAI).divide(coinTotalSupply).value();
+    const value = numeral(reserveRAI)
+      .multiply(uniPoolAmount)
+      .divide(coinTotalSupply)
+      .value();
     return formatNumber(value.toString());
-  }, [reserveRAI, coinTotalSupply]);
+  }, [reserveRAI, coinTotalSupply, uniPoolAmount]);
 
   const returnETHWithdrawn = useCallback(() => {
     if (
+      !uniPoolAmount ||
       !reserveETH ||
       !coinTotalSupply ||
+      Number(uniPoolAmount) === 0 ||
       Number(reserveETH) === 0 ||
       Number(coinTotalSupply) === 0
     )
       return 0;
-    const value = numeral(reserveETH).divide(coinTotalSupply).value();
+    const value = numeral(reserveETH)
+      .multiply(uniPoolAmount)
+      .divide(coinTotalSupply)
+      .value();
     return formatNumber(value.toString());
-  }, [reserveETH, coinTotalSupply]);
+  }, [reserveETH, coinTotalSupply, uniPoolAmount]);
 
   useOnceCall(() => {
     setResultData(returnFLX(campaign));
@@ -128,10 +148,6 @@ const Results = () => {
                 <Item>
                   <Label>{'FLX Rewards Claimed Now'}</Label>{' '}
                   <Value>{formatNumber(resultData.flxAmount)}</Value>
-                </Item>
-                <Item>
-                  <Label>{'Locked Rewards'}</Label>{' '}
-                  <Value>{formatNumber(resultData.lockedReward)}</Value>
                 </Item>
               </>
             ) : (

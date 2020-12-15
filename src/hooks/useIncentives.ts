@@ -254,6 +254,56 @@ export default function useIncentives() {
   return state;
 }
 
+export function useUserCampaigns() {
+  const [state, setState] = useState<Array<IIncentiveHook>>(
+    INITIAL_INCENTIVE_STATE
+  );
+
+  const campaigns = useIncentives();
+  const { incentivesModel: incentivesState } = useStoreState((state) => state);
+
+  const { incentivesCampaignData } = incentivesState;
+
+  const userCampaignChecker = (x: IIncentiveHook, y: IncentiveBalance) => {
+    const { startTime, duration, lastUpdatedTime, rewardPerTokenStored } = x;
+    const {
+      delayedRewardExitedAmount,
+      delayedRewardTotalAmount,
+      userRewardPerTokenPaid,
+    } = y;
+
+    return (
+      Number(delayedRewardExitedAmount) === Number(delayedRewardTotalAmount) &&
+      Number(rewardPerTokenStored) >= Number(userRewardPerTokenPaid) &&
+      Number(lastUpdatedTime) >= Number(startTime) + Number(duration)
+    );
+  };
+
+  useEffect(() => {
+    function returnUserCampaigns() {
+      if (
+        incentivesCampaignData &&
+        incentivesCampaignData.incentiveBalances.length > 0
+      ) {
+        const list = campaigns.filter((x: IIncentiveHook) =>
+          incentivesCampaignData.incentiveBalances.find(
+            (y: IncentiveBalance) =>
+              x.id === y.campaignId && !userCampaignChecker(x, y)
+          )
+        );
+        if (list.length > 0) {
+          setState(list);
+        } else {
+          setState(campaigns);
+        }
+      }
+    }
+    returnUserCampaigns();
+  }, [incentivesCampaignData, campaigns]);
+
+  return state;
+}
+
 export function useIncentivesAssets() {
   const [state, setState] = useState<IIncentiveAssets>();
 
@@ -262,12 +312,7 @@ export function useIncentivesAssets() {
     connectWalletModel: connectWalletState,
   } = useStoreState((state) => state);
   const { incentivesCampaignData } = incentivesState;
-  const {
-    praiBalance,
-    ethBalance,
-    fiatPrice,
-    ethPriceChange,
-  } = connectWalletState;
+  const { ethBalance, fiatPrice, ethPriceChange } = connectWalletState;
 
   useEffect(() => {
     function returnAssetsData() {
@@ -284,7 +329,9 @@ export function useIncentivesAssets() {
         '0'
       );
 
-      const raiBalance = praiBalance[NETWORK_ID];
+      const raiBalance = numeral(
+        _.get(incentivesCampaignData, 'praiBalance', '0')
+      ).value();
       const raiPrice = numeral(raiCurrentPrice).value();
       const raiPriceDiff = numeral(raiCurrentPrice)
         .subtract(raiOld24HPrice)
@@ -343,13 +390,7 @@ export function useIncentivesAssets() {
       setState({ eth, rai, flx });
     }
     returnAssetsData();
-  }, [
-    incentivesCampaignData,
-    fiatPrice,
-    praiBalance,
-    ethBalance,
-    ethPriceChange,
-  ]);
+  }, [incentivesCampaignData, fiatPrice, ethBalance, ethPriceChange]);
 
   return state;
 }

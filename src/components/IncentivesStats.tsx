@@ -6,7 +6,7 @@ import Button from './Button';
 import ReactTooltip from 'react-tooltip';
 import { Info } from 'react-feather';
 import Arrow from './Icons/Arrow';
-import useIncentives from '../hooks/useIncentives';
+import useIncentives, { useUserCampaigns } from '../hooks/useIncentives';
 import { useActiveWeb3React } from '../hooks';
 
 const IncentivesStats = () => {
@@ -24,6 +24,8 @@ const IncentivesStats = () => {
     instantExitPercentage,
     user,
   } = useIncentives()[0];
+
+  const userCampaigns = useUserCampaigns();
 
   const {
     popupsModel: popupsActions,
@@ -93,7 +95,11 @@ const IncentivesStats = () => {
         <ReactTooltip multiline type="light" data-effect="solid" />
       </StatsGrid>
 
-      <BtnContainer>
+      <BtnContainer
+        className={
+          userCampaigns.length && userCampaigns[0].id !== '' ? '' : 'hide'
+        }
+      >
         <div>
           <Button
             text={t('withdraw')}
@@ -109,6 +115,7 @@ const IncentivesStats = () => {
             withArrow
           />
         </div>
+
         <div>
           <Button
             withArrow
@@ -237,7 +244,9 @@ const BtnContainer = styled.div`
   div {
     flex: 0 0 33.3%;
     text-align: center;
-
+    &:first-child {
+      border-right: 1px solid ${(props) => props.theme.colors.border};
+    }
     button {
       display: block;
       width: 100%;
@@ -248,13 +257,22 @@ const BtnContainer = styled.div`
 
   .mid-btn {
     border-right: 1px solid ${(props) => props.theme.colors.border};
-    border-left: 1px solid ${(props) => props.theme.colors.border};
     button {
       background: linear-gradient(225deg, #4ce096 0%, #78d8ff 100%);
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       color: ${(props) => props.theme.colors.inputBorderColor};
+    }
+  }
+
+  &.hide {
+    max-width: 500px;
+    div {
+      flex: 0 0 50%;
+      &.mid-btn {
+        display: none;
+      }
     }
   }
 `;

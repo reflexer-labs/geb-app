@@ -257,6 +257,7 @@ export interface IIncentivesCampaignData {
       value: string;
     };
   };
+  praiBalance: string;
   old24hRaiPrice: {
     currentCoinMedianizerUpdate: {
       value: string;

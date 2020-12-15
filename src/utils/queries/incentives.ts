@@ -50,7 +50,9 @@ export const incentiveCampaignsQuery = (
           delayedRewardLatestExitTime
       }
 
-     
+      praiBalance:erc20Balances(where: {address: "${address}"}) {
+        balance
+        }
       old24hRaiPrice:systemState(id: "current", block: {number: ${past24HBlocks(
         blockNumber
       )}}) {
