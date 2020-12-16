@@ -42,7 +42,6 @@ export const incentiveCampaignsQuery = (
       }
     incentiveBalances(where: {owner: "${address}"}, orderBy: campaignId, orderDirection: desc) {
           campaignId
-          stakedBalance
           reward
           userRewardPerTokenPaid
           delayedRewardTotalAmount
@@ -50,7 +49,10 @@ export const incentiveCampaignsQuery = (
           delayedRewardLatestExitTime
       }
 
-      praiBalance:erc20Balances(where: {address: "${address}"}) {
+      praiBalance:erc20Balances(where: {address: "${address}", label: "COIN"}) {
+        balance
+        }
+      stakedBalance:erc20Balances(where: {owner: "${address}", label: "INCENTIVE_STAKE"}) {
         balance
         }
       old24hRaiPrice:systemState(id: "current", block: {number: ${past24HBlocks(

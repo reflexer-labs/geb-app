@@ -32,9 +32,9 @@ export const getUserSafesListQuery = (address: string) => `{
     createdAt
     debt
   }
- erc20Balances(where: {address: "${address}"}) {
-  balance
-  }
+  erc20Balances(where: {address: "${address}", label:"COIN"}) {
+    balance
+    }
   ${liquidationQuery}
 }`;
 
@@ -67,7 +67,7 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
       amount
     }
   }
-  erc20Balances(where: {address: "${address}"}) {
+  erc20Balances(where: {address: "${address}", label:"COIN"}) {
    balance
    }
    ${liquidationQuery}

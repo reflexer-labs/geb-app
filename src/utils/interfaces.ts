@@ -232,7 +232,6 @@ export interface IncentivesCampaign {
 export interface IncentiveBalance {
   campaignId: string;
   reward: string;
-  stakedBalance: string;
   userRewardPerTokenPaid: string;
   delayedRewardTotalAmount: string;
   delayedRewardExitedAmount: string;
@@ -242,6 +241,7 @@ export interface IncentiveBalance {
 export interface IIncentivesCampaignData {
   user: string | null;
   allCampaigns: Array<IncentivesCampaign>;
+  stakedBalance: string;
   systemState: {
     coinAddress: string;
     wethAddress: string;
