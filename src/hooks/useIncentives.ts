@@ -268,20 +268,20 @@ export function useUserCampaigns() {
 
   const { incentivesCampaignData } = incentivesState;
 
-  // const userCampaignChecker = (x: IIncentiveHook, y: IncentiveBalance) => {
-  //   const { startTime, duration, lastUpdatedTime, rewardPerTokenStored } = x;
-  //   const {
-  //     delayedRewardExitedAmount,
-  //     delayedRewardTotalAmount,
-  //     userRewardPerTokenPaid,
-  //   } = y;
+  const userCampaignChecker = (x: IIncentiveHook, y: IncentiveBalance) => {
+    const { startTime, duration, lastUpdatedTime, rewardPerTokenStored } = x;
+    const {
+      delayedRewardExitedAmount,
+      delayedRewardTotalAmount,
+      userRewardPerTokenPaid,
+    } = y;
 
-  //   return (
-  //     Number(delayedRewardExitedAmount) === Number(delayedRewardTotalAmount) &&
-  //     Number(rewardPerTokenStored) >= Number(userRewardPerTokenPaid) &&
-  //     Number(lastUpdatedTime) >= Number(startTime) + Number(duration)
-  //   );
-  // };
+    return (
+      Number(delayedRewardExitedAmount) === Number(delayedRewardTotalAmount) &&
+      Number(rewardPerTokenStored) >= Number(userRewardPerTokenPaid) &&
+      Number(lastUpdatedTime) >= Number(startTime) + Number(duration)
+    );
+  };
 
   useEffect(() => {
     function returnUserCampaigns() {
@@ -291,7 +291,8 @@ export function useUserCampaigns() {
       ) {
         const list = campaigns.filter((x: IIncentiveHook) =>
           incentivesCampaignData.incentiveBalances.find(
-            (y: IncentiveBalance) => x.id === y.campaignId
+            (y: IncentiveBalance) =>
+              x.id === y.campaignId && !userCampaignChecker(x, y)
           )
         );
         if (list.length > 0) {
@@ -344,6 +345,7 @@ export function useIncentivesAssets() {
         .multiply(raiPriceDiff)
         .divide(100)
         .value();
+
       const rai = {
         img: require('../assets/rai-logo.svg'),
         token: 'RAI Token',
