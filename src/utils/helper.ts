@@ -478,3 +478,9 @@ export const numberizeString = (obj: any) => {
 
   return res;
 };
+
+export const returnTimeOffset = () => {
+  const a = new Date().getTimezoneOffset();
+  const res = -Math.round(a / 60);
+  return res < 0 ? res : '+' + res;
+};

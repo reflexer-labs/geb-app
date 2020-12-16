@@ -5,7 +5,11 @@ import { useEffect, useState } from 'react';
 import { NETWORK_ID } from '../connectors';
 import { useStoreState } from '../store';
 import { COIN_TICKER, INITIAL_INCENTIVE_STATE } from '../utils/constants';
-import { formatNumber, numberizeString } from '../utils/helper';
+import {
+  formatNumber,
+  numberizeString,
+  returnTimeOffset,
+} from '../utils/helper';
 import {
   IIncentiveAssets,
   IIncentiveHook,
@@ -113,20 +117,22 @@ export default function useIncentives() {
             '0'
           );
 
+          console.log(new Date().toLocaleString('en-US'));
+
           const unlockUntil =
             startTime && startTime
               ? dayjs
                   .unix(
                     Number(startTime) + Number(duration) + Number(rewardDelay)
                   )
-                  .format('MMM D, YYYY h:mm A')
+                  .format('MMM D, YYYY h:mm A') + ` (GMT${returnTimeOffset()})`
               : '';
 
           const campaignEndTime =
             startTime && startTime
               ? dayjs
                   .unix(Number(startTime) + Number(duration))
-                  .format('MMM D, YYYY h:mm A')
+                  .format('MMM D, YYYY h:mm A') + ` (GMT${returnTimeOffset()})`
               : '';
 
           const dailyFLX = isOngoingCampaign()
