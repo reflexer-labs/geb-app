@@ -7,6 +7,19 @@ import { getUserQuery } from '../utils/queries/user';
 import { incentiveCampaignsQuery } from '../utils/queries/incentives';
 import { IIncentivesCampaignData } from '../utils/interfaces';
 
+export const getFirstValid = async (query: string, index = 0): Promise<any> => {
+  try {
+    const res = await axios.post(GRAPH_API_URLS[index], query);
+    return res;
+  } catch (error) {
+    if (index < GRAPH_API_URLS.length - 1) {
+      return getFirstValid(query, index + 1);
+    }
+    console.log('Both nodes are down, Contact support!');
+    return Promise.reject(error);
+  }
+};
+
 export const fetchUser = (address: string) => {
   return retry(
     async (bail, attempt) => {
@@ -120,41 +133,33 @@ export const fetchIncentivesCampaigns = async (
   address: string,
   blockNumber: number
 ) => {
-  return retry(
-    async (bail, attempt) => {
-      const res = await axios.post(
-        GRAPH_API_URLS[attempt - 1],
-        JSON.stringify({ query: incentiveCampaignsQuery(address, blockNumber) })
-      );
-
-      const response = res.data.data;
-
-      const proxyData =
-        response.userProxies && response.userProxies.length > 0
-          ? response.userProxies[0]
-          : null;
-
-      const payload: IIncentivesCampaignData = {
-        user: response.user ? response.user.id : null,
-        proxyData,
-        stakedBalance:
-          response.stakedBalance && response.stakedBalance.length > 0
-            ? response.stakedBalance[0].balance
-            : '0',
-        praiBalance:
-          response.praiBalance && response.praiBalance.length > 0
-            ? response.praiBalance[0].balance
-            : '0',
-        old24hRaiPrice: response.old24hRaiPrice,
-        allCampaigns: response.incentiveCampaigns,
-        systemState: response.systemState,
-        incentiveBalances: response.incentiveBalances,
-      };
-
-      return payload;
-    },
-    {
-      retries: GRAPH_API_URLS.length - 1,
-    }
+  const res = await getFirstValid(
+    JSON.stringify({ query: incentiveCampaignsQuery(address, blockNumber) })
   );
+
+  const response = res.data.data;
+
+  const proxyData =
+    response.userProxies && response.userProxies.length > 0
+      ? response.userProxies[0]
+      : null;
+
+  const payload: IIncentivesCampaignData = {
+    user: response.user ? response.user.id : null,
+    proxyData,
+    stakedBalance:
+      response.stakedBalance && response.stakedBalance.length > 0
+        ? response.stakedBalance[0].balance
+        : '0',
+    praiBalance:
+      response.praiBalance && response.praiBalance.length > 0
+        ? response.praiBalance[0].balance
+        : '0',
+    old24hRaiPrice: response.old24hRaiPrice,
+    allCampaigns: response.incentiveCampaigns,
+    systemState: response.systemState,
+    incentiveBalances: response.incentiveBalances,
+  };
+
+  return payload;
 };

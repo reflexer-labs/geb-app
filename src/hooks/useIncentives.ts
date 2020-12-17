@@ -321,36 +321,41 @@ export function useIncentivesAssets() {
   useEffect(() => {
     function returnAssetsData() {
       // RAI token Data
-      const raiCurrentPrice = _.get(
-        incentivesCampaignData,
-        'systemState.currentCoinMedianizerUpdate.value',
-        '0'
-      );
+      const raiCurrentPrice =
+        _.get(
+          incentivesCampaignData,
+          'systemState.currentCoinMedianizerUpdate.value',
+          '0'
+        ) || '0';
 
-      const raiOld24HPrice = _.get(
-        incentivesCampaignData,
-        'old24hRaiPrice.currentCoinMedianizerUpdate.value',
-        '0'
-      );
+      const raiOld24HPrice =
+        _.get(
+          incentivesCampaignData,
+          'old24hRaiPrice.currentCoinMedianizerUpdate.value',
+          '0'
+        ) || '0';
 
       const raiBalance = numeral(
         _.get(incentivesCampaignData, 'praiBalance', '0')
       ).value();
+
       const raiPrice = numeral(raiCurrentPrice).value();
+
       const raiPriceDiff = numeral(raiCurrentPrice)
         .subtract(raiOld24HPrice)
         .value();
+
       const raiVolValue = numeral(raiBalance).multiply(raiPrice).value();
-      const raiDiffPercentage = numeral(raiCurrentPrice)
-        .multiply(raiPriceDiff)
-        .divide(100)
-        .value();
+      const raiDiffPercentage =
+        numeral(raiPriceDiff).value() !== 0
+          ? numeral(raiPriceDiff).multiply(raiCurrentPrice).divide(100).value()
+          : 0;
 
       const rai = {
         img: require('../assets/rai-logo.svg'),
         token: 'RAI Token',
         name: COIN_TICKER || 'RAI',
-        amount: raiBalance || 0,
+        amount: raiBalance,
         price: raiPrice,
         diff: raiPriceDiff,
         value: raiVolValue,
@@ -360,10 +365,10 @@ export function useIncentivesAssets() {
       // ETH token Data
       const totalEth = ethBalance[NETWORK_ID];
       const ethPrice = fiatPrice;
-      const ethPriceDiff = numeral(ethPrice)
-        .multiply(ethPriceChange)
-        .divide(100)
-        .value();
+      const ethPriceDiff =
+        numeral(ethPriceChange).value() !== 0
+          ? numeral(ethPrice).multiply(ethPriceChange).divide(100).value()
+          : 0;
       const ethVolValue = numeral(totalEth).multiply(ethPrice).value();
       const ethDiffPercentage = ethPriceChange;
 
@@ -371,7 +376,7 @@ export function useIncentivesAssets() {
         img: require('../assets/eth-logo.svg'),
         name: 'ETH',
         token: 'Ethereum',
-        amount: totalEth || 0,
+        amount: totalEth,
         price: ethPrice,
         diff: ethPriceDiff,
         value: ethVolValue,
