@@ -15,6 +15,7 @@ const Results = () => {
     reserveRAI,
     totalSupply,
     rewardRate,
+    stakedBalance,
     coinTotalSupply,
     isOngoingCampaign,
   } = campaign;
@@ -66,26 +67,49 @@ const Results = () => {
       shareOfUniSwapPool === 0
     )
       return 0;
+
+    const denominator = numeral(totalSupply).add(shareOfUniSwapPool).value();
     return formatNumber(
-      numeral(shareOfUniSwapPool).divide(totalSupply).value().toString()
+      numeral(shareOfUniSwapPool)
+        .divide(denominator)
+        .multiply(100)
+        .value()
+        .toString()
     );
   }, [returnShareOfUniswapPool, totalSupply]);
 
   const returnFLXPerDay = useCallback(() => {
-    const shareOfIncentivePool = returnShareOfIncentivePool();
+    let { ethAmount, raiAmount } = incentivesFields;
+    if (!ethAmount) ethAmount = '0';
+    if (!raiAmount) ethAmount = '0';
     if (
       !isOngoingCampaign ||
       !rewardRate ||
+      !totalSupply ||
       Number(rewardRate) === 0 ||
-      !shareOfIncentivePool ||
-      shareOfIncentivePool === 0
+      Number(totalSupply) === 0
     )
       return 0;
-    const rateVal = numeral(rewardRate).multiply(3600).multiply(24).value();
+
+    const numerator =
+      Math.sqrt(numeral(ethAmount).multiply(raiAmount).value()) +
+      numeral(stakedBalance).value();
+    const denominator = numeral(totalSupply)
+      .multiply(rewardRate)
+      .multiply(3600)
+      .multiply(24)
+      .value();
+
     return formatNumber(
-      numeral(shareOfIncentivePool).divide(rateVal).value().toString()
+      numeral(numerator).divide(denominator).value().toString()
     );
-  }, [returnShareOfIncentivePool, rewardRate, isOngoingCampaign]);
+  }, [
+    incentivesFields,
+    totalSupply,
+    rewardRate,
+    stakedBalance,
+    isOngoingCampaign,
+  ]);
 
   const returnRAIWithdrawn = useCallback(() => {
     if (
@@ -168,7 +192,7 @@ const Results = () => {
                 </Item>
                 <Item>
                   <Label>{'Share of Incentives Pool'}</Label>{' '}
-                  <Value>{returnShareOfIncentivePool()}</Value>
+                  <Value>{returnShareOfIncentivePool()}%</Value>
                 </Item>
                 <Item>
                   <Label>{'FLX per Day'}</Label>{' '}

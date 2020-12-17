@@ -410,17 +410,17 @@ export function useIncentivesAssets() {
       let uniPoolValue = 0;
 
       if (reserveETH && coinTotalSupply && ethPrice) {
-        const ethSupply = numeral(reserveETH).divide(coinTotalSupply).value();
         uniPoolPrice = numeral(2)
-          .multiply(uniPoolBalance)
-          .multiply(ethSupply)
+          .multiply(ethPrice)
+          .multiply(reserveETH)
+          .divide(coinTotalSupply)
           .value();
         uniPoolValue = numeral(uniPoolBalance).multiply(uniPoolPrice).value();
       }
 
       const uni = {
-        name: 'UniPool',
-        token: 'UniSwap Pool Token',
+        name: 'UNI-V2',
+        token: `Uniswap LP token for ${COIN_TICKER}-ETH pair`,
         img: require('../assets/uni-icon.svg'),
         amount: uniPoolBalance,
         price: uniPoolPrice,
