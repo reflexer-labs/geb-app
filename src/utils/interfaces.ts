@@ -258,6 +258,8 @@ export interface IIncentivesCampaignData {
     };
   };
   praiBalance: string;
+  protBalance: string;
+  uniswapCoinPool: string;
   old24hRaiPrice: {
     currentCoinMedianizerUpdate: {
       value: string;
@@ -347,4 +349,5 @@ export interface IIncentiveAssets {
   eth: AssetData;
   rai: AssetData;
   flx: AssetData;
+  uni: AssetData;
 }

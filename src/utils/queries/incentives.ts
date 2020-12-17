@@ -52,6 +52,12 @@ export const incentiveCampaignsQuery = (
       praiBalance:erc20Balances(where: {address: "${address}", label: "COIN"}) {
         balance
         }
+      protBalance:erc20Balances(where: {address: "${address}", label: "PROT_TOKEN"}) {
+        balance
+        }
+      uniswapCoinPool:erc20Balances(where: {address: "${address}", label: "UNISWAP_POOL_TOKEN_COIN"}) {
+        balance
+        }
       stakedBalance:erc20Balances(where: {owner: "${address}", label: "INCENTIVE_STAKE"}) {
         balance
         }

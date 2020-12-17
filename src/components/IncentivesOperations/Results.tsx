@@ -16,6 +16,7 @@ const Results = () => {
     totalSupply,
     rewardRate,
     coinTotalSupply,
+    isOngoingCampaign,
   } = campaign;
   const [resultData, setResultData] = useState({
     flxAmount: '',
@@ -73,6 +74,7 @@ const Results = () => {
   const returnFLXPerDay = useCallback(() => {
     const shareOfIncentivePool = returnShareOfIncentivePool();
     if (
+      !isOngoingCampaign ||
       !rewardRate ||
       Number(rewardRate) === 0 ||
       !shareOfIncentivePool ||
@@ -83,7 +85,7 @@ const Results = () => {
     return formatNumber(
       numeral(shareOfIncentivePool).divide(rateVal).value().toString()
     );
-  }, [returnShareOfIncentivePool, rewardRate]);
+  }, [returnShareOfIncentivePool, rewardRate, isOngoingCampaign]);
 
   const returnRAIWithdrawn = useCallback(() => {
     if (

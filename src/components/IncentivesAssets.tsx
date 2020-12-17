@@ -128,7 +128,8 @@ const Row = styled.div`
   display: flex;
   padding: 12px 20px;
   border-top: 1px solid ${(props) => props.theme.colors.border};
-  &:first-child {
+  &:first-child,
+  &:last-child {
     img {
       padding: 1px;
       border: 1px solid ${(props) => props.theme.colors.border};

@@ -155,6 +155,14 @@ export const fetchIncentivesCampaigns = async (
       response.praiBalance && response.praiBalance.length > 0
         ? response.praiBalance[0].balance
         : '0',
+    protBalance:
+      response.protBalance && response.protBalance.length > 0
+        ? response.protBalance[0].balance
+        : '0',
+    uniswapCoinPool:
+      response.uniswapCoinPool && response.uniswapCoinPool.length > 0
+        ? response.uniswapCoinPool[0].balance
+        : '0',
     old24hRaiPrice: response.old24hRaiPrice,
     allCampaigns: response.incentiveCampaigns,
     systemState: response.systemState,

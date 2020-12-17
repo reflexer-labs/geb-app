@@ -310,7 +310,7 @@ export function useUserCampaigns() {
 
 export function useIncentivesAssets() {
   const [state, setState] = useState<IIncentiveAssets>();
-
+  const campaign = useIncentives()[0];
   const {
     incentivesModel: incentivesState,
     connectWalletModel: connectWalletState,
@@ -320,6 +320,8 @@ export function useIncentivesAssets() {
 
   useEffect(() => {
     function returnAssetsData() {
+      const { reserveETH, coinTotalSupply } = campaign;
+
       // RAI token Data
       const raiCurrentPrice =
         _.get(
@@ -384,22 +386,53 @@ export function useIncentivesAssets() {
       };
 
       // TODO: FLX
+      const flxBalance =
+        numeral(_.get(incentivesCampaignData, 'protBalance', '0')).value() || 0;
 
       const flx = {
         name: 'FLX',
         token: 'Flex Token',
         img: require('../assets/logo192.png'),
-        amount: 0,
+        amount: flxBalance,
         price: 0,
         diff: 0,
         value: 0,
         diffPercentage: 0,
       };
 
-      setState({ eth, rai, flx });
+      // TODO: uniswapCoinPool
+      const uniPoolBalance =
+        numeral(
+          _.get(incentivesCampaignData, 'uniswapCoinPool', '0')
+        ).value() || 0;
+
+      let uniPoolPrice = 0;
+      let uniPoolValue = 0;
+
+      if (reserveETH && coinTotalSupply && ethPrice) {
+        const ethSupply = numeral(reserveETH).divide(coinTotalSupply).value();
+        uniPoolPrice = numeral(2)
+          .multiply(uniPoolBalance)
+          .multiply(ethSupply)
+          .value();
+        uniPoolValue = numeral(uniPoolBalance).multiply(uniPoolPrice).value();
+      }
+
+      const uni = {
+        name: 'UniPool',
+        token: 'UniSwap Pool Token',
+        img: require('../assets/uni-icon.svg'),
+        amount: uniPoolBalance,
+        price: uniPoolPrice,
+        diff: 0,
+        value: uniPoolValue,
+        diffPercentage: 0,
+      };
+
+      setState({ eth, rai, flx, uni });
     }
     returnAssetsData();
-  }, [incentivesCampaignData, fiatPrice, ethBalance, ethPriceChange]);
+  }, [incentivesCampaignData, campaign, fiatPrice, ethBalance, ethPriceChange]);
 
   return state;
 }
