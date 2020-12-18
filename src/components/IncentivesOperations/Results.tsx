@@ -187,7 +187,7 @@ const Results = () => {
                   <Value>{returnCoinPerCoin()}</Value>
                 </Item>
                 <Item>
-                  <Label>{'Share of Uniswap Pool'}</Label>{' '}
+                  <Label>{'Total Uni LP tokens in incentive pool'}</Label>{' '}
                   <Value>{returnShareOfUniswapPool()}</Value>
                 </Item>
                 <Item>

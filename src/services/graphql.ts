@@ -163,7 +163,7 @@ export const fetchIncentivesCampaigns = async (
       response.uniswapCoinPool && response.uniswapCoinPool.length > 0
         ? response.uniswapCoinPool[0].balance
         : '0',
-    old24hRaiPrice: response.old24hRaiPrice,
+    old24hData: response.old24hData,
     allCampaigns: response.incentiveCampaigns,
     systemState: response.systemState,
     incentiveBalances: response.incentiveBalances,

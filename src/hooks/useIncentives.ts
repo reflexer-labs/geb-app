@@ -268,18 +268,28 @@ export function useUserCampaigns() {
 
   const { incentivesCampaignData } = incentivesState;
 
-  const userCampaignChecker = (x: IIncentiveHook, y: IncentiveBalance) => {
-    const { startTime, duration, lastUpdatedTime, rewardPerTokenStored } = x;
+  const userCampaignChecker = (
+    incentiveCampaign: IIncentiveHook,
+    incentiveBalance: IncentiveBalance
+  ) => {
+    const {
+      startTime,
+      duration,
+      lastUpdatedTime,
+      rewardPerTokenStored,
+    } = incentiveCampaign;
     const {
       delayedRewardExitedAmount,
       delayedRewardTotalAmount,
       userRewardPerTokenPaid,
-    } = y;
+      reward,
+    } = incentiveBalance;
 
     return (
       Number(delayedRewardExitedAmount) === Number(delayedRewardTotalAmount) &&
       Number(rewardPerTokenStored) >= Number(userRewardPerTokenPaid) &&
-      Number(lastUpdatedTime) >= Number(startTime) + Number(duration)
+      Number(lastUpdatedTime) >= Number(startTime) + Number(duration) &&
+      Number(reward) === 0
     );
   };
 
@@ -322,6 +332,51 @@ export function useIncentivesAssets() {
     function returnAssetsData() {
       const { reserveETH, coinTotalSupply } = campaign;
 
+      const old24hCoinAddress = _.get(
+        incentivesCampaignData,
+        'old24hData.coinAddress',
+        ''
+      );
+
+      const old24hWethAddress = _.get(
+        incentivesCampaignData,
+        'old24hData.wethAddress',
+        ''
+      );
+
+      const old24hReserve0 = _.get(
+        incentivesCampaignData,
+        'old24hData.coinUniswapPair.reserve0',
+        '0'
+      );
+
+      const old24hReserve1 = _.get(
+        incentivesCampaignData,
+        'old24hData.coinUniswapPair.reserve1',
+        '0'
+      );
+
+      const old24hCoinTotalSupply = _.get(
+        incentivesCampaignData,
+        'old24hData.coinUniswapPair.totalSupply',
+        '0'
+      );
+
+      const isCoinLessThanWeth = () => {
+        if (!old24hCoinAddress || !old24hWethAddress) return false;
+        return BigNumber.from(old24hCoinAddress).lt(
+          BigNumber.from(old24hWethAddress)
+        );
+      };
+
+      let old24hReserveETH = '0';
+
+      if (isCoinLessThanWeth()) {
+        old24hReserveETH = old24hReserve1;
+      } else {
+        old24hReserveETH = old24hReserve0;
+      }
+
       // RAI token Data
       const raiCurrentPrice =
         _.get(
@@ -333,7 +388,7 @@ export function useIncentivesAssets() {
       const raiOld24HPrice =
         _.get(
           incentivesCampaignData,
-          'old24hRaiPrice.currentCoinMedianizerUpdate.value',
+          'old24hData.currentCoinMedianizerUpdate.value',
           '0'
         ) || '0';
 
@@ -348,9 +403,10 @@ export function useIncentivesAssets() {
         .value();
 
       const raiVolValue = numeral(raiBalance).multiply(raiPrice).value();
+
       const raiDiffPercentage =
         numeral(raiPriceDiff).value() !== 0
-          ? numeral(raiPriceDiff).multiply(raiCurrentPrice).divide(100).value()
+          ? numeral(raiPriceDiff).divide(raiOld24HPrice).multiply(100).value()
           : 0;
 
       const rai = {
@@ -400,7 +456,7 @@ export function useIncentivesAssets() {
         diffPercentage: 0,
       };
 
-      // TODO: uniswapCoinPool
+      // uniswapCoinPool
       const uniPoolBalance =
         numeral(
           _.get(incentivesCampaignData, 'uniswapCoinPool', '0')
@@ -408,6 +464,7 @@ export function useIncentivesAssets() {
 
       let uniPoolPrice = 0;
       let uniPoolValue = 0;
+      let old24hUniPoolPrice = 0;
 
       if (reserveETH && coinTotalSupply && ethPrice) {
         uniPoolPrice = numeral(2)
@@ -418,15 +475,41 @@ export function useIncentivesAssets() {
         uniPoolValue = numeral(uniPoolBalance).multiply(uniPoolPrice).value();
       }
 
+      if (
+        old24hReserveETH &&
+        old24hCoinTotalSupply &&
+        ethPrice &&
+        ethPriceDiff
+      ) {
+        const old24hEthPrice = ethPrice + ethPriceDiff;
+        old24hUniPoolPrice = numeral(2)
+          .multiply(old24hEthPrice)
+          .multiply(old24hReserveETH)
+          .divide(old24hCoinTotalSupply)
+          .value();
+      }
+
+      const uniPoolPriceDiff =
+        numeral(uniPoolPrice).subtract(old24hUniPoolPrice).value() || 0;
+
+      const uniPoolPercentageDiff =
+        numeral(uniPoolPriceDiff).value() !== 0
+          ? numeral(uniPoolPriceDiff)
+              .divide(old24hUniPoolPrice)
+              .multiply(100)
+              .value()
+          : 0;
+
       const uni = {
         name: 'UNI-V2',
         token: `Uniswap LP token for ${COIN_TICKER}-ETH pair`,
         img: require('../assets/uni-icon.svg'),
         amount: uniPoolBalance,
         price: uniPoolPrice,
-        diff: 0,
+        diff: uniPoolPriceDiff,
         value: uniPoolValue,
-        diffPercentage: 0,
+        diffPercentage:
+          uniPoolPercentageDiff === 100 ? 0 : uniPoolPercentageDiff,
       };
 
       setState({ eth, rai, flx, uni });

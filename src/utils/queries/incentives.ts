@@ -61,9 +61,16 @@ export const incentiveCampaignsQuery = (
       stakedBalance:erc20Balances(where: {owner: "${address}", label: "INCENTIVE_STAKE"}) {
         balance
         }
-      old24hRaiPrice:systemState(id: "current", block: {number: ${past24HBlocks(
+      old24hData:systemState(id: "current", block: {number: ${past24HBlocks(
         blockNumber
       )}}) {
+        coinAddress
+        wethAddress
+        coinUniswapPair {
+          totalSupply
+          reserve0
+          reserve1
+         }
         currentCoinMedianizerUpdate{
           value
         }

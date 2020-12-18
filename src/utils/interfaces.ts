@@ -260,7 +260,14 @@ export interface IIncentivesCampaignData {
   praiBalance: string;
   protBalance: string;
   uniswapCoinPool: string;
-  old24hRaiPrice: {
+  old24hData: {
+    coinAddress: string;
+    wethAddress: string;
+    coinUniswapPair: {
+      totalSupply: string;
+      reserve0: string;
+      reserve1: string;
+    };
     currentCoinMedianizerUpdate: {
       value: string;
     };
