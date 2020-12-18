@@ -295,26 +295,20 @@ export function useUserCampaigns() {
 
   useEffect(() => {
     function returnUserCampaigns() {
-      const latestCampaign = campaigns[0];
-
       if (
         incentivesCampaignData &&
         incentivesCampaignData.incentiveBalances.length > 0
       ) {
-        const list = campaigns.filter((x: IIncentiveHook) =>
-          incentivesCampaignData.incentiveBalances.find(
-            (y: IncentiveBalance) => {
-              return x.id === y.campaignId && !userCampaignChecker(x, y);
-            }
-          )
+        const list = campaigns.filter(
+          (x: IIncentiveHook) =>
+            (x.myRewardRate && Number(x.myRewardRate) > 0) ||
+            incentivesCampaignData.incentiveBalances.find(
+              (y: IncentiveBalance) =>
+                x.id === y.campaignId && !userCampaignChecker(x, y)
+            )
         );
         if (list.length > 0) {
-          const includeLatestCampaign =
-            latestCampaign.myRewardRate &&
-            Number(latestCampaign.myRewardRate) > 0
-              ? [latestCampaign]
-              : [];
-          setState([...includeLatestCampaign, ...list]);
+          setState(list);
         } else {
           setState(campaigns);
         }
