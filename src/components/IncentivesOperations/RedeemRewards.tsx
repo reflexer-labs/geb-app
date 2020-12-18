@@ -6,10 +6,7 @@ import { IIncentiveHook } from '../../utils/interfaces';
 import Button from '../Button';
 import DecimalInput from '../DecimalInput';
 import Dropdown from '../Dropdown';
-import useIncentives, {
-  returnFLX,
-  useUserCampaigns,
-} from '../../hooks/useIncentives';
+import { returnFLX, useUserCampaigns } from '../../hooks/useIncentives';
 import { useOnceCall } from '../../hooks/useOnceCall';
 import { formatNumber } from '../../utils/helper';
 

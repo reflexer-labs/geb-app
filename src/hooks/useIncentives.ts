@@ -295,18 +295,26 @@ export function useUserCampaigns() {
 
   useEffect(() => {
     function returnUserCampaigns() {
+      const latestCampaign = campaigns[0];
+
       if (
         incentivesCampaignData &&
         incentivesCampaignData.incentiveBalances.length > 0
       ) {
         const list = campaigns.filter((x: IIncentiveHook) =>
           incentivesCampaignData.incentiveBalances.find(
-            (y: IncentiveBalance) =>
-              x.id === y.campaignId && !userCampaignChecker(x, y)
+            (y: IncentiveBalance) => {
+              return x.id === y.campaignId && !userCampaignChecker(x, y);
+            }
           )
         );
         if (list.length > 0) {
-          setState(list);
+          const includeLatestCampaign =
+            latestCampaign.myRewardRate &&
+            Number(latestCampaign.myRewardRate) > 0
+              ? [latestCampaign]
+              : [];
+          setState([...includeLatestCampaign, ...list]);
         } else {
           setState(campaigns);
         }
