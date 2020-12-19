@@ -17,7 +17,7 @@ systemState(id: "current") {
   globalDebt
   perSafeDebtCeiling
   currentRedemptionRate {
-    annualizedRate
+    eightHourlyRate
   }
   currentRedemptionPrice {
     value

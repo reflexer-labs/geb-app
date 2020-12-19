@@ -48,6 +48,25 @@ const Shared = ({ children }: Props) => {
   } = useStoreActions((state) => state);
   const toastId = 'networdToastHash';
 
+  const resetModals = () => {
+    popupsActions.setIsConnectedWalletModalOpen(false);
+    popupsActions.setIsConnectModalOpen(false);
+    popupsActions.setIsConnectorsWalletOpen(false);
+    popupsActions.setIsIncentivesModalOpen(false);
+    popupsActions.setIsLoadingModalOpen({ text: '', isOpen: false });
+    popupsActions.setIsScreenModalOpen(false);
+    popupsActions.setIsSettingModalOpen(false);
+    popupsActions.setIsScreenModalOpen(false);
+    popupsActions.setIsVotingModalOpen(false);
+    popupsActions.setIsWaitingModalOpen(false);
+    popupsActions.setShowSideMenu(false);
+    popupsActions.setSafeOperationPayload({
+      isOpen: false,
+      type: '',
+      isCreate: false,
+    });
+  };
+
   async function accountChecker() {
     if (!account || !chainId) return;
     popupsActions.setWaitingPayload({
@@ -73,6 +92,7 @@ const Shared = ({ children }: Props) => {
   }
 
   function accountChange() {
+    resetModals();
     const isAccountSwitched =
       account && previousAccount && account !== previousAccount;
     if (!account) {
