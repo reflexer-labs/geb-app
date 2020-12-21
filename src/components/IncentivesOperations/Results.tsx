@@ -85,6 +85,9 @@ const Results = () => {
 
   const returnFLXPerDay = useCallback(() => {
     const shareOfUniSwapPool = returnShareOfUniswapPool();
+    let { ethAmount, raiAmount } = incentivesFields;
+    if (!ethAmount) ethAmount = '0';
+    if (!raiAmount) ethAmount = '0';
 
     if (
       !shareOfUniSwapPool ||
@@ -97,15 +100,27 @@ const Results = () => {
     )
       return 0;
 
+    const totalDeposit = Math.sqrt(
+      numeral(ethAmount).multiply(raiAmount).value()
+    );
+
+    const totalStaked = numeral(totalDeposit).add(totalSupply).value();
+
     const value = numeral(shareOfUniSwapPool)
-      .divide(totalSupply)
+      .divide(totalStaked)
       .multiply(rewardRate)
       .multiply(3600)
       .multiply(24)
       .value();
 
     return formatNumber(value.toString());
-  }, [returnShareOfUniswapPool, isOngoingCampaign, rewardRate, totalSupply]);
+  }, [
+    returnShareOfUniswapPool,
+    incentivesFields,
+    isOngoingCampaign,
+    rewardRate,
+    totalSupply,
+  ]);
 
   const returnRAIWithdrawn = useCallback(() => {
     if (
