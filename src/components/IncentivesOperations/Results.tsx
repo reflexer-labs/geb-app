@@ -53,10 +53,14 @@ const Results = () => {
     let { ethAmount, raiAmount } = incentivesFields;
     if (!ethAmount) ethAmount = '0';
     if (!raiAmount) ethAmount = '0';
-    return formatNumber(
-      Math.sqrt(numeral(ethAmount).multiply(raiAmount).value()).toString()
+
+    const totalDeposit = Math.sqrt(
+      numeral(ethAmount).multiply(raiAmount).value()
     );
-  }, [incentivesFields]);
+
+    const totalShare = numeral(totalDeposit).add(stakedBalance).value();
+    return formatNumber(totalShare.toString());
+  }, [incentivesFields, stakedBalance]);
 
   const returnShareOfIncentivePool = useCallback(() => {
     const shareOfUniSwapPool = returnShareOfUniswapPool();
@@ -74,15 +78,17 @@ const Results = () => {
         .divide(denominator)
         .multiply(100)
         .value()
-        .toString()
+        .toString(),
+      2
     );
   }, [returnShareOfUniswapPool, totalSupply]);
 
   const returnFLXPerDay = useCallback(() => {
-    let { ethAmount, raiAmount } = incentivesFields;
-    if (!ethAmount) ethAmount = '0';
-    if (!raiAmount) ethAmount = '0';
+    const shareOfUniSwapPool = returnShareOfUniswapPool();
+
     if (
+      !shareOfUniSwapPool ||
+      shareOfUniSwapPool === 0 ||
       !isOngoingCampaign ||
       !rewardRate ||
       !totalSupply ||
@@ -91,13 +97,7 @@ const Results = () => {
     )
       return 0;
 
-    const totalDeposit = Math.sqrt(
-      numeral(ethAmount).multiply(raiAmount).value()
-    );
-
-    const totalShare = numeral(totalDeposit).add(stakedBalance).value();
-
-    const value = numeral(totalShare)
+    const value = numeral(shareOfUniSwapPool)
       .divide(totalSupply)
       .multiply(rewardRate)
       .multiply(3600)
@@ -105,13 +105,7 @@ const Results = () => {
       .value();
 
     return formatNumber(value.toString());
-  }, [
-    incentivesFields,
-    totalSupply,
-    rewardRate,
-    stakedBalance,
-    isOngoingCampaign,
-  ]);
+  }, [returnShareOfUniswapPool, isOngoingCampaign, rewardRate, totalSupply]);
 
   const returnRAIWithdrawn = useCallback(() => {
     if (
@@ -189,11 +183,11 @@ const Results = () => {
                   <Value>{returnCoinPerCoin()}</Value>
                 </Item>
                 <Item>
-                  <Label>{'Share of Incentives Pool'}</Label>{' '}
+                  <Label>{'Total Share of Incentives Pool'}</Label>{' '}
                   <Value>{returnShareOfIncentivePool()}%</Value>
                 </Item>
                 <Item>
-                  <Label>{'FLX per Day'}</Label>{' '}
+                  <Label>{'Total FLX per Day'}</Label>{' '}
                   <Value>{returnFLXPerDay()}</Value>
                 </Item>
               </>
