@@ -91,18 +91,20 @@ const Results = () => {
     )
       return 0;
 
-    const numerator =
-      Math.sqrt(numeral(ethAmount).multiply(raiAmount).value()) +
-      numeral(stakedBalance).value();
-    const denominator = numeral(totalSupply)
+    const totalDeposit = Math.sqrt(
+      numeral(ethAmount).multiply(raiAmount).value()
+    );
+
+    const totalShare = numeral(totalDeposit).add(stakedBalance).value();
+
+    const value = numeral(totalShare)
+      .divide(totalSupply)
       .multiply(rewardRate)
       .multiply(3600)
       .multiply(24)
       .value();
 
-    return formatNumber(
-      numeral(numerator).divide(denominator).value().toString()
-    );
+    return formatNumber(value.toString());
   }, [
     incentivesFields,
     totalSupply,
@@ -185,10 +187,6 @@ const Results = () => {
                 <Item>
                   <Label>{`ETH per ${COIN_TICKER}`}</Label>{' '}
                   <Value>{returnCoinPerCoin()}</Value>
-                </Item>
-                <Item>
-                  <Label>{'Total Uni LP tokens in incentive pool'}</Label>{' '}
-                  <Value>{returnShareOfUniswapPool()}</Value>
                 </Item>
                 <Item>
                   <Label>{'Share of Incentives Pool'}</Label>{' '}

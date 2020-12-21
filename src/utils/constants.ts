@@ -165,6 +165,7 @@ export const INITIAL_INCENTIVE_STATE = [
     token1Price: '',
     lastUpdatedTime: '',
     rewardPerTokenStored: '',
+    is100PercentUnlocked: false,
     isOngoingCampaign: true,
     isCoinLessThanWeth: true,
     user: '' || null,

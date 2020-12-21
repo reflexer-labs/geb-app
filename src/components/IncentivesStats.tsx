@@ -23,6 +23,7 @@ const IncentivesStats = () => {
     uniSwapLink,
     instantExitPercentage,
     user,
+    is100PercentUnlocked,
   } = useIncentives()[0];
 
   const userCampaigns = useUserCampaigns();
@@ -80,16 +81,28 @@ const IncentivesStats = () => {
           <StateInner>
             <Label className="top">
               {'Reward Unlock'}{' '}
-              <InfoIcon data-tip={t('my_stake_tip', { date: unlockUntil })}>
+              <InfoIcon
+                data-tip={
+                  !is100PercentUnlocked
+                    ? t('my_stake_tip', {
+                        date: unlockUntil,
+                      })
+                    : t('fullyUnlocked')
+                }
+              >
                 <Info size="20" />
               </InfoIcon>
             </Label>
-            <Value>{`${Number(instantExitPercentage) * 100}% Instant`}</Value>
-            <Label className="small">
-              {`${
-                (1 - Number(instantExitPercentage)) * 100
-              }% linear unlock until ${unlockUntil}`}
-            </Label>
+            <Value>{`${
+              !is100PercentUnlocked ? Number(instantExitPercentage) * 100 : 100
+            }% Instant`}</Value>
+            {!is100PercentUnlocked ? (
+              <Label className="small">
+                {`${
+                  (1 - Number(instantExitPercentage)) * 100
+                }% linear unlock until ${unlockUntil}`}
+              </Label>
+            ) : null}
           </StateInner>
         </StatItem>
         <ReactTooltip multiline type="light" data-effect="solid" />

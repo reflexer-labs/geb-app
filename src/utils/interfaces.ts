@@ -311,6 +311,7 @@ export interface IIncentiveHook {
   token0: string;
   token0Price: string;
   token1Price: string;
+  is100PercentUnlocked: boolean;
   isOngoingCampaign: boolean;
   isCoinLessThanWeth: boolean;
   user: '' | null;

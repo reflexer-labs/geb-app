@@ -117,14 +117,20 @@ export default function useIncentives() {
             '0'
           );
 
+          const unlockUntilUnix =
+            Number(startTime) + Number(duration) + Number(rewardDelay);
+
           const unlockUntil =
             startTime && startTime
-              ? dayjs
-                  .unix(
-                    Number(startTime) + Number(duration) + Number(rewardDelay)
-                  )
-                  .format('MMM D, YYYY h:mm A') + ` (GMT${returnTimeOffset()})`
+              ? dayjs.unix(unlockUntilUnix).format('MMM D, YYYY h:mm A') +
+                ` (GMT${returnTimeOffset()})`
               : '';
+
+          let is100PercentUnlocked = false;
+
+          if (unlockUntilUnix * 1000 <= Date.now()) {
+            is100PercentUnlocked = true;
+          }
 
           const campaignEndTime =
             startTime && startTime
@@ -236,6 +242,7 @@ export default function useIncentives() {
             token1Price,
             lastUpdatedTime,
             rewardPerTokenStored,
+            is100PercentUnlocked,
             isOngoingCampaign: isOngoingCampaign(),
             isCoinLessThanWeth: isCoinLessThanWeth(),
             user,
@@ -254,7 +261,6 @@ export default function useIncentives() {
     }
     returnValues();
   }, [incentivesCampaignData]);
-
   return state;
 }
 
