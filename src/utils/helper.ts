@@ -68,7 +68,7 @@ export const formatNumber = (value: string, digits = 4, round = false) => {
 export const getRatePercentage = (value: string) => {
   const rate = Number(value);
   let ratePercentage = rate < 1 ? (1 - rate) * -1 : rate - 1;
-  return formatNumber(String(ratePercentage * 100), 0);
+  return formatNumber(String(ratePercentage * 100));
 };
 
 export const toFixedString = (
