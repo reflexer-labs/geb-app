@@ -24,6 +24,7 @@ import WaitingModal from '../components/Modals/WaitingModal';
 import TransactionUpdater from '../services/TransactionUpdater';
 import usePrevious from '../hooks/usePrevious';
 import { useHistory } from 'react-router-dom';
+import ImagePreloader from '../components/ImagePreloader';
 
 interface Props {
   children: ReactNode;
@@ -177,6 +178,7 @@ const Shared = ({ children }: Props) => {
       <EmptyDiv>
         <CookieBanner />
       </EmptyDiv>
+      <ImagePreloader />
     </Container>
   );
 };
