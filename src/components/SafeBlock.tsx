@@ -96,6 +96,9 @@ const BlockContainer = styled.div`
 const BlockHeader = styled.div`
   display: flex;
   justify-content: space-between;
+  @media (max-width: 400px) {
+    flex-direction: column;
+  }
 `;
 
 const SafeInfo = styled.div`
@@ -165,6 +168,9 @@ const SafeState = styled.div`
     font-size: ${(props) => props.theme.font.extraSmall};
     text-align:center;
   `}
+  @media (max-width: 414px) {
+    margin-top: 5px;
+  }
 `;
 
 const Block = styled.div`
