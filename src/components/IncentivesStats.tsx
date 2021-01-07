@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { useStoreActions } from '../store';
+import { useStoreActions, useStoreState } from '../store';
 import Button from './Button';
 import ReactTooltip from 'react-tooltip';
 import { Info } from 'react-feather';
@@ -12,6 +12,7 @@ import { useActiveWeb3React } from '../hooks';
 const IncentivesStats = () => {
   const { t } = useTranslation();
   const { account } = useActiveWeb3React();
+  const { incentivesModel: incentivesState } = useStoreState((state) => state);
   const {
     id,
     campaignEndTime,
@@ -22,7 +23,6 @@ const IncentivesStats = () => {
     unlockUntil,
     uniSwapLink,
     instantExitPercentage,
-    user,
     is100PercentUnlocked,
   } = useIncentives()[0];
 
@@ -38,7 +38,7 @@ const IncentivesStats = () => {
       popupsActions.setIsConnectorsWalletOpen(true);
       return;
     }
-    if (!user) {
+    if (!incentivesState.incentivesCampaignData?.user) {
       popupsActions.setIsProxyModalOpen(true);
       return;
     }
