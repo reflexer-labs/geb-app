@@ -29,6 +29,52 @@ export default function useIncentives() {
 
   useEffect(() => {
     function returnValues() {
+      const token0 = _.get(
+        incentivesCampaignData,
+        'systemState.coinUniswapPair.token0',
+        ''
+      );
+      const token0Price = _.get(
+        incentivesCampaignData,
+        'systemState.coinUniswapPair.token0Price',
+        '0'
+      );
+      const token1Price = _.get(
+        incentivesCampaignData,
+        'systemState.coinUniswapPair.token1Price',
+        '0'
+      );
+
+      const coinAddress = _.get(
+        incentivesCampaignData,
+        'systemState.coinAddress',
+        ''
+      );
+
+      const wethAddress = _.get(
+        incentivesCampaignData,
+        'systemState.wethAddress',
+        ''
+      );
+
+      const reserve0 = _.get(
+        incentivesCampaignData,
+        'systemState.coinUniswapPair.reserve0',
+        '0'
+      );
+
+      const reserve1 = _.get(
+        incentivesCampaignData,
+        'systemState.coinUniswapPair.reserve1',
+        '0'
+      );
+
+      const coinTotalSupply = _.get(
+        incentivesCampaignData,
+        'systemState.coinUniswapPair.totalSupply',
+        '0'
+      );
+
       const campaignData = incentivesCampaignData?.allCampaigns.map(
         (campaign: IncentivesCampaign, i: number) => {
           const id = _.get(campaign, 'id', '0');
@@ -47,36 +93,6 @@ export default function useIncentives() {
           const instantExitPercentage = _.get(
             campaign,
             'instantExitPercentage',
-            '0'
-          );
-
-          const coinAddress = _.get(
-            incentivesCampaignData,
-            'systemState.coinAddress',
-            ''
-          );
-
-          const wethAddress = _.get(
-            incentivesCampaignData,
-            'systemState.wethAddress',
-            ''
-          );
-
-          const reserve0 = _.get(
-            incentivesCampaignData,
-            'systemState.coinUniswapPair.reserve0',
-            '0'
-          );
-
-          const reserve1 = _.get(
-            incentivesCampaignData,
-            'systemState.coinUniswapPair.reserve1',
-            '0'
-          );
-
-          const coinTotalSupply = _.get(
-            incentivesCampaignData,
-            'systemState.coinUniswapPair.totalSupply',
             '0'
           );
 
@@ -197,22 +213,6 @@ export default function useIncentives() {
                 ) as string)
               : '0';
 
-          const token0 = _.get(
-            incentivesCampaignData,
-            'systemState.coinUniswapPair.token0',
-            ''
-          );
-          const token0Price = _.get(
-            incentivesCampaignData,
-            'systemState.coinUniswapPair.token0Price',
-            '0'
-          );
-          const token1Price = _.get(
-            incentivesCampaignData,
-            'systemState.coinUniswapPair.token1Price',
-            '0'
-          );
-
           const user = _.get(incentivesCampaignData, 'user', null);
 
           return {
@@ -254,6 +254,20 @@ export default function useIncentives() {
           };
         }
       );
+      if (campaignData && !campaignData.length) {
+        const systemState = {
+          ...INITIAL_INCENTIVE_STATE[0],
+          token0,
+          token0Price,
+          token1Price,
+          coinAddress,
+          wethAddress,
+          reserve0,
+          reserve1,
+          coinTotalSupply,
+        };
+        setState([systemState]);
+      }
 
       if (campaignData && campaignData.length > 0) {
         setState(campaignData);

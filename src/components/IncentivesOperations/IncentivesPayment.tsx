@@ -31,6 +31,7 @@ const IncentivesPayment = () => {
     coinAddress,
     stakedBalance,
   } = useIncentives()[0];
+
   const [ethAmount, setEthAmount] = useState('');
   const [raiAmount, setRaiAmount] = useState('');
   const [error, setError] = useState('');

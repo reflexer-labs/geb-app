@@ -98,7 +98,7 @@ const ProxyModal = () => {
                 <ReactTooltip multiline type="light" data-effect="solid" />
               </>
             ) : (
-              t('create_account_text')
+              t('proxy_wallet_text')
             )}
           </Text>
 
