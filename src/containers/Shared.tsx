@@ -26,6 +26,7 @@ import usePrevious from '../hooks/usePrevious';
 import { useHistory } from 'react-router-dom';
 import IncentivesModal from '../components/Modals/IncentivesModal';
 import ProxyModal from '../components/Modals/ProxyModal';
+import ImagePreloader from '../components/ImagePreloader';
 
 interface Props {
   children: ReactNode;
@@ -182,6 +183,7 @@ const Shared = ({ children }: Props) => {
       <EmptyDiv>
         <CookieBanner />
       </EmptyDiv>
+      <ImagePreloader />
     </Container>
   );
 };

@@ -113,10 +113,7 @@ const NavBarLink = styled(NavLink)`
   color: ${(props) => props.theme.colors.secondary};
   font-weight: 600;
   transition: all 0.3s ease;
-  border-bottom: 1px solid ${(props) => props.theme.colors.border};
-  &:first-child {
-    border-top: 1px solid ${(props) => props.theme.colors.border};
-  }
+
   &:hover {
     background: ${(props) => props.theme.colors.gradient};
     background-clip: text;
@@ -138,6 +135,13 @@ const NavBarLink = styled(NavLink)`
   &:last-child {
     margin-right: 0;
   }
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  border-bottom: 1px solid ${(props) => props.theme.colors.border};
+  &:first-child {
+    border-top: 1px solid ${(props) => props.theme.colors.border};
+  }
+  `}
 `;
 
 // const NavBarBtn = styled.div`
