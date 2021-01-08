@@ -198,7 +198,7 @@ const Results = () => {
                   <Value>{returnCoinPerCoin()}</Value>
                 </Item>
                 <Item>
-                  <Label>{'Total Share of Incentives Pool'}</Label>{' '}
+                  <Label>{'Total Share of Staking Pool'}</Label>{' '}
                   <Value>{returnShareOfIncentivePool()}%</Value>
                 </Item>
                 <Item>

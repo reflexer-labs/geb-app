@@ -319,14 +319,16 @@ export function useUserCampaigns() {
         incentivesCampaignData &&
         incentivesCampaignData.incentiveBalances.length > 0
       ) {
-        const list = campaigns.filter(
-          (x: IIncentiveHook) =>
+        const list = campaigns.filter((x: IIncentiveHook) => {
+          return (
             (x.myRewardRate && Number(x.myRewardRate) > 0) ||
             incentivesCampaignData.incentiveBalances.find(
-              (y: IncentiveBalance) =>
-                x.id === y.campaignId && !userCampaignChecker(x, y)
+              (y: IncentiveBalance) => {
+                return x.id === y.campaignId && !userCampaignChecker(x, y);
+              }
             )
-        );
+          );
+        });
         if (list.length > 0) {
           setState(list);
         }
@@ -483,6 +485,7 @@ export function useIncentivesAssets() {
         ).value() || 0;
 
       let uniPoolPrice = 0;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       let uniPoolValue = 0;
       let old24hUniPoolPrice = 0;
 
@@ -522,12 +525,12 @@ export function useIncentivesAssets() {
 
       const uni = {
         name: 'UNI-V2',
-        token: `Uniswap LP token for ${COIN_TICKER}-ETH pair`,
-        img: require('../assets/uni-icon.svg'),
+        token: `${COIN_TICKER}/ETH Uni V2 LP Token`,
+        img: require('../assets/uni-lp.svg'),
         amount: uniPoolBalance,
-        price: uniPoolPrice,
+        price: 0, //uniPoolPrice,
         diff: uniPoolPriceDiff,
-        value: uniPoolValue,
+        value: 0, // uniPoolValue,
         diffPercentage:
           uniPoolPercentageDiff === 100 ? 0 : uniPoolPercentageDiff,
       };

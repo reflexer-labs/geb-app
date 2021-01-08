@@ -17,6 +17,7 @@ const IncentivesStats = () => {
     id,
     campaignEndTime,
     myRewardRate,
+    stakedBalance,
     dailyFLX,
     ethStake,
     raiStake,
@@ -111,7 +112,11 @@ const IncentivesStats = () => {
 
       <BtnContainer
         className={
-          userCampaigns.length && userCampaigns[0].id !== '' ? '' : 'hide'
+          !Number(stakedBalance) ||
+          Number(stakedBalance) === 0 ||
+          (userCampaigns.length && userCampaigns[0].id !== '')
+            ? ''
+            : 'hide'
         }
       >
         <div>

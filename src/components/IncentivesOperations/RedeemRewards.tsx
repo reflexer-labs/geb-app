@@ -75,12 +75,18 @@ const RedeemRewards = () => {
     <Body>
       <DropdownContainer>
         <Dropdown
-          items={userCampaigns.map(
-            (campaign: IIncentiveHook) => `Campaign #${campaign.id}`
-          )}
+          items={
+            userCampaigns[0].id === ''
+              ? []
+              : userCampaigns.map(
+                  (campaign: IIncentiveHook) => `Campaign #${campaign.id}`
+                )
+          }
           getSelectedItem={handleSelectedCampaign}
           itemSelected={
-            userCampaigns.length > 0
+            userCampaigns[0].id === ''
+              ? 'Nothing to claim'
+              : userCampaigns.length > 0
               ? `Campaign #${userCampaigns[0].id}`
               : 'Fetching Campaigns...'
           }
@@ -103,12 +109,12 @@ const RedeemRewards = () => {
           </Item>
 
           <Item>
-            <Label>{'Start of Unlock Period'}</Label>{' '}
+            <Label className="special">{'Start of Unlock Period'}</Label>{' '}
             <Value>{resultData.start}</Value>
           </Item>
 
           <Item>
-            <Label>{'End of Unlock Period'}</Label>{' '}
+            <Label className="special">{'End of Unlock Period'}</Label>{' '}
             <Value>{resultData.end}</Value>
           </Item>
         </Block>
@@ -117,6 +123,8 @@ const RedeemRewards = () => {
       <Footer>
         <Button dimmed text={t('cancel')} onClick={handleCancel} />
         <Button
+          disabled={userCampaigns[0].id === ''}
+          dimmed={userCampaigns[0].id === ''}
           withArrow
           onClick={handleSubmit}
           text={t('review_transaction')}
@@ -175,6 +183,11 @@ const Label = styled.div`
   line-height: 21px;
   display: flex;
   align-items: center;
+  &.special {
+    @media (max-width: 370px) {
+      max-width: 90px;
+    }
+  }
 `;
 
 const Value = styled.div`
@@ -183,6 +196,7 @@ const Value = styled.div`
   letter-spacing: -0.09px;
   line-height: 21px;
   font-weight: 600;
+  text-align: right;
 `;
 
 const Error = styled.p`

@@ -94,9 +94,8 @@ const IncentivesTransaction = () => {
 
         reset();
       } catch (e) {
-        handleTransactionError(e);
-      } finally {
         reset();
+        handleTransactionError(e);
       }
     }
   };

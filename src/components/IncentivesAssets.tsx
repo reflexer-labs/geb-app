@@ -25,54 +25,66 @@ const IncentivesAssets = () => {
     <Container>
       <Title>{t('assets')}</Title>
 
-      <Header style={{ width: colWidth }}>
-        <Thead>Asset</Thead>
-        <Thead>Amount</Thead>
-        <Thead>Price</Thead>
-        <Thead>Value</Thead>
-      </Header>
+      <Content>
+        <InnerContent>
+          <Header style={{ width: colWidth }}>
+            <Thead>Asset</Thead>
+            <Thead>Amount</Thead>
+            <Thead>Price</Thead>
+            <Thead>Value</Thead>
+          </Header>
 
-      <List>
-        {assets
-          ? Object.values(assets).map((obj: AssetData) => {
-              return (
-                <Row ref={ref} key={obj.name}>
-                  <Col>
-                    <img src={obj.img} alt="" />
-                    <Label>
-                      {obj.name}
-                      <Tag>{obj.token}</Tag>
-                    </Label>
-                  </Col>
-                  <Col>
-                    {obj.amount
-                      ? formatNumber(obj.amount.toString(), 3)
-                      : '0.00'}
-                  </Col>
-                  <Col>
-                    $
-                    {obj.price ? formatNumber(obj.price.toString(), 3) : '0.00'}{' '}
-                    <Diff className={obj.diff >= 0 ? 'green' : 'red'}>
-                      {obj.diff > 0 ? `+` : ''}
-                      {obj.diff ? formatNumber(obj.diff.toString(), 3) : '0.00'}
-                    </Diff>
-                  </Col>
-                  <Col>
-                    $
-                    {obj.value ? formatNumber(obj.value.toString(), 3) : '0.00'}
-                    <Diff className={obj.diffPercentage >= 0 ? 'green' : 'red'}>
-                      {obj.diffPercentage > 0 ? `+` : ''}
-                      {obj.diffPercentage
-                        ? formatNumber(obj.diffPercentage.toString(), 3)
-                        : '0.00'}
-                      %
-                    </Diff>
-                  </Col>{' '}
-                </Row>
-              );
-            })
-          : null}
-      </List>
+          <List>
+            {assets
+              ? Object.values(assets).map((obj: AssetData) => {
+                  return (
+                    <Row ref={ref} key={obj.name}>
+                      <Col>
+                        <img src={obj.img} alt="" />
+                        <Label>
+                          {obj.name}
+                          <Tag>{obj.token}</Tag>
+                        </Label>
+                      </Col>
+                      <Col>
+                        {obj.amount
+                          ? formatNumber(obj.amount.toString(), 3)
+                          : '0.00'}
+                      </Col>
+                      <Col>
+                        $
+                        {obj.price
+                          ? formatNumber(obj.price.toString(), 3)
+                          : '0.00'}{' '}
+                        <Diff className={obj.diff >= 0 ? 'green' : 'red'}>
+                          {obj.diff > 0 ? `+` : ''}
+                          {obj.diff
+                            ? formatNumber(obj.diff.toString(), 3)
+                            : '0.00'}
+                        </Diff>
+                      </Col>
+                      <Col>
+                        $
+                        {obj.value
+                          ? formatNumber(obj.value.toString(), 3)
+                          : '0.00'}
+                        <Diff
+                          className={obj.diffPercentage >= 0 ? 'green' : 'red'}
+                        >
+                          {obj.diffPercentage > 0 ? `+` : ''}
+                          {obj.diffPercentage
+                            ? formatNumber(obj.diffPercentage.toString(), 3)
+                            : '0.00'}
+                          %
+                        </Diff>
+                      </Col>{' '}
+                    </Row>
+                  );
+                })
+              : null}
+          </List>
+        </InnerContent>
+      </Content>
     </Container>
   );
 };
@@ -112,29 +124,12 @@ const Thead = styled.div`
   color: ${(props) => props.theme.colors.secondary};
   letter-spacing: 0.01px;
   font-weight: normal;
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    &:nth-child(2),
-    &:nth-child(3) {
-      display: none;
-    }
-    flex: 0 0 50%;
-    &:nth-child(1) {
-      flex: 0 0 50%;
-    }
-  `}
 `;
 
 const Row = styled.div`
   display: flex;
   padding: 12px 20px;
   border-top: 1px solid ${(props) => props.theme.colors.border};
-  &:first-child,
-  &:last-child {
-    img {
-      padding: 1px;
-      border: 1px solid ${(props) => props.theme.colors.border};
-    }
-  }
 `;
 
 const Col = styled.div`
@@ -160,17 +155,6 @@ const Col = styled.div`
   }
 
   ${({ theme }) => theme.mediaWidth.upToSmall`
-    &:nth-child(2),
-    &:nth-child(3) {
-      display: none;
-    }
-    flex: 0 0 50%;
-    &:nth-child(1) {
-      flex: 0 0 50%;
-    }
-  `}
-
-  ${({ theme }) => theme.mediaWidth.upToSmall`
       font-size:${(props) => props.theme.font.extraSmall};
     `}
 `;
@@ -194,4 +178,12 @@ const Diff = styled.div`
   &.red {
     color: #e5535e;
   }
+`;
+
+const Content = styled.div`
+  overflow-x: auto;
+`;
+
+const InnerContent = styled.div`
+  min-width: 530px;
 `;
