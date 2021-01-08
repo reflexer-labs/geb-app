@@ -38,7 +38,6 @@ const IncentivesStats = () => {
       popupsActions.setIsConnectorsWalletOpen(true);
       return;
     }
-    console.log('user', incentivesState.incentivesCampaignData?.user);
 
     if (!incentivesState.incentivesCampaignData?.user) {
       popupsActions.setIsProxyModalOpen(true);

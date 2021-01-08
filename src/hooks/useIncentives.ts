@@ -329,8 +329,6 @@ export function useUserCampaigns() {
         );
         if (list.length > 0) {
           setState(list);
-        } else {
-          setState(campaigns);
         }
       }
     }
