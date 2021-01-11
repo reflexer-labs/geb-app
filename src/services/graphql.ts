@@ -107,6 +107,7 @@ export const fetchSafeById = (safeId: string, address: string) => {
         currentRedemptionRate:
           res.data.data.systemState.currentRedemptionRate.annualizedRate,
         perSafeDebtCeiling: res.data.data.systemState.perSafeDebtCeiling,
+        globalDebtCeiling: res.data.data.systemState.globalDebtCeiling,
       };
     },
     {

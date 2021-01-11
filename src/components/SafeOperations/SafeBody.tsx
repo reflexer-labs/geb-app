@@ -200,9 +200,9 @@ const SafeBody = ({ isChecked }: Props) => {
     );
 
     const debtCeilingBN = BigNumber.from(toFixedString(debtCeiling, 'RAD'));
-    const globalDebtCeilingBN = BigNumber.from(
-      toFixedString(globalDebtCeiling, 'RAD')
-    );
+    const globalDebtCeilingBN = globalDebtCeiling
+      ? BigNumber.from(toFixedString(globalDebtCeiling, 'RAD'))
+      : BigNumber.from('0');
 
     if (type === 'deposit_borrow') {
       if (leftInputBN.gt(availableEthBN)) {
