@@ -52,6 +52,7 @@ export const fetchUserSafes = (address: string) => {
         currentRedemptionPrice:
           res.data.data.systemState.currentRedemptionPrice.value,
         globalDebt: res.data.data.systemState.globalDebt,
+        globalDebtCeiling: res.data.data.systemState.globalDebtCeiling,
       };
     },
     {
