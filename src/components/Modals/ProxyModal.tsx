@@ -117,7 +117,7 @@ const ProxyModal = () => {
             )}
           </Text>
 
-          {status !== '' || ctHash ? null : (
+          {ctHash ? null : (
             <BtnContainer>
               <Button text={'create_account'} onClick={handleCreateAccount} />
             </BtnContainer>

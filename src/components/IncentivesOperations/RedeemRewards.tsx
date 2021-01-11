@@ -96,7 +96,7 @@ const RedeemRewards = () => {
 
       <DecimalInput
         label={'Claimable FLX'}
-        value={formatNumber(resultData.flxAmount).toString()}
+        value={formatNumber(resultData.flxAmount, 8).toString()}
         onChange={() => {}}
         disabled
       />
@@ -105,7 +105,7 @@ const RedeemRewards = () => {
         <Block>
           <Item>
             <Label>{'Locked Reward'}</Label>{' '}
-            <Value>{formatNumber(resultData.lockedReward).toString()}</Value>
+            <Value>{formatNumber(resultData.lockedReward, 8).toString()}</Value>
           </Item>
 
           <Item>
