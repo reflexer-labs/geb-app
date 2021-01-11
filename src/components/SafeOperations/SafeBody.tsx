@@ -21,7 +21,11 @@ import {
   toFixedString,
 } from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
-import { DEFAULT_SAFE_STATE, COIN_TICKER } from '../../utils/constants';
+import {
+  DEFAULT_SAFE_STATE,
+  COIN_TICKER,
+  COLLATERAL_TYPE_ID,
+} from '../../utils/constants';
 
 interface Props {
   isChecked?: boolean;
@@ -55,8 +59,8 @@ const SafeBody = ({ isChecked }: Props) => {
     safetyCRatio,
     currentRedemptionPrice,
     debtCeiling,
-    globalDebt,
     perSafeDebtCeiling,
+    globalDebtCeiling,
   } = safeState.liquidationData;
 
   const praiBalance = connectWalletState.praiBalance[NETWORK_ID];
@@ -195,8 +199,10 @@ const SafeBody = ({ isChecked }: Props) => {
       toFixedString(accumulatedRate, 'RAY')
     );
 
-    const globalDebtBN = BigNumber.from(toFixedString(globalDebt, 'RAD'));
     const debtCeilingBN = BigNumber.from(toFixedString(debtCeiling, 'RAD'));
+    const globalDebtCeilingBN = globalDebtCeiling
+      ? BigNumber.from(toFixedString(globalDebtCeiling, 'RAD'))
+      : BigNumber.from('0');
 
     if (type === 'deposit_borrow') {
       if (leftInputBN.gt(availableEthBN)) {
@@ -297,10 +303,12 @@ const SafeBody = ({ isChecked }: Props) => {
       return false;
     }
 
-    if (globalDebtBN.add(totalDebtBN).gt(debtCeilingBN)) {
-      setError(
-        `Debt ceiling too low, not possible to draw this amount of ${COIN_TICKER}.`
-      );
+    if (totalDebtBN.gt(globalDebtCeilingBN)) {
+      setError('Cannot exceed global debt ceiling.');
+      return;
+    }
+    if (totalDebtBN.gt(debtCeilingBN)) {
+      setError(`Cannot exceed ${COLLATERAL_TYPE_ID} debt ceiling.`);
       return;
     }
 

@@ -1,5 +1,7 @@
+import { COLLATERAL_TYPE_ID } from '../constants';
+
 export const liquidationQuery = `
-  collateralType(id: "ETH-A") {
+  collateralType(id: "${COLLATERAL_TYPE_ID}") {
     accumulatedRate
     currentPrice {
       liquidationPrice
@@ -16,6 +18,7 @@ export const liquidationQuery = `
 systemState(id: "current") {
   globalDebt
   perSafeDebtCeiling
+  globalDebtCeiling
   currentRedemptionRate {
     eightHourlyRate
   }

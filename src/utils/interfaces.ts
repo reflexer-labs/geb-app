@@ -168,6 +168,7 @@ export interface ILiquidationData {
   globalDebt: string;
   currentRedemptionRate: string;
   perSafeDebtCeiling: string;
+  globalDebtCeiling: string;
 }
 
 export interface ISafePayload {
