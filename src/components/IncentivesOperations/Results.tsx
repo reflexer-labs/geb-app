@@ -166,7 +166,7 @@ const Results = () => {
         <Block>
           <Item>
             <Label>{`Claimable FLX`}</Label>
-            <Value>{claimableFLX}</Value>
+            <Value>{formatNumber(claimableFLX, 8)}</Value>
           </Item>
         </Block>
       ) : (
