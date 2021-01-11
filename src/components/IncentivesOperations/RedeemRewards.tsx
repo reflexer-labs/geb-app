@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { useStoreActions } from '../../store';
 import { IIncentiveHook } from '../../utils/interfaces';
 import Button from '../Button';
-import DecimalInput from '../DecimalInput';
 import Dropdown from '../Dropdown';
 import { returnFLX, useUserCampaigns } from '../../hooks/useIncentives';
 import { useOnceCall } from '../../hooks/useOnceCall';
@@ -94,18 +93,24 @@ const RedeemRewards = () => {
         />
       </DropdownContainer>
 
-      <DecimalInput
-        label={'Claimable FLX'}
-        value={formatNumber(resultData.flxAmount, 8).toString()}
-        onChange={() => {}}
-        disabled
-      />
+      <StaticBlock>
+        <LabelBlock>Claimable FLX</LabelBlock>
+        <ValueBlock>
+          {Number(resultData.flxAmount) > 0.0001
+            ? formatNumber(resultData.flxAmount).toString()
+            : '< 0.0001'}
+        </ValueBlock>
+      </StaticBlock>
       {error && <Error>{error}</Error>}
       <Result>
         <Block>
           <Item>
             <Label>{'Locked Reward'}</Label>{' '}
-            <Value>{formatNumber(resultData.lockedReward, 8).toString()}</Value>
+            <Value>
+              {Number(resultData.lockedReward) > 0.0001
+                ? formatNumber(resultData.lockedReward).toString()
+                : '< 0.0001'}
+            </Value>
           </Item>
 
           <Item>
@@ -204,4 +209,25 @@ const Error = styled.p`
   font-size: ${(props) => props.theme.font.extraSmall};
   width: 100%;
   margin: 16px 0;
+`;
+
+const StaticBlock = styled.div``;
+
+const LabelBlock = styled.div`
+  line-height: 21px;
+  color: ${(props) => props.theme.colors.secondary};
+  font-size: ${(props) => props.theme.font.small};
+  letter-spacing: -0.09px;
+  margin-bottom: 4px;
+  text-transform: capitalize;
+`;
+
+const ValueBlock = styled.div`
+  display: flex;
+  align-items: center;
+  border: 1px solid ${(props) => props.theme.colors.border};
+  border-radius: ${(props) => props.theme.global.borderRadius};
+  transition: all 0.3s ease;
+  padding: 19px;
+  cursor: not-allowed;
 `;

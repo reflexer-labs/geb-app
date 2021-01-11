@@ -166,7 +166,11 @@ const Results = () => {
         <Block>
           <Item>
             <Label>{`Claimable FLX`}</Label>
-            <Value>{formatNumber(claimableFLX, 8)}</Value>
+            <Value>
+              {Number(claimableFLX) > 0.0001
+                ? formatNumber(claimableFLX).toString()
+                : '< 0.0001'}
+            </Value>
           </Item>
         </Block>
       ) : (
