@@ -5,7 +5,7 @@ export type IconName = keyof typeof icons;
 
 export type IconProps = {
   name: IconName;
-} & icons.IconProps;
+} & icons.Props;
 
 const FeatherIconWrapper = ({ name, ...rest }: IconProps) => {
   const IconComponent = icons[name];
