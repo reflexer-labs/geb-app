@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AlertTriangle, ArrowUpCircle, CheckCircle } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import ReactTooltip from 'react-tooltip';
@@ -11,6 +11,7 @@ import {
 } from '../../hooks/TransactionHooks';
 import { use10BlocksConfirmations } from '../../hooks/useBlocksConfirmations';
 import { useStoreState, useStoreActions } from '../../store';
+import { timeout } from '../../utils/helper';
 import Button from '../Button';
 import Loader from '../Loader';
 import Modal from './Modal';
@@ -26,12 +27,25 @@ const ProxyModal = () => {
     popupsModel: popupsState,
     connectWalletModel: connectWalletState,
   } = useStoreState((state) => state);
+  const storeActions = useStoreActions((state) => state);
   const {
     popupsModel: popupsActions,
     connectWalletModel: connectWalletActions,
-  } = useStoreActions((state) => state);
+  } = storeActions;
 
   const { ctHash } = connectWalletState;
+
+  useEffect(() => {
+    async function blocksChecker() {
+      if (blocksSinceCheck === 10) {
+        await timeout(2000);
+        popupsActions.setIsProxyModalOpen(false);
+        popupsState.returnProxyFunction(storeActions);
+        localStorage.removeItem('ctHash');
+      }
+    }
+    blocksChecker();
+  }, [account, blocksSinceCheck, popupsActions, popupsState, storeActions]);
 
   const handleCreateAccount = async () => {
     const { blockNumber } = connectWalletState;
@@ -51,6 +65,7 @@ const ProxyModal = () => {
       );
       setStatus('success');
       await txResponse.wait();
+      popupsActions.setBlockBackdrop(false);
     } catch (e) {
       popupsActions.setBlockBackdrop(false);
       handleTransactionError(e);
@@ -102,7 +117,7 @@ const ProxyModal = () => {
             )}
           </Text>
 
-          {ctHash ? null : (
+          {status !== '' || ctHash ? null : (
             <BtnContainer>
               <Button text={'create_account'} onClick={handleCreateAccount} />
             </BtnContainer>

@@ -12,6 +12,7 @@ export interface PopupsModel {
   isConnectedWalletModalOpen: boolean;
   isConnectorsWalletOpen: boolean;
   showSideMenu: boolean;
+  returnProxyFunction: (actions: any) => void | null;
   blockBackdrop: boolean;
   isProxyModalOpen: boolean;
   isScreenModalOpen: boolean;
@@ -42,6 +43,7 @@ export interface PopupsModel {
   setWaitingPayload: Action<PopupsModel, IWaitingPayload>;
   setBlockBackdrop: Action<PopupsModel, boolean>;
   setIsProxyModalOpen: Action<PopupsModel, boolean>;
+  setReturnProxyFunction: Action<PopupsModel, (storeActions: any) => void>;
 }
 
 const popupsModel: PopupsModel = {
@@ -53,6 +55,7 @@ const popupsModel: PopupsModel = {
   isScreenModalOpen: false,
   isIncentivesModalOpen: false,
   isWaitingModalOpen: false,
+  returnProxyFunction: () => {},
   waitingPayload: {
     title: '',
     text: '',
@@ -80,6 +83,7 @@ const popupsModel: PopupsModel = {
     isOpen: false,
     text: '',
   },
+
   setIsSettingModalOpen: action((state, payload) => {
     state.isSettingsModalOpen = payload;
   }),
@@ -136,6 +140,9 @@ const popupsModel: PopupsModel = {
   }),
   setIsProxyModalOpen: action((state, payload) => {
     state.isProxyModalOpen = payload;
+  }),
+  setReturnProxyFunction: action((state, payload) => {
+    state.returnProxyFunction = payload;
   }),
 };
 

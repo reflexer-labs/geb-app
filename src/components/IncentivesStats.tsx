@@ -28,7 +28,6 @@ const IncentivesStats = () => {
   } = useIncentives()[0];
 
   const userCampaigns = useUserCampaigns();
-
   const {
     popupsModel: popupsActions,
     incentivesModel: incentivesActions,
@@ -42,6 +41,10 @@ const IncentivesStats = () => {
 
     if (!incentivesState.incentivesCampaignData?.user) {
       popupsActions.setIsProxyModalOpen(true);
+      popupsActions.setReturnProxyFunction((storeActions: any) => {
+        storeActions.popupsModel.setIsIncentivesModalOpen(true);
+        storeActions.incentivesModel.setType(type);
+      });
       return;
     }
     popupsActions.setIsIncentivesModalOpen(true);
@@ -112,9 +115,10 @@ const IncentivesStats = () => {
 
       <BtnContainer
         className={
-          !Number(stakedBalance) ||
-          Number(stakedBalance) === 0 ||
-          (userCampaigns.length && userCampaigns[0].id !== '')
+          account &&
+          Number(stakedBalance) !== 0 &&
+          userCampaigns.length &&
+          userCampaigns[0].id !== ''
             ? ''
             : 'hide'
         }

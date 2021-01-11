@@ -73,6 +73,14 @@ const IncentivesPayment = () => {
         ? BigNumber.from(toFixedString(praiBalance.toString(), 'WAD'))
         : BigNumber.from('0');
 
+      // if (
+      //   incentivesState.incentivesCampaignData?.allCampaigns &&
+      //   !incentivesState.incentivesCampaignData.allCampaigns.length
+      // ) {
+      //   setError(`Deposits are currently blocked`);
+      //   return;
+      // }
+
       if (
         ethAmountBN.isZero() ||
         raiAmountBN.isZero() ||
