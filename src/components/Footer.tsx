@@ -99,14 +99,24 @@ const Footer = ({ slapToBottom }: Props) => {
             {selectedGroup === 1 ? <Minus size={16} /> : <Plus size={16} />}
           </Header>
           <LinksContainer>
-            <LinkBtn href={'https://discord.gg/83t3xKT'} target="_blank">Discord</LinkBtn>
-            <LinkBtn href={'https://twitter.com/reflexerfinance'} target="_blank">
+            <LinkBtn href={'https://discord.gg/83t3xKT'} target="_blank">
+              Discord
+            </LinkBtn>
+            <LinkBtn
+              href={'https://twitter.com/reflexerfinance'}
+              target="_blank"
+            >
               Twitter
             </LinkBtn>
-            <LinkBtn href={'https://t.me/joinchat/Dp-hCVfCrf1zfCP5q2VI9w'} target="_blank">
+            <LinkBtn
+              href={'https://t.me/joinchat/Dp-hCVfCrf1zfCP5q2VI9w'}
+              target="_blank"
+            >
               Telegram
             </LinkBtn>
-            <LinkBtn href={'https://medium.com/reflexer-labs'} target="_blank">Medium</LinkBtn>
+            <LinkBtn href={'https://medium.com/reflexer-labs'} target="_blank">
+              Medium
+            </LinkBtn>
           </LinksContainer>
         </Column>
         <Column className={`col20 ${selectedGroup === 2 ? 'active' : ''}`}>
@@ -115,8 +125,8 @@ const Footer = ({ slapToBottom }: Props) => {
             {selectedGroup === 2 ? <Minus size={16} /> : <Plus size={16} />}
           </Header>
           <LinksContainer>
-            <LinkBtn href={'https://github.com/reflexer-labs/whitepapers'} target="_blank">
-              Whitepaper
+            <LinkBtn href={'https://docs.reflexer.finance/'} target="_blank">
+              Documentation
             </LinkBtn>
             <LinkBtn
               href={
@@ -126,13 +136,15 @@ const Footer = ({ slapToBottom }: Props) => {
             >
               TL;DR Reflex Index
             </LinkBtn>
-            <LinkBtn href={'https://github.com/reflexer-labs'} target="_blank">GitHub</LinkBtn>
+            <LinkBtn href={'https://github.com/reflexer-labs'} target="_blank">
+              GitHub
+            </LinkBtn>
           </LinksContainer>
         </Column>
       </UpperSection>
       <LowerSection>
         <LinkContainer>
-          <Link to={"/privacy"}>Privacy Policy</Link>
+          <Link to={'/privacy'}>Privacy Policy</Link>
         </LinkContainer>
         {/* <Button text={`Deployed Commit - master`} /> */}
         <Button text="© Reflexer Labs 2020" />
@@ -152,7 +164,7 @@ const BrandContainer = styled.div`
   img {
     width: auto !important;
   }
-`
+`;
 
 const LinksContainer = styled.div``;
 
@@ -163,12 +175,12 @@ const UpperSection = styled.div`
   .col40 {
     flex: 0 0 55%;
   }
-  
+
   .col20 {
     flex: 0 0 15%;
     text-align: right;
   }
-  
+
   ${({ theme }) => theme.mediaWidth.upToLarge`
     .col40 {
       flex: 0 0 40%;
@@ -230,11 +242,11 @@ const Header = styled.h4`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  
+
   svg {
     display: none;
   }
-  
+
   ${({ theme }) => theme.mediaWidth.upToMedium`
     svg {
        display: block;
@@ -253,7 +265,7 @@ const LinkBtn = styled.a`
   transition: all 0.3s ease;
   display: block;
   margin: 5px 0;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -261,7 +273,7 @@ const LinkBtn = styled.a`
   &:hover {
     text-decoration: underline;
     color: ${(props) => props.theme.colors.primary};
-    
+
     svg {
       color: ${(props) => props.theme.colors.primary};
     }
@@ -273,12 +285,12 @@ const LowerSection = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-top: 30px;
-  
+
   button {
     padding: 4px 8px;
     pointer-events: none;
   }
-  
+
   ${({ theme }) => theme.mediaWidth.upToMedium`
     align-items: flex-start;
     margin-top: 25px;
@@ -296,36 +308,35 @@ const Success = styled.p`
   font-size: ${(props) => props.theme.font.extraSmall};
 `;
 
-
 const LinkContainer = styled.div`
   a {
-    font-size: ${props => props.theme.font.default};
+    font-size: ${(props) => props.theme.font.default};
     line-height: 22px;
     letter-spacing: -0.18px;
-    color: ${props => props.theme.colors.secondary};
+    color: ${(props) => props.theme.colors.secondary};
     transition: all 0.3s ease;
     display: block;
-    
+
     &:hover {
       text-decoration: underline;
-      color: ${props => props.theme.colors.primary};
-      
+      color: ${(props) => props.theme.colors.primary};
+
       svg {
-        color: ${props => props.theme.colors.primary};
+        color: ${(props) => props.theme.colors.primary};
       }
     }
   }
-  
+
   ${({ theme }) => theme.mediaWidth.upToSmall`
     margin-bottom: 20px;
     
     a {
       font-weight: 600;
-      color: ${props => props.theme.colors.primary};
+      color: ${(props) => props.theme.colors.primary};
       
       &:hover {
         text-decoration:none;
       }
     }
   `}
-`
+`;
