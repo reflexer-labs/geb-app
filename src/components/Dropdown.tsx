@@ -129,13 +129,13 @@ const Container = styled.div`
   display: inline-block;
   &.isOpen {
     position: relative;
-    z-index: 1000;
+    z-index: 998;
   }
 `;
 
 const InnerContainer = styled.div`
   position: relative;
-  z-index: 999;
+  z-index: 997;
 `;
 const DropdownBtn = styled.button`
   border: 1px solid ${(props) => props.theme.colors.border};

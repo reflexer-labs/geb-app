@@ -26,7 +26,7 @@ const IncentivesTransaction = () => {
   const {
     type,
     incentivesFields,
-    selectedCampaignId: campaignId,
+    selectedCampaignAddress: campaignAddress,
     uniPoolAmount,
   } = incentivesState;
 
@@ -52,6 +52,9 @@ const IncentivesTransaction = () => {
 
   const handleConfirm = async () => {
     if (account && library) {
+      if (!campaignAddress) {
+        throw new Error('No campaignAddress specified');
+      }
       popupsActions.setIsIncentivesModalOpen(false);
       popupsActions.setIsWaitingModalOpen(true);
       popupsActions.setWaitingPayload({
@@ -61,20 +64,19 @@ const IncentivesTransaction = () => {
         status: 'loading',
       });
       const signer = library.getSigner(account);
+
       try {
         if (type === 'deposit') {
           await incentivesActions.incentiveDeposit({
             signer,
             incentivesFields,
+            campaignAddress,
           });
         }
         if (type === 'claim') {
-          if (!campaignId) {
-            throw new Error('No CampaignId specified');
-          }
           await incentivesActions.incentiveClaim({
             signer,
-            campaignId,
+            campaignAddress,
           });
         }
 
@@ -84,7 +86,7 @@ const IncentivesTransaction = () => {
           }
           await incentivesActions.incentiveWithdraw({
             signer,
-            campaignId: id,
+            campaignAddress,
             uniPoolAmount,
             reserveRAI,
             reserveETH,

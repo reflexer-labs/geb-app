@@ -219,24 +219,38 @@ export interface ISafeHistory {
 
 export interface IncentivesCampaign {
   duration: string;
-  id: string;
   instantExitPercentage: string;
   reward: string;
   rewardDelay: string;
   startTime: string;
-  totalSupply: string;
-  rewardRate: string;
   lastUpdateTime: string;
+
+  // new
+  id: string;
+  campaignAddress: string;
+  campaignNumber: string;
+  rewardsDuration: string;
+  rewardRate: string;
+  totalSupply: string;
+  rewardToken: string;
   rewardPerTokenStored: string;
 }
 
 export interface IncentiveBalance {
   campaignId: string;
-  reward: string;
-  userRewardPerTokenPaid: string;
   delayedRewardTotalAmount: string;
   delayedRewardExitedAmount: string;
   delayedRewardLatestExitTime: string;
+
+  // new
+  id: string;
+  stakeBalance: string;
+  address: string;
+  owner: {
+    id: string;
+  };
+  reward: string;
+  userRewardPerTokenPaid: string;
 }
 
 export interface IIncentivesCampaignData {
@@ -287,6 +301,9 @@ export interface IIncentivesFields {
 
 export interface IIncentiveHook {
   id: string;
+  campaignNumber: string;
+  periodFinish: string;
+  campaignAddress: string;
   duration: string;
   startTime: string;
   reward: string;
@@ -326,14 +343,15 @@ export interface IIncentiveHook {
 export interface IIncentivePayload {
   incentivesFields: IIncentivesFields;
   signer: JsonRpcSigner;
+  campaignAddress: string;
 }
 export interface IIncentiveClaim {
   signer: JsonRpcSigner;
-  campaignId: string;
+  campaignAddress: string;
 }
 export interface IIncentiveWithdraw {
   signer: JsonRpcSigner;
-  campaignId: string;
+  campaignAddress: string;
   uniPoolAmount: string;
   reserveRAI: string;
   reserveETH: string;

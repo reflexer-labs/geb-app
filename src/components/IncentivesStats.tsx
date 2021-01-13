@@ -4,28 +4,28 @@ import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
 import Button from './Button';
 import ReactTooltip from 'react-tooltip';
-import { Info } from 'react-feather';
 import Arrow from './Icons/Arrow';
-import useIncentives, { useUserCampaigns } from '../hooks/useIncentives';
+import { useUserCampaigns, useSelectedCampaign } from '../hooks/useIncentives';
 import { useActiveWeb3React } from '../hooks';
+import { formatNumber } from '../utils/helper';
+import Dropdown from './Dropdown';
+import { IIncentiveHook } from '../utils/interfaces';
 
 const IncentivesStats = () => {
   const { t } = useTranslation();
   const { account } = useActiveWeb3React();
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
   const {
-    id,
+    campaignNumber,
     campaignEndTime,
+    periodFinish,
     myRewardRate,
     stakedBalance,
     dailyFLX,
     ethStake,
     raiStake,
-    unlockUntil,
     uniSwapLink,
-    instantExitPercentage,
-    is100PercentUnlocked,
-  } = useIncentives()[0];
+  } = useSelectedCampaign();
 
   const userCampaigns = useUserCampaigns();
   const {
@@ -51,14 +51,53 @@ const IncentivesStats = () => {
     incentivesActions.setType(type);
   };
 
+  const handleSelectedCampaign = (selected: string) => {
+    const id = selected.split('#').pop();
+    if (userCampaigns.length > 0) {
+      const campaign = userCampaigns.find(
+        (campaign: IIncentiveHook) => campaign.campaignNumber === id
+      );
+      if (campaign) {
+        incentivesActions.setSelectedCampaignAddress(campaign.campaignAddress);
+      }
+    }
+  };
+
+  const returnItemSelected = () => {
+    if (userCampaigns[0].id === '') {
+      if (campaignNumber && Date.now() < Number(periodFinish) * 1000) {
+        return `#${campaignNumber}`;
+      } else {
+        return `#0`;
+      }
+    }
+    return `#${userCampaigns[0].campaignNumber}`;
+  };
+
   return (
     <>
       <StatsGrid>
         <StatItem>
           <StateInner>
             <Label className="top">{'Campaign'} </Label>
-            <Value>{`#${id}`}</Value>
-            <Label className="small">{`Ending on ${campaignEndTime}`}</Label>
+            {/* <Value>{`#${campaignNumber}`}</Value> */}
+            <Value>
+              <Dropdown
+                items={
+                  userCampaigns[0].id === ''
+                    ? []
+                    : userCampaigns.map(
+                        (campaign: IIncentiveHook) =>
+                          `Campaign #${campaign.campaignNumber}`
+                      )
+                }
+                getSelectedItem={handleSelectedCampaign}
+                itemSelected={returnItemSelected()}
+              />
+            </Value>
+            <Label className="small">{`${
+              Date.now() > Number(periodFinish) * 1000 ? 'Ended' : 'Ending'
+            } on ${campaignEndTime}`}</Label>
           </StateInner>
         </StatItem>
 
@@ -66,7 +105,9 @@ const IncentivesStats = () => {
           <StateInner>
             <Label className="top">{'My Reward Rate'}</Label>
             <Value>{`${account ? myRewardRate : 0} FLX/Day`}</Value>
-            <Label className="small">{`Out of ${dailyFLX} FLX/Day`}</Label>
+            <Label className="small">{`Out of ${formatNumber(
+              dailyFLX.toString()
+            )} FLX/Day`}</Label>
           </StateInner>
         </StatItem>
 
@@ -82,34 +123,6 @@ const IncentivesStats = () => {
           </StateInner>
         </StatItem>
 
-        <StatItem>
-          <StateInner>
-            <Label className="top">
-              {'Reward Unlock'}{' '}
-              <InfoIcon
-                data-tip={
-                  !is100PercentUnlocked
-                    ? t('my_stake_tip', {
-                        date: unlockUntil,
-                      })
-                    : t('fullyUnlocked')
-                }
-              >
-                <Info size="20" />
-              </InfoIcon>
-            </Label>
-            <Value>{`${
-              !is100PercentUnlocked ? Number(instantExitPercentage) * 100 : 100
-            }% Instant`}</Value>
-            {!is100PercentUnlocked ? (
-              <Label className="small">
-                {`${
-                  (1 - Number(instantExitPercentage)) * 100
-                }% linear unlock until ${unlockUntil}`}
-              </Label>
-            ) : null}
-          </StateInner>
-        </StatItem>
         <ReactTooltip multiline type="light" data-effect="solid" />
       </StatsGrid>
 
@@ -164,7 +177,7 @@ const StatsGrid = styled.div`
 
 const StatItem = styled.div`
   padding: 0 7.5px;
-  flex: 0 0 25%;
+  flex: 0 0 33.3%;
   margin-bottom: 15px;
   &.w50 {
     flex: 0 0 50%;
@@ -211,10 +224,19 @@ const Value = styled.div`
   line-height: 27px;
   letter-spacing: -0.69px;
   font-weight: 600;
-  margin: 30px 0 0px;
+  margin: 20px 0 0px;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     font-size: ${(props) => props.theme.font.medium};
  `}
+  >div {
+    button {
+      padding: 15px 20px !important;
+    }
+  }
+  > div div {
+    font-size: ${(props) => props.theme.font.default};
+    font-weight: normal;
+  }
 `;
 const Label = styled.div`
   font-size: ${(props) => props.theme.font.small};
@@ -234,6 +256,7 @@ const Label = styled.div`
   &.small {
     font-size: ${(props) => props.theme.font.extraSmall};
     color: ${(props) => props.theme.colors.secondary};
+    margin-top: 10px;
     a {
       color: inherit;
       filter: grayscale(100%);
@@ -297,15 +320,5 @@ const BtnContainer = styled.div`
         display: none;
       }
     }
-  }
-`;
-
-const InfoIcon = styled.div`
-  cursor: pointer;
-  position: relative;
-  top: 2px;
-  svg {
-    fill: ${(props) => props.theme.colors.secondary};
-    color: ${(props) => props.theme.colors.neutral};
   }
 `;

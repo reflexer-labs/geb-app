@@ -1,16 +1,16 @@
 import React, { useCallback, useState } from 'react';
 import numeral from 'numeral';
 import styled from 'styled-components';
-import useIncentives, { returnFLX } from '../../hooks/useIncentives';
+import { returnFLX, useSelectedCampaign } from '../../hooks/useIncentives';
 import { useStoreState } from '../../store';
 import { COIN_TICKER } from '../../utils/constants';
 import { formatNumber } from '../../utils/helper';
 import { useOnceCall } from '../../hooks/useOnceCall';
 
 const Results = () => {
-  const campaign = useIncentives()[0];
+  const campaign = useSelectedCampaign();
   const {
-    id,
+    campaignNumber,
     reserveETH,
     reserveRAI,
     totalSupply,
@@ -21,9 +21,6 @@ const Results = () => {
   } = campaign;
   const [resultData, setResultData] = useState({
     flxAmount: '',
-    lockedReward: '0',
-    start: 'N/A',
-    end: 'N/A',
   });
 
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
@@ -212,7 +209,7 @@ const Results = () => {
               </>
             )}
             <Item>
-              <Label>{'Campaign #'}</Label> <Value>{id}</Value>
+              <Label>{'Campaign #'}</Label> <Value>{campaignNumber}</Value>
             </Item>
           </Block>
         </>

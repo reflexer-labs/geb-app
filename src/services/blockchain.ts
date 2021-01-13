@@ -138,7 +138,8 @@ export const handleCollectETH = async (signer: JsonRpcSigner, safe: ISafe) => {
 
 export const handleIncentiveDeposit = async (
   signer: JsonRpcSigner,
-  incentiveFields: IIncentivesFields
+  incentiveFields: IIncentivesFields,
+  campaignAddress: string
 ) => {
   if (!signer || !incentiveFields) {
     return false;
@@ -161,7 +162,8 @@ export const handleIncentiveDeposit = async (
   const txData = proxy.provideLiquidityStake(
     ethAmountBN,
     raiAmountBN,
-    minTokenAmounts
+    minTokenAmounts,
+    campaignAddress
   );
 
   if (!txData) throw new Error('No transaction request!');
@@ -174,16 +176,16 @@ export const handleIncentiveDeposit = async (
 
 export const handleIncentiveClaim = async (
   signer: JsonRpcSigner,
-  campaignId: string
+  campaignAddress: string
 ) => {
-  if (!signer || !campaignId) {
+  if (!signer || !campaignAddress) {
     return false;
   }
   const geb = new Geb(ETH_NETWORK, signer.provider);
 
   const proxy = await geb.getProxyAction(signer._address);
 
-  const txData = proxy.getRewards(campaignId);
+  const txData = proxy.getRewards(campaignAddress);
 
   if (!txData) throw new Error('No transaction request!');
 
@@ -195,7 +197,7 @@ export const handleIncentiveClaim = async (
 
 export const handleIncentiveWithdraw = async ({
   signer,
-  campaignId,
+  campaignAddress,
   uniPoolAmount,
   reserveRAI,
   reserveETH,
@@ -203,16 +205,12 @@ export const handleIncentiveWithdraw = async ({
 }: IIncentiveWithdraw) => {
   if (
     !signer ||
-    !campaignId ||
+    !campaignAddress ||
     !uniPoolAmount ||
     !reserveRAI ||
     !reserveETH ||
     !coinTotalSupply
   ) {
-    console.log(uniPoolAmount);
-    console.log(reserveRAI);
-    console.log(reserveETH);
-    console.log(coinTotalSupply);
     return false;
   }
   const uniPoolAmountBN = ethersUtils.parseEther(uniPoolAmount);
@@ -236,8 +234,8 @@ export const handleIncentiveWithdraw = async ({
 
   const txData = proxy.withdrawHarvestRemoveLiquidity(
     uniPoolAmountBN,
-    campaignId,
-    minTokenAmounts
+    minTokenAmounts,
+    campaignAddress
   );
   if (!txData) throw new Error('No transaction request!');
   const tx = await handlePreTxGasEstimate(signer, txData);

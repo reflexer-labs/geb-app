@@ -23,7 +23,7 @@ export interface IncentivesModel {
   operation: number;
   type: string;
   claimableFLX: string;
-  selectedCampaignId: string;
+  selectedCampaignAddress: string;
   uniPoolAmount: string;
   incentivesFields: IIncentivesFields;
   incentivesCampaignData: IIncentivesCampaignData | null;
@@ -41,7 +41,7 @@ export interface IncentivesModel {
   setIncentivesCampaignData: Action<IncentivesModel, IIncentivesCampaignData>;
   setIncentivesFields: Action<IncentivesModel, IIncentivesFields>;
   setClaimableFLX: Action<IncentivesModel, string>;
-  setSelectedCampaignId: Action<IncentivesModel, string>;
+  setSelectedCampaignAddress: Action<IncentivesModel, string>;
   setUniPoolAmount: Action<IncentivesModel, string>;
 }
 const incentivesModel: IncentivesModel = {
@@ -51,7 +51,7 @@ const incentivesModel: IncentivesModel = {
   claimableFLX: '0.00',
   uniPoolAmount: '',
   incentivesCampaignData: null,
-  selectedCampaignId: '',
+  selectedCampaignAddress: '',
   setOperation: action((state, payload) => {
     state.operation = payload;
   }),
@@ -87,7 +87,8 @@ const incentivesModel: IncentivesModel = {
     const storeActions = getStoreActions();
     const txResponse = await handleIncentiveDeposit(
       payload.signer,
-      payload.incentivesFields
+      payload.incentivesFields,
+      payload.campaignAddress
     );
     if (txResponse) {
       const { hash, chainId } = txResponse;
@@ -115,7 +116,7 @@ const incentivesModel: IncentivesModel = {
     const storeActions = getStoreActions();
     const txResponse = await handleIncentiveClaim(
       payload.signer,
-      payload.campaignId
+      payload.campaignAddress
     );
     if (txResponse) {
       const { hash, chainId } = txResponse;
@@ -175,8 +176,8 @@ const incentivesModel: IncentivesModel = {
   setClaimableFLX: action((state, payload) => {
     state.claimableFLX = payload;
   }),
-  setSelectedCampaignId: action((state, payload) => {
-    state.selectedCampaignId = payload;
+  setSelectedCampaignAddress: action((state, payload) => {
+    state.selectedCampaignAddress = payload;
   }),
   setUniPoolAmount: action((state, payload) => {
     state.uniPoolAmount = payload;

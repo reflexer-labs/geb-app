@@ -13,16 +13,16 @@ export const incentiveCampaignsQuery = (
         amount
       }
     }
-    incentiveCampaigns(orderBy: id, orderDirection: desc) {
+    incentiveCampaigns(orderBy: campaignNumber, orderDirection: desc) {
         id
-        startTime
-        duration
-        reward
-        totalSupply
-        instantExitPercentage
-        rewardDelay
-        rewardRate
+        campaignAddress
+        campaignNumber
+        rewardsDuration
         lastUpdatedTime
+        periodFinish
+        rewardRate
+        totalSupply
+        rewardToken
         rewardPerTokenStored
       }
     systemState(id: "current") {
@@ -40,13 +40,15 @@ export const incentiveCampaignsQuery = (
           value
         }
       }
-    incentiveBalances(where: {owner: "${address}"}, orderBy: campaignId, orderDirection: desc) {
-          campaignId
-          reward
-          userRewardPerTokenPaid
-          delayedRewardTotalAmount
-          delayedRewardExitedAmount
-          delayedRewardLatestExitTime
+    incentiveBalances(where: {owner: "${address}"}, orderDirection: desc) {
+        id
+        stakeBalance
+        address
+        owner {
+          id
+        }
+        reward
+        userRewardPerTokenPaid
       }
 
       praiBalance:erc20Balances(where: {address: "${address}", label: "COIN"}) {

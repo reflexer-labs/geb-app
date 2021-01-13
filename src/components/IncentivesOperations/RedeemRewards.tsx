@@ -11,9 +11,6 @@ import { formatNumber } from '../../utils/helper';
 
 interface ResultData {
   flxAmount: string;
-  lockedReward: string;
-  start: string;
-  end: string;
 }
 const RedeemRewards = () => {
   const { t } = useTranslation();
@@ -22,9 +19,6 @@ const RedeemRewards = () => {
 
   const [resultData, setResultData] = useState<ResultData>({
     flxAmount: '',
-    lockedReward: '0',
-    start: 'N/A',
-    end: 'N/A',
   });
 
   const {
@@ -51,14 +45,14 @@ const RedeemRewards = () => {
     const result = returnFLX(campaign);
     setResultData(result);
     incentivesActions.setClaimableFLX(result.flxAmount);
-    incentivesActions.setSelectedCampaignId(campaign.id);
+    incentivesActions.setSelectedCampaignAddress(campaign.campaignAddress);
   };
 
   const handleSelectedCampaign = (selected: string) => {
     const id = selected.split('#').pop();
     if (userCampaigns.length > 0) {
       const campaign = userCampaigns.find(
-        (campaign: IIncentiveHook) => campaign.id === id
+        (campaign: IIncentiveHook) => campaign.campaignNumber === id
       );
       if (campaign) {
         getResultData(campaign);
@@ -78,7 +72,8 @@ const RedeemRewards = () => {
             userCampaigns[0].id === ''
               ? []
               : userCampaigns.map(
-                  (campaign: IIncentiveHook) => `Campaign #${campaign.id}`
+                  (campaign: IIncentiveHook) =>
+                    `Campaign #${campaign.campaignNumber}`
                 )
           }
           getSelectedItem={handleSelectedCampaign}
@@ -86,7 +81,7 @@ const RedeemRewards = () => {
             userCampaigns[0].id === ''
               ? 'Nothing to claim'
               : userCampaigns.length > 0
-              ? `Campaign #${userCampaigns[0].id}`
+              ? `Campaign #${userCampaigns[0].campaignNumber}`
               : 'Fetching Campaigns...'
           }
           label={'Select Campaign'}
@@ -102,28 +97,6 @@ const RedeemRewards = () => {
         </ValueBlock>
       </StaticBlock>
       {error && <Error>{error}</Error>}
-      <Result>
-        <Block>
-          <Item>
-            <Label>{'Locked Reward'}</Label>{' '}
-            <Value>
-              {Number(resultData.lockedReward) > 0.0001
-                ? formatNumber(resultData.lockedReward).toString()
-                : '< 0.0001'}
-            </Value>
-          </Item>
-
-          <Item>
-            <Label className="special">{'Start of Unlock Period'}</Label>{' '}
-            <Value>{resultData.start}</Value>
-          </Item>
-
-          <Item>
-            <Label className="special">{'End of Unlock Period'}</Label>{' '}
-            <Value>{resultData.end}</Value>
-          </Item>
-        </Block>
-      </Result>
 
       <Footer>
         <Button dimmed text={t('cancel')} onClick={handleCancel} />
@@ -153,55 +126,6 @@ const Footer = styled.div`
 
 const DropdownContainer = styled.div`
   margin-bottom: 30px;
-`;
-
-const Result = styled.div`
-  border-radius: ${(props) => props.theme.global.borderRadius};
-  border: 1px solid ${(props) => props.theme.colors.border};
-  background: ${(props) => props.theme.colors.foreground};
-  margin-top: 20px;
-`;
-
-const Block = styled.div`
-  border-bottom: 1px solid;
-  padding: 16px 20px;
-  border-bottom: 1px solid ${(props) => props.theme.colors.border};
-  &:last-child {
-    border-bottom: 0;
-  }
-`;
-
-const Item = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const Label = styled.div`
-  font-size: ${(props) => props.theme.font.small};
-  color: ${(props) => props.theme.colors.secondary};
-  letter-spacing: -0.09px;
-  line-height: 21px;
-  display: flex;
-  align-items: center;
-  &.special {
-    @media (max-width: 370px) {
-      max-width: 90px;
-    }
-  }
-`;
-
-const Value = styled.div`
-  font-size: ${(props) => props.theme.font.small};
-  color: ${(props) => props.theme.colors.primary};
-  letter-spacing: -0.09px;
-  line-height: 21px;
-  font-weight: 600;
-  text-align: right;
 `;
 
 const Error = styled.p`

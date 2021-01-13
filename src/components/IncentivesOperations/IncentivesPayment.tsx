@@ -11,7 +11,7 @@ import Dropdown from '../Dropdown';
 import { formatNumber, toFixedString } from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
 import Results from './Results';
-import useIncentives from '../../hooks/useIncentives';
+import { useSelectedCampaign } from '../../hooks/useIncentives';
 import _ from '../../utils/lodash';
 
 const INITITAL_STATE = [
@@ -30,7 +30,8 @@ const IncentivesPayment = () => {
     token0Price,
     coinAddress,
     stakedBalance,
-  } = useIncentives()[0];
+    campaignAddress,
+  } = useSelectedCampaign();
 
   const [ethAmount, setEthAmount] = useState('');
   const [raiAmount, setRaiAmount] = useState('');
@@ -146,6 +147,7 @@ const IncentivesPayment = () => {
   const handleSubmit = () => {
     const isPassedValidation = validationChecker();
     if (isPassedValidation) {
+      incentivesActions.setSelectedCampaignAddress(campaignAddress);
       if (type === 'deposit' && !passedCheckForCoinAllowance()) {
         incentivesActions.setOperation(2);
       } else {
