@@ -70,9 +70,11 @@ const RedeemRewards = () => {
       <StaticBlock>
         <LabelBlock>Claimable FLX</LabelBlock>
         <ValueBlock>
-          {Number(resultData.flxAmount) > 0.0001
-            ? formatNumber(resultData.flxAmount).toString()
-            : '< 0.0001'}
+          {Number(resultData.flxAmount) > 0
+            ? Number(resultData.flxAmount) > 0.0001
+              ? formatNumber(resultData.flxAmount).toString()
+              : '< 0.0001'
+            : '0'}
         </ValueBlock>
       </StaticBlock>
       {error && <Error>{error}</Error>}

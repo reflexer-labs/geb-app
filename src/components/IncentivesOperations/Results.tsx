@@ -19,6 +19,7 @@ const Results = () => {
     coinTotalSupply,
     isOngoingCampaign,
   } = campaign;
+
   const [resultData, setResultData] = useState({
     flxAmount: '',
   });
@@ -61,15 +62,11 @@ const Results = () => {
 
   const returnShareOfIncentivePool = useCallback(() => {
     const shareOfUniSwapPool = returnShareOfUniswapPool();
-    if (
-      !totalSupply ||
-      totalSupply === '0' ||
-      !shareOfUniSwapPool ||
-      shareOfUniSwapPool === 0
-    )
-      return 0;
+    if (!shareOfUniSwapPool || shareOfUniSwapPool === 0) return 0;
+    const denominator = numeral(totalSupply || '0')
+      .add(shareOfUniSwapPool)
+      .value();
 
-    const denominator = numeral(totalSupply).add(shareOfUniSwapPool).value();
     return formatNumber(
       numeral(shareOfUniSwapPool)
         .divide(denominator)
@@ -86,22 +83,16 @@ const Results = () => {
     if (!ethAmount) ethAmount = '0';
     if (!raiAmount) ethAmount = '0';
 
-    if (
-      !shareOfUniSwapPool ||
-      shareOfUniSwapPool === 0 ||
-      !isOngoingCampaign ||
-      !rewardRate ||
-      !totalSupply ||
-      Number(rewardRate) === 0 ||
-      Number(totalSupply) === 0
-    )
+    if (!shareOfUniSwapPool || shareOfUniSwapPool === 0 || !isOngoingCampaign)
       return 0;
 
     const totalDeposit = Math.sqrt(
       numeral(ethAmount).multiply(raiAmount).value()
     );
 
-    const totalStaked = numeral(totalDeposit).add(totalSupply).value();
+    const totalStaked = numeral(totalDeposit)
+      .add(totalSupply || '0')
+      .value();
 
     const value = numeral(shareOfUniSwapPool)
       .divide(totalStaked)

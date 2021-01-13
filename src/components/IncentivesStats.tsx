@@ -104,9 +104,13 @@ const IncentivesStats = () => {
         <StatItem>
           <StateInner>
             <Label className="top">{'My Reward Rate'}</Label>
-            <Value>{`${account ? myRewardRate : 0} FLX/Day`}</Value>
+            <Value>{`${
+              account ? formatNumber(myRewardRate, 2, true) : 0
+            } FLX/Day`}</Value>
             <Label className="small">{`Out of ${formatNumber(
-              dailyFLX.toString()
+              dailyFLX.toString(),
+              2,
+              true
             )} FLX/Day`}</Label>
           </StateInner>
         </StatItem>
@@ -127,14 +131,7 @@ const IncentivesStats = () => {
       </StatsGrid>
 
       <BtnContainer
-        className={
-          account &&
-          Number(stakedBalance) !== 0 &&
-          userCampaigns.length &&
-          userCampaigns[0].id !== ''
-            ? ''
-            : 'hide'
-        }
+        className={account && Number(stakedBalance) !== 0 ? '' : 'hide'}
       >
         <div>
           <Button

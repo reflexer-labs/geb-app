@@ -37,15 +37,25 @@ const ProxyModal = () => {
 
   useEffect(() => {
     async function blocksChecker() {
-      if (blocksSinceCheck === 10) {
+      if (ctHash && blocksSinceCheck === 10) {
         await timeout(2000);
         popupsActions.setIsProxyModalOpen(false);
         popupsState.returnProxyFunction(storeActions);
         localStorage.removeItem('ctHash');
+        connectWalletActions.setCtHash('');
+        connectWalletActions.setStep(2);
       }
     }
     blocksChecker();
-  }, [account, blocksSinceCheck, popupsActions, popupsState, storeActions]);
+  }, [
+    account,
+    blocksSinceCheck,
+    popupsActions,
+    ctHash,
+    popupsState,
+    connectWalletActions,
+    storeActions,
+  ]);
 
   const handleCreateAccount = async () => {
     const { blockNumber } = connectWalletState;

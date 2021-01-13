@@ -43,7 +43,10 @@ export interface PopupsModel {
   setWaitingPayload: Action<PopupsModel, IWaitingPayload>;
   setBlockBackdrop: Action<PopupsModel, boolean>;
   setIsProxyModalOpen: Action<PopupsModel, boolean>;
-  setReturnProxyFunction: Action<PopupsModel, (storeActions: any) => void>;
+  setReturnProxyFunction: Action<
+    PopupsModel,
+    (storeActions: any) => void | null
+  >;
 }
 
 const popupsModel: PopupsModel = {

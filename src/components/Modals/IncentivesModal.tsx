@@ -15,6 +15,7 @@ const IncentivesModal = () => {
     incentivesActions.setOperation(0);
     incentivesActions.setUniPoolAmount('');
     incentivesActions.setIncentivesFields({ ethAmount: '', raiAmount: '' });
+    popupsActions.setReturnProxyFunction(() => {});
   };
   return (
     <Modal
