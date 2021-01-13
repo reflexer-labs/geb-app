@@ -314,32 +314,22 @@ export function useUserCampaigns() {
     incentiveBalance: IncentiveBalance
   ) => {
     const {
-      startTime,
-      duration,
+      periodFinish,
       lastUpdatedTime,
       rewardPerTokenStored,
     } = incentiveCampaign;
-    const {
-      delayedRewardExitedAmount,
-      delayedRewardTotalAmount,
-      userRewardPerTokenPaid,
-      reward,
-    } = incentiveBalance;
+    const { userRewardPerTokenPaid, reward } = incentiveBalance;
 
     return (
-      Number(delayedRewardExitedAmount) === Number(delayedRewardTotalAmount) &&
       Number(rewardPerTokenStored) >= Number(userRewardPerTokenPaid) &&
-      Number(lastUpdatedTime) >= Number(startTime) + Number(duration) &&
+      Number(lastUpdatedTime) >= Number(periodFinish) &&
       Number(reward) === 0
     );
   };
 
   useEffect(() => {
     function returnUserCampaigns() {
-      if (
-        incentivesCampaignData &&
-        incentivesCampaignData.incentiveBalances.length > 0
-      ) {
+      if (incentivesCampaignData) {
         const list = campaigns.filter((x: IIncentiveHook, i) => {
           return (
             (i === 0 && x.isOngoingCampaign && Number(x.periodFinish) !== 0) ||
