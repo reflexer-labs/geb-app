@@ -330,10 +330,11 @@ export function useUserCampaigns() {
   useEffect(() => {
     function returnUserCampaigns() {
       if (incentivesCampaignData) {
-        const list = campaigns.filter((x: IIncentiveHook, i) => {
+        const list = campaigns.filter((x: IIncentiveHook) => {
           return (
-            (i === 0 && x.isOngoingCampaign && Number(x.periodFinish) !== 0) ||
+            (x.isOngoingCampaign && Number(x.periodFinish) !== 0) ||
             (x.myRewardRate && Number(x.myRewardRate) > 0) ||
+            Number(x.stakedBalance) > 0 ||
             incentivesCampaignData.incentiveBalances.find(
               (y: IncentiveBalance) => {
                 return x.id === y.campaignId && !userCampaignChecker(x, y);

@@ -5,7 +5,7 @@ import { useStoreActions } from '../../store';
 import { IIncentiveHook } from '../../utils/interfaces';
 import Button from '../Button';
 import Dropdown from '../Dropdown';
-import { returnFLX, useUserCampaigns } from '../../hooks/useIncentives';
+import { returnFLX, useSelectedCampaign } from '../../hooks/useIncentives';
 import { useOnceCall } from '../../hooks/useOnceCall';
 import { formatNumber } from '../../utils/helper';
 
@@ -15,7 +15,7 @@ interface ResultData {
 const RedeemRewards = () => {
   const { t } = useTranslation();
   const [error, setError] = useState('');
-  const userCampaigns = useUserCampaigns();
+  const selectedCampaign = useSelectedCampaign();
 
   const [resultData, setResultData] = useState<ResultData>({
     flxAmount: '',
@@ -48,43 +48,22 @@ const RedeemRewards = () => {
     incentivesActions.setSelectedCampaignAddress(campaign.campaignAddress);
   };
 
-  const handleSelectedCampaign = (selected: string) => {
-    const id = selected.split('#').pop();
-    if (userCampaigns.length > 0) {
-      const campaign = userCampaigns.find(
-        (campaign: IIncentiveHook) => campaign.campaignNumber === id
-      );
-      if (campaign) {
-        getResultData(campaign);
-      }
-    }
-  };
-
   useOnceCall(() => {
-    getResultData(userCampaigns[0]);
-  }, userCampaigns[0].id !== '');
+    getResultData(selectedCampaign);
+  }, selectedCampaign.id !== '');
 
   return (
     <Body>
       <DropdownContainer>
         <Dropdown
-          items={
-            userCampaigns[0].id === ''
-              ? []
-              : userCampaigns.map(
-                  (campaign: IIncentiveHook) =>
-                    `Campaign #${campaign.campaignNumber}`
-                )
-          }
-          getSelectedItem={handleSelectedCampaign}
+          items={[]}
+          getSelectedItem={() => {}}
           itemSelected={
-            userCampaigns[0].id === ''
+            selectedCampaign.id === ''
               ? 'Nothing to claim'
-              : userCampaigns.length > 0
-              ? `Campaign #${userCampaigns[0].campaignNumber}`
-              : 'Fetching Campaigns...'
+              : `Campaign #${selectedCampaign.campaignNumber}`
           }
-          label={'Select Campaign'}
+          label={'Selected Campaign'}
         />
       </DropdownContainer>
 
@@ -101,8 +80,8 @@ const RedeemRewards = () => {
       <Footer>
         <Button dimmed text={t('cancel')} onClick={handleCancel} />
         <Button
-          disabled={userCampaigns[0].id === ''}
-          dimmed={userCampaigns[0].id === ''}
+          disabled={selectedCampaign.id === ''}
+          dimmed={selectedCampaign.id === ''}
           withArrow
           onClick={handleSubmit}
           text={t('review_transaction')}
