@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../store';
@@ -15,6 +15,8 @@ const IncentivesStats = () => {
   const { t } = useTranslation();
   const { account } = useActiveWeb3React();
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
+
+  const { selectedCampaignAddress } = incentivesState;
   const {
     campaignNumber,
     campaignEndTime,
@@ -63,16 +65,24 @@ const IncentivesStats = () => {
     }
   };
 
-  const returnItemSelected = () => {
+  const returnItemSelected = useCallback(() => {
     if (userCampaigns[0].id === '') {
       if (campaignNumber && Date.now() < Number(periodFinish) * 1000) {
         return `#${campaignNumber}`;
       } else {
         return `#0`;
       }
+    } else if (selectedCampaignAddress) {
+      const campaign = userCampaigns.find(
+        (campaign: IIncentiveHook) =>
+          campaign.campaignAddress === selectedCampaignAddress
+      );
+      if (campaign) {
+        return `#${campaign.campaignNumber}`;
+      }
     }
     return `#${userCampaigns[0].campaignNumber}`;
-  };
+  }, [campaignNumber, periodFinish, userCampaigns, selectedCampaignAddress]);
 
   return (
     <>

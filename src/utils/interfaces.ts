@@ -304,18 +304,12 @@ export interface IIncentiveHook {
   campaignNumber: string;
   periodFinish: string;
   campaignAddress: string;
-  duration: string;
-  startTime: string;
-  reward: string;
   rewardRate: string;
-  rewardDelay: string;
   totalSupply: string;
-  instantExitPercentage: string;
   coinAddress: string;
   wethAddress: string;
   coinTotalSupply: string;
   stakedBalance: string;
-  unlockUntil: string;
   campaignEndTime: string;
   dailyFLX: number;
   uniSwapLink: string;
@@ -329,15 +323,11 @@ export interface IIncentiveHook {
   token0: string;
   token0Price: string;
   token1Price: string;
-  is100PercentUnlocked: boolean;
   isOngoingCampaign: boolean;
   isCoinLessThanWeth: boolean;
   user: '' | null;
   IB_reward: string;
-  IB_delayedRewardTotalAmount: string;
   IB_userRewardPerTokenPaid: string;
-  IB_delayedRewardExitedAmount: string;
-  IB_delayedRewardLatestExitTime: string;
 }
 
 export interface IIncentivePayload {

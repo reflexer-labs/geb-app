@@ -77,28 +77,17 @@ export default function useIncentives() {
 
       const campaignData = incentivesCampaignData?.allCampaigns.map(
         (campaign: IncentivesCampaign, i: number) => {
-          // new
           const campaignNumber = _.get(campaign, 'campaignNumber', '0');
           const periodFinish = _.get(campaign, 'periodFinish', '0');
           const campaignAddress = _.get(campaign, 'campaignAddress', '0');
-          // new
 
           const id = _.get(campaign, 'id', '0');
-          const duration = _.get(campaign, 'duration', '0');
-          const startTime = _.get(campaign, 'startTime', '0');
-          const reward = _.get(campaign, 'reward', '0');
           const rewardRate = _.get(campaign, 'rewardRate', '0');
-          const rewardDelay = _.get(campaign, 'rewardDelay', '0');
           const totalSupply = _.get(campaign, 'totalSupply', '0');
           const lastUpdatedTime = _.get(campaign, 'lastUpdatedTime', '0');
           const rewardPerTokenStored = _.get(
             campaign,
             'rewardPerTokenStored',
-            '0'
-          );
-          const instantExitPercentage = _.get(
-            campaign,
-            'instantExitPercentage',
             '0'
           );
 
@@ -117,37 +106,6 @@ export default function useIncentives() {
             `userRewardPerTokenPaid`,
             '0'
           );
-          const IB_delayedRewardTotalAmount = _.get(
-            incentiveBalance,
-            `delayedRewardTotalAmount`,
-            '0'
-          );
-
-          const IB_delayedRewardExitedAmount = _.get(
-            incentiveBalance,
-            `delayedRewardExitedAmount`,
-            '0'
-          );
-          const IB_delayedRewardLatestExitTime = _.get(
-            incentiveBalance,
-            `delayedRewardLatestExitTime`,
-            '0'
-          );
-
-          const unlockUntilUnix =
-            Number(startTime) + Number(duration) + Number(rewardDelay);
-
-          const unlockUntil =
-            startTime && startTime
-              ? dayjs.unix(unlockUntilUnix).format('MMM D, YYYY h:mm A') +
-                ` (GMT${returnTimeOffset()})`
-              : '';
-
-          let is100PercentUnlocked = false;
-
-          if (unlockUntilUnix * 1000 <= Date.now()) {
-            is100PercentUnlocked = true;
-          }
 
           const campaignEndTime = periodFinish
             ? dayjs.unix(Number(periodFinish)).format('MMM D, YYYY h:mm A') +
@@ -215,18 +173,12 @@ export default function useIncentives() {
             campaignNumber: String(Number(campaignNumber) + 1),
             periodFinish,
             campaignAddress,
-            duration,
-            startTime,
-            reward,
             rewardRate,
-            rewardDelay,
             totalSupply,
-            instantExitPercentage,
             coinAddress,
             wethAddress,
             coinTotalSupply,
             stakedBalance,
-            unlockUntil,
             campaignEndTime,
             dailyFLX,
             uniSwapLink,
@@ -240,15 +192,11 @@ export default function useIncentives() {
             token1Price,
             lastUpdatedTime,
             rewardPerTokenStored,
-            is100PercentUnlocked,
             isOngoingCampaign: isOngoingCampaign(),
             isCoinLessThanWeth: isCoinLessThanWeth(),
             user,
             IB_reward,
-            IB_delayedRewardTotalAmount,
             IB_userRewardPerTokenPaid,
-            IB_delayedRewardExitedAmount,
-            IB_delayedRewardLatestExitTime,
           };
         }
       );

@@ -8,13 +8,14 @@ import { useActiveWeb3React } from '../../hooks';
 import { returnConnectorName } from '../../utils/helper';
 import Results from './Results';
 import { handleTransactionError } from '../../hooks/TransactionHooks';
-import useIncentives from '../../hooks/useIncentives';
+import { useUserCampaigns } from '../../hooks/useIncentives';
 
 const IncentivesTransaction = () => {
   const { connector, account, library } = useActiveWeb3React();
   const { t } = useTranslation();
 
-  const { id, reserveRAI, reserveETH, coinTotalSupply } = useIncentives()[0];
+  const userCampaigns = useUserCampaigns();
+  const { id, reserveRAI, reserveETH, coinTotalSupply } = userCampaigns[0];
 
   const { incentivesModel: incentivesState } = useStoreState((state) => state);
 
@@ -38,6 +39,10 @@ const IncentivesTransaction = () => {
     switch (type) {
       case 'deposit':
         return 'Incentive Deposit';
+      case 'claim':
+        return 'Incentive Claim';
+      case 'withdraw':
+        return 'Incentive Withdraw';
       default:
         return '';
     }
@@ -48,6 +53,7 @@ const IncentivesTransaction = () => {
     incentivesActions.setOperation(0);
     incentivesActions.setUniPoolAmount('');
     incentivesActions.setIncentivesFields({ ethAmount: '', raiAmount: '' });
+    popupsActions.setIsWaitingModalOpen(false);
   };
 
   const handleConfirm = async () => {
@@ -93,7 +99,11 @@ const IncentivesTransaction = () => {
             coinTotalSupply,
           });
         }
-
+        if (userCampaigns[0].id !== '') {
+          incentivesActions.setSelectedCampaignAddress(
+            userCampaigns[0].campaignAddress
+          );
+        }
         reset();
       } catch (e) {
         reset();
@@ -117,68 +127,6 @@ const IncentivesTransaction = () => {
         />
 
         <Results />
-        {/* <Result>
-          <Block>
-            {incentivesState.type !== 'claim' ? (
-              <>
-                <Item>
-                  <Label>
-                    {incentivesState.type === 'withdraw'
-                      ? `${COIN_TICKER} Withdrawn`
-                      : `${COIN_TICKER} per ETH`}
-                  </Label>{' '}
-                  <Value>{'0.12345678'}</Value>
-                </Item>
-                <Item>
-                  <Label>
-                    {incentivesState.type === 'withdraw'
-                      ? 'ETH Withdrawn'
-                      : `ETH per ${COIN_TICKER}`}
-                  </Label>{' '}
-                  <Value>{'432.1098'}</Value>
-                </Item>
-                <Item>
-                  <Label>{'Share of Uniswap Pool'}</Label>{' '}
-                  <Value>{'0.00'}</Value>
-                </Item>
-                <Item>
-                  <Label>{'Share of Incentives Pool'}</Label>{' '}
-                  <Value>{'0.00'}</Value>
-                </Item>
-                {incentivesState.type === 'withdraw' ? (
-                  <>
-                    <Item>
-                      <Label>{'Rewards Received Now'}</Label>{' '}
-                      <Value>{'0.00'}</Value>
-                    </Item>
-                    <Item>
-                      <Label>{'Rewards to Unlock'}</Label>{' '}
-                      <Value>{'0.00'}</Value>
-                    </Item>
-                    <Item>
-                      <Label>{'Unlock Time'}</Label> <Value>{'0.00'}</Value>
-                    </Item>
-                  </>
-                ) : (
-                  <>
-                    <Item>
-                      <Label>{'Campaign #'}</Label> <Value>{'1234'}</Value>
-                    </Item>
-                    <Item>
-                      <Label>{'FLX per Block'}</Label> <Value>{'12.00'}</Value>
-                    </Item>
-                  </>
-                )}
-              </>
-            ) : (
-              <>
-                <Item>
-                  <Label>{'Claimable FLX'}</Label> <Value>{'50.00'}</Value>
-                </Item>
-              </>
-            )}
-          </Block>
-        </Result> */}
 
         <UniSwapCheckContainer>
           <Text>{t('confirm_text')}</Text>
