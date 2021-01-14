@@ -88,7 +88,7 @@ const IncentivesStats = () => {
                     ? []
                     : userCampaigns.map(
                         (campaign: IIncentiveHook) =>
-                          `Campaign #${campaign.campaignNumber}`
+                          `#${campaign.campaignNumber}`
                       )
                 }
                 getSelectedItem={handleSelectedCampaign}
@@ -227,6 +227,7 @@ const Value = styled.div`
  `}
   >div {
     button {
+      max-width: 200px;
       padding: 15px 20px !important;
     }
   }
