@@ -125,11 +125,8 @@ const Footer = ({ slapToBottom }: Props) => {
             {selectedGroup === 2 ? <Minus size={16} /> : <Plus size={16} />}
           </Header>
           <LinksContainer>
-            <LinkBtn
-              href={'https://github.com/reflexer-labs/whitepapers'}
-              target="_blank"
-            >
-              Whitepaper
+            <LinkBtn href={'https://docs.reflexer.finance/'} target="_blank">
+              Documentation
             </LinkBtn>
             <LinkBtn
               href={
