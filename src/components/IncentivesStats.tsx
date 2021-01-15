@@ -27,6 +27,7 @@ const IncentivesStats = () => {
     ethStake,
     raiStake,
     uniSwapLink,
+    isOngoingCampaign,
   } = useSelectedCampaign();
 
   const userCampaigns = useUserCampaigns();
@@ -38,6 +39,10 @@ const IncentivesStats = () => {
   const handleClick = (type: string) => {
     if (!account) {
       popupsActions.setIsConnectorsWalletOpen(true);
+      return;
+    }
+
+    if (userCampaigns[0].id === '') {
       return;
     }
 
@@ -70,7 +75,7 @@ const IncentivesStats = () => {
       if (campaignNumber && Date.now() < Number(periodFinish) * 1000) {
         return `#${campaignNumber}`;
       } else {
-        return `#0`;
+        return `N/A`;
       }
     } else if (selectedCampaignAddress) {
       const campaign = userCampaigns.find(
@@ -93,9 +98,11 @@ const IncentivesStats = () => {
             {/* <Value>{`#${campaignNumber}`}</Value> */}
             <Value>
               <Dropdown
+                width="200px"
+                itemPadding={'10px 20px'}
                 items={
                   userCampaigns[0].id === ''
-                    ? []
+                    ? ['item']
                     : userCampaigns.map(
                         (campaign: IIncentiveHook) =>
                           `#${campaign.campaignNumber}`
@@ -105,9 +112,15 @@ const IncentivesStats = () => {
                 itemSelected={returnItemSelected()}
               />
             </Value>
-            <Label className="small">{`${
-              Date.now() > Number(periodFinish) * 1000 ? 'Ended' : 'Ending'
-            } on ${campaignEndTime}`}</Label>
+            <Label className="small">
+              {isOngoingCampaign
+                ? `${
+                    Date.now() > Number(periodFinish) * 1000
+                      ? 'Ended'
+                      : 'Ending'
+                  } on ${campaignEndTime}`
+                : 'Ended on N/A'}
+            </Label>
           </StateInner>
         </StatItem>
 
@@ -179,6 +192,7 @@ const StatsGrid = styled.div`
   flex-wrap: wrap;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     margin: 0;
+    justify-content:center;
   `}
 `;
 

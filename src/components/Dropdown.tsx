@@ -13,6 +13,7 @@ interface Props {
   width?: string;
   extraWord?: string;
   label?: string;
+  itemPadding?: string;
 }
 const Dropdown = (props: Props) => {
   const wrapperRef = useRef(null);
@@ -26,6 +27,7 @@ const Dropdown = (props: Props) => {
     fontSize,
     getSelectedItem,
     label,
+    itemPadding,
   } = props;
   const [isOpen, setIsOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Item>(itemSelected);
@@ -105,7 +107,11 @@ const Dropdown = (props: Props) => {
               autoHeightMax={185}
             >
               {items.map((item: Item, index: number) => (
-                <DropDownItem key={index} onClick={() => handleItemClick(item)}>
+                <DropDownItem
+                  key={index}
+                  onClick={() => handleItemClick(item)}
+                  style={{ padding: itemPadding || '20px' }}
+                >
                   {typeof item === 'string' ? (
                     item
                   ) : (
@@ -129,13 +135,13 @@ const Container = styled.div`
   display: inline-block;
   &.isOpen {
     position: relative;
-    z-index: 998;
+    z-index: 305;
   }
 `;
 
 const InnerContainer = styled.div`
   position: relative;
-  z-index: 997;
+  z-index: 300;
 `;
 const DropdownBtn = styled.button`
   border: 1px solid ${(props) => props.theme.colors.border};

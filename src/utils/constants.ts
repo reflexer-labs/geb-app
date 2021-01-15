@@ -164,7 +164,7 @@ export const INITIAL_INCENTIVE_STATE = [
     token1Price: '',
     lastUpdatedTime: '',
     rewardPerTokenStored: '',
-    isOngoingCampaign: true,
+    isOngoingCampaign: false,
     isCoinLessThanWeth: true,
     user: '' || null,
     IB_reward: '',

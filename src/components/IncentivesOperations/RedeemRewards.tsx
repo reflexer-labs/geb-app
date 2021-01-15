@@ -63,7 +63,7 @@ const RedeemRewards = () => {
               ? 'Nothing to claim'
               : `Campaign #${selectedCampaign.campaignNumber}`
           }
-          label={'Selected Campaign'}
+          label={'Campaign Number'}
         />
       </DropdownContainer>
 
