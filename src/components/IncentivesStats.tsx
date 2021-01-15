@@ -102,7 +102,7 @@ const IncentivesStats = () => {
                 itemPadding={'10px 20px'}
                 items={
                   userCampaigns[0].id === ''
-                    ? ['item']
+                    ? []
                     : userCampaigns.map(
                         (campaign: IIncentiveHook) =>
                           `#${campaign.campaignNumber}`
