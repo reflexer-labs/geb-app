@@ -25,6 +25,8 @@ export const COIN_TICKER =
     ? REACT_APP_COIN_TICKER_KOVAN
     : 'RAI';
 
+export const COLLATERAL_TYPE_ID = 'ETH-A';
+
 export const GRAPH_API_URLS = REACT_APP_GRAPH_API_URLS
   ? REACT_APP_GRAPH_API_URLS.split(',')
   : [
