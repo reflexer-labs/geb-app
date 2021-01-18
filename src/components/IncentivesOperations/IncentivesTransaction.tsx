@@ -29,6 +29,8 @@ const IncentivesTransaction = () => {
     incentivesFields,
     selectedCampaignAddress: campaignAddress,
     uniPoolAmount,
+    uniswapShare,
+    isUniSwapShareChecked,
   } = incentivesState;
 
   const handleBack = () => {
@@ -54,6 +56,9 @@ const IncentivesTransaction = () => {
     incentivesActions.setUniPoolAmount('');
     incentivesActions.setIncentivesFields({ ethAmount: '', raiAmount: '' });
     popupsActions.setIsWaitingModalOpen(false);
+    incentivesActions.setIsUniSwapShareChecked(false);
+    incentivesActions.setUniswapShare('');
+    incentivesActions.setUniPoolAmount('');
   };
 
   const handleConfirm = async () => {
@@ -77,6 +82,8 @@ const IncentivesTransaction = () => {
             signer,
             incentivesFields,
             campaignAddress,
+            uniswapShare,
+            isUniSwapShareChecked,
           });
         }
         if (type === 'claim') {
@@ -97,6 +104,7 @@ const IncentivesTransaction = () => {
             reserveRAI,
             reserveETH,
             coinTotalSupply,
+            isUniSwapShareChecked,
           });
         }
         if (userCampaigns[0].id !== '') {

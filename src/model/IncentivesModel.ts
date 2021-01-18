@@ -23,7 +23,9 @@ const INITIAL_STATE = {
 export interface IncentivesModel {
   operation: number;
   type: string;
+  isUniSwapShareChecked: boolean;
   claimableFLX: string;
+  uniswapShare: string;
   selectedCampaignAddress: string;
   uniPoolAmount: string;
   incentivesFields: IIncentivesFields;
@@ -44,14 +46,18 @@ export interface IncentivesModel {
   setClaimableFLX: Action<IncentivesModel, string>;
   setSelectedCampaignAddress: Action<IncentivesModel, string>;
   setUniPoolAmount: Action<IncentivesModel, string>;
+  setUniswapShare: Action<IncentivesModel, string>;
+  setIsUniSwapShareChecked: Action<IncentivesModel, boolean>;
 }
 const incentivesModel: IncentivesModel = {
   operation: 0,
   type: 'withdraw',
   incentivesFields: INITIAL_STATE,
   claimableFLX: '0.00',
+  uniswapShare: '',
   uniPoolAmount: '',
   incentivesCampaignData: null,
+  isUniSwapShareChecked: false,
   selectedCampaignAddress: '',
   setOperation: action((state, payload) => {
     state.operation = payload;
@@ -89,7 +95,9 @@ const incentivesModel: IncentivesModel = {
     const txResponse = await handleIncentiveDeposit(
       payload.signer,
       payload.incentivesFields,
-      payload.campaignAddress
+      payload.campaignAddress,
+      payload.uniswapShare,
+      payload.isUniSwapShareChecked
     );
     if (txResponse) {
       const { hash, chainId } = txResponse;
@@ -209,6 +217,12 @@ const incentivesModel: IncentivesModel = {
   }),
   setUniPoolAmount: action((state, payload) => {
     state.uniPoolAmount = payload;
+  }),
+  setIsUniSwapShareChecked: action((state, payload) => {
+    state.isUniSwapShareChecked = payload;
+  }),
+  setUniswapShare: action((state, payload) => {
+    state.uniswapShare = payload;
   }),
 };
 

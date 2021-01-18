@@ -484,16 +484,21 @@ export function useIncentivesAssets() {
               .value()
           : 0;
 
+      const setToZero = true;
+
       const uni = {
         name: 'UNI-V2',
         token: `${COIN_TICKER}/ETH Uni V2 LP Token`,
         img: require('../assets/uni-lp.svg'),
         amount: uniPoolBalance,
-        price: 0, //uniPoolPrice,
-        diff: uniPoolPriceDiff,
-        value: 0, // uniPoolValue,
-        diffPercentage:
-          uniPoolPercentageDiff === 100 ? 0 : uniPoolPercentageDiff,
+        price: setToZero ? 0 : uniPoolPrice,
+        diff: setToZero ? 0 : uniPoolPriceDiff,
+        value: setToZero ? 0 : uniPoolValue,
+        diffPercentage: setToZero
+          ? 0
+          : uniPoolPercentageDiff === 100
+          ? 0
+          : uniPoolPercentageDiff,
       };
 
       setState({ eth, rai, flx, uni });

@@ -11,8 +11,12 @@ import Dropdown from '../Dropdown';
 import { formatNumber, toFixedString } from '../../utils/helper';
 import { NETWORK_ID } from '../../connectors';
 import Results from './Results';
-import { useSelectedCampaign } from '../../hooks/useIncentives';
+import {
+  useIncentivesAssets,
+  useSelectedCampaign,
+} from '../../hooks/useIncentives';
 import _ from '../../utils/lodash';
+import CheckBox from '../CheckBox';
 
 const INITITAL_STATE = [
   {
@@ -22,7 +26,7 @@ const INITITAL_STATE = [
   { item: 'RAI/ETH', img: require('../../assets/rai.png') },
 ];
 
-const IncentivesPayment = () => {
+const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
   const { t } = useTranslation();
   const {
     token0,
@@ -33,10 +37,15 @@ const IncentivesPayment = () => {
     campaignAddress,
   } = useSelectedCampaign();
 
+  const assets = useIncentivesAssets();
+
+  const [isUniSwapChecked, setIsUniSwapChecked] = useState(isChecked || false);
+
   const [ethAmount, setEthAmount] = useState('');
   const [raiAmount, setRaiAmount] = useState('');
   const [error, setError] = useState('');
   const [uniPool, setUniPool] = useState('');
+  const [uniShare, setUniShare] = useState('');
 
   const {
     incentivesModel: incentivesState,
@@ -48,7 +57,12 @@ const IncentivesPayment = () => {
     popupsModel: popupsActions,
   } = useStoreActions((state) => state);
 
-  const { type, incentivesFields, uniPoolAmount } = incentivesState;
+  const {
+    type,
+    incentivesFields,
+    uniPoolAmount,
+    uniswapShare,
+  } = incentivesState;
 
   const ethBalance = connectWalletState.ethBalance[NETWORK_ID];
   const praiBalance = _.get(
@@ -74,6 +88,14 @@ const IncentivesPayment = () => {
         ? BigNumber.from(toFixedString(praiBalance.toString(), 'WAD'))
         : BigNumber.from('0');
 
+      const uniShareBN = uniShare
+        ? BigNumber.from(toFixedString(uniShare.toString(), 'WAD'))
+        : BigNumber.from('0');
+
+      const uniShareBalanceBN = assets?.uni.amount
+        ? BigNumber.from(toFixedString(assets?.uni.amount.toString(), 'WAD'))
+        : BigNumber.from('0');
+
       // if (
       //   incentivesState.incentivesCampaignData?.allCampaigns &&
       //   !incentivesState.incentivesCampaignData.allCampaigns.length
@@ -82,10 +104,22 @@ const IncentivesPayment = () => {
       //   return;
       // }
 
+      if (isUniSwapChecked) {
+        if (uniShareBN.isZero()) {
+          setError(`Please enter the amount of uniswap share to be deposited`);
+          return;
+        }
+        if (!uniShareBN.isZero() && uniShareBN.gt(uniShareBalanceBN)) {
+          setError(`Deposited Uniswap share cannot exceed available amount.`);
+          return;
+        }
+      }
+
       if (
-        ethAmountBN.isZero() ||
-        raiAmountBN.isZero() ||
-        (ethAmountBN.isZero() && raiAmountBN.isZero)
+        !isUniSwapChecked &&
+        (ethAmountBN.isZero() ||
+          raiAmountBN.isZero() ||
+          (ethAmountBN.isZero() && raiAmountBN.isZero))
       ) {
         setError(
           `Please enter the amount of ETH/${COIN_TICKER} to be deposited`
@@ -202,6 +236,16 @@ const IncentivesPayment = () => {
     incentivesActions.setUniPoolAmount(val);
   };
 
+  const handleUniswapCheck = (state: boolean) => {
+    setIsUniSwapChecked(state);
+    incentivesActions.setIsUniSwapShareChecked(state);
+  };
+
+  const handleUniShareChange = (val: string) => {
+    setUniShare(val);
+    incentivesActions.setUniswapShare(val);
+  };
+
   useEffect(() => {
     setEthAmount(incentivesFields.ethAmount);
     setRaiAmount(incentivesFields.raiAmount);
@@ -210,6 +254,10 @@ const IncentivesPayment = () => {
   useEffect(() => {
     setUniPool(uniPoolAmount);
   }, [uniPoolAmount]);
+
+  useEffect(() => {
+    setUniShare(uniswapShare);
+  }, [uniswapShare]);
 
   return (
     <Body>
@@ -227,7 +275,6 @@ const IncentivesPayment = () => {
           padding={'22px 20px'}
         />
       </DoubleDropdown>
-
       {incentivesState.type === 'withdraw' ? (
         <SingleInput>
           <DecimalInput
@@ -237,6 +284,21 @@ const IncentivesPayment = () => {
             handleMaxClick={() => handleUniPoolChange(stakedBalance)}
           />
         </SingleInput>
+      ) : isChecked ? (
+        <DecimalInput
+          label={`Deposit Uniswap V2 ETH/${COIN_TICKER} LP shares (Avail ${
+            assets?.uni.amount
+              ? formatNumber(assets?.uni.amount.toString())
+              : '0'
+          })`}
+          value={uniShare}
+          onChange={handleUniShareChange}
+          handleMaxClick={() =>
+            handleUniShareChange(
+              assets?.uni.amount ? assets?.uni.amount.toString() : ''
+            )
+          }
+        />
       ) : (
         <DoubleInput>
           <DecimalInput
@@ -257,10 +319,16 @@ const IncentivesPayment = () => {
           />
         </DoubleInput>
       )}
-      {error && <Error>{error}</Error>}
 
+      {error && <Error>{error}</Error>}
       <Results />
 
+      <UniSwapCheckContainer>
+        <Text>
+          {t('uniswap_modal_check_text', { coin_ticker: COIN_TICKER })}
+        </Text>
+        <CheckBox checked={isUniSwapChecked} onChange={handleUniswapCheck} />
+      </UniSwapCheckContainer>
       <Footer>
         <Button dimmed text={t('cancel')} onClick={handleCancel} />
         <Button
@@ -346,4 +414,17 @@ const Error = styled.p`
   font-size: ${(props) => props.theme.font.extraSmall};
   width: 100%;
   margin: 16px 0;
+`;
+
+const UniSwapCheckContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+`;
+
+const Text = styled.div`
+  line-height: 18px;
+  letter-spacing: -0.18px;
+  color: ${(props) => props.theme.colors.secondary};
+  font-size: ${(props) => props.theme.font.extraSmall};
 `;

@@ -30,6 +30,8 @@ const Results = () => {
     incentivesFields,
     claimableFLX,
     uniPoolAmount,
+    isUniSwapShareChecked,
+    uniswapShare,
   } = incentivesState;
 
   const returnCoinPerCoin = useCallback(
@@ -52,30 +54,47 @@ const Results = () => {
     if (!ethAmount) ethAmount = '0';
     if (!raiAmount) ethAmount = '0';
 
-    const totalDeposit = Math.sqrt(
-      numeral(ethAmount).multiply(raiAmount).value()
-    );
+    const totalDeposit = isUniSwapShareChecked
+      ? uniswapShare || '0'
+      : Math.sqrt(numeral(ethAmount).multiply(raiAmount).value());
 
     const totalShare = numeral(totalDeposit).add(stakedBalance).value();
     return formatNumber(totalShare.toString());
-  }, [incentivesFields, stakedBalance]);
+  }, [incentivesFields, isUniSwapShareChecked, stakedBalance, uniswapShare]);
 
   const returnShareOfIncentivePool = useCallback(() => {
-    const shareOfUniSwapPool = returnShareOfUniswapPool();
-    if (!shareOfUniSwapPool || shareOfUniSwapPool === 0) return 0;
-    const denominator = numeral(totalSupply || '0')
-      .add(shareOfUniSwapPool)
-      .value();
+    if (isUniSwapShareChecked) {
+      if (!uniswapShare) return 0;
+      const numerator = numeral(uniswapShare).add(stakedBalance).value();
+      const denominator = numeral(totalSupply || '0')
+        .add(uniswapShare)
+        .value();
+      return formatNumber(
+        numeral(numerator).divide(denominator).value().toString()
+      );
+    } else {
+      const shareOfUniSwapPool = returnShareOfUniswapPool();
+      if (!shareOfUniSwapPool || shareOfUniSwapPool === 0) return 0;
+      const denominator = numeral(totalSupply || '0')
+        .add(shareOfUniSwapPool)
+        .value();
 
-    return formatNumber(
-      numeral(shareOfUniSwapPool)
-        .divide(denominator)
-        .multiply(100)
-        .value()
-        .toString(),
-      2
-    );
-  }, [returnShareOfUniswapPool, totalSupply]);
+      return formatNumber(
+        numeral(shareOfUniSwapPool)
+          .divide(denominator)
+          .multiply(100)
+          .value()
+          .toString(),
+        2
+      );
+    }
+  }, [
+    isUniSwapShareChecked,
+    uniswapShare,
+    stakedBalance,
+    totalSupply,
+    returnShareOfUniswapPool,
+  ]);
 
   const returnFLXPerDay = useCallback(() => {
     const shareOfUniSwapPool = returnShareOfUniswapPool();
@@ -86,9 +105,9 @@ const Results = () => {
     if (!shareOfUniSwapPool || shareOfUniSwapPool === 0 || !isOngoingCampaign)
       return 0;
 
-    const totalDeposit = Math.sqrt(
-      numeral(ethAmount).multiply(raiAmount).value()
-    );
+    const totalDeposit = isUniSwapShareChecked
+      ? uniswapShare || '0'
+      : Math.sqrt(numeral(ethAmount).multiply(raiAmount).value());
 
     const totalStaked = numeral(totalDeposit)
       .add(totalSupply || '0')
@@ -106,8 +125,10 @@ const Results = () => {
     returnShareOfUniswapPool,
     incentivesFields,
     isOngoingCampaign,
-    rewardRate,
+    isUniSwapShareChecked,
+    uniswapShare,
     totalSupply,
+    rewardRate,
   ]);
 
   const returnRAIWithdrawn = useCallback(() => {
@@ -166,14 +187,18 @@ const Results = () => {
           <Block>
             {type === 'withdraw' ? (
               <>
-                <Item>
-                  <Label>{'ETH Withdrawn'}</Label>{' '}
-                  <Value>{returnETHWithdrawn()}</Value>
-                </Item>
-                <Item>
-                  <Label>{'RAI Withdrawn'}</Label>{' '}
-                  <Value>{returnRAIWithdrawn()}</Value>
-                </Item>
+                {isUniSwapShareChecked ? null : (
+                  <>
+                    <Item>
+                      <Label>{'ETH Withdrawn'}</Label>{' '}
+                      <Value>{returnETHWithdrawn()}</Value>
+                    </Item>
+                    <Item>
+                      <Label>{'RAI Withdrawn'}</Label>{' '}
+                      <Value>{returnRAIWithdrawn()}</Value>
+                    </Item>
+                  </>
+                )}
                 <Item>
                   <Label>{'FLX Rewards Claimed Now'}</Label>{' '}
                   <Value>{formatNumber(resultData.flxAmount)}</Value>
@@ -181,14 +206,23 @@ const Results = () => {
               </>
             ) : (
               <>
-                <Item>
-                  <Label>{`${COIN_TICKER} per ETH`}</Label>
-                  <Value>{returnCoinPerCoin(false)}</Value>
-                </Item>
-                <Item>
-                  <Label>{`ETH per ${COIN_TICKER}`}</Label>{' '}
-                  <Value>{returnCoinPerCoin()}</Value>
-                </Item>
+                {isUniSwapShareChecked ? (
+                  <Item>
+                    <Label>{`Deposited Uniswap V2 ETH/${COIN_TICKER}`}</Label>
+                    <Value>{formatNumber(uniswapShare)}</Value>
+                  </Item>
+                ) : (
+                  <>
+                    <Item>
+                      <Label>{`${COIN_TICKER} per ETH`}</Label>
+                      <Value>{returnCoinPerCoin(false)}</Value>
+                    </Item>
+                    <Item>
+                      <Label>{`ETH per ${COIN_TICKER}`}</Label>{' '}
+                      <Value>{returnCoinPerCoin()}</Value>
+                    </Item>
+                  </>
+                )}
                 <Item>
                   <Label>{'Total Share of Staking Pool'}</Label>{' '}
                   <Value>{returnShareOfIncentivePool()}%</Value>

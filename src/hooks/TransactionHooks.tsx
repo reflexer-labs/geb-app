@@ -57,7 +57,6 @@ export async function handlePreTxGasEstimate(
   tx: TransactionRequest
 ): Promise<TransactionRequest> {
   let gasLimit: BigNumber;
-
   try {
     gasLimit = await signer.estimateGas(tx);
   } catch (err) {
@@ -75,7 +74,7 @@ export async function handlePreTxGasEstimate(
     } else {
       errorMessage = 'Provider error: ' + (err || err.message);
     }
-
+    store.dispatch.popupsModel.setIsWaitingModalOpen(true);
     store.dispatch.popupsModel.setWaitingPayload({
       title: 'Transaction Failed.',
       status: 'error',

@@ -13,6 +13,8 @@ const IncentivesModal = () => {
   const handleCancel = () => {
     popupsActions.setIsIncentivesModalOpen(false);
     incentivesActions.setOperation(0);
+    incentivesActions.setIsUniSwapShareChecked(false);
+    incentivesActions.setUniswapShare('');
     incentivesActions.setUniPoolAmount('');
     incentivesActions.setIncentivesFields({ ethAmount: '', raiAmount: '' });
     popupsActions.setReturnProxyFunction(() => {});

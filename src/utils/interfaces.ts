@@ -334,6 +334,8 @@ export interface IIncentivePayload {
   incentivesFields: IIncentivesFields;
   signer: JsonRpcSigner;
   campaignAddress: string;
+  uniswapShare: string;
+  isUniSwapShareChecked: boolean;
 }
 export interface IIncentiveClaim {
   signer: JsonRpcSigner;
@@ -346,6 +348,7 @@ export interface IIncentiveWithdraw {
   reserveRAI: string;
   reserveETH: string;
   coinTotalSupply: string;
+  isUniSwapShareChecked: boolean;
 }
 
 export interface NumberMap {
