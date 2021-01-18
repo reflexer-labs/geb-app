@@ -3,9 +3,11 @@ import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import styled from 'styled-components';
 import { useStoreActions, useStoreState } from '../../store';
 import Safe from './Safe';
+import _ from '../../utils/lodash';
 import ReviewTransaction from './ReviewTransaction';
 import UniSwapPool from './UniSwapPool';
 import ApprovePRAI from '../ApprovePRAI';
+import { COIN_TICKER } from '../../utils/constants';
 
 interface Props {
   width?: string;
@@ -16,9 +18,14 @@ const SafeContainer = ({ width, maxWidth }: Props) => {
   const nodeRef = React.useRef(null);
 
   const [stageNo, setStageNo] = useState(0);
-  const { safeModel: safeState } = useStoreState((state) => state);
+  const {
+    safeModel: safeState,
+    connectWalletModel: connectWalletState,
+  } = useStoreState((state) => state);
   const { safeModel: safeActions } = useStoreActions((state) => state);
   const { stage, isUniSwapPoolChecked } = safeState;
+
+  const raiCoinAllowance = _.get(connectWalletState, 'coinAllowance', '0');
 
   useEffect(() => {
     setStageNo(stage);
@@ -33,7 +40,10 @@ const SafeContainer = ({ width, maxWidth }: Props) => {
           <ApprovePRAI
             handleBackBtn={() => safeActions.setStage(0)}
             handleSuccess={() => safeActions.setStage(3)}
-            raiValue={safeState.safeData.rightInput}
+            amount={safeState.safeData.rightInput}
+            allowance={raiCoinAllowance}
+            coinName={COIN_TICKER as string}
+            methodName={'coin'}
           />
         );
       case 3:

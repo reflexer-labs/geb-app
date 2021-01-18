@@ -71,6 +71,12 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
     '0'
   );
 
+  const uniCoinLpAllowance = _.get(
+    incentivesState,
+    'incentivesCampaignData.proxyData.uniCoinLpAllowance.amount',
+    '0'
+  );
+
   const validationChecker = () => {
     if (type === 'deposit') {
       const ethAmountBN = ethAmount
@@ -169,12 +175,22 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
     const raiAmountBN = raiAmount
       ? BigNumber.from(toFixedString(raiAmount, 'WAD'))
       : BigNumber.from('0');
-    if (coinAllowance) {
-      const coinAllowanceBN = BigNumber.from(
-        toFixedString(coinAllowance, 'WAD')
+
+    const uniShareBN = uniShare
+      ? BigNumber.from(toFixedString(uniShare, 'WAD'))
+      : BigNumber.from('0');
+    const coinAllowanceBN = BigNumber.from(toFixedString(coinAllowance, 'WAD'));
+    if (isChecked && uniCoinLpAllowance) {
+      const uniCoinLpAllowanceBN = BigNumber.from(
+        toFixedString(uniCoinLpAllowance, 'WAD')
       );
+      incentivesActions.setAllowanceType('uniCoin');
+      return uniCoinLpAllowanceBN.gte(uniShareBN);
+    } else if (coinAllowance) {
+      incentivesActions.setAllowanceType('rai');
       return coinAllowanceBN.gte(raiAmountBN);
     }
+
     return false;
   };
 

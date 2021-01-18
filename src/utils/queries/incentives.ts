@@ -12,6 +12,9 @@ export const incentiveCampaignsQuery = (
       coinAllowance {
         amount
       }
+      uniCoinLpAllowance{
+        amount
+      }
     }
     incentiveCampaigns(orderBy: campaignNumber, orderDirection: desc) {
         id
@@ -77,6 +80,4 @@ export const incentiveCampaignsQuery = (
           value
         }
         }
-    
-      
 }`;

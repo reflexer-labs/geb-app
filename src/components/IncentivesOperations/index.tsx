@@ -2,20 +2,50 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import styled from 'styled-components';
+import _ from '../../utils/lodash';
 import { useStoreActions, useStoreState } from '../../store';
 import ApprovePRAI from '../ApprovePRAI';
 import IncentivesPayment from './IncentivesPayment';
 import IncentivesTransaction from './IncentivesTransaction';
-import PoolTokens from './PoolTokens';
 import RedeemRewards from './RedeemRewards';
+import { COIN_TICKER } from '../../utils/constants';
+import { IApprove } from '../../utils/interfaces';
 
 const IncentivesOperations = () => {
   const { t } = useTranslation();
   const nodeRef = React.useRef(null);
-  const { incentivesModel: incentivesState } = useStoreState((state) => state);
+  const {
+    incentivesModel: incentivesState,
+    connectWalletModel: connectWalletState,
+  } = useStoreState((state) => state);
   const { incentivesModel: incentivesActions } = useStoreActions(
     (state) => state
   );
+
+  const uniCoinLpAllowance = _.get(
+    incentivesState,
+    'incentivesCampaignData.proxyData.uniCoinLpAllowance.amount',
+    '0'
+  );
+
+  const raiCoinAllowance = _.get(connectWalletState, 'coinAllowance', '0');
+
+  const returnAllowanceType = (type: string): IApprove => {
+    if (type === 'uniCoin') {
+      return {
+        allowance: uniCoinLpAllowance,
+        coinName: 'Uniswap LP Token',
+        methodName: 'uniswapPairCoinEth',
+      };
+    }
+
+    return {
+      allowance: raiCoinAllowance,
+      coinName: COIN_TICKER as string,
+      methodName: 'coin',
+    };
+  };
+
   const returnBody = () => {
     switch (incentivesState.operation) {
       case 0:
@@ -26,8 +56,6 @@ const IncentivesOperations = () => {
         ) : (
           <RedeemRewards />
         );
-      case 2:
-        return <PoolTokens />;
       case 3:
         return <IncentivesTransaction />;
       default:
@@ -54,7 +82,16 @@ const IncentivesOperations = () => {
             <ApprovePRAI
               handleBackBtn={() => incentivesActions.setOperation(0)}
               handleSuccess={() => incentivesActions.setOperation(3)}
-              raiValue={incentivesState.incentivesFields.raiAmount}
+              amount={incentivesState.incentivesFields.raiAmount}
+              allowance={
+                returnAllowanceType(incentivesState.allowanceType).allowance
+              }
+              coinName={
+                returnAllowanceType(incentivesState.allowanceType).coinName
+              }
+              methodName={
+                returnAllowanceType(incentivesState.allowanceType).methodName
+              }
             />
           ) : (
             <ModalContent

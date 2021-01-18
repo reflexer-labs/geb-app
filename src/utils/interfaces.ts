@@ -4,6 +4,7 @@ import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
 import { DefaultTheme, ThemedCssFunction } from 'styled-components';
 import { ChainId } from '@uniswap/sdk';
 import { IconName } from '../components/FeatherIconWrapper';
+import { ApproveMethod } from '../components/ApprovePRAI';
 
 export interface DynamicObject {
   [key: string]: any;
@@ -291,6 +292,7 @@ export interface IIncentivesCampaignData {
   proxyData: {
     address: string;
     coinAllowance: { amount: string };
+    uniCoinLpAllowance: { amount: string };
   };
 }
 
@@ -370,4 +372,10 @@ export interface IIncentiveAssets {
   rai: AssetData;
   flx: AssetData;
   uni: AssetData;
+}
+
+export interface IApprove {
+  allowance: string;
+  coinName: string;
+  methodName: ApproveMethod;
 }

@@ -26,6 +26,7 @@ export interface IncentivesModel {
   isUniSwapShareChecked: boolean;
   claimableFLX: string;
   uniswapShare: string;
+  allowanceType: string;
   selectedCampaignAddress: string;
   uniPoolAmount: string;
   incentivesFields: IIncentivesFields;
@@ -48,6 +49,7 @@ export interface IncentivesModel {
   setUniPoolAmount: Action<IncentivesModel, string>;
   setUniswapShare: Action<IncentivesModel, string>;
   setIsUniSwapShareChecked: Action<IncentivesModel, boolean>;
+  setAllowanceType: Action<IncentivesModel, string>;
 }
 const incentivesModel: IncentivesModel = {
   operation: 0,
@@ -56,6 +58,7 @@ const incentivesModel: IncentivesModel = {
   claimableFLX: '0.00',
   uniswapShare: '',
   uniPoolAmount: '',
+  allowanceType: '',
   incentivesCampaignData: null,
   isUniSwapShareChecked: false,
   selectedCampaignAddress: '',
@@ -223,6 +226,9 @@ const incentivesModel: IncentivesModel = {
   }),
   setUniswapShare: action((state, payload) => {
     state.uniswapShare = payload;
+  }),
+  setAllowanceType: action((state, payload) => {
+    state.allowanceType = payload;
   }),
 };
 
