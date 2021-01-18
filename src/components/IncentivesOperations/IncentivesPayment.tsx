@@ -340,9 +340,7 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
       <Results />
 
       <UniSwapCheckContainer>
-        <Text>
-          {t('uniswap_modal_check_text', { coin_ticker: COIN_TICKER })}
-        </Text>
+        <Text>{t('uniswap_modal_check_text')}</Text>
         <CheckBox checked={isUniSwapChecked} onChange={handleUniswapCheck} />
       </UniSwapCheckContainer>
       <Footer>

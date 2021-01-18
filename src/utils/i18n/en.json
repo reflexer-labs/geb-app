@@ -17,7 +17,7 @@
   "metamask": "MetaMask",
   "create_safe_title": "Create Safe",
   "max": "MAX",
-  "uniswap_modal_check_text": "I also want to liquidity mine the {{coin_ticker}}/ETH Uniswap pool",
+  "uniswap_modal_check_text": "I want to directly deposit LP tokens and mine",
   "review_transaction": "Review Transaction",
   "uniswap_pool": "Uniswap Pool",
   "confirm_transaction": "Confirm Transaction",

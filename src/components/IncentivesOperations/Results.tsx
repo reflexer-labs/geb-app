@@ -63,38 +63,21 @@ const Results = () => {
   }, [incentivesFields, isUniSwapShareChecked, stakedBalance, uniswapShare]);
 
   const returnShareOfIncentivePool = useCallback(() => {
-    if (isUniSwapShareChecked) {
-      if (!uniswapShare) return 0;
-      const numerator = numeral(uniswapShare).add(stakedBalance).value();
-      const denominator = numeral(totalSupply || '0')
-        .add(uniswapShare)
-        .value();
-      return formatNumber(
-        numeral(numerator).divide(denominator).value().toString()
-      );
-    } else {
-      const shareOfUniSwapPool = returnShareOfUniswapPool();
-      if (!shareOfUniSwapPool || shareOfUniSwapPool === 0) return 0;
-      const denominator = numeral(totalSupply || '0')
-        .add(shareOfUniSwapPool)
-        .value();
+    const shareOfUniSwapPool = returnShareOfUniswapPool();
+    if (!shareOfUniSwapPool || shareOfUniSwapPool === 0) return 0;
+    const denominator = numeral(totalSupply || '0')
+      .add(shareOfUniSwapPool)
+      .value();
 
-      return formatNumber(
-        numeral(shareOfUniSwapPool)
-          .divide(denominator)
-          .multiply(100)
-          .value()
-          .toString(),
-        2
-      );
-    }
-  }, [
-    isUniSwapShareChecked,
-    uniswapShare,
-    stakedBalance,
-    totalSupply,
-    returnShareOfUniswapPool,
-  ]);
+    return formatNumber(
+      numeral(shareOfUniSwapPool)
+        .divide(denominator)
+        .multiply(100)
+        .value()
+        .toString(),
+      2
+    );
+  }, [totalSupply, returnShareOfUniswapPool]);
 
   const returnFLXPerDay = useCallback(() => {
     const shareOfUniSwapPool = returnShareOfUniswapPool();
