@@ -36,6 +36,7 @@ const IncentivesOperations = () => {
         allowance: uniCoinLpAllowance,
         coinName: 'Uniswap LP Token',
         methodName: 'uniswapPairCoinEth',
+        amount: incentivesState.uniswapShare,
       };
     }
 
@@ -43,6 +44,7 @@ const IncentivesOperations = () => {
       allowance: raiCoinAllowance,
       coinName: COIN_TICKER as string,
       methodName: 'coin',
+      amount: incentivesState.incentivesFields.raiAmount,
     };
   };
 
@@ -82,7 +84,7 @@ const IncentivesOperations = () => {
             <ApprovePRAI
               handleBackBtn={() => incentivesActions.setOperation(0)}
               handleSuccess={() => incentivesActions.setOperation(3)}
-              amount={incentivesState.incentivesFields.raiAmount}
+              amount={returnAllowanceType(incentivesState.allowanceType).amount}
               allowance={
                 returnAllowanceType(incentivesState.allowanceType).allowance
               }

@@ -179,7 +179,6 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
     const uniShareBN = uniShare
       ? BigNumber.from(toFixedString(uniShare, 'WAD'))
       : BigNumber.from('0');
-    const coinAllowanceBN = BigNumber.from(toFixedString(coinAllowance, 'WAD'));
     if (isChecked && uniCoinLpAllowance) {
       const uniCoinLpAllowanceBN = BigNumber.from(
         toFixedString(uniCoinLpAllowance, 'WAD')
@@ -187,6 +186,9 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
       incentivesActions.setAllowanceType('uniCoin');
       return uniCoinLpAllowanceBN.gte(uniShareBN);
     } else if (coinAllowance) {
+      const coinAllowanceBN = BigNumber.from(
+        toFixedString(coinAllowance, 'WAD')
+      );
       incentivesActions.setAllowanceType('rai');
       return coinAllowanceBN.gte(raiAmountBN);
     }
@@ -340,7 +342,13 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
       <Results />
 
       <UniSwapCheckContainer>
-        <Text>{t('uniswap_modal_check_text')}</Text>
+        <Text>
+          {t(
+            type === 'deposit'
+              ? 'uniswap_deposit_check_text'
+              : 'uniswap_withdraw_check_text'
+          )}
+        </Text>
         <CheckBox checked={isUniSwapChecked} onChange={handleUniswapCheck} />
       </UniSwapCheckContainer>
       <Footer>

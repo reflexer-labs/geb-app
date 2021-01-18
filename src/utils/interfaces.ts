@@ -378,4 +378,5 @@ export interface IApprove {
   allowance: string;
   coinName: string;
   methodName: ApproveMethod;
+  amount: string;
 }

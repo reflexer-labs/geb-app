@@ -223,7 +223,7 @@ export const handleIncentiveWithdraw = async ({
   let txData;
 
   if (isUniSwapShareChecked) {
-    txData = proxy.withdrawFromMine(uniPoolAmountBN, campaignAddress);
+    txData = proxy.withdrawAndHarvest(uniPoolAmountBN, campaignAddress);
   } else {
     if (!reserveRAI || !reserveETH || !coinTotalSupply) return false;
     const coinTotalSupplyBN = ethersUtils.parseEther(coinTotalSupply);
