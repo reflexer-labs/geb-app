@@ -20,7 +20,6 @@ const IncentivesOperations = () => {
   const { incentivesModel: incentivesActions } = useStoreActions(
     (state) => state
   );
-
   const raiCoinAllowance = _.get(connectWalletState, 'coinAllowance', '0');
   const raiAmount = _.get(auctionsState, 'auctionsData.raiAmount', '0');
 
