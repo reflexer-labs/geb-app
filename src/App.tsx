@@ -23,6 +23,7 @@ import SafeDetails from './containers/OnBoarding/SafeDetails';
 import Privacy from './containers/Privacy';
 import CustomToast from './components/CustomToast';
 import Incentives from './containers/Incentives';
+import Auctions from './containers/Auctions';
 
 // Toast css
 
@@ -50,6 +51,7 @@ const App = () => {
               <Suspense fallback={null}>
                 <Web3ReactManager>
                   <Switch>
+                    <Route exact component={Auctions} path={'/auctions'} />
                     <Route exact component={Incentives} path={'/incentives'} />
                     <Route exact component={Privacy} path={'/privacy'} />
                     <Route exact component={SafeDetails} path={'/safes/:id'} />

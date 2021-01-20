@@ -35,6 +35,9 @@ const NavLinks = () => {
       <NavBarLink to="/incentives" onClick={(e) => handleLinkClick(e, false)}>
         <DollarSign size="18" /> {t('incentives')}
       </NavBarLink>
+      <NavBarLink to="/auctions" onClick={(e) => handleLinkClick(e, false)}>
+        <DollarSign size="18" /> {t('auctions')}
+      </NavBarLink>
 
       <NavBarLink
         to="/"
