@@ -112,5 +112,7 @@
   "auctions": "Auctions",
   "auctions_header_text": "Dashboard to bid in collateral, debt and surplus auctions",
   "claim_tokens": "Claim Tokens",
-  "claim_flx": "Claim FLX"
+  "claim_flx": "Claim FLX",
+  "hide_faq": "Hide FAQ",
+  "show_faq": "Show FAQ"
 }
