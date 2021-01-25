@@ -1,18 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import AuctionsFAQ from '../../components/AuctionsFAQ';
 import Button from '../../components/Button';
 import GridContainer from '../../components/GridContainer';
 import PageHeader from '../../components/PageHeader';
+import { useStoreActions } from '../../store';
 import AuctionsList from './AuctionsList';
 
 const Auctions = () => {
   const { t } = useTranslation();
+  const { auctionsModel: auctionsActions } = useStoreActions((state) => state);
 
   const [hide, setHide] = useState(false);
 
   const handleHideFAQ = () => setHide(!hide);
+
+  useEffect(() => {
+    async function fetchIncentivesCampaigns() {
+      await auctionsActions.fetchAuctions();
+    }
+    fetchIncentivesCampaigns();
+    // const interval = setInterval(() => {
+    //   fetchIncentivesCampaigns();
+    // }, 2000);
+  }, [auctionsActions]);
 
   return (
     <>

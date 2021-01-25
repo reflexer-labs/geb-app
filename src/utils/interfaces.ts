@@ -380,3 +380,35 @@ export interface IApprove {
   methodName: ApproveMethod;
   amount: string;
 }
+
+export interface IAuctionBidder {
+  bidder: string;
+  buyAmount: string;
+  createdAt: string;
+  sellAmount: string;
+}
+
+export interface IAuction {
+  auctionDeadline: string;
+  auctionId: string;
+  buyAmount: string;
+  buyInitialAmount: string;
+  buyToken: string;
+  englishAuctionBids: Array<IAuctionBidder>;
+  englishAuctionConfiguration: {
+    bidDuration: string;
+    bidIncrease: string;
+    totalAuctionLength: string;
+  };
+  englishAuctionType: string;
+  isClaimed: boolean;
+  sellAmount: string;
+  sellInitialAmount: string;
+  sellToken: string;
+  winner: string;
+}
+
+export interface IPaging {
+  from: number;
+  to: number;
+}

@@ -6,6 +6,7 @@ import { formatUserSafe, formatHistoryArray } from '../utils/helper';
 import { getUserQuery } from '../utils/queries/user';
 import { incentiveCampaignsQuery } from '../utils/queries/incentives';
 import { IIncentivesCampaignData } from '../utils/interfaces';
+import { auctionsQuery } from '../utils/queries/auctions';
 
 export const getFirstValid = async (query: string, index = 0): Promise<any> => {
   try {
@@ -172,4 +173,14 @@ export const fetchIncentivesCampaigns = async (
   };
 
   return payload;
+};
+
+export const fetchAuctions = async () => {
+  const res = await getFirstValid(JSON.stringify({ query: auctionsQuery() }));
+
+  const response = res.data.data;
+
+  console.log(response);
+
+  return response;
 };

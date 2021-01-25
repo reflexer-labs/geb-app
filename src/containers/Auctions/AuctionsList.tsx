@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import AuctionBlock from '../../components/AuctionBlock';
 import Button from '../../components/Button';
+import useAuctions from '../../hooks/useAuctions';
+import Pagination from '../../components/Pagination';
+import { IPaging } from '../../utils/interfaces';
 
 const AuctionsList = () => {
   const { t } = useTranslation();
+  const [paging, setPaging] = useState<IPaging>({ from: 0, to: 5 });
+  const auctions = useAuctions();
 
   return (
     <Container>
@@ -13,8 +18,21 @@ const AuctionsList = () => {
         <Title>Active Auctions</Title>
         <Button text={t('claim_tokens')} />
       </InfoBox>
-      <AuctionBlock />
-      <AuctionBlock />
+
+      {auctions?.slice(paging.from, paging.to).map((auction, i: number) => (
+        <AuctionBlock
+          key={auction.auctionId}
+          {...{ ...auction, isCollapsed: i !== 0 }}
+        />
+      ))}
+
+      {auctions && auctions.length > 0 ? (
+        <Pagination
+          items={auctions}
+          perPage={5}
+          handlePagingMargin={setPaging}
+        />
+      ) : null}
     </Container>
   );
 };

@@ -6,17 +6,27 @@ import { useStoreActions } from '../store';
 import { COIN_TICKER } from '../utils/constants';
 import AlertLabel from './AlertLabel';
 import Button from './Button';
+import _ from '../utils/lodash';
+import { IAuction } from '../utils/interfaces';
 
-const AuctionBlock = () => {
+type Props = IAuction & { isCollapsed: boolean };
+
+const AuctionBlock = (auction: Props) => {
   const { t } = useTranslation();
-  const [collapse, setCollapse] = useState(false);
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
+
+  const isCollapsed = _.get(auction, 'isCollapsed', false);
+
+  const [collapse, setCollapse] = useState(isCollapsed);
+
+  const id = _.get(auction, 'auctionId', '');
+
   return (
     <Container>
       <Header onClick={() => setCollapse(!collapse)}>
         <LeftAucInfo>
           <img src={require('../assets/debt.svg')} alt="debt type auction" />
-          {'Auction #625'}
+          {`Auction #${id}`}
         </LeftAucInfo>
 
         <RightAucInfo>
