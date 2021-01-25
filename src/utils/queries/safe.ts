@@ -42,7 +42,7 @@ export const getUserSafesListQuery = (address: string) => `{
 }`;
 
 export const getSafeByIdQuery = (safeId: string, address: string) => `{
-  safes(where: { safeId: "${safeId}" }) {
+  safes(where: { safeId: "${safeId}" , proxy_not: null, safeId_not: null}) {
     safeId
     collateral
     createdAt
