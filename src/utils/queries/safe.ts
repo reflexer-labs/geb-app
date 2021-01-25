@@ -28,7 +28,7 @@ systemState(id: "current") {
 }`;
 
 export const getUserSafesListQuery = (address: string) => `{
-  safes(where: { owner: "${address}" }) {
+  safes(where: { owner: "${address}",  proxy_not: null, safeId_not: null }) {
     safeId
     safeHandler
     collateral
