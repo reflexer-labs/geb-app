@@ -8,6 +8,7 @@ const {
   REACT_APP_NETWORK_ID,
   REACT_APP_COIN_TICKER_PRODUCTION,
   REACT_APP_COIN_TICKER_KOVAN,
+  REACT_APP_SYSTEM_STATUS,
 } = process.env;
 
 export enum Network {
@@ -26,6 +27,8 @@ export const COIN_TICKER =
     : 'RAI';
 
 export const COLLATERAL_TYPE_ID = 'ETH-A';
+
+export const SYSTEM_STATUS = REACT_APP_SYSTEM_STATUS || '';
 
 export const GRAPH_API_URLS = REACT_APP_GRAPH_API_URLS
   ? REACT_APP_GRAPH_API_URLS.split(',')

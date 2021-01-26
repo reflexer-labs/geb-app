@@ -114,5 +114,6 @@
   "claim_tokens": "Claim Tokens",
   "claim_flx": "Claim FLX",
   "hide_faq": "Hide FAQ",
-  "show_faq": "Show FAQ"
+  "show_faq": "Show FAQ",
+  "shutdown_text": "The global settlement procedure was triggered for this system. You can't manage your Safes from this application anymore."
 }
