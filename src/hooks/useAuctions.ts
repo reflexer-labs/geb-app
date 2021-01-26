@@ -8,7 +8,16 @@ export default function useAuctions() {
   const { autctionsData } = auctionsState;
 
   useEffect(() => {
-    setState(autctionsData);
+    const oneMonthOld =
+      Date.now() - new Date().setMonth(new Date().getMonth() - 1);
+
+    const filteredAuctions = autctionsData.filter(
+      (auction: IAuction) =>
+        Number(auction.auctionDeadline) * 1000 > Date.now() ||
+        Number(auction.createdAt) * 1000 > oneMonthOld
+    );
+
+    setState(filteredAuctions);
   }, [autctionsData]);
 
   return state;

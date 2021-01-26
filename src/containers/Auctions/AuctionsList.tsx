@@ -15,7 +15,7 @@ const AuctionsList = () => {
   return (
     <Container>
       <InfoBox>
-        <Title>Active Auctions</Title>
+        <Title>Debt Auctions</Title>
         <Button text={t('claim_tokens')} />
       </InfoBox>
 

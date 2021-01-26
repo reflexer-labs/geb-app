@@ -35,15 +35,9 @@ export const getUserSafesListQuery = (address: string) => `{
     createdAt
     debt
   }
-<<<<<<< HEAD
-  erc20Balances(where: {address: "${address}", label:"COIN"}) {
-    balance
-    }
-=======
  erc20Balances(where: {address: "${address}", label: "COIN"}) {
   balance
   }
->>>>>>> 237d0cc82ec55d541dd0da63ad2e6007b832f329
   ${liquidationQuery}
 }`;
 
@@ -76,11 +70,7 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
       amount
     }
   }
-<<<<<<< HEAD
-  erc20Balances(where: {address: "${address}", label:"COIN"}) {
-=======
   erc20Balances(where: {address: "${address}", label: "COIN"}) {
->>>>>>> 237d0cc82ec55d541dd0da63ad2e6007b832f329
    balance
    }
    ${liquidationQuery}

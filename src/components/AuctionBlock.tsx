@@ -150,10 +150,10 @@ const AuctionBlock = (auction: Props) => {
                           <ListItemLabel>Event Type</ListItemLabel>
                           {winner &&
                           winner.toLowerCase() === bidder.bidder.toLowerCase()
-                            ? 'Deal'
+                            ? 'Settle'
                             : bidder.bidder.toLowerCase() ===
                               kickBidder.bidder.toLowerCase()
-                            ? 'Kick'
+                            ? 'Start'
                             : 'Tend'}
                         </ListItem>
                         <ListItem>

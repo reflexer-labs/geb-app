@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { NETWORK_ID } from '../connectors';
 import { useStoreActions } from '../store';
 import AnalyticsIcon from './Icons/AnalyticsIcon';
+import AuctionIcon from './Icons/AuctionIcon';
 import SafeIcon from './Icons/SafeIcon';
 
 const NavLinks = () => {
@@ -36,7 +37,7 @@ const NavLinks = () => {
         <DollarSign size="18" /> {t('incentives')}
       </NavBarLink>
       <NavBarLink to="/auctions" onClick={(e) => handleLinkClick(e, false)}>
-        <DollarSign size="18" /> {t('auctions')}
+        <AuctionIcon className="opacity" /> {t('auctions')}
       </NavBarLink>
 
       <NavBarLink

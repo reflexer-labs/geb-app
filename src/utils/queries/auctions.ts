@@ -9,6 +9,7 @@ export const auctionsQuery = () => `{
     sellAmount
     buyAmount
     startedBy
+    createdAt
     auctionDeadline
     createdAtTransaction
     winner

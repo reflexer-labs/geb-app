@@ -51,7 +51,7 @@ const AuctionsFAQ = ({ hideFAQ }: Props) => {
               What does the Claim Tokens button do?
             </SectionHeading>
             <SectionContent>
-              In case someone outbids you in a debt auctions, your RAI bid will
+              In case someone outbids you in a debt auction, your RAI bid will
               be reimbursed to your Reflexer Account. Claim Tokens can be used
               to get back RAI (and FLX) that is kept in your Account.
             </SectionContent>

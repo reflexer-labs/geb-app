@@ -396,6 +396,7 @@ export interface IAuction {
   buyInitialAmount: string;
   buyToken: string;
   startedBy: string;
+  createdAt: string;
   createdAtTransaction: string;
   englishAuctionBids: Array<IAuctionBidder>;
   englishAuctionConfiguration: {
