@@ -8,7 +8,9 @@ export const auctionsQuery = () => `{
     buyInitialAmount
     sellAmount
     buyAmount
+    startedBy
     auctionDeadline
+    createdAtTransaction
     winner
     isClaimed
     englishAuctionConfiguration {
@@ -21,6 +23,7 @@ export const auctionsQuery = () => `{
       buyAmount
       sellAmount
       createdAt
+      createdAtTransaction
     }
   }
   }`;

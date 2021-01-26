@@ -386,6 +386,7 @@ export interface IAuctionBidder {
   buyAmount: string;
   createdAt: string;
   sellAmount: string;
+  createdAtTransaction: string;
 }
 
 export interface IAuction {
@@ -394,6 +395,8 @@ export interface IAuction {
   buyAmount: string;
   buyInitialAmount: string;
   buyToken: string;
+  startedBy: string;
+  createdAtTransaction: string;
   englishAuctionBids: Array<IAuctionBidder>;
   englishAuctionConfiguration: {
     bidDuration: string;

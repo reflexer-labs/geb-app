@@ -25,7 +25,7 @@ const AuctionBlock = (auction: Props) => {
   const [collapse, setCollapse] = useState(isCollapsed);
 
   const id = _.get(auction, 'auctionId', '');
-  const auctionType = _.get(auction, 'englishAuctionType', 'Debt');
+  // const auctionType = _.get(auction, 'englishAuctionType', 'Debt');
   const icon = _.get(auction, 'englishAuctionType', 'debt');
   const buyToken = _.get(auction, 'buyToken', 'COIN');
   const sellToken = _.get(auction, 'sellToken', 'PROTOCOL_TOKEN');
@@ -43,6 +43,15 @@ const AuctionBlock = (auction: Props) => {
 
   const bidders = _.get(auction, 'englishAuctionBids', []);
   const winner = _.get(auction, 'winner', '');
+
+  const kickBidder = {
+    bidder: _.get(auction, 'startedBy', ''),
+    buyAmount: _.get(auction, 'buyInitialAmount', ''),
+    createdAt: _.get(auction, 'createdAt', ''),
+    sellAmount: _.get(auction, 'sellInitialAmount', ''),
+    createdAtTransaction: _.get(auction, 'createdAtTransaction', ''),
+  };
+
   return (
     <Container>
       <Header onClick={() => setCollapse(!collapse)}>
@@ -55,26 +64,25 @@ const AuctionBlock = (auction: Props) => {
         </LeftAucInfo>
 
         <RightAucInfo>
-          {collapse ? (
-            <InfoContainer>
-              <Info>
-                <InfoCol>
-                  <InfoLabel>{sellSymbol} OFFERED</InfoLabel>
-                  <InfoValue>{`${sellAmount} ${sellSymbol}`}</InfoValue>
-                </InfoCol>
+          <InfoContainer>
+            <Info>
+              <InfoCol>
+                <InfoLabel>{sellSymbol} OFFERED</InfoLabel>
+                <InfoValue>{`${sellAmount} ${sellSymbol}`}</InfoValue>
+              </InfoCol>
 
-                <InfoCol>
-                  <InfoLabel>{buySymbol} BID</InfoLabel>
-                  <InfoValue>{`${buyAmount} ${buySymbol}`}</InfoValue>
-                </InfoCol>
+              <InfoCol>
+                <InfoLabel>{buySymbol} BID</InfoLabel>
+                <InfoValue>{`${buyAmount} ${buySymbol}`}</InfoValue>
+              </InfoCol>
 
-                <InfoCol>
-                  <InfoLabel>ENDS ON</InfoLabel>
-                  <InfoValue>{endsOn}</InfoValue>
-                </InfoCol>
-              </Info>
-            </InfoContainer>
-          ) : null}
+              <InfoCol>
+                <InfoLabel>ENDS ON</InfoLabel>
+                <InfoValue>{endsOn}</InfoValue>
+              </InfoCol>
+            </Info>
+          </InfoContainer>
+
           <AlertContainer>
             <AlertLabel
               text={
@@ -88,7 +96,7 @@ const AuctionBlock = (auction: Props) => {
       {collapse ? null : (
         <Content>
           <SectionContent>
-            <InnerContent>
+            {/* <InnerContent>
               <Col>
                 <InnerCol>
                   <Label>AUCTION TYPE</Label>
@@ -113,11 +121,12 @@ const AuctionBlock = (auction: Props) => {
                   <Value>{`${buyAmount} ${buySymbol}`}</Value>
                 </InnerCol>
               </Col>
-            </InnerContent>
+            </InnerContent> */}
 
             <Bidders>
               {bidders.length > 0 ? (
                 <Heads>
+                  <Head>Event Type</Head>
                   <Head>Bidder</Head>
                   <Head>Timestamp</Head>
                   <Head>Sell Amount</Head>
@@ -126,42 +135,70 @@ const AuctionBlock = (auction: Props) => {
                 </Heads>
               ) : null}
               {bidders.length > 0
-                ? bidders.map((bidder: IAuctionBidder) => (
-                    <List
-                      key={bidder.bidder}
-                      className={
-                        winner &&
-                        winner.toLowerCase() === bidder.bidder.toLowerCase()
-                          ? 'winner'
-                          : ''
-                      }
-                    >
-                      <ListItem>
-                        <Link
-                          href={getEtherscanLink(
-                            chainId as ChainId,
-                            bidder.bidder,
-                            'address'
-                          )}
-                          target="_blank"
-                        >
-                          {returnWalletAddress(bidder.bidder)}
-                        </Link>
-                      </ListItem>
-                      <ListItem>
-                        {dayjs
-                          .unix(Number(bidder.createdAt))
-                          .format('MMM D, h:mm A')}
-                      </ListItem>
-                      <ListItem>
-                        {bidder.sellAmount} {sellSymbol}
-                      </ListItem>
-                      <ListItem>
-                        {bidder.buyAmount} {buySymbol}
-                      </ListItem>
-                      <ListItem>{'N/A'}</ListItem>
-                    </List>
-                  ))
+                ? [...bidders, ...[kickBidder]].map(
+                    (bidder: IAuctionBidder, i: number) => (
+                      <List
+                        key={bidder.bidder}
+                        className={
+                          winner &&
+                          winner.toLowerCase() === bidder.bidder.toLowerCase()
+                            ? 'winner'
+                            : ''
+                        }
+                      >
+                        <ListItem>
+                          <ListItemLabel>Event Type</ListItemLabel>
+                          {winner &&
+                          winner.toLowerCase() === bidder.bidder.toLowerCase()
+                            ? 'Deal'
+                            : bidder.bidder.toLowerCase() ===
+                              kickBidder.bidder.toLowerCase()
+                            ? 'Kick'
+                            : 'Tend'}
+                        </ListItem>
+                        <ListItem>
+                          <ListItemLabel>Bidder</ListItemLabel>
+                          <Link
+                            href={getEtherscanLink(
+                              chainId as ChainId,
+                              bidder.bidder,
+                              'address'
+                            )}
+                            target="_blank"
+                          >
+                            {returnWalletAddress(bidder.bidder)}
+                          </Link>
+                        </ListItem>
+                        <ListItem>
+                          <ListItemLabel>Timestamp</ListItemLabel>
+                          {dayjs
+                            .unix(Number(bidder.createdAt))
+                            .format('MMM D, h:mm A')}
+                        </ListItem>
+                        <ListItem>
+                          <ListItemLabel>Sell Amount</ListItemLabel>
+                          {bidder.sellAmount} {sellSymbol}
+                        </ListItem>
+                        <ListItem>
+                          <ListItemLabel>Buy Amount</ListItemLabel>
+                          {bidder.buyAmount} {buySymbol}
+                        </ListItem>
+                        <ListItem>
+                          <ListItemLabel>TX</ListItemLabel>
+                          <Link
+                            href={getEtherscanLink(
+                              chainId as ChainId,
+                              bidder.createdAtTransaction,
+                              'transaction'
+                            )}
+                            target="_blank"
+                          >
+                            {returnWalletAddress(bidder.createdAtTransaction)}
+                          </Link>
+                        </ListItem>
+                      </List>
+                    )
+                  )
                 : null}
             </Bidders>
 
@@ -248,42 +285,42 @@ const SectionContent = styled.div`
   font-size: ${(props) => props.theme.font.default};
 `;
 
-const InnerContent = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  margin: 0 -10px;
-`;
+// const InnerContent = styled.div`
+//   display: flex;
+//   flex-wrap: wrap;
+//   align-items: center;
+//   margin: 0 -10px;
+// `;
 
-const InnerCol = styled.div`
-  border-radius: ${(props) => props.theme.global.borderRadius};
-  border: 1px solid ${(props) => props.theme.colors.border};
-  background: ${(props) => props.theme.colors.foreground};
-  text-align: center;
-  height: 100%;
-  padding: 20px;
-`;
+// const InnerCol = styled.div`
+//   border-radius: ${(props) => props.theme.global.borderRadius};
+//   border: 1px solid ${(props) => props.theme.colors.border};
+//   background: ${(props) => props.theme.colors.foreground};
+//   text-align: center;
+//   height: 100%;
+//   padding: 20px;
+// `;
 
-const Col = styled.div`
-  padding: 0 7.5px;
-  flex-grow: 1;
-  margin-bottom: 15px;
-`;
+// const Col = styled.div`
+//   padding: 0 7.5px;
+//   flex-grow: 1;
+//   margin-bottom: 15px;
+// `;
 
-const Label = styled.div`
-  color: ${(props) => props.theme.colors.secondary};
-  font-weight: bold;
-  font-size: ${(props) => props.theme.font.small};
-  margin-top: 15px;
-  &:first-child {
-    margin-top: 0;
-  }
-`;
-const Value = styled.div`
-  color: #272727;
-  font-size: ${(props) => props.theme.font.small};
-  margin-top: 5px;
-`;
+// const Label = styled.div`
+//   color: ${(props) => props.theme.colors.secondary};
+//   font-weight: bold;
+//   font-size: ${(props) => props.theme.font.small};
+//   margin-top: 15px;
+//   &:first-child {
+//     margin-top: 0;
+//   }
+// `;
+// const Value = styled.div`
+//   color: #272727;
+//   font-size: ${(props) => props.theme.font.small};
+//   margin-top: 5px;
+// `;
 
 const Link = styled.a`
   ${ExternalLinkArrow}
@@ -336,17 +373,20 @@ const InfoContainer = styled.div`
 `;
 
 const Bidders = styled.div`
-  margin-top: 20px;
+  /* margin-top: 20px; */
 `;
 
 const Heads = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 10px;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    display:none;
+  `}
 `;
 
 const Head = styled.div`
-  flex: 0 0 20%;
+  flex: 0 0 16.6%;
   font-size: 12px;
   font-weight: bold;
   text-transform: uppercase;
@@ -371,11 +411,38 @@ const List = styled.div`
       -webkit-text-fill-color: #fff;
     }
   }
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    flex-wrap:wrap;
+    border:1px solid ${(props) => props.theme.colors.border};
+    margin-bottom:10px;
+    &:last-child {
+      margin-bottom:0;
+    }
+
+  `}
+`;
+
+const ListItemLabel = styled.div`
+  display: none;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    display:block;
+    margin-bottom:5px;
+    font-weight:normal;
+   color: ${(props) => props.theme.colors.secondary};
+  `}
 `;
 
 const ListItem = styled.div`
-  flex: 0 0 20%;
+  flex: 0 0 16.6%;
   color: #272727;
   font-size: ${(props) => props.theme.font.small};
   padding: 15px 20px;
+
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    flex: 0 0 50%;
+    min-width:50%;
+    font-size: ${(props) => props.theme.font.extraSmall};
+    font-weight:900;
+  `}
 `;
