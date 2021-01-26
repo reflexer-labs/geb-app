@@ -104,5 +104,6 @@
   "annual_redemption_tip": "Rate at which RAI is devalued or revalued over 8 hours.",
   "liquidation_price_tip": "ETH price under which this Safe can get liquidated.",
   "liquidation_penalty_tip": "This is a fee you pay in case your Safe gets liquidated. The fee is added on top of your Safe's debt during liquidation, resulting in more Safe collateral being sold.",
-  "app": "App"
+  "app": "App",
+  "shutdown_text": "The global settlement procedure was triggered for this system. You can't manage your Safes from this application anymore."
 }

@@ -11,7 +11,7 @@ import BalanceUpdater from '../services/BalanceUpdater';
 import { capitalizeName, timeout } from '../utils/helper';
 import WalletModal from '../components/WalletModal';
 import { ChainId } from '@uniswap/sdk';
-import { ETHERSCAN_PREFIXES } from '../utils/constants';
+import { ETHERSCAN_PREFIXES, SYSTEM_STATUS } from '../utils/constants';
 import { useActiveWeb3React } from '../hooks';
 import LoadingModal from '../components/Modals/LoadingModal';
 import styled from 'styled-components';
@@ -25,6 +25,7 @@ import TransactionUpdater from '../services/TransactionUpdater';
 import usePrevious from '../hooks/usePrevious';
 import { useHistory } from 'react-router-dom';
 import ImagePreloader from '../components/ImagePreloader';
+import AlertLabel from '../components/AlertLabel';
 
 interface Props {
   children: ReactNode;
@@ -174,6 +175,11 @@ const Shared = ({ children }: Props) => {
       <EmptyDiv>
         <Navbar />
       </EmptyDiv>
+      {SYSTEM_STATUS && SYSTEM_STATUS.toLowerCase() === 'shutdown' ? (
+        <AlertContainer>
+          <AlertLabel type="danger" text={t('shutdown_text')} />
+        </AlertContainer>
+      ) : null}
       <Content>{children}</Content>
       <EmptyDiv>
         <CookieBanner />
@@ -225,3 +231,7 @@ const Container = styled.div`
 
 const Content = styled.div``;
 const EmptyDiv = styled.div``;
+
+const AlertContainer = styled.div`
+  padding: 0 20px;
+`;
