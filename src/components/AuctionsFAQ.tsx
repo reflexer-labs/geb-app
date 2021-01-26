@@ -67,6 +67,7 @@ export default AuctionsFAQ;
 const HeroSection = styled.div`
   margin-bottom: 20px;
   margin-top: 30px;
+  overflow: hidden;
 `;
 const Header = styled.div`
   font-size: ${(props) => props.theme.font.large};

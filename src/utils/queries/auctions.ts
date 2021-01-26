@@ -1,5 +1,5 @@
 export const auctionsQuery = () => `{
-  englishAuctions (orderBy:id, orderDirection: desc){
+  englishAuctions (orderBy:auctionId, orderDirection: desc, where:{englishAuctionType: DEBT}){
     auctionId
     englishAuctionType
     sellToken
