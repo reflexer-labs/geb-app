@@ -216,3 +216,84 @@ export interface ISafeHistory {
   icon: IconName;
   color: string;
 }
+
+export interface ISafeResponse {
+  collateral: string;
+  createdAt: string;
+  debt: string;
+  safeHandler: string;
+  safeId: string;
+}
+
+// query responses for the safes
+export interface ILiquidationResponse {
+  collateralType: {
+    accumulatedRate: string;
+    currentPrice: {
+      liquidationPrice: string;
+      safetyPrice: string;
+      value: string;
+    };
+    debtCeiling: string;
+    debtFloor: string;
+    liquidationCRatio: string;
+    liquidationPenalty: string;
+    safetyCRatio: string;
+    totalAnnualizedStabilityFee: string;
+  };
+  systemState: {
+    currentRedemptionPrice: {
+      value: string;
+    };
+    currentRedemptionRate: {
+      eightHourlyRate: string;
+    };
+    globalDebt: string;
+    globalDebtCeiling: string;
+    perSafeDebtCeiling: string;
+  };
+}
+
+export interface IUserSafeList extends ILiquidationResponse {
+  erc20Balances: Array<{ balance: string }>;
+  safes: Array<ISafeResponse>;
+}
+
+export interface IModifySAFECollateralization {
+  deltaDebt: string;
+  deltaCollateral: string;
+  createdAt: string;
+  createdAtTransaction: string;
+  accumulatedRate: string;
+}
+
+export interface ILiquidationFixedDiscount {
+  sellInitialAmount: string;
+  sellAmount: string;
+  createdAt: string;
+  createdAtTransaction: string;
+}
+
+export interface ISingleSafe {
+  safeId: string;
+  collateral: string;
+  createdAt: string;
+  debt: string;
+  internalCollateralBalance: {
+    balance: string;
+  };
+  modifySAFECollateralization: Array<IModifySAFECollateralization>;
+  liquidationFixedDiscount: Array<ILiquidationFixedDiscount>;
+}
+export interface ISafeQuery extends ILiquidationResponse {
+  erc20Balances: Array<{ balance: string }>;
+  safes: Array<ISingleSafe>;
+  userProxies: [
+    {
+      address: string;
+      coinAllowance: {
+        amount: string;
+      } | null;
+    }
+  ];
+}
