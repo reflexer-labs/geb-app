@@ -99,36 +99,10 @@ const verifyKeys = (objA: any, objB: any, matchArrays = true) => {
 };
 
 describe("actions", () => {
+  // Address and safe to run the test against
+  // !! This safe needs to exist on the deployment tested against
   const address = "0xe94d94eddb2322975d73ca3f2086978e0f2953b1";
   const safeId = "16";
-
-  // const liquidationResponse = {
-  //   systemState: {
-  //     currentRedemptionPrice: {
-  //       value: expect.any(String),
-  //     },
-  //     currentRedemptionRate: {
-  //       eightHourlyRate: expect.any(String),
-  //     },
-  //     globalDebt: expect.any(String),
-  //     globalDebtCeiling: expect.any(String),
-  //     perSafeDebtCeiling: expect.any(String),
-  //   },
-  //   collateralType: {
-  //     accumulatedRate: expect.any(String),
-  //     currentPrice: {
-  //       liquidationPrice: expect.any(String),
-  //       safetyPrice: expect.any(String),
-  //       value: expect.any(String),
-  //     },
-  //     debtCeiling: expect.any(String),
-  //     debtFloor: expect.any(String),
-  //     liquidationCRatio: expect.any(String),
-  //     liquidationPenalty: expect.any(String),
-  //     safetyCRatio: expect.any(String),
-  //     totalAnnualizedStabilityFee: expect.any(String),
-  //   },
-  // };
 
   describe("FetchLiquidationData", () => {
     // prettier-ignore
@@ -179,16 +153,17 @@ describe("actions", () => {
       expect(gqlResponse).toBeTruthy();
       expect(rpcResponse).toBeTruthy();
 
+      // This will als make that we have the same number of safe on both sides
       verifyKeys(rpcResponse, gqlResponse);
 
       expect(rpcResponse.erc20Balances[0].balance).fixedNumberMatch(
         gqlResponse.erc20Balances[0].balance
       );
 
+      // Check that every safe is the same
       for (let i = 0; i < rpcResponse.safes.length; i++) {
         let rpcSafe = rpcResponse.safes[i];
         let gqlSafe = gqlResponse.safes[i];
-
         expect(rpcSafe.collateral).fixedNumberMatch(gqlSafe.collateral);
         expect(rpcSafe.debt).fixedNumberMatch(gqlSafe.debt);
         expect(rpcSafe.safeHandler).toEqual(gqlSafe.safeHandler);
@@ -201,58 +176,7 @@ describe("actions", () => {
     it("fetches a safe by id", async () => {
       const response = await gebManager.getSafeByIdRpc({ address, safeId });
       expect(response).toBeTruthy();
-      // expect(response).toEqual({
-      //   safes: [
-      //     {
-      //       collateral: expect.any(String),
-      //       createdAt: expect.any(String),
-      //       debt: expect.any(String),
-      //       internalCollateralBalance: {
-      //         balance: expect.any(String),
-      //       },
-      //       liquidationFixedDiscount: [
-      //         {
-      //           createdAt: expect.any(String),
-      //           createdAtTransaction: expect.any(String),
-      //           sellAmount: expect.any(String),
-      //           sellInitialAmount: expect.any(String),
-      //         },
-      //       ],
-      //       modifySAFECollateralization: [
-      //         {
-      //           accumulatedRate: expect.any(String),
-      //           createdAt: expect.any(String),
-      //           createdAtTransaction: expect.any(String),
-      //           deltaCollateral: expect.any(String),
-      //           deltaDebt: expect.any(String),
-      //         },
-      //         {
-      //           accumulatedRate: expect.any(String),
-      //           createdAt: expect.any(String),
-      //           createdAtTransaction: expect.any(String),
-      //           deltaCollateral: expect.any(String),
-      //           deltaDebt: expect.any(String),
-      //         },
-      //       ],
-      //       safeId: expect.any(String),
-      //     },
-      //   ],
-      //   erc20Balances: [
-      //     {
-      //       balance: expect.any(String),
-      //     },
-      //   ],
-      //   userProxies: [
-      //     {
-      //       address: expect.any(String),
-      //       coinAllowance:
-      //         {
-      //           amount: expect.any(String),
-      //         } || expect.any(null),
-      //     },
-      //   ],
-      //   ...liquidationResponse,
-      // });
+      // TODO
     });
   });
 });
