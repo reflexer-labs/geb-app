@@ -118,7 +118,7 @@ const getUserSafesRpc = async (
     safe.push({
       collateral: parseWad(collateralAndDebt[i].lockedCollateral),
       debt: parseWad(collateralAndDebt[i].generatedDebt),
-      createdAt: "0",
+      createdAt: null,
       safeHandler: safeDetails.safes[i].toLowerCase(),
       safeId: safeDetails.ids[i].toString(),
     });
@@ -139,8 +139,57 @@ const getUserSafesRpc = async (
 const getSafeByIdRpc = async (
   config: SingleSafeConfig
 ): Promise<ISafeQuery> => {
-  // TODO
-  return await userSingleSafeMockedResponse;
+  const multiCall1Request = geb.multiCall([
+    geb.contracts.safeManager.safes(config.safeId, true), // 0
+    geb.contracts.coin.balanceOf(config.address, true), // 1
+    geb.contracts.proxyRegistry.proxies(config.address, true), // 2
+  ]);
+
+  // Fetch the liq data and the a multicall in parallel
+  const [multiCall1, liquidationDataRpc] = await Promise.all([
+    multiCall1Request,
+    getLiquidationDataRpc(),
+  ]);
+
+  const safeHandler = multiCall1[0];
+
+  const multiCall2 = await geb.multiCall([
+    geb.contracts.safeEngine.safes(utils.ETH_A, safeHandler, true), // 0
+    geb.contracts.safeEngine.tokenCollateral(utils.ETH_A, safeHandler, true), // 1
+    geb.contracts.coin.allowance(config.address, multiCall1[2], true), // 2
+  ]);
+
+  return {
+    safes: [
+      {
+        collateral: parseWad(multiCall2[0].lockedCollateral),
+        // We can't get this over RPC
+        createdAt: null,
+        debt: parseWad(multiCall2[0].generatedDebt),
+        internalCollateralBalance: {
+          balance: parseWad(multiCall2[1]),
+        },
+        // We can't get these over RPC
+        liquidationFixedDiscount: null,
+        modifySAFECollateralization: null,
+        safeId: config.safeId,
+      },
+    ],
+    erc20Balances: [
+      {
+        balance: parseWad(multiCall1[1]),
+      },
+    ],
+    userProxies: [
+      {
+        address: multiCall1[2].toLowerCase(),
+        coinAllowance: {
+          amount: parseWad(multiCall2[2]),
+        },
+      },
+    ],
+    ...liquidationDataRpc,
+  };
 };
 
 export default {

@@ -3,8 +3,14 @@ import gebManager from ".";
 import "../../setupTests";
 import axios from "axios";
 import { GRAPH_API_URLS } from "../constants";
-import { getUserSafesListQuery, liquidationQuery } from "../queries/safe";
+import {
+  getSafeByIdQuery,
+  getUserSafesListQuery,
+  liquidationQuery,
+} from "../queries/safe";
 import { BigNumber, FixedNumber } from "ethers";
+import { ISafeQuery, IUserSafeList } from "../interfaces";
+import { id } from "ethers/lib/utils";
 
 // Add custom match type
 declare global {
@@ -19,25 +25,27 @@ declare global {
 // Add some custom matchers
 expect.extend({
   // Compare numbers as string regardless of things like trailing/leading zeros
-  // And with rounding to the 28th decimal
+  // And work with the gql endpoint way of handling BigDecimals
   fixedNumberMatch(received, other: string) {
-    // Round to 28 decimals, the max that the graph supports
-    const round = (fx: FixedNumber) => {
-      // 10**28
-      const factor = FixedNumber.from(
-        "10000000000000000000000000000",
-        fx.format
-      );
-      return fx.mulUnsafe(factor).floor().divUnsafe(factor);
-    };
-
     // Use format 45 decimal
-    const fixReceived = round(FixedNumber.from(received, "fixed256x45"));
-    const fixOther = round(FixedNumber.from(other, "fixed256x45"));
+    const fixReceived = FixedNumber.from(received, "fixed256x45");
+    const fixOther = FixedNumber.from(other, "fixed256x45");
 
+    // The GQL endpoint will allow only up to 33-34 digits base 10 for the mantissa
+    // So we truncate it
+    const gqlMaxMantissaSize = 33;
+    const mantissaReceived = BigNumber.from(
+      fixReceived.toHexString()
+    ).toString();
+    const mantissaOther = BigNumber.from(fixOther.toHexString()).toString();
+    const truncatedMantissaReceived = mantissaReceived.slice(
+      0,
+      gqlMaxMantissaSize
+    );
+    const truncatedMantissaOther = mantissaOther.slice(0, gqlMaxMantissaSize);
     // Compare the mantissa and the decimal place
     if (
-      fixReceived.toHexString() === fixOther.toHexString() &&
+      truncatedMantissaReceived === truncatedMantissaOther &&
       fixReceived.format.decimals === fixOther.format.decimals
     ) {
       return { pass: true, message: () => "Good" };
@@ -74,11 +82,18 @@ const verifyKeys = (objA: any, objB: any, matchArrays = true) => {
 
   for (let i = 0; i < keyA.length; i++) {
     if (keyA[i] !== keyB[i]) {
-      fail("Key names not matching");
+      fail(`Key names not matching: ${keyA[i]} ${keyB[i]}`);
     }
 
-    if (typeof objA[keyA[i]] !== typeof objB[keyB[i]]) {
-      fail("Type of object not matching");
+    const typeA = typeof objA[keyA[i]];
+    const typeB = typeof objA[keyB[i]];
+
+    if (typeA !== typeB && typeA !== null && typeB !== null) {
+      fail(
+        `Type of object not matching for: \n ${JSON.stringify(
+          objA
+        )} \n and: \n   ${JSON.stringify(objB)}`
+      );
     }
 
     if (Array.isArray(objA[keyA[i]]) && matchArrays) {
@@ -90,10 +105,14 @@ const verifyKeys = (objA: any, objB: any, matchArrays = true) => {
 
       // Check each individual objec within the aeeay
       for (let j = 0; j < arrayA.length; j++) {
-        verifyKeys(arrayA[j], arrayB[j]);
+        verifyKeys(arrayA[j], arrayB[j], matchArrays);
       }
-    } else if (typeof objA[keyA[i]] == "object") {
-      verifyKeys(objA[keyA[i]], objB[keyB[i]]);
+    } else if (
+      typeof objA[keyA[i]] === "object" &&
+      !Array.isArray(objA[keyA[i]]) &&
+      objA[keyA[i]]
+    ) {
+      verifyKeys(objA[keyA[i]], objB[keyB[i]], matchArrays);
     }
   }
 };
@@ -101,7 +120,7 @@ const verifyKeys = (objA: any, objB: any, matchArrays = true) => {
 describe("actions", () => {
   // Address and safe to run the test against
   // !! This safe needs to exist on the deployment tested against
-  const address = "0xe94d94eddb2322975d73ca3f2086978e0f2953b1";
+  const address = "0xe94d94eddb2322975d73ca3f2086978e0f2953b1".toLowerCase();
   const safeId = "16";
 
   describe("FetchLiquidationData", () => {
@@ -110,7 +129,7 @@ describe("actions", () => {
       const rpcResponse = await gebManager.getLiquidationDataRpc();
 
       const gqlQuery = `{ ${liquidationQuery} }`;
-      const gqlResponse = (
+      const gqlResponse : IUserSafeList = (
         await axios.post(GRAPH_API_URLS[0], JSON.stringify({ query: gqlQuery }))
       ).data.data;
 
@@ -143,7 +162,7 @@ describe("actions", () => {
   describe("FetchUserSafeList", () => {
     it("fetches a list of user safes", async () => {
       const rpcResponse = await gebManager.getUserSafesRpc({ address });
-      const gqlResponse = (
+      const gqlResponse: IUserSafeList = (
         await axios.post(
           GRAPH_API_URLS[0],
           JSON.stringify({ query: getUserSafesListQuery(address) })
@@ -160,6 +179,10 @@ describe("actions", () => {
         gqlResponse.erc20Balances[0].balance
       );
 
+      // Sort the safes by id to compare each
+      rpcResponse.safes.sort((a, b) => Number(a.safeId) - Number(b.safeId));
+      gqlResponse.safes.sort((a, b) => Number(a.safeId) - Number(b.safeId));
+
       // Check that every safe is the same
       for (let i = 0; i < rpcResponse.safes.length; i++) {
         let rpcSafe = rpcResponse.safes[i];
@@ -168,15 +191,59 @@ describe("actions", () => {
         expect(rpcSafe.debt).fixedNumberMatch(gqlSafe.debt);
         expect(rpcSafe.safeHandler).toEqual(gqlSafe.safeHandler);
         expect(rpcSafe.safeId).toEqual(gqlSafe.safeId);
+        // !! There is no way to fetch this over RPC, so we return 0
+        expect(rpcSafe.createdAt).toBeNull();
       }
     });
   });
 
   describe("FetchSafeById", () => {
+    // prettier-ignore
     it("fetches a safe by id", async () => {
-      const response = await gebManager.getSafeByIdRpc({ address, safeId });
-      expect(response).toBeTruthy();
-      // TODO
+      const rpcResponse = await gebManager.getSafeByIdRpc({ safeId, address });
+      const gqlResponse: ISafeQuery = (
+        await axios.post(
+          GRAPH_API_URLS[0],
+          JSON.stringify({ query: getSafeByIdQuery(safeId, address) })
+        )
+      ).data.data;
+
+      expect(gqlResponse).toBeTruthy();
+      expect(rpcResponse).toBeTruthy();
+
+      // We set check array to false because the safe history will be missing
+      verifyKeys(rpcResponse, gqlResponse, false);
+
+      expect(rpcResponse.safes.length).toEqual(1);
+      expect(gqlResponse.safes.length).toEqual(1);
+
+      const safeRpc = rpcResponse.safes[0];
+      const safeGql = gqlResponse.safes[0];
+
+      expect(safeRpc.collateral).fixedNumberMatch(safeGql.collateral);
+      // There is no way to fetch this over RPC, so we return null
+      expect(safeRpc.createdAt).toBeNull();
+      expect(safeRpc.debt).fixedNumberMatch(safeGql.debt);
+      expect(safeRpc.internalCollateralBalance.balance).fixedNumberMatch(safeGql.internalCollateralBalance.balance);
+      // There is no way to fetch this over RPC, so we return null
+      expect(safeRpc.liquidationFixedDiscount).toBeNull()
+      // There is no way to fetch this over RPC, so we return null
+      expect(safeRpc.modifySAFECollateralization).toBeNull()
+      expect(safeRpc.safeId).fixedNumberMatch(safeGql.safeId);
+        
+      expect(rpcResponse.erc20Balances.length).toEqual(1);
+      expect(gqlResponse.erc20Balances.length).toEqual(1);
+      expect(rpcResponse.erc20Balances[0].balance).fixedNumberMatch(gqlResponse.erc20Balances[0].balance)
+
+      expect(rpcResponse.userProxies.length).toEqual(1);
+      expect(gqlResponse.userProxies.length).toEqual(1);
+      expect(rpcResponse.userProxies[0].address).toEqual(gqlResponse.userProxies[0].address);
+
+      expect(!!rpcResponse.userProxies[0].coinAllowance).toEqual(!!gqlResponse.userProxies[0].coinAllowance);
+      
+      if(rpcResponse.userProxies[0].coinAllowance && gqlResponse.userProxies[0].coinAllowance) {
+        expect(rpcResponse.userProxies[0].coinAllowance.amount).fixedNumberMatch(gqlResponse.userProxies[0].coinAllowance.amount);
+      }
     });
   });
 });

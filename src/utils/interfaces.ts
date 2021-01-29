@@ -1,9 +1,9 @@
-import { AbstractConnector } from '@web3-react/abstract-connector';
-import { TransactionResponse } from '@ethersproject/providers';
-import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
-import { DefaultTheme, ThemedCssFunction } from 'styled-components';
-import { ChainId } from '@uniswap/sdk';
-import { IconName } from '../components/FeatherIconWrapper';
+import { AbstractConnector } from "@web3-react/abstract-connector";
+import { TransactionResponse } from "@ethersproject/providers";
+import { JsonRpcSigner } from "@ethersproject/providers/lib/json-rpc-provider";
+import { DefaultTheme, ThemedCssFunction } from "styled-components";
+import { ChainId } from "@uniswap/sdk";
+import { IconName } from "../components/FeatherIconWrapper";
 
 export interface DynamicObject {
   [key: string]: any;
@@ -219,7 +219,7 @@ export interface ISafeHistory {
 
 export interface ISafeResponse {
   collateral: string;
-  createdAt: string;
+  createdAt: string | null; // Will be null in RPC mode;
   debt: string;
   safeHandler: string;
   safeId: string;
@@ -277,13 +277,13 @@ export interface ILiquidationFixedDiscount {
 export interface ISingleSafe {
   safeId: string;
   collateral: string;
-  createdAt: string;
+  createdAt: string | null; // Will be null in RPC mode
   debt: string;
   internalCollateralBalance: {
     balance: string;
   };
-  modifySAFECollateralization: Array<IModifySAFECollateralization>;
-  liquidationFixedDiscount: Array<ILiquidationFixedDiscount>;
+  modifySAFECollateralization: Array<IModifySAFECollateralization> | null; // Will be null over RPC;
+  liquidationFixedDiscount: Array<ILiquidationFixedDiscount> | null; // Will be null over RPC
 }
 export interface ISafeQuery extends ILiquidationResponse {
   erc20Balances: Array<{ balance: string }>;
