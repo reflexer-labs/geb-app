@@ -5,7 +5,11 @@ import { GRAPH_API_URLS } from '../utils/constants';
 import { formatUserSafe, formatHistoryArray } from '../utils/helper';
 import { getUserQuery } from '../utils/queries/user';
 import { incentiveCampaignsQuery } from '../utils/queries/incentives';
-import { IIncentivesCampaignData } from '../utils/interfaces';
+import {
+  IIncentivesCampaignData,
+  IUserSafeList,
+  ISafeQuery,
+} from '../utils/interfaces';
 import { auctionsQuery } from '../utils/queries/auctions';
 
 export const getFirstValid = async (query: string, index = 0): Promise<any> => {
@@ -53,22 +57,28 @@ export const fetchUserSafes = (address: string) => {
       if (!res.data.data && attempt < GRAPH_API_URLS.length) {
         throw new Error('retry');
       }
-      const userSafes = formatUserSafe(res.data.data.safes, {
-        ...res.data.data.collateralType,
+
+      const safesResponse: IUserSafeList = res.data.data;
+
+      const liquidationData = {
+        ...safesResponse.collateralType,
         currentRedemptionPrice:
-          res.data.data.systemState.currentRedemptionPrice.value,
-      });
+          safesResponse.systemState.currentRedemptionPrice.value,
+        currentRedemptionRate:
+          safesResponse.systemState.currentRedemptionRate.eightHourlyRate,
+        globalDebt: safesResponse.systemState.globalDebt,
+        globalDebtCeiling: safesResponse.systemState.globalDebtCeiling,
+        perSafeDebtCeiling: safesResponse.systemState.perSafeDebtCeiling,
+      };
+
+      const userSafes = formatUserSafe(safesResponse.safes, liquidationData);
       return {
         userSafes,
         availablePRAI:
-          res.data.data.erc20Balances && res.data.data.erc20Balances.length > 0
-            ? res.data.data.erc20Balances[0].balance
+          safesResponse.erc20Balances && safesResponse.erc20Balances.length > 0
+            ? safesResponse.erc20Balances[0].balance
             : '0',
-        collateralType: res.data.data.collateralType,
-        currentRedemptionPrice:
-          res.data.data.systemState.currentRedemptionPrice.value,
-        globalDebt: res.data.data.systemState.globalDebt,
-        globalDebtCeiling: res.data.data.systemState.globalDebtCeiling,
+        liquidationData,
       };
     },
     {
@@ -78,6 +88,8 @@ export const fetchUserSafes = (address: string) => {
 };
 
 export const fetchSafeById = (safeId: string, address: string) => {
+  // console.log(getSafeByIdQuery(safeId, address));
+
   return retry(
     async (bail, attempt) => {
       const res = await axios.post(
@@ -89,26 +101,33 @@ export const fetchSafeById = (safeId: string, address: string) => {
       if (!res.data.data && attempt < GRAPH_API_URLS.length) {
         throw new Error('retry');
       }
-      const safe = formatUserSafe(res.data.data.safes, {
-        ...res.data.data.collateralType,
+      const safeResponse: ISafeQuery = res.data.data;
+
+      const liquidationData = {
+        ...safeResponse.collateralType,
         currentRedemptionPrice:
-          res.data.data.systemState.currentRedemptionPrice.value,
+          safeResponse.systemState.currentRedemptionPrice.value,
         currentRedemptionRate:
-          res.data.data.systemState.currentRedemptionRate.eightHourlyRate,
-      });
+          safeResponse.systemState.currentRedemptionRate.eightHourlyRate,
+        globalDebt: safeResponse.systemState.globalDebt,
+        globalDebtCeiling: safeResponse.systemState.globalDebtCeiling,
+        perSafeDebtCeiling: safeResponse.systemState.perSafeDebtCeiling,
+      };
+
+      const safe = formatUserSafe(res.data.data.safes, liquidationData);
       const safeHistory = formatHistoryArray(
-        res.data.data.safes[0].modifySAFECollateralization,
-        res.data.data.safes[0].liquidationFixedDiscount
+        safeResponse.safes[0].modifySAFECollateralization,
+        safeResponse.safes[0].liquidationFixedDiscount
       );
 
       const proxyData =
-        res.data.data.userProxies.length > 0
-          ? res.data.data.userProxies[0]
+        safeResponse.userProxies.length > 0
+          ? safeResponse.userProxies[0]
           : null;
 
       const erc20Balance =
-        res.data.data.erc20Balances && res.data.data.erc20Balances.length > 0
-          ? res.data.data.erc20Balances[0].balance
+        safeResponse.erc20Balances && safeResponse.erc20Balances.length > 0
+          ? safeResponse.erc20Balances[0].balance
           : '0';
 
       return {
@@ -116,14 +135,7 @@ export const fetchSafeById = (safeId: string, address: string) => {
         safeHistory,
         proxyData,
         erc20Balance,
-        collateralType: res.data.data.collateralType,
-        currentRedemptionPrice:
-          res.data.data.systemState.currentRedemptionPrice.value,
-        globalDebt: res.data.data.systemState.globalDebt,
-        currentRedemptionRate:
-          res.data.data.systemState.currentRedemptionRate.annualizedRate,
-        perSafeDebtCeiling: res.data.data.systemState.perSafeDebtCeiling,
-        globalDebtCeiling: res.data.data.systemState.globalDebtCeiling,
+        liquidationData,
       };
     },
     {

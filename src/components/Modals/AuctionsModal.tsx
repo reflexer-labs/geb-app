@@ -14,6 +14,8 @@ const AuctionsModal = () => {
     popupsActions.setAuctionOperationPayload({ isOpen: false, type: '' });
     auctionsActions.setOperation(0);
     popupsActions.setReturnProxyFunction(() => {});
+    auctionsActions.setAmount('');
+    auctionsActions.setSelectedAuction(null);
   };
 
   return (

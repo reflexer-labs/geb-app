@@ -11,6 +11,7 @@ export interface AuctionsModel {
     prai: string;
     flx: string;
   };
+  isSubmitting: boolean;
   autctionsData: Array<IAuction>;
   selectedAuction: IAuction | null;
   fetchAuctions: Thunk<AuctionsModel, { address: string }, any, StoreModel>;
@@ -27,11 +28,13 @@ export interface AuctionsModel {
       flx: string;
     }
   >;
+  setIsSubmitting: Action<AuctionsModel, boolean>;
 }
 
 const auctionsModel: AuctionsModel = {
   operation: 0,
   autctionsData: [],
+  isSubmitting: false,
   coinBalances: {
     prai: '',
     flx: '',
@@ -92,6 +95,7 @@ const auctionsModel: AuctionsModel = {
     const storeActions = getStoreActions();
     const txResponse = await handleAuctionClaim(payload);
     if (txResponse) {
+      actions.setIsSubmitting(true);
       const { hash, chainId } = txResponse;
       storeActions.transactionsModel.addTransaction({
         chainId,
@@ -108,6 +112,7 @@ const auctionsModel: AuctionsModel = {
         status: 'success',
       });
       await txResponse.wait();
+      actions.setIsSubmitting(false);
     }
   }),
   setOperation: action((state, payload) => {
@@ -124,6 +129,9 @@ const auctionsModel: AuctionsModel = {
   }),
   setCoinBalances: action((state, payload) => {
     state.coinBalances = payload;
+  }),
+  setIsSubmitting: action((state, payload) => {
+    state.isSubmitting = payload;
   }),
 };
 

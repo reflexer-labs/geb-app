@@ -23,9 +23,10 @@ const AuctionBlock = (auction: Props) => {
     auctionsModel: auctionsActions,
   } = useStoreActions((state) => state);
 
-  const { connectWalletModel: connectWalletState } = useStoreState(
-    (state) => state
-  );
+  const {
+    connectWalletModel: connectWalletState,
+    auctionsModel: auctionsState,
+  } = useStoreState((state) => state);
 
   const isCollapsed = _.get(auction, 'isCollapsed', false);
 
@@ -112,6 +113,7 @@ const AuctionBlock = (auction: Props) => {
           <Button
             text={t('claim_flx')}
             withArrow
+            disabled={auctionsState.isSubmitting}
             onClick={() => handleClick('claim_flx')}
           />
         </BtnContainer>
@@ -129,9 +131,10 @@ const AuctionBlock = (auction: Props) => {
             text={t('rai_bid', { rai: COIN_TICKER })}
             withArrow
             disabled={
-              isOngoingAuction &&
-              userProxy &&
-              userProxy === winner.toLowerCase()
+              auctionsState.isSubmitting ||
+              (isOngoingAuction &&
+                userProxy &&
+                userProxy === winner.toLowerCase())
             }
             onClick={() => handleClick('rai_bid')}
           />

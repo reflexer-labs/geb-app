@@ -212,12 +212,7 @@ const safeModel: SafeModel = {
       });
       actions.setIsSafeCreated(false);
     }
-    actions.setLiquidationData({
-      ...fetched.collateralType,
-      currentRedemptionPrice: fetched.currentRedemptionPrice,
-      globalDebt: fetched.globalDebt,
-      globalDebtCeiling: fetched.globalDebtCeiling,
-    });
+    actions.setLiquidationData(fetched.liquidationData);
     const chainId = NETWORK_ID;
     if (fetched.availablePRAI && chainId) {
       storeActions.connectWalletModel.updatePraiBalance({
@@ -239,14 +234,7 @@ const safeModel: SafeModel = {
     if (res.safeHistory.length > 0) {
       actions.setSafeHistoryList(res.safeHistory);
     }
-    actions.setLiquidationData({
-      ...res.collateralType,
-      currentRedemptionPrice: res.currentRedemptionPrice,
-      globalDebt: res.globalDebt,
-      currentRedemptionRate: res.currentRedemptionRate,
-      perSafeDebtCeiling: res.perSafeDebtCeiling,
-      globalDebtCeiling: res.globalDebtCeiling,
-    });
+    actions.setLiquidationData(res.liquidationData);
     storeActions.connectWalletModel.updatePraiBalance({
       chainId: NETWORK_ID,
       balance: numeral(res.erc20Balance).value(),
