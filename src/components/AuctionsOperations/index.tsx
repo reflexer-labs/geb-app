@@ -15,11 +15,10 @@ const IncentivesOperations = () => {
   const nodeRef = React.useRef(null);
   const {
     auctionsModel: auctionsState,
+    popupsModel: popupsState,
     connectWalletModel: connectWalletState,
   } = useStoreState((state) => state);
-  const { incentivesModel: incentivesActions } = useStoreActions(
-    (state) => state
-  );
+  const { auctionsModel: auctionsActions } = useStoreActions((state) => state);
   const raiCoinAllowance = _.get(connectWalletState, 'coinAllowance', '0');
   const raiAmount = _.get(auctionsState, 'auctionsData.raiAmount', '0');
 
@@ -60,8 +59,8 @@ const IncentivesOperations = () => {
         >
           {auctionsState.operation === 1 ? (
             <ApprovePRAI
-              handleBackBtn={() => incentivesActions.setOperation(0)}
-              handleSuccess={() => incentivesActions.setOperation(2)}
+              handleBackBtn={() => auctionsActions.setOperation(0)}
+              handleSuccess={() => auctionsActions.setOperation(2)}
               amount={returnAllowanceType().amount}
               allowance={returnAllowanceType().allowance}
               coinName={returnAllowanceType().coinName}
@@ -74,7 +73,11 @@ const IncentivesOperations = () => {
                 maxWidth: '720px',
               }}
             >
-              <Header>{t('claim_flx')}</Header>
+              <Header>
+                {t(popupsState.auctionOperationPayload.type, {
+                  rai: COIN_TICKER,
+                })}
+              </Header>
               {returnBody()}
             </ModalContent>
           )}

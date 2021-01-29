@@ -16,7 +16,7 @@ import { ChainId } from '@uniswap/sdk';
 type Props = IAuction & { isCollapsed: boolean };
 
 const AuctionBlock = (auction: Props) => {
-  const { chainId } = useActiveWeb3React();
+  const { chainId, account } = useActiveWeb3React();
   const { t } = useTranslation();
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
 
@@ -29,11 +29,15 @@ const AuctionBlock = (auction: Props) => {
   const icon = _.get(auction, 'englishAuctionType', 'debt');
   const buyToken = _.get(auction, 'buyToken', 'COIN');
   const sellToken = _.get(auction, 'sellToken', 'PROTOCOL_TOKEN');
+
+  const buyInititalAmount = _.get(auction, 'buyInitialAmount', '0');
+  const sellInititalAmount = _.get(auction, 'sellInitialAmount', '0');
   const buySymbol = buyToken === 'COIN' ? COIN_TICKER : 'FLX';
   const sellSymbol = sellToken === 'COIN' ? COIN_TICKER : 'FLX';
   const sellAmount = _.get(auction, 'sellAmount', '0');
   const buyAmount = _.get(auction, 'buyAmount', '0');
   const auctionDeadline = _.get(auction, 'auctionDeadline', '');
+  const isClaimed = _.get(auction, 'isClaimed', false);
   const endsOn = auctionDeadline
     ? dayjs.unix(Number(auctionDeadline)).format('MMM D, h:mm A')
     : '';
@@ -52,6 +56,69 @@ const AuctionBlock = (auction: Props) => {
     createdAtTransaction: _.get(auction, 'createdAtTransaction', ''),
   };
 
+  const returnEventType = (address: string, i: number) => {
+    if (
+      i === 0 &&
+      winner &&
+      winner.toLowerCase() === address.toLowerCase() &&
+      isClaimed
+    ) {
+      return 'Settle';
+    }
+    if (address === kickBidder.bidder.toLowerCase()) {
+      return 'Start';
+    }
+    return 'Tend';
+  };
+
+  const returnBtn = () => {
+    if (
+      account &&
+      winner &&
+      account.toLowerCase() === winner.toLowerCase() &&
+      !isClaimed
+    ) {
+      return (
+        <BtnContainer>
+          <Button
+            text={t('claim_flx')}
+            withArrow
+            onClick={() =>
+              popupsActions.setAuctionOperationPayload({
+                isOpen: true,
+                type: 'claim_flx',
+              })
+            }
+          />
+        </BtnContainer>
+      );
+    }
+
+    if (
+      (isOngoingAuction && !winner) ||
+      (isOngoingAuction &&
+        account &&
+        account.toLowerCase() !== winner.toLowerCase()) ||
+      !bidders.length
+    ) {
+      return (
+        <BtnContainer>
+          <Button
+            text={t('rai_bid', { rai: COIN_TICKER })}
+            withArrow
+            onClick={() =>
+              popupsActions.setAuctionOperationPayload({
+                isOpen: true,
+                type: 'rai_bid',
+              })
+            }
+          />
+        </BtnContainer>
+      );
+    }
+    return null;
+  };
+
   return (
     <Container>
       <Header onClick={() => setCollapse(!collapse)}>
@@ -68,12 +135,12 @@ const AuctionBlock = (auction: Props) => {
             <Info>
               <InfoCol>
                 <InfoLabel>{sellSymbol} OFFERED</InfoLabel>
-                <InfoValue>{`${sellAmount} ${sellSymbol}`}</InfoValue>
+                <InfoValue>{`${sellInititalAmount} ${sellSymbol}`}</InfoValue>
               </InfoCol>
 
               <InfoCol>
                 <InfoLabel>{buySymbol} BID</InfoLabel>
-                <InfoValue>{`${buyAmount} ${buySymbol}`}</InfoValue>
+                <InfoValue>{`${buyInititalAmount} ${buySymbol}`}</InfoValue>
               </InfoCol>
 
               <InfoCol>
@@ -134,83 +201,68 @@ const AuctionBlock = (auction: Props) => {
                   <Head>TX</Head>
                 </Heads>
               ) : null}
-              {bidders.length > 0
-                ? [...bidders, ...[kickBidder]].map(
-                    (bidder: IAuctionBidder, i: number) => (
-                      <List
-                        key={bidder.bidder}
-                        className={
-                          winner &&
-                          winner.toLowerCase() === bidder.bidder.toLowerCase()
-                            ? 'winner'
-                            : ''
-                        }
+              {[...[kickBidder], ...bidders.reverse()]
+                .reverse()
+                .map((bidder: IAuctionBidder, i: number) => (
+                  <List
+                    key={bidder.bidder + i}
+                    className={
+                      i === 0 &&
+                      winner &&
+                      winner.toLowerCase() === bidder.bidder.toLowerCase()
+                        ? 'winner'
+                        : ''
+                    }
+                  >
+                    <ListItem>
+                      <ListItemLabel>Event Type</ListItemLabel>
+                      {returnEventType(bidder.bidder, i)}
+                    </ListItem>
+                    <ListItem>
+                      <ListItemLabel>Bidder</ListItemLabel>
+                      <Link
+                        href={getEtherscanLink(
+                          chainId as ChainId,
+                          bidder.bidder,
+                          'address'
+                        )}
+                        target="_blank"
                       >
-                        <ListItem>
-                          <ListItemLabel>Event Type</ListItemLabel>
-                          {winner &&
-                          winner.toLowerCase() === bidder.bidder.toLowerCase()
-                            ? 'Settle'
-                            : bidder.bidder.toLowerCase() ===
-                              kickBidder.bidder.toLowerCase()
-                            ? 'Start'
-                            : 'Tend'}
-                        </ListItem>
-                        <ListItem>
-                          <ListItemLabel>Bidder</ListItemLabel>
-                          <Link
-                            href={getEtherscanLink(
-                              chainId as ChainId,
-                              bidder.bidder,
-                              'address'
-                            )}
-                            target="_blank"
-                          >
-                            {returnWalletAddress(bidder.bidder)}
-                          </Link>
-                        </ListItem>
-                        <ListItem>
-                          <ListItemLabel>Timestamp</ListItemLabel>
-                          {dayjs
-                            .unix(Number(bidder.createdAt))
-                            .format('MMM D, h:mm A')}
-                        </ListItem>
-                        <ListItem>
-                          <ListItemLabel>Sell Amount</ListItemLabel>
-                          {bidder.sellAmount} {sellSymbol}
-                        </ListItem>
-                        <ListItem>
-                          <ListItemLabel>Buy Amount</ListItemLabel>
-                          {bidder.buyAmount} {buySymbol}
-                        </ListItem>
-                        <ListItem>
-                          <ListItemLabel>TX</ListItemLabel>
-                          <Link
-                            href={getEtherscanLink(
-                              chainId as ChainId,
-                              bidder.createdAtTransaction,
-                              'transaction'
-                            )}
-                            target="_blank"
-                          >
-                            {returnWalletAddress(bidder.createdAtTransaction)}
-                          </Link>
-                        </ListItem>
-                      </List>
-                    )
-                  )
-                : null}
+                        {returnWalletAddress(bidder.bidder)}
+                      </Link>
+                    </ListItem>
+                    <ListItem>
+                      <ListItemLabel>Timestamp</ListItemLabel>
+                      {dayjs
+                        .unix(Number(bidder.createdAt))
+                        .format('MMM D, h:mm A')}
+                    </ListItem>
+                    <ListItem>
+                      <ListItemLabel>Sell Amount</ListItemLabel>
+                      {bidder.sellAmount} {sellSymbol}
+                    </ListItem>
+                    <ListItem>
+                      <ListItemLabel>Buy Amount</ListItemLabel>
+                      {bidder.buyAmount} {buySymbol}
+                    </ListItem>
+                    <ListItem>
+                      <ListItemLabel>TX</ListItemLabel>
+                      <Link
+                        href={getEtherscanLink(
+                          chainId as ChainId,
+                          bidder.createdAtTransaction,
+                          'transaction'
+                        )}
+                        target="_blank"
+                      >
+                        {returnWalletAddress(bidder.createdAtTransaction)}
+                      </Link>
+                    </ListItem>
+                  </List>
+                ))}
             </Bidders>
 
-            {isOngoingAuction ? (
-              <BtnContainer>
-                <Button
-                  text={t('claim_flx')}
-                  withArrow
-                  onClick={() => popupsActions.setIsAuctionsModalOpen(true)}
-                />
-              </BtnContainer>
-            ) : null}
+            {returnBtn()}
           </SectionContent>
         </Content>
       )}
@@ -328,7 +380,10 @@ const Link = styled.a`
 
 const BtnContainer = styled.div`
   text-align: right;
+  padding-top: 15px;
+  margin-bottom: -5px;
   margin-top: 10px;
+  border-top: 1px solid ${(props) => props.theme.colors.border};
 `;
 
 const LeftAucInfo = styled.div`

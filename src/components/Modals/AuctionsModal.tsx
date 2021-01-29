@@ -11,14 +11,14 @@ const AuctionsModal = () => {
   } = useStoreActions((state) => state);
 
   const handleCancel = () => {
-    popupsActions.setIsAuctionsModalOpen(false);
+    popupsActions.setAuctionOperationPayload({ isOpen: false, type: '' });
     auctionsActions.setOperation(0);
     popupsActions.setReturnProxyFunction(() => {});
   };
 
   return (
     <Modal
-      isModalOpen={popupsState.isAuctionsModalOpen}
+      isModalOpen={popupsState.auctionOperationPayload.isOpen}
       handleModalContent
       backDropClose={!popupsState.blockBackdrop}
       closeModal={handleCancel}
