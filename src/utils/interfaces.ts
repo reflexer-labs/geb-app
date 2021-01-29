@@ -412,7 +412,19 @@ export interface IAuction {
   winner: string;
 }
 
+export interface UserProxy {
+  address: string;
+}
+
 export interface IPaging {
   from: number;
   to: number;
+}
+
+export interface IAuctionBid {
+  amount?: string;
+  auctionId: string;
+  title: string;
+  signer: JsonRpcSigner;
+  auctionType: 'DEBT';
 }

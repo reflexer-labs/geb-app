@@ -1,18 +1,52 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useStoreState } from '../../store';
+import { COIN_TICKER } from '../../utils/constants';
+import { formatNumber } from '../../utils/helper';
+import _ from '../../utils/lodash';
 
 const Results = () => {
+  const {
+    auctionsModel: auctionsState,
+    popupsModel: popupsState,
+  } = useStoreState((state) => state);
+
+  const { selectedAuction, amount } = auctionsState;
+  const buyInititalAmount = _.get(selectedAuction, 'buyInitialAmount', '0');
+
+  const auctionId = _.get(selectedAuction, 'auctionId', '');
+  const buyToken = _.get(selectedAuction, 'buyToken', 'COIN');
+  const sellToken = _.get(selectedAuction, 'sellToken', 'PROTOCOL_TOKEN');
+  const sellAmount = _.get(selectedAuction, 'sellAmount', '0');
+
+  const buySymbol = buyToken === 'COIN' ? COIN_TICKER : 'FLX';
+  const sellSymbol = sellToken === 'COIN' ? COIN_TICKER : 'FLX';
+
+  const isClaim = popupsState.auctionOperationPayload.type.includes('claim');
   return (
     <Result>
       <Block>
         <Item>
-          <Label>{`RAI to Bid`}</Label>
-          <Value>{`200`}</Value>
+          <Label>{`Auction #`}</Label>
+          <Value>{`${auctionId}`}</Value>
         </Item>
-        <Item>
-          <Label>{`FLX to Receive`}</Label>
-          <Value>{`200`}</Value>
-        </Item>
+        {isClaim ? (
+          <Item>
+            <Label>{`Claimable ${sellSymbol}`}</Label>
+            <Value>{`${sellAmount}`}</Value>
+          </Item>
+        ) : (
+          <>
+            <Item>
+              <Label>{`${buySymbol} to Bid`}</Label>
+              <Value>{`${formatNumber(buyInititalAmount)}`}</Value>
+            </Item>
+            <Item>
+              <Label>{`${sellSymbol} to Receive`}</Label>
+              <Value>{`${formatNumber(amount)}`}</Value>
+            </Item>
+          </>
+        )}
       </Block>
     </Result>
   );

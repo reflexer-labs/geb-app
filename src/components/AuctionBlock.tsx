@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import styled from 'styled-components';
 import { ExternalLinkArrow } from '../GlobalStyle';
-import { useStoreActions } from '../store';
+import { useStoreActions, useStoreState } from '../store';
 import { COIN_TICKER } from '../utils/constants';
 import AlertLabel from './AlertLabel';
 import Button from './Button';
@@ -18,21 +18,28 @@ type Props = IAuction & { isCollapsed: boolean };
 const AuctionBlock = (auction: Props) => {
   const { chainId, account } = useActiveWeb3React();
   const { t } = useTranslation();
-  const { popupsModel: popupsActions } = useStoreActions((state) => state);
+  const {
+    popupsModel: popupsActions,
+    auctionsModel: auctionsActions,
+  } = useStoreActions((state) => state);
+
+  const { connectWalletModel: connectWalletState } = useStoreState(
+    (state) => state
+  );
 
   const isCollapsed = _.get(auction, 'isCollapsed', false);
 
   const [collapse, setCollapse] = useState(isCollapsed);
 
   const id = _.get(auction, 'auctionId', '');
-  // const auctionType = _.get(auction, 'englishAuctionType', 'Debt');
   const icon = _.get(auction, 'englishAuctionType', 'debt');
   const buyToken = _.get(auction, 'buyToken', 'COIN');
   const sellToken = _.get(auction, 'sellToken', 'PROTOCOL_TOKEN');
-
   const buyInititalAmount = _.get(auction, 'buyInitialAmount', '0');
   const sellInititalAmount = _.get(auction, 'sellInitialAmount', '0');
   const buySymbol = buyToken === 'COIN' ? COIN_TICKER : 'FLX';
+  const sellAmount = _.get(auction, 'sellAmount', '0');
+
   const sellSymbol = sellToken === 'COIN' ? COIN_TICKER : 'FLX';
   const auctionDeadline = _.get(auction, 'auctionDeadline', '');
   const isClaimed = _.get(auction, 'isClaimed', false);
@@ -54,26 +61,50 @@ const AuctionBlock = (auction: Props) => {
     createdAtTransaction: _.get(auction, 'createdAtTransaction', ''),
   };
 
-  const returnEventType = (address: string, i: number) => {
-    if (
-      i === 0 &&
-      winner &&
-      winner.toLowerCase() === address.toLowerCase() &&
-      isClaimed
-    ) {
+  const userProxy = _.get(connectWalletState, 'proxyAddress', '');
+  const isUserCreated = _.get(connectWalletState, 'isUserCreated', false);
+
+  const returnEventType = (bidder: IAuctionBidder) => {
+    if (!isOngoingAuction && bidder.sellAmount === sellAmount && isClaimed) {
       return 'Settle';
     }
-    if (address === kickBidder.bidder.toLowerCase()) {
+    if (bidder.bidder === kickBidder.bidder) {
       return 'Start';
     }
     return 'Tend';
   };
 
+  const handleClick = (type: string) => {
+    if (!account) {
+      popupsActions.setIsConnectorsWalletOpen(true);
+      return;
+    }
+
+    if (!isUserCreated) {
+      popupsActions.setIsProxyModalOpen(true);
+      popupsActions.setReturnProxyFunction((storeActions: any) => {
+        storeActions.popupsModel.setAuctionOperationPayload({
+          isOpen: true,
+          type,
+        });
+        storeActions.auctionsModel.setSelectedAuction(auction);
+      });
+      return;
+    }
+
+    popupsActions.setAuctionOperationPayload({
+      isOpen: true,
+      type,
+    });
+    auctionsActions.setSelectedAuction(auction);
+  };
+
   const returnBtn = () => {
     if (
-      account &&
+      !isOngoingAuction &&
+      userProxy &&
       winner &&
-      account.toLowerCase() === winner.toLowerCase() &&
+      userProxy === winner.toLowerCase() &&
       !isClaimed
     ) {
       return (
@@ -81,12 +112,7 @@ const AuctionBlock = (auction: Props) => {
           <Button
             text={t('claim_flx')}
             withArrow
-            onClick={() =>
-              popupsActions.setAuctionOperationPayload({
-                isOpen: true,
-                type: 'claim_flx',
-              })
-            }
+            onClick={() => handleClick('claim_flx')}
           />
         </BtnContainer>
       );
@@ -94,22 +120,20 @@ const AuctionBlock = (auction: Props) => {
 
     if (
       (isOngoingAuction && !winner) ||
-      (isOngoingAuction &&
-        account &&
-        account.toLowerCase() !== winner.toLowerCase()) ||
-      !bidders.length
+      !bidders.length ||
+      (userProxy && winner && userProxy === winner.toLowerCase() && !isClaimed)
     ) {
       return (
         <BtnContainer>
           <Button
             text={t('rai_bid', { rai: COIN_TICKER })}
             withArrow
-            onClick={() =>
-              popupsActions.setAuctionOperationPayload({
-                isOpen: true,
-                type: 'rai_bid',
-              })
+            disabled={
+              isOngoingAuction &&
+              userProxy &&
+              userProxy === winner.toLowerCase()
             }
+            onClick={() => handleClick('rai_bid')}
           />
         </BtnContainer>
       );
@@ -176,17 +200,11 @@ const AuctionBlock = (auction: Props) => {
                 .map((bidder: IAuctionBidder, i: number) => (
                   <List
                     key={bidder.bidder + i}
-                    className={
-                      i === 0 &&
-                      winner &&
-                      winner.toLowerCase() === bidder.bidder.toLowerCase()
-                        ? 'winner'
-                        : ''
-                    }
+                    className={bidder.sellAmount === sellAmount ? 'winner' : ''}
                   >
                     <ListItem>
                       <ListItemLabel>Event Type</ListItemLabel>
-                      {returnEventType(bidder.bidder, i)}
+                      {returnEventType(bidder)}
                     </ListItem>
                     <ListItem>
                       <ListItemLabel>Bidder</ListItemLabel>

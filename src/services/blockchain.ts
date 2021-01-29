@@ -2,6 +2,7 @@ import { BigNumberish, utils as ethersUtils } from 'ethers';
 import { Geb, TransactionRequest, utils as gebUtils } from 'geb.js';
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
 import {
+  IAuctionBid,
   IIncentivesFields,
   IIncentiveWithdraw,
   ISafe,
@@ -245,6 +246,57 @@ export const handleIncentiveWithdraw = async ({
       minTokenAmounts,
       campaignAddress
     );
+  }
+
+  if (!txData) throw new Error('No transaction request!');
+  const tx = await handlePreTxGasEstimate(signer, txData);
+  const txResponse = await signer.sendTransaction(tx);
+  return txResponse;
+};
+
+export const handleAuctionBid = async ({
+  signer,
+  amount,
+  auctionId,
+  auctionType,
+}: IAuctionBid) => {
+  if (!signer || !auctionId || !amount) {
+    return false;
+  }
+
+  const geb = new Geb(ETH_NETWORK, signer.provider);
+  const proxy = await geb.getProxyAction(signer._address);
+
+  const amountBN = ethersUtils.parseEther(amount);
+
+  let txData;
+
+  if (auctionType === 'DEBT') {
+    txData = proxy.debtAuctionDecreaseSoldAmount(amountBN, auctionId);
+  }
+
+  if (!txData) throw new Error('No transaction request!');
+  const tx = await handlePreTxGasEstimate(signer, txData);
+  const txResponse = await signer.sendTransaction(tx);
+  return txResponse;
+};
+
+export const handleAuctionClaim = async ({
+  signer,
+  auctionId,
+  auctionType,
+}: IAuctionBid) => {
+  if (!signer || !auctionId || !auctionType) {
+    return false;
+  }
+
+  const geb = new Geb(ETH_NETWORK, signer.provider);
+  const proxy = await geb.getProxyAction(signer._address);
+
+  let txData;
+
+  if (auctionType === 'DEBT') {
+    txData = proxy.debtAuctionSettleAuction(auctionId);
   }
 
   if (!txData) throw new Error('No transaction request!');

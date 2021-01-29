@@ -1,4 +1,6 @@
-export const auctionsQuery = () => `{
+import { userQuery } from './user';
+
+export const auctionsQuery = (address: string) => `{
   englishAuctions (orderBy:auctionId, orderDirection: desc, where:{englishAuctionType: DEBT}){
     auctionId
     englishAuctionType
@@ -27,4 +29,14 @@ export const auctionsQuery = () => `{
       createdAtTransaction
     }
   }
+  userProxies(where: {owner: "${address}"}) {
+    address
+    coinAllowance{
+      amount
+    }
+  }
+  praiBalance:erc20Balances(where: {address: "${address}", label: "COIN"}) {
+    balance
+  }
+  ${userQuery(address)}
   }`;

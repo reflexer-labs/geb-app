@@ -2,34 +2,27 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import styled from 'styled-components';
-import _ from '../../utils/lodash';
 import { useStoreActions, useStoreState } from '../../store';
-import ApprovePRAI from '../ApprovePRAI';
 import { COIN_TICKER } from '../../utils/constants';
-import { IApprove } from '../../utils/interfaces';
+import _ from '../../utils/lodash';
+import ApprovePRAI from '../ApprovePRAI';
 import AuctionsPayment from './AuctionsPayment';
 import AuctionsTransactions from './AuctionsTransactions';
 
 const IncentivesOperations = () => {
   const { t } = useTranslation();
   const nodeRef = React.useRef(null);
+
+  const { auctionsModel: auctionsActions } = useStoreActions((state) => state);
   const {
     auctionsModel: auctionsState,
     popupsModel: popupsState,
     connectWalletModel: connectWalletState,
   } = useStoreState((state) => state);
-  const { auctionsModel: auctionsActions } = useStoreActions((state) => state);
-  const raiCoinAllowance = _.get(connectWalletState, 'coinAllowance', '0');
-  const raiAmount = _.get(auctionsState, 'auctionsData.raiAmount', '0');
 
-  const returnAllowanceType = (): IApprove => {
-    return {
-      allowance: raiCoinAllowance,
-      coinName: COIN_TICKER as string,
-      methodName: 'coin',
-      amount: raiAmount,
-    };
-  };
+  const raiCoinAllowance = _.get(connectWalletState, 'coinAllowance', '0');
+
+  const amount = _.get(auctionsState, 'amount', '0');
 
   const returnBody = () => {
     switch (auctionsState.operation) {
@@ -61,10 +54,10 @@ const IncentivesOperations = () => {
             <ApprovePRAI
               handleBackBtn={() => auctionsActions.setOperation(0)}
               handleSuccess={() => auctionsActions.setOperation(2)}
-              amount={returnAllowanceType().amount}
-              allowance={returnAllowanceType().allowance}
-              coinName={returnAllowanceType().coinName}
-              methodName={returnAllowanceType().methodName}
+              amount={amount}
+              allowance={raiCoinAllowance}
+              coinName={COIN_TICKER as string}
+              methodName={'coin'}
             />
           ) : (
             <ModalContent

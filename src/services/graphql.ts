@@ -175,12 +175,10 @@ export const fetchIncentivesCampaigns = async (
   return payload;
 };
 
-export const fetchAuctions = async () => {
-  const res = await getFirstValid(JSON.stringify({ query: auctionsQuery() }));
-
+export const fetchAuctions = async (address: string) => {
+  const res = await getFirstValid(
+    JSON.stringify({ query: auctionsQuery(address) })
+  );
   const response = res.data.data;
-
-  console.log(response);
-
   return response;
 };
