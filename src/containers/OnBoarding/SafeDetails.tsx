@@ -56,7 +56,7 @@ const SafeDetails = ({ ...props }) => {
         {safeState.singleSafe ? (
           <>
             <SafeStats />
-            <SafeHistory />
+            <SafeHistory hideHistory={!safeState.historyList.length} />
           </>
         ) : null}
       </GridContainer>
