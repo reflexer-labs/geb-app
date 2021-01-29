@@ -1,9 +1,9 @@
-import { AbstractConnector } from "@web3-react/abstract-connector";
-import { TransactionResponse } from "@ethersproject/providers";
-import { JsonRpcSigner } from "@ethersproject/providers/lib/json-rpc-provider";
-import { DefaultTheme, ThemedCssFunction } from "styled-components";
-import { ChainId } from "@uniswap/sdk";
-import { IconName } from "../components/FeatherIconWrapper";
+import { AbstractConnector } from '@web3-react/abstract-connector';
+import { TransactionResponse } from '@ethersproject/providers';
+import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
+import { DefaultTheme, ThemedCssFunction } from 'styled-components';
+import { ChainId } from '@uniswap/sdk';
+import { IconName } from '../components/FeatherIconWrapper';
 
 export interface DynamicObject {
   [key: string]: any;
