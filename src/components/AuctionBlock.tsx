@@ -34,8 +34,6 @@ const AuctionBlock = (auction: Props) => {
   const sellInititalAmount = _.get(auction, 'sellInitialAmount', '0');
   const buySymbol = buyToken === 'COIN' ? COIN_TICKER : 'FLX';
   const sellSymbol = sellToken === 'COIN' ? COIN_TICKER : 'FLX';
-  const sellAmount = _.get(auction, 'sellAmount', '0');
-  const buyAmount = _.get(auction, 'buyAmount', '0');
   const auctionDeadline = _.get(auction, 'auctionDeadline', '');
   const isClaimed = _.get(auction, 'isClaimed', false);
   const endsOn = auctionDeadline
@@ -163,44 +161,16 @@ const AuctionBlock = (auction: Props) => {
       {collapse ? null : (
         <Content>
           <SectionContent>
-            {/* <InnerContent>
-              <Col>
-                <InnerCol>
-                  <Label>AUCTION TYPE</Label>
-                  <Value>{auctionType}</Value>
-                </InnerCol>
-              </Col>
-              <Col>
-                <InnerCol>
-                  <Label>AUCTION DEADLINE</Label>
-                  <Value>{endsOn}</Value>
-                </InnerCol>
-              </Col>
-              <Col>
-                <InnerCol>
-                  <Label>{sellSymbol} OFFERED</Label>
-                  <Value>{`${sellAmount} ${sellSymbol}`}</Value>
-                </InnerCol>
-              </Col>
-              <Col>
-                <InnerCol>
-                  <Label>{buySymbol} BID</Label>
-                  <Value>{`${buyAmount} ${buySymbol}`}</Value>
-                </InnerCol>
-              </Col>
-            </InnerContent> */}
-
             <Bidders>
-              {bidders.length > 0 ? (
-                <Heads>
-                  <Head>Event Type</Head>
-                  <Head>Bidder</Head>
-                  <Head>Timestamp</Head>
-                  <Head>Sell Amount</Head>
-                  <Head>Buy Amount</Head>
-                  <Head>TX</Head>
-                </Heads>
-              ) : null}
+              <Heads>
+                <Head>Event Type</Head>
+                <Head>Bidder</Head>
+                <Head>Timestamp</Head>
+                <Head>Sell Amount</Head>
+                <Head>Buy Amount</Head>
+                <Head>TX</Head>
+              </Heads>
+
               {[...[kickBidder], ...bidders.reverse()]
                 .reverse()
                 .map((bidder: IAuctionBidder, i: number) => (
@@ -336,43 +306,6 @@ const Content = styled.div`
 const SectionContent = styled.div`
   font-size: ${(props) => props.theme.font.default};
 `;
-
-// const InnerContent = styled.div`
-//   display: flex;
-//   flex-wrap: wrap;
-//   align-items: center;
-//   margin: 0 -10px;
-// `;
-
-// const InnerCol = styled.div`
-//   border-radius: ${(props) => props.theme.global.borderRadius};
-//   border: 1px solid ${(props) => props.theme.colors.border};
-//   background: ${(props) => props.theme.colors.foreground};
-//   text-align: center;
-//   height: 100%;
-//   padding: 20px;
-// `;
-
-// const Col = styled.div`
-//   padding: 0 7.5px;
-//   flex-grow: 1;
-//   margin-bottom: 15px;
-// `;
-
-// const Label = styled.div`
-//   color: ${(props) => props.theme.colors.secondary};
-//   font-weight: bold;
-//   font-size: ${(props) => props.theme.font.small};
-//   margin-top: 15px;
-//   &:first-child {
-//     margin-top: 0;
-//   }
-// `;
-// const Value = styled.div`
-//   color: #272727;
-//   font-size: ${(props) => props.theme.font.small};
-//   margin-top: 5px;
-// `;
 
 const Link = styled.a`
   ${ExternalLinkArrow}
