@@ -19,9 +19,8 @@ const Auctions = () => {
   const handleHideFAQ = () => setHide(!hide);
 
   useEffect(() => {
-    if (!account) return;
     async function fetchIncentivesCampaigns() {
-      await auctionsActions.fetchAuctions({ address: account as string });
+      await auctionsActions.fetchAuctions({ address: account ? account : '' });
     }
     fetchIncentivesCampaigns();
     const interval = setInterval(() => {
