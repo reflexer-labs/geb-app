@@ -4,6 +4,7 @@ import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
 import { DefaultTheme, ThemedCssFunction } from 'styled-components';
 import { ChainId } from '@uniswap/sdk';
 import { IconName } from '../components/FeatherIconWrapper';
+import { Geb } from 'geb.js';
 
 export interface DynamicObject {
   [key: string]: any;
@@ -296,4 +297,14 @@ export interface ISafeQuery extends ILiquidationResponse {
       } | null;
     }
   ];
+}
+
+export interface IFetchSafesPayload {
+  address: string;
+  geb: Geb;
+  isRPCAdapterOn?: boolean;
+}
+
+export interface IFetchSafeById extends IFetchSafesPayload {
+  safeId: string;
 }

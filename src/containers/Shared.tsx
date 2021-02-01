@@ -26,6 +26,7 @@ import usePrevious from '../hooks/usePrevious';
 import { useHistory } from 'react-router-dom';
 import ImagePreloader from '../components/ImagePreloader';
 import AlertLabel from '../components/AlertLabel';
+import useGeb from '../hooks/useGeb';
 
 interface Props {
   children: ReactNode;
@@ -33,7 +34,8 @@ interface Props {
 
 const Shared = ({ children }: Props) => {
   const { t } = useTranslation();
-  const { chainId, account } = useActiveWeb3React();
+  const { chainId, account, library } = useActiveWeb3React();
+  const geb = useGeb();
   const history = useHistory();
   const previousAccount = usePrevious(account);
   const {
@@ -70,13 +72,17 @@ const Shared = ({ children }: Props) => {
   };
 
   async function accountChecker() {
-    if (!account || !chainId) return;
+    if (!account || !chainId || !library || !geb) return;
     popupsActions.setWaitingPayload({
       title: '',
       status: 'loading',
     });
     popupsActions.setIsWaitingModalOpen(true);
-    const isUserCreated = await connectWalletActions.fetchUser(account);
+    const isUserCreated = await geb.getProxyAction(account);
+
+    if (isUserCreated) {
+      connectWalletActions.setIsUserCreated(true);
+    }
     const txs = localStorage.getItem(`${account}-${chainId}`);
     if (txs) {
       transactionsActions.setTransactions(JSON.parse(txs));
@@ -84,7 +90,7 @@ const Shared = ({ children }: Props) => {
     await timeout(200);
     if (isUserCreated && !connectWalletState.ctHash) {
       connectWalletActions.setStep(2);
-      safeActions.fetchUserSafes(account);
+      await safeActions.fetchUserSafes({ address: account as string, geb });
     } else {
       safeActions.setIsSafeCreated(false);
       connectWalletActions.setStep(1);

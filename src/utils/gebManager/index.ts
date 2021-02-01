@@ -91,6 +91,7 @@ const getUserSafesRpc = async (
   config: UserListConfig
 ): Promise<IUserSafeList> => {
   const { geb, address } = config;
+
   const multiCallRequest = geb.multiCall([
     geb.contracts.coin.balanceOf(address, true), // 0
     geb.contracts.proxyRegistry.proxies(address, true), // 1
@@ -115,6 +116,7 @@ const getUserSafesRpc = async (
   const collateralAndDebt = await geb.multiCall(collateralAndDebtRequest); //RMV
 
   let safe: ISafeResponse[] = [];
+
   for (let i = 0; i < collateralAndDebt.length; i++) {
     safe.push({
       collateral: parseWad(collateralAndDebt[i].lockedCollateral),

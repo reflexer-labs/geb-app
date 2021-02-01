@@ -14,6 +14,7 @@ import ConnectedWalletIcon from './ConnectedWalletIcon';
 import { SUPPORTED_WALLETS } from '../utils/constants';
 import Transaction from './Transaction';
 import { isTransactionRecent } from '../hooks/TransactionHooks';
+import SwitchButton from './SwitchButton';
 
 const ConnectedWalletInfo = () => {
   const { t } = useTranslation();
@@ -23,14 +24,16 @@ const ConnectedWalletInfo = () => {
 
   const [copied, setCopied] = useState(false);
 
-  const { transactionsModel: transactionsState } = useStoreState(
-    (state) => state
-  );
+  const {
+    transactionsModel: transactionsState,
+    settingsModel: settingsState,
+  } = useStoreState((state) => state);
 
   const {
     popupsModel: popupsActions,
     connectWalletModel: connectWalletActions,
     transactionsModel: transactionsActions,
+    settingsModel: settingsActions,
   } = useStoreActions((state) => state);
 
   const handleChange = () => {
@@ -83,6 +86,9 @@ const ConnectedWalletInfo = () => {
     localStorage.removeItem(`${account}-${chainId}`);
   };
 
+  const toggleRPC = () =>
+    settingsActions.setIsRPCAdapterOn(!settingsState.isRPCAdapterOn);
+
   return (
     <>
       <DataContainer>
@@ -126,6 +132,13 @@ const ConnectedWalletInfo = () => {
             ) : null}
           </WalletData>
         ) : null}
+        <SwitchContainer>
+          {t('toggle_rpc')}
+          <SwitchButton
+            state={settingsState.isRPCAdapterOn}
+            getState={toggleRPC}
+          />
+        </SwitchContainer>
       </DataContainer>
       <TransactionsContainer>
         {!!pendingTransactions.length || !!confirmedTransactions.length ? (
@@ -262,4 +275,12 @@ const Heading = styled.div`
       display: none;
     }
   }
+`;
+
+const SwitchContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 30px;
+  font-size: ${(props) => props.theme.font.small};
 `;
