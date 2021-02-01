@@ -140,3 +140,6 @@ export const jdenticonConfig = {
   },
   backColor: '#50ccd5',
 };
+
+export const network_name =
+  process.env.REACT_APP_NETWORK_ID === '1' ? 'mainnet' : 'kovan';

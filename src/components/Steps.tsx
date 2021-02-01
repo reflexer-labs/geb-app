@@ -4,14 +4,14 @@ import ReactTooltip from 'react-tooltip';
 import { useStoreActions, useStoreState } from '../store';
 import StepsContent from './StepsContent';
 import { useActiveWeb3React } from '../hooks';
-import { geb } from '../connectors';
 import {
   handleTransactionError,
   useTransactionAdder,
 } from '../hooks/TransactionHooks';
 import { timeout } from '../utils/helper';
 import { useTranslation } from 'react-i18next';
-import { COIN_TICKER } from '../utils/constants';
+import { COIN_TICKER, network_name } from '../utils/constants';
+import { Geb } from 'geb.js';
 
 const Steps = () => {
   const { t } = useTranslation();
@@ -84,6 +84,7 @@ const Steps = () => {
 
   const handleCreateAccount = async () => {
     if (!account || !library || !chainId) return false;
+    const geb = new Geb(network_name, library);
     const txData = geb.deployProxy();
     const signer = library.getSigner(account);
 

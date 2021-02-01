@@ -25,11 +25,11 @@ const SafeList = () => {
       await safeActions.fetchUserSafes(account as string);
     }
     fetchSafe();
-    // const interval = setInterval(() => {
-    //   fetchSafe();
-    // }, 5000);
+    const interval = setInterval(() => {
+      fetchSafe();
+    }, 2000);
 
-    // return () => clearInterval(interval);
+    return () => clearInterval(interval);
   }, [account, safeActions, isUserCreated]);
 
   const setPagination = (safes: Array<ISafe>) => {
