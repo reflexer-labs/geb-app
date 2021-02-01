@@ -1,15 +1,14 @@
-import { BigNumber } from "ethers";
-import { utils } from "geb.js";
-import { geb } from "../../connectors";
+import { BigNumber } from 'ethers';
+import { Geb, utils } from 'geb.js';
 import {
   ILiquidationResponse,
   ISafeQuery,
   ISafeResponse,
   IUserSafeList,
-} from "../interfaces";
-import { userSafesMockedResponse, userSingleSafeMockedResponse } from "./mocks";
+} from '../interfaces';
 
 interface UserListConfig {
+  geb: Geb;
   address: string;
   proxy_not?: null;
   safeId_not?: null;
@@ -19,10 +18,11 @@ type SingleSafeConfig = UserListConfig & { safeId: string };
 
 // returns LiquidationData
 const getLiquidationDataRpc = async (
-  collateralTypeId = "ETH-A",
-  systemStateTypeId = "current"
+  geb: Geb,
+  collateralTypeId = 'ETH-A',
+  systemStateTypeId = 'current'
 ): Promise<ILiquidationResponse> => {
-  if (collateralTypeId !== "ETH-A") {
+  if (collateralTypeId !== 'ETH-A') {
     throw Error(`Collateral ${collateralTypeId} not supported`);
   }
 
@@ -90,15 +90,16 @@ const getLiquidationDataRpc = async (
 const getUserSafesRpc = async (
   config: UserListConfig
 ): Promise<IUserSafeList> => {
+  const { geb, address } = config;
   const multiCallRequest = geb.multiCall([
-    geb.contracts.coin.balanceOf(config.address, true), // 0
-    geb.contracts.proxyRegistry.proxies(config.address, true), // 1
+    geb.contracts.coin.balanceOf(address, true), // 0
+    geb.contracts.proxyRegistry.proxies(address, true), // 1
   ]);
 
   // Fetch the liq data and the a multicall in parallel
   const [multiCall, liquidationDataRpc] = await Promise.all([
     multiCallRequest,
-    getLiquidationDataRpc(),
+    getLiquidationDataRpc(geb),
   ]);
 
   const safeDetails = await geb.contracts.getSafes.getSafesAsc(
@@ -139,16 +140,17 @@ const getUserSafesRpc = async (
 const getSafeByIdRpc = async (
   config: SingleSafeConfig
 ): Promise<ISafeQuery> => {
+  const { geb, address, safeId } = config;
   const multiCall1Request = geb.multiCall([
-    geb.contracts.safeManager.safes(config.safeId, true), // 0
-    geb.contracts.coin.balanceOf(config.address, true), // 1
-    geb.contracts.proxyRegistry.proxies(config.address, true), // 2
+    geb.contracts.safeManager.safes(safeId, true), // 0
+    geb.contracts.coin.balanceOf(address, true), // 1
+    geb.contracts.proxyRegistry.proxies(address, true), // 2
   ]);
 
   // Fetch the liq data and the a multicall in parallel
   const [multiCall1, liquidationDataRpc] = await Promise.all([
     multiCall1Request,
-    getLiquidationDataRpc(),
+    getLiquidationDataRpc(geb),
   ]);
 
   const safeHandler = multiCall1[0];

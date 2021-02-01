@@ -34,12 +34,14 @@ export const fetchUserSafes = (address: string) => {
         JSON.stringify({ query: getUserSafesListQuery(address) })
       );
 
+      const response = res.data.data;
+
       // Retry if returned data is empty
-      if (!res.data.data && attempt < GRAPH_API_URLS.length) {
+      if (!response && attempt < GRAPH_API_URLS.length) {
         throw new Error('retry');
       }
 
-      const safesResponse: IUserSafeList = res.data.data;
+      const safesResponse: IUserSafeList = response;
 
       const liquidationData = {
         ...safesResponse.collateralType,
@@ -96,9 +98,14 @@ export const fetchSafeById = (safeId: string, address: string) => {
       };
 
       const safe = formatUserSafe(res.data.data.safes, liquidationData);
+
+      const modifySAFECollateralization =
+        safeResponse.safes[0].modifySAFECollateralization ?? [];
+      const liquidationFixedDiscount =
+        safeResponse.safes[0].liquidationFixedDiscount ?? [];
       const safeHistory = formatHistoryArray(
-        safeResponse.safes[0].modifySAFECollateralization,
-        safeResponse.safes[0].liquidationFixedDiscount
+        modifySAFECollateralization,
+        liquidationFixedDiscount
       );
 
       const proxyData =
