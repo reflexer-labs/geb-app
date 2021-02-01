@@ -110,7 +110,7 @@
   "fullyUnlocked": "You can claim all your FLX rewards right after you earn them.",
   "proxy_wallet_text": "Your wallet is connected! Now, let's create your Reflexer Account",
   "auctions": "Auctions",
-  "auctions_header_text": "Dashboard to bid in collateral, debt and surplus auctions",
+  "auctions_header_text": "Dashboard to bid in debt auctions.",
   "claim_tokens": "Claim Tokens",
   "claim_flx": "Claim FLX",
   "hide_faq": "Hide FAQ",

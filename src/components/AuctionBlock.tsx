@@ -128,7 +128,7 @@ const AuctionBlock = (auction: Props) => {
       return (
         <BtnContainer>
           <Button
-            text={t('rai_bid', { rai: COIN_TICKER })}
+            text={'Bid'}
             withArrow
             disabled={
               auctionsState.isSubmitting ||
@@ -142,6 +142,30 @@ const AuctionBlock = (auction: Props) => {
       );
     }
     return null;
+  };
+
+  const returnLabel = () => {
+    if (isOngoingAuction) {
+      return {
+        text: 'Auction is Ongoing',
+        label: 'warning',
+      };
+    } else if (isClaimed && winner) {
+      return {
+        text: 'Auction Completed',
+        label: 'success',
+      };
+    } else if (!isClaimed && !winner) {
+      return {
+        text: 'Auction can be dealt',
+        label: 'dimmed',
+      };
+    } else {
+      return {
+        text: 'Auction Won',
+        label: 'greenish',
+      };
+    }
   };
 
   return (
@@ -176,12 +200,7 @@ const AuctionBlock = (auction: Props) => {
           </InfoContainer>
 
           <AlertContainer>
-            <AlertLabel
-              text={
-                isOngoingAuction ? 'Auction is Ongoing' : 'Auction Completed'
-              }
-              type={isOngoingAuction ? 'warning' : 'success'}
-            />
+            <AlertLabel text={returnLabel().text} type={returnLabel().label} />
           </AlertContainer>
         </RightAucInfo>
       </Header>

@@ -60,6 +60,12 @@ const Container = styled.div`
     color: ${(props) => props.theme.colors.neutral};
   }
 
+  &.greenish {
+    border: 1px solid ${(props) => props.theme.colors.inputBorderColor};
+    background: #6dbab5;
+    color: ${(props) => props.theme.colors.neutral};
+  }
+
   &.floated {
     position: fixed;
     width: 100%;

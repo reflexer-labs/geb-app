@@ -35,6 +35,7 @@ const AuctionsPayment = () => {
 
   const auctionType = _.get(selectedAuction, 'englishAuctionType', 'DEBT');
   const buyInititalAmount = _.get(selectedAuction, 'buyInitialAmount', '0');
+  const bids = _.get(selectedAuction, 'englishAuctionBids', '[]');
   const buyAmount = _.get(selectedAuction, 'buyAmount', '0');
   const sellAmount = _.get(selectedAuction, 'sellAmount', '0');
   const sellInititalAmount = _.get(selectedAuction, 'sellInitialAmount', '0');
@@ -96,7 +97,7 @@ const AuctionsPayment = () => {
       const leastAmount = sellAmountBN.sub(decreasedAmount);
 
       if (
-        sellAmountBN.sub(decreasedAmount).gt(valueBN) ||
+        (bids.length > 0 && sellAmountBN.sub(decreasedAmount).gt(valueBN)) ||
         valueBN.gte(sellAmountBN)
       ) {
         setError(
