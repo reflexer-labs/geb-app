@@ -4,7 +4,7 @@ import store from '../store';
 import { getSafeByIdQuery, getUserSafesListQuery } from '../utils/queries/safe';
 import { GRAPH_API_URLS } from '../utils/constants';
 import { formatUserSafe, formatHistoryArray } from '../utils/helper';
-import { getUserQuery } from '../utils/queries/user';
+import { getSubgraphBlock, getUserQuery } from '../utils/queries/user';
 import {
   IFetchSafeById,
   IFetchSafesPayload,
@@ -24,6 +24,34 @@ export const request = async (query: string, index = 0): Promise<any> => {
     console.log('Both nodes are down');
     store.dispatch.settingsModel.setIsRPCAdapterOn(true);
     return false;
+  }
+};
+
+export const checkSubgraphBlockDiff = async (latesBlockNumber: number) => {
+  try {
+    const res = await request(
+      JSON.stringify({ query: getSubgraphBlock(latesBlockNumber) })
+    );
+    if (
+      res.data.errors &&
+      res.data.errors.length > 0 &&
+      res.data.errors[0].message
+    ) {
+      const errorMessage = res.data.errors[0].message;
+      const block = Number(
+        errorMessage.match(/indexed up to block number ([0-9]*)/)[1]
+      );
+      const blocksSinceCheck = latesBlockNumber - block;
+      if (blocksSinceCheck >= 6) {
+        store.dispatch.settingsModel.setIsRPCAdapterOn(true);
+        console.log(
+          'subgraph is way behind, setting connection to RPC Adapter, Block difference is',
+          blocksSinceCheck
+        );
+      }
+    }
+  } catch (error) {
+    throw Error('Error with subgraph query: ' + error);
   }
 };
 

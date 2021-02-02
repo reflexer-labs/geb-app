@@ -3,6 +3,12 @@ export const userQuery = (address: string) =>
   id
 }
 `;
+
+export const getSubgraphBlock = (blockNunber: number) => `{
+  systemStates(block: {number: ${blockNunber}}) {
+    id
+  }
+}`;
 export const getUserQuery = (address: string) => `{
   ${userQuery(address)}
  }`;

@@ -17,6 +17,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useActiveWeb3React } from '../hooks';
 import useDebounce from '../hooks/useDebounce';
 import store from '../store';
+import { checkSubgraphBlockDiff } from './graphql';
 
 export default function ApplicationUpdater(): null {
   const { library, chainId } = useActiveWeb3React();
@@ -30,6 +31,9 @@ export default function ApplicationUpdater(): null {
 
   const blockNumberCallback = useCallback(
     (blockNumber: number) => {
+      if (blockNumber) {
+        checkSubgraphBlockDiff(blockNumber);
+      }
       setState((state) => {
         if (chainId === state.chainId) {
           if (typeof state.blockNumber !== 'number')
