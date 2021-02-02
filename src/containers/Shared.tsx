@@ -51,6 +51,7 @@ const Shared = ({ children }: Props) => {
     safeModel: safeActions,
   } = useStoreActions((state) => state);
   const toastId = 'networdToastHash';
+  const successAccountConnection = 'successAccountConnection';
 
   const resetModals = () => {
     popupsActions.setIsConnectedWalletModalOpen(false);
@@ -146,6 +147,7 @@ const Shared = ({ children }: Props) => {
           />,
           {
             type: 'success',
+            toastId: successAccountConnection,
           }
         );
         connectWalletActions.setStep(1);
@@ -157,6 +159,7 @@ const Shared = ({ children }: Props) => {
   const networkCheckerCallBack = useCallback(networkChecker, [
     account,
     chainId,
+    geb,
   ]);
 
   useEffect(() => {

@@ -39,6 +39,7 @@ const SafeDetails = ({ ...props }) => {
         safeId,
         address: account as string,
         geb,
+        isRPCAdapterOn,
       });
       popupsActions.setIsWaitingModalOpen(false);
     }

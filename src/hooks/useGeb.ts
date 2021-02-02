@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import { Geb } from 'geb.js';
 import { useEffect, useState } from 'react';
 import { useActiveWeb3React } from '.';
@@ -9,10 +8,8 @@ export default function useGeb(): Geb {
   const [state, setState] = useState<Geb>();
 
   useEffect(() => {
-    const ethersProvider = new ethers.providers.JsonRpcProvider(
-      process.env.REACT_APP_NETWORK_URL
-    );
-    const provider = library ? library.getSigner().provider : ethersProvider;
+    if (!library) return;
+    const provider = library.getSigner().provider;
     const geb = new Geb(network_name, provider);
     setState(geb);
   }, [library]);
