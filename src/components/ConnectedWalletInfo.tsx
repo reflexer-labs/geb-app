@@ -25,6 +25,7 @@ const ConnectedWalletInfo = () => {
   const { active, account, connector, chainId } = useWeb3React();
 
   const [copied, setCopied] = useState(false);
+  const isMetaMask = !!(ethereum && ethereum.isMetaMask);
 
   const {
     transactionsModel: transactionsState,
@@ -52,7 +53,6 @@ const ConnectedWalletInfo = () => {
   };
 
   const formatConnectorName = () => {
-    const isMetaMask = !!(ethereum && ethereum.isMetaMask);
     const name = Object.keys(SUPPORTED_WALLETS)
       .filter(
         (k) =>
@@ -95,9 +95,12 @@ const ConnectedWalletInfo = () => {
   };
 
   const handleSelectedConnection = (selected: string) => {
-    settingsActions.setIsRPCAdapterOn(selected === connections[1]);
-    localStorage.setItem('blockchain_connection', selected);
+    if (connector === injected) {
+      settingsActions.setIsRPCAdapterOn(selected === connections[1]);
+      localStorage.setItem('blockchain_connection', selected);
+    }
   };
+
   return (
     <>
       <DataContainer>

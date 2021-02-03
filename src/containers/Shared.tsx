@@ -15,7 +15,7 @@ import { ETHERSCAN_PREFIXES, SYSTEM_STATUS } from '../utils/constants';
 import { useActiveWeb3React } from '../hooks';
 import LoadingModal from '../components/Modals/LoadingModal';
 import styled from 'styled-components';
-import { NETWORK_ID } from '../connectors';
+import { injected, NETWORK_ID } from '../connectors';
 import CookieBanner from '../components/CookieBanner';
 import BlockBodyContainer from '../components/BlockBodyContainer';
 import { toast } from 'react-toastify';
@@ -34,7 +34,7 @@ interface Props {
 
 const Shared = ({ children }: Props) => {
   const { t } = useTranslation();
-  const { chainId, account, library } = useActiveWeb3React();
+  const { chainId, account, library, connector } = useActiveWeb3React();
   const geb = useGeb();
   const history = useHistory();
   const previousAccount = usePrevious(account);
@@ -165,6 +165,13 @@ const Shared = ({ children }: Props) => {
   useEffect(() => {
     networkCheckerCallBack();
   }, [networkCheckerCallBack]);
+
+  // set rpc adapter off if connector isn't injected
+  useEffect(() => {
+    if (connector && connector !== injected) {
+      settingsActions.setIsRPCAdapterOn(false);
+    }
+  }, [connector, settingsActions]);
 
   return (
     <Container>
