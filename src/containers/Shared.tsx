@@ -15,7 +15,7 @@ import { ETHERSCAN_PREFIXES, SYSTEM_STATUS } from '../utils/constants';
 import { useActiveWeb3React } from '../hooks';
 import LoadingModal from '../components/Modals/LoadingModal';
 import styled from 'styled-components';
-import { NETWORK_ID } from '../connectors';
+import { injected, NETWORK_ID } from '../connectors';
 import CookieBanner from '../components/CookieBanner';
 import BlockBodyContainer from '../components/BlockBodyContainer';
 import { toast } from 'react-toastify';
@@ -26,6 +26,7 @@ import usePrevious from '../hooks/usePrevious';
 import { useHistory } from 'react-router-dom';
 import ImagePreloader from '../components/ImagePreloader';
 import AlertLabel from '../components/AlertLabel';
+import useGeb from '../hooks/useGeb';
 
 interface Props {
   children: ReactNode;
@@ -33,7 +34,8 @@ interface Props {
 
 const Shared = ({ children }: Props) => {
   const { t } = useTranslation();
-  const { chainId, account } = useActiveWeb3React();
+  const { chainId, account, library, connector } = useActiveWeb3React();
+  const geb = useGeb();
   const history = useHistory();
   const previousAccount = usePrevious(account);
   const {
@@ -49,6 +51,7 @@ const Shared = ({ children }: Props) => {
     safeModel: safeActions,
   } = useStoreActions((state) => state);
   const toastId = 'networdToastHash';
+  const successAccountConnection = 'successAccountConnection';
 
   const resetModals = () => {
     popupsActions.setIsConnectedWalletModalOpen(false);
@@ -70,13 +73,17 @@ const Shared = ({ children }: Props) => {
   };
 
   async function accountChecker() {
-    if (!account || !chainId) return;
+    if (!account || !chainId || !library || !geb) return;
     popupsActions.setWaitingPayload({
       title: '',
       status: 'loading',
     });
     popupsActions.setIsWaitingModalOpen(true);
-    const isUserCreated = await connectWalletActions.fetchUser(account);
+    const isUserCreated = await geb.getProxyAction(account);
+
+    if (isUserCreated) {
+      connectWalletActions.setIsUserCreated(true);
+    }
     const txs = localStorage.getItem(`${account}-${chainId}`);
     if (txs) {
       transactionsActions.setTransactions(JSON.parse(txs));
@@ -84,7 +91,7 @@ const Shared = ({ children }: Props) => {
     await timeout(200);
     if (isUserCreated && !connectWalletState.ctHash) {
       connectWalletActions.setStep(2);
-      safeActions.fetchUserSafes(account);
+      await safeActions.fetchUserSafes({ address: account as string, geb });
     } else {
       safeActions.setIsSafeCreated(false);
       connectWalletActions.setStep(1);
@@ -140,6 +147,7 @@ const Shared = ({ children }: Props) => {
           />,
           {
             type: 'success',
+            toastId: successAccountConnection,
           }
         );
         connectWalletActions.setStep(1);
@@ -151,11 +159,19 @@ const Shared = ({ children }: Props) => {
   const networkCheckerCallBack = useCallback(networkChecker, [
     account,
     chainId,
+    geb,
   ]);
 
   useEffect(() => {
     networkCheckerCallBack();
   }, [networkCheckerCallBack]);
+
+  // set rpc adapter off if connector isn't injected
+  useEffect(() => {
+    if (connector && connector !== injected) {
+      settingsActions.setIsRPCAdapterOn(false);
+    }
+  }, [connector, settingsActions]);
 
   return (
     <Container>

@@ -4,7 +4,6 @@ import ReactTooltip from 'react-tooltip';
 import { useStoreActions, useStoreState } from '../store';
 import StepsContent from './StepsContent';
 import { useActiveWeb3React } from '../hooks';
-import { geb } from '../connectors';
 import {
   handleTransactionError,
   useTransactionAdder,
@@ -12,10 +11,12 @@ import {
 import { timeout } from '../utils/helper';
 import { useTranslation } from 'react-i18next';
 import { COIN_TICKER } from '../utils/constants';
+import useGeb from '../hooks/useGeb';
 
 const Steps = () => {
   const { t } = useTranslation();
   const { account, library, chainId } = useActiveWeb3React();
+  const geb = useGeb();
   const [blocksSinceCheck, setBlocksSinceCheck] = useState<number>();
   const {
     connectWalletModel: connectWalletState,
@@ -43,6 +44,7 @@ const Steps = () => {
     if (
       !account ||
       !chainId ||
+      !library ||
       !blockNumber[chainId] ||
       !ctHash ||
       !transactions[ctHash] ||
@@ -58,7 +60,7 @@ const Steps = () => {
     setBlocksSinceCheck(diff >= 10 ? 10 : diff);
     if (diff > 10) {
       await timeout(1000);
-      safeActions.fetchUserSafes(account as string);
+      safeActions.fetchUserSafes({ address: account as string, geb });
       await timeout(2000);
       connectWalletActions.setIsUserCreated(true);
       connectWalletActions.setIsStepLoading(false);

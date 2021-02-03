@@ -7,6 +7,8 @@ import {
   ILiquidationData,
   ISafe,
   ISafeHistory,
+  IFetchSafesPayload,
+  IFetchSafeById,
 } from '../utils/interfaces';
 import {
   handleCollectETH,
@@ -46,13 +48,8 @@ export interface SafeModel {
     any,
     StoreModel
   >;
-  fetchSafeById: Thunk<
-    SafeModel,
-    { safeId: string; account: string },
-    any,
-    StoreModel
-  >;
-  fetchUserSafes: Thunk<SafeModel, string, any, StoreModel>;
+  fetchSafeById: Thunk<SafeModel, IFetchSafeById, any, StoreModel>;
+  fetchUserSafes: Thunk<SafeModel, IFetchSafesPayload, any, StoreModel>;
   collectETH: Thunk<
     SafeModel,
     { signer: JsonRpcSigner; safe: ISafe },
@@ -203,54 +200,57 @@ const safeModel: SafeModel = {
   }),
   fetchUserSafes: thunk(async (actions, payload, { getStoreActions }) => {
     const storeActions = getStoreActions();
-    const fetched = await fetchUserSafes(payload.toLowerCase());
-    actions.setList(fetched.userSafes);
-    if (fetched.userSafes.length > 0) {
-      actions.setIsSafeCreated(true);
-      storeActions.connectWalletModel.setStep(2);
-    } else {
-      storeActions.popupsModel.setWaitingPayload({
-        title: 'Fetching user safes',
-        status: 'loading',
-      });
-      actions.setIsSafeCreated(false);
+    const fetched = await fetchUserSafes(payload);
+    if (fetched) {
+      actions.setList(fetched.userSafes);
+      if (fetched.userSafes.length > 0) {
+        actions.setIsSafeCreated(true);
+        storeActions.connectWalletModel.setStep(2);
+      } else {
+        storeActions.popupsModel.setWaitingPayload({
+          title: 'Fetching user safes',
+          status: 'loading',
+        });
+        actions.setIsSafeCreated(false);
+      }
+      actions.setLiquidationData(fetched.liquidationData);
+      const chainId = NETWORK_ID;
+      if (fetched.availablePRAI && chainId) {
+        storeActions.connectWalletModel.updatePraiBalance({
+          chainId,
+          balance: numeral(fetched.availablePRAI).value(),
+        });
+      }
+      await timeout(200);
+      return fetched;
     }
-    actions.setLiquidationData(fetched.liquidationData);
-    const chainId = NETWORK_ID;
-    if (fetched.availablePRAI && chainId) {
-      storeActions.connectWalletModel.updatePraiBalance({
-        chainId,
-        balance: numeral(fetched.availablePRAI).value(),
-      });
-    }
-    await timeout(200);
-    return fetched;
   }),
 
   fetchSafeById: thunk(async (actions, payload, { getStoreActions }) => {
     const storeActions = getStoreActions();
-    const res = await fetchSafeById(
-      payload.safeId,
-      payload.account.toLowerCase()
-    );
-    actions.setSingleSafe(res.safe[0]);
-    if (res.safeHistory.length > 0) {
-      actions.setSafeHistoryList(res.safeHistory);
-    }
-    actions.setLiquidationData(res.liquidationData);
-    storeActions.connectWalletModel.updatePraiBalance({
-      chainId: NETWORK_ID,
-      balance: numeral(res.erc20Balance).value(),
-    });
-    if (res.proxyData) {
-      const { address, coinAllowance } = res.proxyData;
-      if (address) {
-        storeActions.connectWalletModel.setProxyAddress(address);
+    const res = await fetchSafeById(payload);
+    if (res) {
+      actions.setSingleSafe(res.safe[0]);
+      if (res.safeHistory.length > 0) {
+        actions.setSafeHistoryList(res.safeHistory);
       }
-      if (coinAllowance) {
-        storeActions.connectWalletModel.setCoinAllowance(coinAllowance.amount);
-      } else {
-        storeActions.connectWalletModel.setCoinAllowance('');
+      actions.setLiquidationData(res.liquidationData);
+      storeActions.connectWalletModel.updatePraiBalance({
+        chainId: NETWORK_ID,
+        balance: numeral(res.erc20Balance).value(),
+      });
+      if (res.proxyData) {
+        const { address, coinAllowance } = res.proxyData;
+        if (address) {
+          storeActions.connectWalletModel.setProxyAddress(address);
+        }
+        if (coinAllowance) {
+          storeActions.connectWalletModel.setCoinAllowance(
+            coinAllowance.amount
+          );
+        } else {
+          storeActions.connectWalletModel.setCoinAllowance('');
+        }
       }
     }
   }),
