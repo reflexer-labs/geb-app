@@ -16,11 +16,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useActiveWeb3React } from '../hooks';
 import useDebounce from '../hooks/useDebounce';
-import store from '../store';
+import store, { useStoreState } from '../store';
 import { checkSubgraphBlockDiff } from './graphql';
 
 export default function ApplicationUpdater(): null {
   const { library, chainId } = useActiveWeb3React();
+  const { settingsModel: settingsState } = useStoreState((state) => state);
+  const { isRPCAdapterOn } = settingsState;
   const [state, setState] = useState<{
     chainId: number | undefined;
     blockNumber: number | null;
@@ -31,7 +33,7 @@ export default function ApplicationUpdater(): null {
 
   const blockNumberCallback = useCallback(
     (blockNumber: number) => {
-      if (blockNumber) {
+      if (blockNumber && !isRPCAdapterOn) {
         checkSubgraphBlockDiff(blockNumber);
       }
       setState((state) => {
@@ -46,7 +48,7 @@ export default function ApplicationUpdater(): null {
         return state;
       });
     },
-    [chainId, setState]
+    [chainId, setState, isRPCAdapterOn]
   );
 
   // attach/detach listeners
