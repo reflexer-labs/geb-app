@@ -5,6 +5,7 @@ import { DefaultTheme, ThemedCssFunction } from 'styled-components';
 import { ChainId } from '@uniswap/sdk';
 import { IconName } from '../components/FeatherIconWrapper';
 import { ApproveMethod } from '../components/ApprovePRAI';
+import { Geb } from 'geb.js';
 
 export interface DynamicObject {
   [key: string]: any;
@@ -379,4 +380,94 @@ export interface IApprove {
   coinName: string;
   methodName: ApproveMethod;
   amount: string;
+}
+export interface ISafeResponse {
+  collateral: string;
+  createdAt: string | null; // Will be null in RPC mode;
+  debt: string;
+  safeHandler: string;
+  safeId: string;
+}
+
+// query responses for the safes
+export interface ILiquidationResponse {
+  collateralType: {
+    accumulatedRate: string;
+    currentPrice: {
+      liquidationPrice: string;
+      safetyPrice: string;
+      value: string;
+    };
+    debtCeiling: string;
+    debtFloor: string;
+    liquidationCRatio: string;
+    liquidationPenalty: string;
+    safetyCRatio: string;
+    totalAnnualizedStabilityFee: string;
+  };
+  systemState: {
+    currentRedemptionPrice: {
+      value: string;
+    };
+    currentRedemptionRate: {
+      eightHourlyRate: string;
+    };
+    globalDebt: string;
+    globalDebtCeiling: string;
+    perSafeDebtCeiling: string;
+  };
+}
+
+export interface IUserSafeList extends ILiquidationResponse {
+  erc20Balances: Array<{ balance: string }>;
+  safes: Array<ISafeResponse>;
+}
+
+export interface IModifySAFECollateralization {
+  deltaDebt: string;
+  deltaCollateral: string;
+  createdAt: string;
+  createdAtTransaction: string;
+  accumulatedRate: string;
+}
+
+export interface ILiquidationFixedDiscount {
+  sellInitialAmount: string;
+  sellAmount: string;
+  createdAt: string;
+  createdAtTransaction: string;
+}
+
+export interface ISingleSafe {
+  safeId: string;
+  collateral: string;
+  createdAt: string | null; // Will be null in RPC mode
+  debt: string;
+  internalCollateralBalance: {
+    balance: string;
+  };
+  modifySAFECollateralization: Array<IModifySAFECollateralization> | null; // Will be null over RPC;
+  liquidationFixedDiscount: Array<ILiquidationFixedDiscount> | null; // Will be null over RPC
+}
+export interface ISafeQuery extends ILiquidationResponse {
+  erc20Balances: Array<{ balance: string }>;
+  safes: Array<ISingleSafe>;
+  userProxies: [
+    {
+      address: string;
+      coinAllowance: {
+        amount: string;
+      } | null;
+    }
+  ];
+}
+
+export interface IFetchSafesPayload {
+  address: string;
+  geb: Geb;
+  isRPCAdapterOn?: boolean;
+}
+
+export interface IFetchSafeById extends IFetchSafesPayload {
+  safeId: string;
 }

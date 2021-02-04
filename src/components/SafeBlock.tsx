@@ -13,7 +13,9 @@ const SafeBlock = ({ ...props }) => {
 
   const collateral = formatNumber(props.collateral);
   const totalDebt = formatNumber(props.totalDebt);
-  const createdAt = dayjs.unix(props.date).format('MMM D, YYYY h:mm A');
+  const createdAt = props.date
+    ? dayjs.unix(props.date).format('MMM D, YYYY h:mm A')
+    : null;
 
   function createImage() {
     return { __html: toSvg(props.safeHandler + props.id, 40, jdenticonConfig) };
@@ -39,9 +41,11 @@ const SafeBlock = ({ ...props }) => {
             {<div dangerouslySetInnerHTML={createImage()} />}
             <SafeData>
               <SafeTitle>{`Safe #${props.id}`}</SafeTitle>
-              <Date>
-                {t('created')} {createdAt}
-              </Date>
+              {createdAt ? (
+                <Date>
+                  {t('created')} {createdAt}
+                </Date>
+              ) : null}
             </SafeData>
           </SafeInfo>
 

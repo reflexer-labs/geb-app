@@ -139,13 +139,13 @@ const SafeBody = ({ isChecked }: Props) => {
   };
   const returnInputType = (isLeft = true) => {
     if (type === 'deposit_borrow' && isLeft) {
-      return `Deposit ETH (Avail ${getAvailableEth()})`;
+      return `Deposit ETH (Available ${getAvailableEth()})`;
     }
     if (type === 'deposit_borrow' && !isLeft) {
-      return `Borrow ${COIN_TICKER} (Avail ${getAvailableRai()})`;
+      return `Borrow ${COIN_TICKER} (Available ${getAvailableRai()})`;
     }
     if (type === 'repay_withdraw' && isLeft) {
-      return `Withdraw ETH (Avail ${getAvailableEth()})`;
+      return `Withdraw ETH (Available ${getAvailableEth()})`;
     }
     if (type === 'repay_withdraw' && singleSafe && !isLeft) {
       return `Repay ${COIN_TICKER} (Owe: ${formatNumber(
@@ -464,12 +464,12 @@ const SafeBody = ({ isChecked }: Props) => {
         {isChecked ? (
           <DoubleInput>
             <DecimalInput
-              label={'ETH on Uniswap (Avail 0.00)'}
+              label={'ETH on Uniswap (Available 0.00)'}
               value={uniSwapVal ? uniSwapVal.leftInput : ''}
               onChange={() => {}}
             />
             <DecimalInput
-              label={`${COIN_TICKER} on Uniswap (Avail ${getAvailableRai()})`}
+              label={`${COIN_TICKER} on Uniswap (Available ${getAvailableRai()})`}
               value={uniSwapVal ? uniSwapVal.rightInput : ''}
               onChange={() => {}}
               disableMax

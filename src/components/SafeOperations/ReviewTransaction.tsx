@@ -9,9 +9,11 @@ import { DEFAULT_SAFE_STATE, COIN_TICKER } from '../../utils/constants';
 import { useActiveWeb3React } from '../../hooks';
 import { handleTransactionError } from '../../hooks/TransactionHooks';
 import { formatNumber, returnConnectorName } from '../../utils/helper';
+import useGeb from '../../hooks/useGeb';
 
 const ReviewTransaction = () => {
   const { account, connector, library } = useActiveWeb3React();
+  const geb = useGeb();
   const { t } = useTranslation();
 
   const {
@@ -91,7 +93,7 @@ const ReviewTransaction = () => {
           });
         }
         reset();
-        await safeActions.fetchUserSafes(account);
+        await safeActions.fetchUserSafes({ address: account as string, geb });
       } catch (e) {
         handleTransactionError(e);
       } finally {

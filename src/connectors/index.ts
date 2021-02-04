@@ -17,14 +17,10 @@ import { InjectedConnector } from '@web3-react/injected-connector';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 import { NetworkConnector } from './NetworkConnector';
-import { ethers } from 'ethers';
-import { Geb } from 'geb.js';
 
 const { REACT_APP_NETWORK_ID, REACT_APP_NETWORK_URL } = process.env;
 
-export const NETWORK_URL =
-  REACT_APP_NETWORK_URL ??
-  'https://kovan.infura.io/v3/645c2c65dd8f4be18a50a0bf011bab85';
+export const NETWORK_URL = REACT_APP_NETWORK_URL as string;
 
 export const NETWORK_ID = parseInt(REACT_APP_NETWORK_ID ?? '1');
 
@@ -51,8 +47,3 @@ export const walletlink = new WalletLinkConnector({
   appLogoUrl:
     'https://gblobscdn.gitbook.com/spaces%2F-M9jdHretGKCtWYz5jZR%2Favatar-1593281271873.png?alt=media',
 });
-
-// geb.js
-const provider = new ethers.providers.JsonRpcProvider(NETWORK_URL);
-const network_name = NETWORK_ID === 1 ? 'mainnet' : 'kovan';
-export const geb = new Geb(network_name, provider);

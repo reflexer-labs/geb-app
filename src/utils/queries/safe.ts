@@ -28,21 +28,21 @@ systemState(id: "current") {
 }`;
 
 export const getUserSafesListQuery = (address: string) => `{
-  safes(where: { owner: "${address}" }) {
+  safes(where: { owner: "${address}",  proxy_not: null, safeId_not: null }) {
     safeId
     safeHandler
     collateral
     createdAt
     debt
   }
-  erc20Balances(where: {address: "${address}", label:"COIN"}) {
-    balance
-    }
+ erc20Balances(where: {address: "${address}", label: "COIN"}) {
+  balance
+  }
   ${liquidationQuery}
 }`;
 
 export const getSafeByIdQuery = (safeId: string, address: string) => `{
-  safes(where: { safeId: "${safeId}" }) {
+  safes(where: { safeId: "${safeId}" , proxy_not: null, safeId_not: null}) {
     safeId
     collateral
     createdAt
@@ -70,7 +70,7 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
       amount
     }
   }
-  erc20Balances(where: {address: "${address}", label:"COIN"}) {
+  erc20Balances(where: {address: "${address}", label: "COIN"}) {
    balance
    }
    ${liquidationQuery}

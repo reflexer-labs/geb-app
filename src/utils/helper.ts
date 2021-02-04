@@ -65,10 +65,10 @@ export const formatNumber = (value: string, digits = 4, round = false) => {
   return numeral(n).format(`0.${nOfDigits}`, Math.floor);
 };
 
-export const getRatePercentage = (value: string) => {
+export const getRatePercentage = (value: string, digits = 4) => {
   const rate = Number(value);
   let ratePercentage = rate < 1 ? (1 - rate) * -1 : rate - 1;
-  return formatNumber(String(ratePercentage * 100));
+  return formatNumber(String(ratePercentage * 100), digits);
 };
 
 export const toFixedString = (
@@ -342,19 +342,21 @@ export const formatHistoryArray = (
 
   history = history.sort((a, b) => Number(a.createdAt) - Number(b.createdAt));
 
-  items.push({
-    title: 'Open Safe',
-    txHash: history[0].createdAtTransaction,
-    date: Number(history[0].createdAt - 1).toString(),
-    amount: 0,
-    link: getEtherscanLink(
-      networkId,
-      history[0].createdAtTransaction,
-      'transaction'
-    ),
-    icon: 'ArrowRightCircle',
-    color: '',
-  });
+  if (history.length > 0) {
+    items.push({
+      title: 'Open Safe',
+      txHash: history[0].createdAtTransaction,
+      date: Number(history[0].createdAt - 1).toString(),
+      amount: 0,
+      link: getEtherscanLink(
+        networkId,
+        history[0].createdAtTransaction,
+        'transaction'
+      ),
+      icon: 'ArrowRightCircle',
+      color: '',
+    });
+  }
 
   for (let i of liquidationItems) {
     items.push({
