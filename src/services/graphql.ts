@@ -205,6 +205,8 @@ export const fetchIncentivesCampaigns = async (
   address: string,
   blockNumber: number
 ) => {
+  console.log(incentiveCampaignsQuery(address, blockNumber));
+
   const res = await request(
     JSON.stringify({ query: incentiveCampaignsQuery(address, blockNumber) })
   );
