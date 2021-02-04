@@ -4,6 +4,8 @@ import store from '../store';
 import { getSafeByIdQuery, getUserSafesListQuery } from '../utils/queries/safe';
 import { GRAPH_API_URLS } from '../utils/constants';
 import { formatUserSafe, formatHistoryArray } from '../utils/helper';
+import { incentiveCampaignsQuery } from '../utils/queries/incentives';
+import { IIncentivesCampaignData } from '../utils/interfaces';
 import { getSubgraphBlock, getUserQuery } from '../utils/queries/user';
 import {
   IFetchSafeById,
@@ -145,6 +147,7 @@ export const fetchSafeById = async (config: IFetchSafeById) => {
     const res = await request(
       JSON.stringify({ query: getSafeByIdQuery(safeId, address) })
     );
+
     response = res
       ? res.data.data
       : geb
@@ -196,4 +199,47 @@ export const fetchSafeById = async (config: IFetchSafeById) => {
     erc20Balance,
     liquidationData,
   };
+};
+
+export const fetchIncentivesCampaigns = async (
+  address: string,
+  blockNumber: number
+) => {
+  const res = await request(
+    JSON.stringify({ query: incentiveCampaignsQuery(address, blockNumber) })
+  );
+
+  const response = res.data.data;
+
+  const proxyData =
+    response.userProxies && response.userProxies.length > 0
+      ? response.userProxies[0]
+      : null;
+
+  const payload: IIncentivesCampaignData = {
+    user: response.user ? response.user.id : null,
+    proxyData,
+    stakedBalance:
+      response.stakedBalance && response.stakedBalance.length > 0
+        ? response.stakedBalance[0].balance
+        : '0',
+    praiBalance:
+      response.praiBalance && response.praiBalance.length > 0
+        ? response.praiBalance[0].balance
+        : '0',
+    protBalance:
+      response.protBalance && response.protBalance.length > 0
+        ? response.protBalance[0].balance
+        : '0',
+    uniswapCoinPool:
+      response.uniswapCoinPool && response.uniswapCoinPool.length > 0
+        ? response.uniswapCoinPool[0].balance
+        : '0',
+    old24hData: response.old24hData,
+    allCampaigns: response.incentiveCampaigns,
+    systemState: response.systemState,
+    incentiveBalances: response.incentiveBalances,
+  };
+
+  return payload;
 };

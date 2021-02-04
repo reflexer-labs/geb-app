@@ -24,6 +24,8 @@ import WaitingModal from '../components/Modals/WaitingModal';
 import TransactionUpdater from '../services/TransactionUpdater';
 import usePrevious from '../hooks/usePrevious';
 import { useHistory } from 'react-router-dom';
+import IncentivesModal from '../components/Modals/IncentivesModal';
+import ProxyModal from '../components/Modals/ProxyModal';
 import ImagePreloader from '../components/ImagePreloader';
 import AlertLabel from '../components/AlertLabel';
 import useGeb from '../hooks/useGeb';
@@ -95,6 +97,7 @@ const Shared = ({ children }: Props) => {
     } else {
       safeActions.setIsSafeCreated(false);
       connectWalletActions.setStep(1);
+      history.push('/');
     }
     await timeout(1000);
     popupsActions.setIsWaitingModalOpen(false);
@@ -119,6 +122,7 @@ const Shared = ({ children }: Props) => {
   function networkChecker() {
     accountChange();
     const id: ChainId = NETWORK_ID;
+    connectWalletActions.fetchFiatPrice();
     if (chainId && chainId !== id) {
       const chainName = ETHERSCAN_PREFIXES[id];
       connectWalletActions.setIsWrongNetwork(true);
@@ -182,8 +186,9 @@ const Shared = ({ children }: Props) => {
       <BalanceUpdater />
       <TransactionUpdater />
       <LoadingModal />
-
+      <IncentivesModal />
       <CreateAccountModal />
+      <ProxyModal />
       <ConnectedWalletModal />
 
       <ScreenLoader />

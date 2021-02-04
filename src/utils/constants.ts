@@ -35,6 +35,7 @@ export const GRAPH_API_URLS = REACT_APP_GRAPH_API_URLS
   ? REACT_APP_GRAPH_API_URLS.split(',')
   : [
       'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai',
+      'https://api.thegraph.com/subgraphs/name/reflexer-labs/rai-kovan',
     ];
 
 export const MAILCHIMP_URL = REACT_APP_MAILCHIMP_URL;
@@ -141,5 +142,53 @@ export const jdenticonConfig = {
   backColor: '#50ccd5',
 };
 
+export const INITIAL_INCENTIVE_STATE = [
+  {
+    id: '',
+    campaignNumber: '',
+    periodFinish: '',
+    campaignAddress: '',
+    rewardRate: '',
+    totalSupply: '',
+    coinAddress: '',
+    wethAddress: '',
+    coinTotalSupply: '',
+    stakedBalance: '',
+    campaignEndTime: '',
+    dailyFLX: 0,
+    uniSwapLink: '',
+    ethStake: '',
+    raiStake: '',
+    myRewardRate: '',
+    reserveRAI: '',
+    reserveETH: '',
+    token0: '',
+    token0Price: '',
+    token1Price: '',
+    lastUpdatedTime: '',
+    rewardPerTokenStored: '',
+    isOngoingCampaign: false,
+    isCoinLessThanWeth: true,
+    user: '' || null,
+    IB_reward: '',
+    IB_userRewardPerTokenPaid: '',
+  },
+];
+
+const INIT_VALUES = {
+  name: 'FLX',
+  img: require('../assets/logo192.png'),
+  amount: 0,
+  price: 0,
+  diff: 0,
+  value: 0,
+  diffPercentage: 0,
+};
+
+export const INITIAL_INCENTIVE_ASSETS_STATE = {
+  eth: INIT_VALUES,
+  rai: INIT_VALUES,
+  flx: INIT_VALUES,
+};
 export const network_name =
   process.env.REACT_APP_NETWORK_ID === '1' ? 'mainnet' : 'kovan';

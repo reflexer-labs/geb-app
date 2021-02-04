@@ -4,6 +4,7 @@ import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
 import { DefaultTheme, ThemedCssFunction } from 'styled-components';
 import { ChainId } from '@uniswap/sdk';
 import { IconName } from '../components/FeatherIconWrapper';
+import { ApproveMethod } from '../components/ApprovePRAI';
 import { Geb } from 'geb.js';
 
 export interface DynamicObject {
@@ -218,6 +219,168 @@ export interface ISafeHistory {
   color: string;
 }
 
+export interface IncentivesCampaign {
+  duration: string;
+  instantExitPercentage: string;
+  reward: string;
+  rewardDelay: string;
+  startTime: string;
+  lastUpdateTime: string;
+
+  // new
+  id: string;
+  campaignAddress: string;
+  campaignNumber: string;
+  rewardsDuration: string;
+  rewardRate: string;
+  totalSupply: string;
+  rewardToken: string;
+  rewardPerTokenStored: string;
+}
+
+export interface IncentiveBalance {
+  campaignId: string;
+  delayedRewardTotalAmount: string;
+  delayedRewardExitedAmount: string;
+  delayedRewardLatestExitTime: string;
+
+  // new
+  id: string;
+  stakeBalance: string;
+  address: string;
+  owner: {
+    id: string;
+  };
+  reward: string;
+  userRewardPerTokenPaid: string;
+}
+
+export interface IIncentivesCampaignData {
+  user: string | null;
+  allCampaigns: Array<IncentivesCampaign>;
+  stakedBalance: string;
+  systemState: {
+    coinAddress: string;
+    wethAddress: string;
+    coinUniswapPair: {
+      totalSupply: string;
+      reserve0: string;
+      reserve1: string;
+      token0: string;
+      token0Price: string;
+      token1Price: string;
+    };
+    currentCoinMedianizerUpdate: {
+      value: string;
+    };
+  };
+  praiBalance: string;
+  protBalance: string;
+  uniswapCoinPool: string;
+  old24hData: {
+    coinAddress: string;
+    wethAddress: string;
+    coinUniswapPair: {
+      totalSupply: string;
+      reserve0: string;
+      reserve1: string;
+    };
+    currentCoinMedianizerUpdate: {
+      value: string;
+    };
+  };
+  incentiveBalances: Array<IncentiveBalance>;
+  proxyData: {
+    address: string;
+    coinAllowance: { amount: string };
+    uniCoinLpAllowance: { amount: string };
+  };
+}
+
+export interface IIncentivesFields {
+  ethAmount: string;
+  raiAmount: string;
+}
+
+export interface IIncentiveHook {
+  id: string;
+  campaignNumber: string;
+  periodFinish: string;
+  campaignAddress: string;
+  rewardRate: string;
+  totalSupply: string;
+  coinAddress: string;
+  wethAddress: string;
+  coinTotalSupply: string;
+  stakedBalance: string;
+  campaignEndTime: string;
+  dailyFLX: number;
+  uniSwapLink: string;
+  ethStake: string;
+  raiStake: string;
+  myRewardRate: string;
+  reserveRAI: string;
+  reserveETH: string;
+  lastUpdatedTime: string;
+  rewardPerTokenStored: string;
+  token0: string;
+  token0Price: string;
+  token1Price: string;
+  isOngoingCampaign: boolean;
+  isCoinLessThanWeth: boolean;
+  user: '' | null;
+  IB_reward: string;
+  IB_userRewardPerTokenPaid: string;
+}
+
+export interface IIncentivePayload {
+  incentivesFields: IIncentivesFields;
+  signer: JsonRpcSigner;
+  campaignAddress: string;
+  uniswapShare: string;
+  isUniSwapShareChecked: boolean;
+}
+export interface IIncentiveClaim {
+  signer: JsonRpcSigner;
+  campaignAddress: string;
+}
+export interface IIncentiveWithdraw {
+  signer: JsonRpcSigner;
+  campaignAddress: string;
+  uniPoolAmount: string;
+  reserveRAI: string;
+  reserveETH: string;
+  coinTotalSupply: string;
+  isUniSwapShareChecked: boolean;
+}
+
+export interface NumberMap {
+  [key: string]: number;
+}
+
+export interface AssetData {
+  img: string;
+  token: string;
+  name: string;
+  amount: number;
+  price: number;
+  value: number;
+  diff: number;
+  diffPercentage: number;
+}
+export interface IIncentiveAssets {
+  eth: AssetData;
+  rai: AssetData;
+  flx: AssetData;
+  uni: AssetData;
+}
+
+export interface IApprove {
+  allowance: string;
+  coinName: string;
+  methodName: ApproveMethod;
+  amount: string;
+}
 export interface ISafeResponse {
   collateral: string;
   createdAt: string | null; // Will be null in RPC mode;

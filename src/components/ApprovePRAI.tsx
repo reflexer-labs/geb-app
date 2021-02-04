@@ -3,21 +3,39 @@ import { Geb, utils as gebUtils } from 'geb.js';
 import React, { useCallback, useEffect, useState } from 'react';
 import { AlertTriangle, ArrowUpCircle, CheckCircle } from 'react-feather';
 import styled from 'styled-components';
-import { useActiveWeb3React } from '../../hooks';
-import { useTransactionAdder } from '../../hooks/TransactionHooks';
-import { useStoreActions, useStoreState } from '../../store';
-import { ETH_NETWORK, COIN_TICKER } from '../../utils/constants';
-import { timeout } from '../../utils/helper';
-import Button from '../Button';
-import Loader from '../Loader';
+import { useActiveWeb3React } from '../hooks';
+import { useTransactionAdder } from '../hooks/TransactionHooks';
+import { useStoreActions, useStoreState } from '../store';
+import { ETH_NETWORK } from '../utils/constants';
+import { timeout } from '../utils/helper';
+import Button from './Button';
+import Loader from './Loader';
 
-const TEXT_PAYLOAD_DEFAULT_STATE = {
-  title: `${COIN_TICKER} Allowance`,
-  text: `Allow your account to manage your ${COIN_TICKER}`,
-  status: '',
-};
+export type ApproveMethod = 'coin' | 'uniswapPairCoinEth';
 
-const ApprovePRAI = () => {
+interface Props {
+  handleBackBtn: () => void;
+  handleSuccess: () => void;
+  amount: string;
+  allowance: string;
+  methodName: ApproveMethod;
+  coinName: string;
+}
+
+const ApprovePRAI = ({
+  amount,
+  allowance,
+  handleBackBtn,
+  handleSuccess,
+  methodName,
+  coinName,
+}: Props) => {
+  const TEXT_PAYLOAD_DEFAULT_STATE = {
+    title: `${coinName} Allowance`,
+    text: `Allow your account to manage your ${coinName}`,
+    status: '',
+  };
+
   const [textPayload, setTextPayload] = useState(TEXT_PAYLOAD_DEFAULT_STATE);
   const [isPaid, setIsPaid] = useState(false);
 
@@ -27,12 +45,11 @@ const ApprovePRAI = () => {
 
   const {
     connectWalletModel: connectWalletState,
-    safeModel: safeState,
+    popupsModel: popupsState,
   } = useStoreState((state) => state);
-  const { safeModel: safeActions } = useStoreActions((state) => state);
+  const { popupsModel: popupsActions } = useStoreActions((state) => state);
 
-  const { rightInput } = safeState.safeData;
-  const { proxyAddress, coinAllowance } = connectWalletState;
+  const { proxyAddress } = connectWalletState;
 
   const returnStatusIcon = (status: string) => {
     switch (status) {
@@ -47,42 +64,41 @@ const ApprovePRAI = () => {
     }
   };
 
-  const passedCheckForCoinAllowance = async (
+  const passedCheckForAllowance = async (
     allowance: string,
-    rightInput: string,
+    amount: string,
     isPaid: boolean
   ) => {
     if (!isPaid) return;
-    const coinAllowanceBN = allowance
+    const allowanceBN = allowance
       ? ethersUtils.parseEther(allowance)
       : ethersUtils.parseEther('0');
-    const rightInputBN = ethersUtils.parseEther(rightInput);
-    if (coinAllowanceBN.gte(rightInputBN)) {
+    const amountBN = ethersUtils.parseEther(amount);
+    if (allowanceBN.gte(amountBN)) {
       setTextPayload({
-        title: `${COIN_TICKER} Unlocked`,
-        text: `${COIN_TICKER} unlocked successfully, proceeding to review transaction...`,
+        title: `${coinName} Unlocked`,
+        text: `${coinName} unlocked successfully, proceeding to review transaction...`,
         status: 'success',
       });
       await timeout(2000);
-      safeActions.setStage(3);
-      safeActions.setBlockBackdrop(false);
+      handleSuccess();
+      popupsActions.setBlockBackdrop(false);
     } else {
-      safeActions.setStage(2);
       setTextPayload(TEXT_PAYLOAD_DEFAULT_STATE);
-      safeActions.setBlockBackdrop(false);
+      popupsActions.setBlockBackdrop(false);
       setIsPaid(false);
     }
   };
 
-  const passedCheckCB = useCallback(passedCheckForCoinAllowance, [
-    coinAllowance,
-    rightInput,
+  const passedCheckCB = useCallback(passedCheckForAllowance, [
+    allowance,
+    amount,
     isPaid,
   ]);
 
   useEffect(() => {
-    passedCheckCB(coinAllowance, rightInput, isPaid);
-  }, [passedCheckCB, coinAllowance, rightInput, isPaid]);
+    passedCheckCB(allowance, amount, isPaid);
+  }, [passedCheckCB, allowance, amount, isPaid]);
 
   const unlockPRAI = async () => {
     try {
@@ -92,7 +108,7 @@ const ApprovePRAI = () => {
           'No proxy address, disconnect your wallet and reconnect it again'
         );
       }
-      safeActions.setBlockBackdrop(true);
+      popupsActions.setBlockBackdrop(true);
       setTextPayload({
         title: 'Waiting for confirmation',
         text: 'Confirm this transaction in your wallet',
@@ -100,22 +116,22 @@ const ApprovePRAI = () => {
       });
       const signer = library.getSigner(account);
       const geb = new Geb(ETH_NETWORK, signer.provider);
-      const tx = geb.contracts.coin.approve(
+      const tx = geb.contracts[methodName].approve(
         proxyAddress,
         ethers.constants.MaxUint256
       );
       const txResponse = await signer.sendTransaction(tx);
       setTextPayload({
-        title: `Unlocking ${COIN_TICKER}`,
-        text: `Confirming transaction and unlocking ${COIN_TICKER}`,
+        title: `Unlocking ${coinName}`,
+        text: `Confirming transaction and unlocking ${coinName}`,
         status: 'loading',
       });
-      addTransaction(txResponse, `Unlocking ${COIN_TICKER}`);
+      addTransaction(txResponse, `Unlocking ${coinName}`);
       await txResponse.wait();
       setIsPaid(true);
-      await timeout(5000);
+      await timeout(10000);
     } catch (e) {
-      safeActions.setBlockBackdrop(false);
+      popupsActions.setBlockBackdrop(false);
       if (e?.code === 4001) {
         setTextPayload({
           title: 'Transaction Rejected.',
@@ -136,13 +152,9 @@ const ApprovePRAI = () => {
   return (
     <Container>
       <InnerContainer>
-        {safeState.blockBackdrop ? null : (
+        {popupsState.blockBackdrop ? null : (
           <BackContainer>
-            <Button
-              dimmedWithArrow
-              text={'back'}
-              onClick={() => safeActions.setStage(1)}
-            />
+            <Button dimmedWithArrow text={'back'} onClick={handleBackBtn} />
           </BackContainer>
         )}
         <ImgContainer>{returnStatusIcon(textPayload.status)}</ImgContainer>

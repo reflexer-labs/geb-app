@@ -1,4 +1,5 @@
 import React from 'react';
+import { DollarSign } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
@@ -30,6 +31,9 @@ const NavLinks = () => {
     <Nav>
       <NavBarLink to="/" onClick={(e) => handleLinkClick(e, false)}>
         <SafeIcon className="opacity" /> {t('app')}
+      </NavBarLink>
+      <NavBarLink to="/incentives" onClick={(e) => handleLinkClick(e, false)}>
+        <DollarSign size="18" /> {t('incentives')}
       </NavBarLink>
 
       <NavBarLink

@@ -465,3 +465,24 @@ export const returnConnectorName = (
     })
     .filter((x: string | null) => x !== null)[0];
 };
+
+export const numberizeString = (obj: any) => {
+  const res: any = {};
+  Object.keys(obj).forEach((key) => {
+    res[key] = {};
+    Object.keys(obj[key]).forEach((temp) => {
+      res[key][temp] = !isNaN(obj[key][temp])
+        ? numeral(obj[key][temp]).value()
+        : obj[key][temp];
+    });
+    return res;
+  });
+
+  return res;
+};
+
+export const returnTimeOffset = () => {
+  const a = new Date().getTimezoneOffset();
+  const res = -Math.round(a / 60);
+  return res < 0 ? res : '+' + res;
+};

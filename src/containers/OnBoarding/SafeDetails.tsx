@@ -82,7 +82,7 @@ const SafeDetails = ({ ...props }) => {
         {safeState.singleSafe ? (
           <>
             <SafeStats />
-            {safeState.historyList.length ? (
+            {safeState.historyList.length && !isRPCAdapterOn ? (
               <SafeHistory hideHistory={!safeState.historyList.length} />
             ) : null}
           </>
