@@ -1,11 +1,19 @@
 import { BigNumber } from 'ethers';
 import { Geb, utils } from 'geb.js';
 import {
+  IIncentivesCampaignData,
   ILiquidationResponse,
+  IncentiveBalance,
+  IncentivesCampaign,
   ISafeQuery,
   ISafeResponse,
   IUserSafeList,
 } from '../interfaces';
+import {
+  incentivesBalanceResponse,
+  incentivesCampaigns,
+  incentivesResponse,
+} from './mocks';
 
 interface UserListConfig {
   geb: Geb;
@@ -196,10 +204,30 @@ const getSafeByIdRpc = async (
   };
 };
 
+// incentives
+
+const getIncentivesCampaigns = async (): Promise<Array<IncentivesCampaign>> => {
+  return incentivesCampaigns;
+};
+
+const getIncentivesBalances = async (): Promise<Array<IncentiveBalance>> => {
+  return incentivesBalanceResponse;
+};
+
+const getIncentives = async (
+  address: string,
+  blockNumber: number
+): Promise<IIncentivesCampaignData> => {
+  return incentivesResponse;
+};
+
 export default {
   getUserSafesRpc,
   getSafeByIdRpc,
   getLiquidationDataRpc,
+  getIncentivesCampaigns,
+  getIncentivesBalances,
+  getIncentives,
 };
 
 const parseWad = (val: BigNumber) => utils.wadToFixed(val).toString();
