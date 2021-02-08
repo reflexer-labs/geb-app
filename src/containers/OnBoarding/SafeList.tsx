@@ -3,6 +3,7 @@ import ReactPaginate from 'react-paginate';
 import styled from 'styled-components';
 import SafeBlock from '../../components/SafeBlock';
 import { useActiveWeb3React } from '../../hooks';
+import useGeb from '../../hooks/useGeb';
 import { useStoreActions, useStoreState } from '../../store';
 import { ISafe } from '../../utils/interfaces';
 
@@ -11,26 +12,35 @@ const SafeList = () => {
   const [perPage] = useState(5);
   const [total, setTotal] = useState(0);
 
-  const { account } = useActiveWeb3React();
+  const { account, library } = useActiveWeb3React();
+  const geb = useGeb();
   const {
     safeModel: safeState,
     connectWalletModel: connectModelState,
+    settingsModel: settingsState,
   } = useStoreState((state) => state);
-  const { safeModel: safeActions } = useStoreActions((state) => state);
 
+  const { safeModel: safeActions } = useStoreActions((state) => state);
+  const { isRPCAdapterOn } = settingsState;
   const { isUserCreated } = connectModelState;
+
   useEffect(() => {
-    if (!account || !isUserCreated) return;
+    if (!account || !isUserCreated || !library) return;
     async function fetchSafe() {
-      await safeActions.fetchUserSafes(account as string);
+      await safeActions.fetchUserSafes({
+        address: account as string,
+        geb,
+        isRPCAdapterOn,
+      });
     }
     fetchSafe();
+    const ms = isRPCAdapterOn ? 5000 : 2000;
     const interval = setInterval(() => {
       fetchSafe();
-    }, 2000);
+    }, ms);
 
     return () => clearInterval(interval);
-  }, [account, safeActions, isUserCreated]);
+  }, [account, library, safeActions, isUserCreated, isRPCAdapterOn, geb]);
 
   const setPagination = (safes: Array<ISafe>) => {
     if (!safes.length) return;

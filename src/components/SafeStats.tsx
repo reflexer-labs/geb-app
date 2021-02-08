@@ -28,7 +28,8 @@ const SafeStats = () => {
   const totalDebt = formatNumber(singleSafe?.totalDebt || '0');
 
   const liquidationPenalty = getRatePercentage(
-    singleSafe?.liquidationPenalty || '1'
+    singleSafe?.liquidationPenalty || '1',
+    0
   );
 
   const raiPrice = singleSafe
@@ -80,7 +81,11 @@ const SafeStats = () => {
             <InfoIcon data-tip={t('annual_redemption_tip')}>
               <Info size="16" />
             </InfoIcon>
-            <Value>{`${currentRedemptionRate}%`}</Value>
+            <Value>{`${
+              Number(currentRedemptionRate) > 0.001
+                ? currentRedemptionRate
+                : '< 0.001'
+            }%`}</Value>
             <Label>{`8-Hourly Redemption Rate`}</Label>
           </StateInner>
         </StatItem>

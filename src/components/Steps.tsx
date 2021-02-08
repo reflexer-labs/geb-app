@@ -4,7 +4,6 @@ import ReactTooltip from 'react-tooltip';
 import { useStoreActions, useStoreState } from '../store';
 import StepsContent from './StepsContent';
 import { useActiveWeb3React } from '../hooks';
-import { geb } from '../connectors';
 import {
   handleTransactionError,
   useTransactionAdder,
@@ -12,10 +11,12 @@ import {
 import { useTranslation } from 'react-i18next';
 import { COIN_TICKER } from '../utils/constants';
 import { use10BlocksConfirmations } from '../hooks/useBlocksConfirmations';
+import useGeb from '../hooks/useGeb';
 
 const Steps = () => {
   const { t } = useTranslation();
   const { account, library, chainId } = useActiveWeb3React();
+  const geb = useGeb();
   const blocksSinceCheck = use10BlocksConfirmations();
 
   const { connectWalletModel: connectWalletState } = useStoreState(

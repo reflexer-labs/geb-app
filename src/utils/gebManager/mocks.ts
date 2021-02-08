@@ -1,4 +1,10 @@
-import { ISafeQuery, IUserSafeList } from '../interfaces';
+import {
+  IIncentivesCampaignData,
+  IncentiveBalance,
+  IncentivesCampaign,
+  ISafeQuery,
+  IUserSafeList,
+} from '../interfaces';
 
 export const liquidationMockedResponse = {
   systemState: {
@@ -99,4 +105,82 @@ export const userSingleSafeMockedResponse: ISafeQuery = {
     },
   ],
   ...liquidationMockedResponse,
+};
+
+export const incentivesBalanceResponse: Array<IncentiveBalance> = [
+  {
+    campaignId: '',
+    delayedRewardTotalAmount: '',
+    delayedRewardExitedAmount: '',
+    delayedRewardLatestExitTime: '',
+    id: '',
+    stakeBalance: '',
+    address: '',
+    owner: {
+      id: '',
+    },
+    reward: '',
+    userRewardPerTokenPaid: '',
+  },
+];
+
+export const incentivesCampaigns: Array<IncentivesCampaign> = [
+  {
+    duration: '',
+    instantExitPercentage: '',
+    reward: '',
+    rewardDelay: '',
+    startTime: '',
+    lastUpdateTime: '',
+    id: '',
+    campaignAddress: '',
+    campaignNumber: '',
+    rewardsDuration: '',
+    rewardRate: '',
+    totalSupply: '',
+    rewardToken: '',
+    rewardPerTokenStored: '',
+  },
+];
+
+export const incentivesResponse: IIncentivesCampaignData = {
+  incentiveBalances: incentivesBalanceResponse,
+  allCampaigns: incentivesCampaigns,
+  old24hData: {
+    coinAddress: '0x76b06a2f6df6f0514e7bec52a9afb3f603b477cd',
+    coinUniswapPair: {
+      reserve0: '11800',
+      reserve1: '24.592714337918330877',
+      totalSupply: '538.676058261857576155',
+    },
+    currentCoinMedianizerUpdate: {
+      value: '3.467004817009046158',
+    },
+    wethAddress: '0xd0a1e359811322d97991e03f863a0c30c2cf029c',
+  },
+  praiBalance: '0',
+  protBalance: '0',
+  stakedBalance: '0',
+  systemState: {
+    coinAddress: '0x76b06a2f6df6f0514e7bec52a9afb3f603b477cd',
+    coinUniswapPair: {
+      reserve0: '11800',
+      reserve1: '24.592714337918330877',
+      token0: '0x76b06a2f6df6f0514e7bec52a9afb3f603b477cd',
+      token0Price: '479.8169017807905798303431789694058',
+      token1Price: '0.002084128333721892447203389830508475',
+      totalSupply: '538.676058261857576155',
+    },
+    currentCoinMedianizerUpdate: {
+      value: '3.455156032054565194',
+    },
+    wethAddress: '0xd0a1e359811322d97991e03f863a0c30c2cf029c',
+  },
+  uniswapCoinPool: '0',
+  user: '0xb403063c38b6aa112da9b972a5842bb659a38a90',
+  proxyData: {
+    address: '0x5ba971f7f6d2cc39295a57a2f74c35520c03304d',
+    coinAllowance: { amount: '0' },
+    uniCoinLpAllowance: { amount: '0' },
+  },
 };

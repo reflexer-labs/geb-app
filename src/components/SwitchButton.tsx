@@ -7,11 +7,12 @@ interface Props {
 }
 
 const SwitchButton = ({ state, getState }: Props) => {
-  const [checked, setChecked] = useState(!state || false);
+  const [checked, setChecked] = useState(state || false);
   const setTheme = (e: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(e.target.checked);
     getState(e.target.checked);
   };
+
   return (
     <Label>
       <Input type="checkbox" checked={checked} onChange={setTheme} />
@@ -31,8 +32,8 @@ export default SwitchButton;
 const Label = styled.label`
   position: relative;
   display: inline-block;
-  width: 65px;
-  height: 31px;
+  width: 55px;
+  height: 26px;
 `;
 
 const Input = styled.input`
@@ -46,9 +47,9 @@ const Input = styled.input`
     box-shadow: 0 0 1px ${(props) => props.theme.colors.gradient};
   }
   &:checked + .slider:before {
-    -webkit-transform: translateX(34px);
-    -ms-transform: translateX(34px);
-    transform: translateX(34px);
+    -webkit-transform: translateX(28px);
+    -ms-transform: translateX(28px);
+    transform: translateX(28px);
   }
 `;
 
@@ -66,8 +67,8 @@ const Slider = styled.span`
   &:before {
     position: absolute;
     content: '';
-    height: 23px;
-    width: 23px;
+    height: 19px;
+    width: 19px;
     left: 4px;
     bottom: 4px;
     background-color: white;
@@ -81,7 +82,7 @@ const State = styled.span`
   position: absolute;
   top: 8px;
   right: 8px;
-  font-size: ${(props) => props.theme.font.extraSmall};
+  font-size: 10px;
   &.on {
     right: 0;
     left: 8px;

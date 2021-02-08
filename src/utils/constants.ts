@@ -9,6 +9,7 @@ const {
   REACT_APP_COIN_TICKER_PRODUCTION,
   REACT_APP_COIN_TICKER_KOVAN,
   REACT_APP_SYSTEM_STATUS,
+  REACT_APP_MAILCHIMP_URL,
 } = process.env;
 
 export enum Network {
@@ -37,8 +38,7 @@ export const GRAPH_API_URLS = REACT_APP_GRAPH_API_URLS
       'https://api.thegraph.com/subgraphs/name/reflexer-labs/rai-kovan',
     ];
 
-export const MAILCHIMP_URL =
-  'https://finance.us20.list-manage.com/subscribe/post-json?u=a3b1b26a531e341b4e086da36&id=b5976e4e32';
+export const MAILCHIMP_URL = REACT_APP_MAILCHIMP_URL;
 
 export const NetworkContextName = 'NETWORK';
 
@@ -190,3 +190,5 @@ export const INITIAL_INCENTIVE_ASSETS_STATE = {
   rai: INIT_VALUES,
   flx: INIT_VALUES,
 };
+export const network_name =
+  process.env.REACT_APP_NETWORK_ID === '1' ? 'mainnet' : 'kovan';

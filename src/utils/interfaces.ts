@@ -5,6 +5,7 @@ import { DefaultTheme, ThemedCssFunction } from 'styled-components';
 import { ChainId } from '@uniswap/sdk';
 import { IconName } from '../components/FeatherIconWrapper';
 import { ApproveMethod } from '../components/ApprovePRAI';
+import { Geb } from 'geb.js';
 
 export interface DynamicObject {
   [key: string]: any;
@@ -430,7 +431,7 @@ export interface IAuctionBid {
 }
 export interface ISafeResponse {
   collateral: string;
-  createdAt: string;
+  createdAt: string | null; // Will be null in RPC mode;
   debt: string;
   safeHandler: string;
   safeId: string;
@@ -488,13 +489,13 @@ export interface ILiquidationFixedDiscount {
 export interface ISingleSafe {
   safeId: string;
   collateral: string;
-  createdAt: string;
+  createdAt: string | null; // Will be null in RPC mode
   debt: string;
   internalCollateralBalance: {
     balance: string;
   };
-  modifySAFECollateralization: Array<IModifySAFECollateralization>;
-  liquidationFixedDiscount: Array<ILiquidationFixedDiscount>;
+  modifySAFECollateralization: Array<IModifySAFECollateralization> | null; // Will be null over RPC;
+  liquidationFixedDiscount: Array<ILiquidationFixedDiscount> | null; // Will be null over RPC
 }
 export interface ISafeQuery extends ILiquidationResponse {
   erc20Balances: Array<{ balance: string }>;
@@ -507,4 +508,14 @@ export interface ISafeQuery extends ILiquidationResponse {
       } | null;
     }
   ];
+}
+
+export interface IFetchSafesPayload {
+  address: string;
+  geb: Geb;
+  isRPCAdapterOn?: boolean;
+}
+
+export interface IFetchSafeById extends IFetchSafesPayload {
+  safeId: string;
 }

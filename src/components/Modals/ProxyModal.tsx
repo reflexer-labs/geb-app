@@ -3,13 +3,13 @@ import { AlertTriangle, ArrowUpCircle, CheckCircle } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
-import { geb } from '../../connectors';
 import { useActiveWeb3React } from '../../hooks';
 import {
   handleTransactionError,
   useTransactionAdder,
 } from '../../hooks/TransactionHooks';
 import { use10BlocksConfirmations } from '../../hooks/useBlocksConfirmations';
+import useGeb from '../../hooks/useGeb';
 import { useStoreState, useStoreActions } from '../../store';
 import { timeout } from '../../utils/helper';
 import Button from '../Button';
@@ -20,6 +20,7 @@ const ProxyModal = () => {
   const [status, setStatus] = useState('stateless');
   const { t } = useTranslation();
   const { account, library, chainId } = useActiveWeb3React();
+  const geb = useGeb();
   const addTransaction = useTransactionAdder();
   const blocksSinceCheck = use10BlocksConfirmations();
 
