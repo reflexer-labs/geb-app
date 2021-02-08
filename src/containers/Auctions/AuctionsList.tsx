@@ -16,23 +16,27 @@ const AuctionsList = () => {
     <Container>
       <InfoBox>
         <Title>Debt Auctions</Title>
-        <Button text={t('claim_tokens')} />
+        {auctions && auctions.length ? (
+          <Button text={t('claim_tokens')} />
+        ) : null}
       </InfoBox>
-
-      {auctions?.slice(paging.from, paging.to).map((auction, i: number) => (
-        <AuctionBlock
-          key={auction.auctionId}
-          {...{ ...auction, isCollapsed: i !== 0 }}
-        />
-      ))}
-
       {auctions && auctions.length > 0 ? (
-        <Pagination
-          items={auctions}
-          perPage={5}
-          handlePagingMargin={setPaging}
-        />
-      ) : null}
+        <>
+          {auctions.slice(paging.from, paging.to).map((auction, i: number) => (
+            <AuctionBlock
+              key={auction.auctionId}
+              {...{ ...auction, isCollapsed: i !== 0 }}
+            />
+          ))}
+          <Pagination
+            items={auctions}
+            perPage={5}
+            handlePagingMargin={setPaging}
+          />
+        </>
+      ) : (
+        <NoData>{t('no_auctions')}</NoData>
+      )}
     </Container>
   );
 };
@@ -57,4 +61,14 @@ const InfoBox = styled.div`
     min-width: 100px;
     padding: 4px 12px;
   }
+`;
+
+const NoData = styled.div`
+  border-radius: ${(props) => props.theme.global.borderRadius};
+  border: 1px solid ${(props) => props.theme.colors.border};
+  margin-bottom: 15px;
+  background: ${(props) => props.theme.colors.background};
+  padding: 2rem 20px;
+  text-align: center;
+  font-size: ${(props) => props.theme.font.small};
 `;

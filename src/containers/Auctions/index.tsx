@@ -1,24 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import AuctionsFAQ from '../../components/AuctionsFAQ';
 import Button from '../../components/Button';
 import GridContainer from '../../components/GridContainer';
 import PageHeader from '../../components/PageHeader';
 import { useActiveWeb3React } from '../../hooks';
-import { useStoreActions } from '../../store';
+import { useStoreActions, useStoreState } from '../../store';
 import AuctionsList from './AuctionsList';
 
 const Auctions = () => {
   const { t } = useTranslation();
+  const history = useHistory();
   const { account } = useActiveWeb3React();
   const { auctionsModel: auctionsActions } = useStoreActions((state) => state);
+  const { settingsModel: settingsState } = useStoreState((state) => state);
+
+  const { isRPCAdapterOn } = settingsState;
 
   const [hide, setHide] = useState(false);
 
   const handleHideFAQ = () => setHide(!hide);
 
   useEffect(() => {
+    if (isRPCAdapterOn) {
+      history.push('/');
+    }
+
     async function fetchIncentivesCampaigns() {
       await auctionsActions.fetchAuctions({ address: account ? account : '' });
     }
@@ -28,7 +37,7 @@ const Auctions = () => {
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [account, auctionsActions]);
+  }, [account, auctionsActions, history, isRPCAdapterOn]);
 
   return (
     <>

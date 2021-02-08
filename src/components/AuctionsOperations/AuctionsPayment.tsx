@@ -69,7 +69,7 @@ const AuctionsPayment = () => {
       : BigNumber.from('0');
 
     if (auctionType.toLowerCase() === 'debt') {
-      const rate = getRatePercentage(bidIncrease, true) as number;
+      const rate = getRatePercentage(bidIncrease, 0, true) as number;
       const decreaseRate = rate * 100;
 
       const praiBalanceBN = praiBalance
