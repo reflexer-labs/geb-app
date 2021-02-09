@@ -20,7 +20,7 @@ const OnBoarding = () => {
   const { popupsModel: popupsActions } = useStoreActions((state) => state);
 
   return (
-    <Container>
+    <Container id="app-page">
       <GridContainer>
         <Content>
           <PageHeader

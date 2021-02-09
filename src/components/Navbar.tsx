@@ -46,6 +46,7 @@ const Navbar = () => {
       <RightSide>
         <BtnContainer>
           <Button
+            id="web3-status-connected"
             isLoading={hasPendingTransactions}
             onClick={handleWalletConnect}
             text={

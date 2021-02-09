@@ -54,6 +54,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "integration-test": "start-server-and-test start http://localhost:3000 'cypress run'",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -73,6 +74,7 @@
   },
   "devDependencies": {
     "@types/async-retry": "^1.4.2",
+    "@types/cypress": "^1.1.3",
     "@types/jsonp": "^0.2.0",
     "@types/numeral": "^0.0.28",
     "@types/react-copy-to-clipboard": "^4.3.0",
@@ -80,6 +82,8 @@
     "@types/react-paginate": "^6.2.1",
     "@types/react-router-dom": "^5.1.5",
     "@types/react-transition-group": "^4.4.0",
-    "@types/styled-components": "^5.1.3"
+    "@types/styled-components": "^5.1.3",
+    "cypress": "^6.4.0",
+    "start-server-and-test": "^1.12.0"
   }
 }

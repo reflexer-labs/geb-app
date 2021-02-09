@@ -6,22 +6,25 @@ import { Link } from 'react-router-dom';
 
 const CookieBanner = () => {
   return (
-    <CookieConsent
-      location="bottom"
-      buttonText="✓ Accept"
-      cookieName="cookiesAccepted"
-      style={{ background: '#fff', boxShadow: '0 0 6px rgba(0,0,0,0.16)' }}
-    >
-      <CookiesText>
-        {' '}
-        <img src={require('../assets/cookie.svg')} alt="" />
-        This website uses cookies to enhance the user experience. By continuing
-        to browse the site you're agreeing to our{' '}
-        <CustomLink to={{ pathname: '/privacy', state: { goToCookies: true } }}>
-          use of cookies.
-        </CustomLink>
-      </CookiesText>
-    </CookieConsent>
+    <div id="cookies-consent">
+      <CookieConsent
+        location="bottom"
+        buttonText="✓ Accept"
+        cookieName="cookiesAccepted"
+        style={{ background: '#fff', boxShadow: '0 0 6px rgba(0,0,0,0.16)' }}
+      >
+        <CookiesText>
+          <img src={require('../assets/cookie.svg')} alt="" />
+          This website uses cookies to enhance the user experience. By
+          continuing to browse the site you're agreeing to our
+          <CustomLink
+            to={{ pathname: '/privacy', state: { goToCookies: true } }}
+          >
+            use of cookies.
+          </CustomLink>
+        </CookiesText>
+      </CookieConsent>
+    </div>
   );
 };
 
