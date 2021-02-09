@@ -34,7 +34,7 @@ export const SYSTEM_STATUS = REACT_APP_SYSTEM_STATUS || '';
 export const GRAPH_API_URLS = REACT_APP_GRAPH_API_URLS
   ? REACT_APP_GRAPH_API_URLS.split(',')
   : [
-      'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai',
+      'https://api.thegraph.com/subgraphs/id/QmQ31Q9DwdiYjUxXLuPcs5hTiSf4aEQXZLt6bXXFFq7Lx9/graphql',
       'https://api.thegraph.com/subgraphs/name/reflexer-labs/rai-kovan',
     ];
 

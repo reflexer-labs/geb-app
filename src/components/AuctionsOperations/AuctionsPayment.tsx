@@ -98,7 +98,7 @@ const AuctionsPayment = () => {
 
       if (
         (bids.length > 0 && sellAmountBN.sub(decreasedAmount).gt(valueBN)) ||
-        valueBN.gte(sellAmountBN)
+        valueBN.gt(sellAmountBN)
       ) {
         setError(
           `You must accept at least (${formatNumber(

@@ -72,7 +72,7 @@ const AuctionBlock = (auction: Props) => {
     if (bidder.bidder === kickBidder.bidder) {
       return 'Start';
     }
-    return 'Tend';
+    return 'Bid';
   };
 
   const handleClick = (type: string) => {
@@ -157,12 +157,12 @@ const AuctionBlock = (auction: Props) => {
       };
     } else if (!isClaimed && !winner) {
       return {
-        text: 'Auction can be dealt',
+        text: 'Auction to Restart',
         label: 'dimmed',
       };
     } else {
       return {
-        text: 'Auction Won',
+        text: 'Auction Won / Not Claimed',
         label: 'greenish',
       };
     }
@@ -222,7 +222,15 @@ const AuctionBlock = (auction: Props) => {
                 .map((bidder: IAuctionBidder, i: number) => (
                   <List
                     key={bidder.bidder + i}
-                    className={bidder.sellAmount === sellAmount ? 'winner' : ''}
+                    className={
+                      bidders.length > 0 &&
+                      winner &&
+                      !isOngoingAuction &&
+                      bidder.sellAmount === sellAmount &&
+                      bidder.bidder.toLowerCase() === winner.toLowerCase()
+                        ? 'winner'
+                        : ''
+                    }
                   >
                     <ListItem>
                       <ListItemLabel>Event Type</ListItemLabel>
