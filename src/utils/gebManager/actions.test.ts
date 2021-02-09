@@ -120,8 +120,17 @@ const verifyKeys = (objA: any, objB: any, matchArrays = true) => {
 describe('actions', () => {
   // Address and safe to run the test against
   // !! This safe needs to exist on the deployment tested against
-  const address = '0xe94d94eddb2322975d73ca3f2086978e0f2953b1'.toLowerCase();
-  const safeId = '16';
+  const address = '0x6C5CCF22147A96e27855E26bC6824EB76497D112'.toLowerCase();
+  let safeId: string;
+
+  beforeAll(async () => {
+    const userSafes = await gebManager.getUserSafesRpc({ geb, address });
+    if (!userSafes || !userSafes.safes.length) {
+      console.log(`WARNING => ADDRESS HAS NO PROXY OR HAS NO SAFES`);
+    } else {
+      safeId = userSafes.safes[0].safeId;
+    }
+  });
 
   describe('FetchLiquidationData', () => {
     // prettier-ignore
