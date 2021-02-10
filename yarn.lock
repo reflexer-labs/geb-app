@@ -1730,27 +1730,27 @@
     hash.js "^1.1.7"
     randombytes "^2.1.0"
 
-"@reflexer-finance/geb-contract-api@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-contract-api/-/geb-contract-api-0.5.0.tgz#33f375b0cd30a5551157eef834c3afcb6d52dea5"
-  integrity sha512-KcAWdO4sVP1c4epm5doPhAOsBlTqH78M12sBlPxd5iXiQtUtlcxQv5WJTMqPq9wlrwxu8fzLHdkGu4w/X570xg==
+"@reflexer-finance/geb-contract-api@^0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-contract-api/-/geb-contract-api-0.5.1.tgz#5900aa4e126783f2783cb495b8edf1034f642f83"
+  integrity sha512-HksdsrqpjdhNG0y0smRYMmVrTDeyu3FHuKQsCWdjSDRVKJR7/10Onlr64ZsBSiE7Cmmfgc83RrH1jpKawyDKtw==
   dependencies:
     "@ethersproject/bignumber" "5.x"
-    "@reflexer-finance/geb-contract-base" "^0.5.0"
+    "@reflexer-finance/geb-contract-base" "^0.5.1"
 
-"@reflexer-finance/geb-contract-base@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-contract-base/-/geb-contract-base-0.5.0.tgz#c42ec6e131f94e06968569f9d2354802a80e5ec8"
-  integrity sha512-LHJbz2h5IMCM/F04CkLD+SJJ6CMR7CBmfHGu3kP+l9a5+EQoXU7hj5ZPjALtxhwvyB8HcuA+YJq/xLH9DoaU5w==
+"@reflexer-finance/geb-contract-base@^0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-contract-base/-/geb-contract-base-0.5.1.tgz#806d01e686826039781dbd65ca78c679d7347c95"
+  integrity sha512-dQnOmaF9lnwC4hErKqxiZLUKiHooptIeavxEhNcUx0rx0rYlw3E/6EyLPPn4xNNnCbYHzFjnOl+FedCWNvpJiA==
   dependencies:
     "@ethersproject/bignumber" "5.x"
 
-"@reflexer-finance/geb-ethers-provider@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-ethers-provider/-/geb-ethers-provider-0.5.0.tgz#2d4d0a321314ee72657e508e678713467239a13b"
-  integrity sha512-xKmmKTywkBN5VqtB/ZOtkzzJ8Vsl0I3oYzPBeULmfO63cqKcTV374M6kGOp1Swj9nkHL0H+cVXQafjmNFHQT2A==
+"@reflexer-finance/geb-ethers-provider@^0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-ethers-provider/-/geb-ethers-provider-0.5.1.tgz#94ceb9d13d77f8a25dc82ba6d09c7d1f67adbe02"
+  integrity sha512-5lBPwoeIkcx9G+IHtJDiVG4gv+/RD4C1/qO9zn1SD8A9llzK8ESfswviEkQgy3xizc3VGEey8OtId24YTSv+tg==
   dependencies:
-    "@reflexer-finance/geb-contract-base" "^0.5.0"
+    "@reflexer-finance/geb-contract-base" "^0.5.1"
 
 "@sheerun/mutationobserver-shim@^0.3.2":
   version "0.3.3"
@@ -6208,15 +6208,15 @@ functional-red-black-tree@^1.0.1:
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
 
-geb.js@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/geb.js/-/geb.js-0.5.0.tgz#0f8cf9487d285975edea412862dd16720dc045a7"
-  integrity sha512-TYR5rTlJMKt6130VDpBHo6X2n4RrCnB5X/HPYkF1rUCcN/w/PPWexqHYLeNJtWnWvAAL8A65xT+vhePmF3H4qQ==
+geb.js@^0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/geb.js/-/geb.js-0.5.1.tgz#00ed7b68f3a6dc0f8627e01996430bd9a4f14f30"
+  integrity sha512-IN9iauaOem07RnQR8fmADsaC3N8MDKc4Mi5KPEUofncrDCqXieGmcsZUvW3O3r9FoJNWpAJxCytsDc1f28xaFA==
   dependencies:
     "@ethersproject/bignumber" "5.x"
-    "@reflexer-finance/geb-contract-api" "^0.5.0"
-    "@reflexer-finance/geb-contract-base" "^0.5.0"
-    "@reflexer-finance/geb-ethers-provider" "^0.5.0"
+    "@reflexer-finance/geb-contract-api" "^0.5.1"
+    "@reflexer-finance/geb-contract-base" "^0.5.1"
+    "@reflexer-finance/geb-ethers-provider" "^0.5.1"
 
 gensync@^1.0.0-beta.1:
   version "1.0.0-beta.2"
