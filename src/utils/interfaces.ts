@@ -276,6 +276,7 @@ export interface IIncentivesCampaignData {
   praiBalance: string;
   protBalance: string;
   uniswapCoinPool: string;
+  // old24hData is null when using RPC as this can't be fetched over RPC
   old24hData: {
     coinAddress: string;
     wethAddress: string;
@@ -287,13 +288,16 @@ export interface IIncentivesCampaignData {
     currentCoinMedianizerUpdate: {
       value: string;
     };
-  };
+  } | null;
   incentiveBalances: Array<IncentiveBalance>;
+  // proxyData is null when user does not have a proxy
   proxyData: {
     address: string;
-    coinAllowance: { amount: string };
-    uniCoinLpAllowance: { amount: string };
-  };
+    // coinAllowance when allowance is 0 TODO: need uniform behavior when 0
+    coinAllowance: { amount: string } | null;
+    // uniCoinLpAllowance when allowance is 0 TODO: need uniform behavior when 0
+    uniCoinLpAllowance: { amount: string } | null;
+  } | null;
 }
 
 export interface IIncentivesFields {

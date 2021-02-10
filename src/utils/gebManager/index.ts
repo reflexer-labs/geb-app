@@ -215,10 +215,70 @@ const getIncentivesBalances = async (): Promise<Array<IncentiveBalance>> => {
 };
 
 const getIncentives = async (
-  address: string,
-  blockNumber: number
+  config: UserListConfig
 ): Promise<IIncentivesCampaignData> => {
-  return incentivesResponse;
+  const { geb, address } = config;
+  // @ts-ignore Typing only supported up to 7 queries
+  const multiCall1 = await geb.multiCall([
+    geb.contracts.coin.balanceOf(address, true), // 0
+    geb.contracts.protocolToken.balanceOf(address, true), // 1
+    geb.contracts.uniswapPairCoinEth.getReserves(true), // 2
+    geb.contracts.uniswapPairCoinEth.token0(true), // 3
+    geb.contracts.uniswapPairCoinEth.totalSupply(true), // 4
+    geb.contracts.medianizerCoin.read(true), // 5
+    geb.contracts.proxyRegistry.proxies(address, true), // 6
+  ]);
+
+  const multiCall2 = await geb.multiCall([
+    geb.contracts.uniswapPairCoinEth.balanceOf(address, true), // 0
+    geb.contracts.coin.allowance(address, multiCall1[6], true), // 1
+    geb.contracts.uniswapPairCoinEth.allowance(address, multiCall1[6], true), // 2
+  ]);
+
+  return {
+    incentiveBalances: incentivesBalanceResponse,
+    allCampaigns: incentivesCampaigns,
+    old24hData: null,
+    praiBalance: parseWad(multiCall1[0]),
+    protBalance: parseWad(multiCall1[1]),
+    // TODO: Remove
+    stakedBalance: "REMOVE ME",
+    systemState: {
+      coinAddress: geb.contracts.coin.address.toLowerCase(),
+      coinUniswapPair: {
+        reserve0: parseWad(multiCall1[2]._reserve0),
+        reserve1: parseWad(multiCall1[2]._reserve1),
+        token0: multiCall1[3],
+        token0Price: String(
+          Number(parseWad(multiCall1[2]._reserve0)) /
+            Number(parseWad(multiCall1[2]._reserve1))
+        ),
+        token1Price: String(
+          Number(parseWad(multiCall1[2]._reserve1)) /
+            Number(parseWad(multiCall1[2]._reserve0))
+        ),
+        totalSupply: parseWad(multiCall1[4]),
+      },
+      currentCoinMedianizerUpdate: {
+        value: parseRay(multiCall1[5]),
+      },
+      wethAddress: geb.contracts.weth.address.toLowerCase(),
+    },
+    uniswapCoinPool: parseWad(multiCall2[0]),
+    user: address.toLowerCase(),
+    proxyData:
+      multiCall1[6] === utils.NULL_ADDRESS
+        ? null
+        : {
+            address: multiCall1[6].toLowerCase(),
+            coinAllowance: multiCall2[1].isZero()
+              ? null
+              : { amount: parseWad(multiCall2[1]) },
+            uniCoinLpAllowance: multiCall2[2].isZero()
+              ? null
+              : { amount: parseWad(multiCall2[2]) },
+          },
+  };
 };
 
 export default {
