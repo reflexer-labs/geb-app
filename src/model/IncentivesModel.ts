@@ -7,7 +7,6 @@ import {
   handleIncentiveWithdraw,
 } from '../services/blockchain';
 import { fetchIncentivesCampaigns } from '../services/graphql';
-import { timeout } from '../utils/helper';
 import {
   IIncentivePayload,
   IIncentivesCampaignData,
@@ -117,20 +116,10 @@ const incentivesModel: IncentivesModel = {
         title: 'Transaction Submitted',
         hash: txResponse.hash,
         status: 'success',
-        isCreate: true,
-      });
-      await timeout(1000);
-
-      storeActions.popupsModel.setWaitingPayload({
-        title: 'Fetching data...',
-        hash: txResponse.hash,
-        status: 'loading',
-        isCreate: true,
       });
       actions.setIncentivesFields(INITIAL_STATE);
       storeActions.incentivesModel.setOperation(0);
       await txResponse.wait();
-      await timeout(1000);
     }
   }),
   incentiveClaim: thunk(async (actions, payload, { getStoreActions }) => {
@@ -154,20 +143,10 @@ const incentivesModel: IncentivesModel = {
         title: 'Transaction Submitted',
         hash: txResponse.hash,
         status: 'success',
-        isCreate: true,
       });
-      await timeout(1000);
-      storeActions.popupsModel.setWaitingPayload({
-        title: 'Fetching data...',
-        hash: txResponse.hash,
-        status: 'loading',
-        isCreate: true,
-      });
-
       actions.setClaimableFLX('');
       storeActions.incentivesModel.setOperation(0);
       await txResponse.wait();
-      await timeout(1000);
     }
   }),
   incentiveWithdraw: thunk(async (actions, payload, { getStoreActions }) => {
@@ -188,19 +167,10 @@ const incentivesModel: IncentivesModel = {
         title: 'Transaction Submitted',
         hash: txResponse.hash,
         status: 'success',
-        isCreate: true,
-      });
-      await timeout(1000);
-      storeActions.popupsModel.setWaitingPayload({
-        title: 'Fetching data...',
-        hash: txResponse.hash,
-        status: 'loading',
-        isCreate: true,
       });
       actions.setUniPoolAmount('');
       storeActions.incentivesModel.setOperation(0);
       await txResponse.wait();
-      await timeout(1000);
     }
   }),
   setType: action((state, payload) => {
