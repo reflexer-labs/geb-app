@@ -70,7 +70,6 @@ class CustomizedBridge extends _Eip1193Bridge {
 }
 
 // sets up the injected provider to be a mock ethereum provider with the given mnemonic/index
-// eslint-disable-next-line no-undef
 Cypress.Commands.overwrite('visit', (original, url, options) => {
   return original(url, {
     ...options,
