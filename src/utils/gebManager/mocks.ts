@@ -160,7 +160,6 @@ export const incentivesResponse: IIncentivesCampaignData = {
   },
   praiBalance: '0',
   protBalance: '0',
-  stakedBalance: '0',
   systemState: {
     coinAddress: '0x76b06a2f6df6f0514e7bec52a9afb3f603b477cd',
     coinUniswapPair: {
