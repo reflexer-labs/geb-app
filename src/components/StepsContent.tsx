@@ -6,6 +6,7 @@ import Button from './Button';
 interface Props {
   title: string;
   text: string;
+  stepNumber: number;
   btnText: string;
   handleClick: () => void;
   isDisabled: boolean;
@@ -15,6 +16,7 @@ interface Props {
 const StepsContent = ({
   title,
   text,
+  stepNumber,
   btnText,
   handleClick,
   isDisabled,
@@ -26,6 +28,7 @@ const StepsContent = ({
       <Title>{t(title)}</Title>
       <Text>{t(text)}</Text>
       <Button
+        id={stepNumber === 2 ? 'create-safe' : ''}
         disabled={isDisabled || isLoading}
         isLoading={isLoading}
         text={t(btnText)}

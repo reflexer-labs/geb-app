@@ -32,7 +32,7 @@ const Incentives = () => {
   }, [account, chainId, history, incentivesActions]);
 
   return (
-    <>
+    <div id="incentives-page">
       <GridContainer>
         <PageHeader
           breadcrumbs={{ '/': t('incentives') }}
@@ -43,7 +43,7 @@ const Incentives = () => {
           <IncentivesAssets />
         </AssetsContainer>
       </GridContainer>
-    </>
+    </div>
   );
 };
 

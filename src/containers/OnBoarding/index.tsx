@@ -36,6 +36,7 @@ const OnBoarding = () => {
           {safeState.safeCreated ? (
             <BtnContainer>
               <Button
+                id="create-safe"
                 disabled={connectWalletState.isWrongNetwork}
                 onClick={() =>
                   popupsActions.setSafeOperationPayload({

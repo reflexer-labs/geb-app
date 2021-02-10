@@ -54,7 +54,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "integration-test": "start-server-and-test start http://localhost:3000 'cypress run'",
+    "cypress-test": "start-server-and-test start http://localhost:3000 'cypress run'",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

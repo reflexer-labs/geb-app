@@ -23,7 +23,7 @@ const IncentivesAssets = () => {
 
   return (
     <Container>
-      <Title>{t('assets')}</Title>
+      <Title id="incentives-assets">{t('assets')}</Title>
 
       <Content>
         <InnerContent>

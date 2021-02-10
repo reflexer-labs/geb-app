@@ -19,4 +19,15 @@ describe('Landing Page', () => {
       TEST_ADDRESS_NEVER_USE_SHORTENED
     );
   });
+
+  it('it has create safe', () => {
+    cy.get('#create-safe').contains('Safe');
+    cy.get('#create-safe').click();
+    cy.get('#safe-header').contains('Create a Safe');
+  });
+
+  it('allows navigation to incentives', () => {
+    cy.get('#incentives-link').click();
+    cy.url().should('include', '/incentives');
+  });
 });
