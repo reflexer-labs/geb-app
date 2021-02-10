@@ -15,31 +15,30 @@ export default function useAuctions() {
   useEffect(() => {
     const oneMonthOld =
       Date.now() - new Date().setMonth(new Date().getMonth() - 1);
-    const filteredAuctions = autctionsData
-      .filter((auction: IAuction) => {
-        return (
-          Number(auction.auctionDeadline) * 1000 > Date.now() ||
-          Number(auction.createdAt) * 1000 > oneMonthOld
-        );
-      })
-      .sort((a, b) => {
-        if (
-          Number(a.auctionDeadline) * 1000 > Date.now() ||
-          (a.winner && userProxy && a.winner === userProxy && !a.isClaimed)
-        ) {
-          console.log(true);
+    const filteredAuctions = autctionsData.filter((auction: IAuction) => {
+      return (
+        Number(auction.auctionDeadline) * 1000 > Date.now() ||
+        Number(auction.createdAt) * 1000 > oneMonthOld
+      );
+    });
 
-          return 1;
-        }
-        return -1;
+    const myAuctions = filteredAuctions.filter(
+      (auction: IAuction) =>
+        auction.winner &&
+        userProxy &&
+        auction.winner.toLowerCase() === userProxy.toLowerCase() &&
+        !auction.isClaimed
+    );
 
-        // return (
-        //   Number(b.auctionId) - Number(a.auctionId) &&
-        //   a.englishAuctionBids.length - b.englishAuctionBids.length
-        // );
-      });
+    const auctionsToRestart = filteredAuctions.filter(
+      (auction: IAuction) => !auction.englishAuctionBids.length
+    );
 
-    setState(filteredAuctions);
+    const auctionsData = Array.from(
+      new Set([...myAuctions, ...auctionsToRestart, ...filteredAuctions])
+    );
+
+    setState(auctionsData);
   }, [autctionsData, userProxy]);
 
   return state;

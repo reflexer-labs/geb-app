@@ -258,7 +258,6 @@ export interface IncentiveBalance {
 export interface IIncentivesCampaignData {
   user: string | null;
   allCampaigns: Array<IncentivesCampaign>;
-  stakedBalance: string;
   systemState: {
     coinAddress: string;
     wethAddress: string;
