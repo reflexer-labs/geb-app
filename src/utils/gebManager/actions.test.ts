@@ -9,7 +9,7 @@ import {
   liquidationQuery,
 } from "../queries/safe";
 import { BigNumber, FixedNumber } from "ethers";
-import { ISafeQuery, IUserSafeList } from "../interfaces";
+import { IncentiveBalance, ISafeQuery, IUserSafeList } from "../interfaces";
 import { geb } from "../../setupTests";
 import { fetchIncentivesCampaigns } from "../../services/graphql";
 
@@ -121,8 +121,8 @@ const verifyKeys = (objA: any, objB: any, matchArrays = true) => {
 describe("actions", () => {
   // Address and safe to run the test against
   // !! This safe needs to exist on the deployment tested against
-  const address = "0xe94d94eddb2322975d73ca3f2086978e0f2953b1".toLowerCase();
-  const safeId = "5";
+  const address = "0x7eb8caf136Ba45DD16483188cbe8b615f6251ca7".toLowerCase();
+  const safeId = "2";
 
   describe("FetchLiquidationData", () => {
     // prettier-ignore
@@ -258,6 +258,8 @@ describe("actions", () => {
       expect(gqlResponse).toBeTruthy();
       expect(rpcResponse).toBeTruthy();
 
+      // Check the full object
+
       // It's not possible to get historical data over RPC
       expect(rpcResponse.old24hData).toBeNull()
       expect(rpcResponse.praiBalance).fixedNumberMatch(gqlResponse.praiBalance)
@@ -265,7 +267,7 @@ describe("actions", () => {
       expect(rpcResponse.uniswapCoinPool).fixedNumberMatch(gqlResponse.uniswapCoinPool)
       expect(rpcResponse.user).toEqual(gqlResponse.user)
 
-      // System state
+      // Check System state data
       verifyKeys(rpcResponse.systemState, gqlResponse.systemState);
       expect(rpcResponse.systemState.coinAddress).toEqual(gqlResponse.systemState.coinAddress)
       expect(rpcResponse.systemState.coinUniswapPair.reserve0).fixedNumberMatch(gqlResponse.systemState.coinUniswapPair.reserve0)
@@ -277,7 +279,7 @@ describe("actions", () => {
       expect(rpcResponse.systemState.wethAddress).toEqual(gqlResponse.systemState.wethAddress)
       
       
-      // Proxy data
+      // Check Proxy data
       verifyKeys(rpcResponse.proxyData, gqlResponse.proxyData);
       if(rpcResponse.proxyData && gqlResponse.proxyData) {
         expect(rpcResponse.proxyData.address).toEqual(gqlResponse.proxyData.address)
@@ -288,7 +290,40 @@ describe("actions", () => {
           expect(rpcResponse.proxyData.uniCoinLpAllowance.amount).fixedNumberMatch(gqlResponse.proxyData.uniCoinLpAllowance.amount)
         }
       }
-      
+
+      // Check Campaigns data
+      expect(rpcResponse.allCampaigns.length).toEqual(gqlResponse.allCampaigns.length)
+      const rpcCampaigns = rpcResponse.allCampaigns
+      const gqlCampaigns = gqlResponse.allCampaigns
+      for(let i = 0; i < gqlCampaigns.length; i++) {
+        verifyKeys(rpcCampaigns[i], gqlCampaigns[i])
+        const rpcCampaign = rpcCampaigns[i]
+        const gqlCampaign = gqlCampaigns[i]
+        expect(rpcCampaign).toBeTruthy()
+        expect(rpcCampaign.campaignAddress).toEqual(gqlCampaign.campaignAddress)
+        expect(rpcCampaign.campaignNumber).toEqual(gqlCampaign.campaignNumber)
+        expect(rpcCampaign.id).toEqual(gqlCampaign.id)
+        expect(rpcCampaign.lastUpdatedTime).toEqual(gqlCampaign.lastUpdatedTime)
+        expect(rpcCampaign.periodFinish).toEqual(gqlCampaign.periodFinish)
+        expect(rpcCampaign.rewardPerTokenStored).fixedNumberMatch(gqlCampaign.rewardPerTokenStored)
+        expect(rpcCampaign.rewardRate).fixedNumberMatch(gqlCampaign.rewardRate)
+        expect(rpcCampaign.rewardToken).toEqual(gqlCampaign.rewardToken)
+        expect(rpcCampaign.rewardsDuration).toEqual(gqlCampaign.rewardsDuration)
+        expect(rpcCampaign.totalSupply).fixedNumberMatch(gqlCampaign.totalSupply)
+
+      }
+
+      // Incentive balance data
+      expect(rpcResponse.incentiveBalances.length).toEqual(gqlResponse.incentiveBalances.length)
+      for(let gqlBalance of gqlResponse.incentiveBalances) {
+        const rpcBalance = rpcResponse.incentiveBalances.find(x => x.id === gqlBalance.id) as IncentiveBalance
+        expect(rpcBalance).toBeTruthy()
+        expect(rpcBalance.address).toEqual(gqlBalance.address)
+        expect(rpcBalance.owner).toEqual(gqlBalance.owner)
+        expect(rpcBalance.reward).fixedNumberMatch(gqlBalance.reward)
+        expect(rpcBalance.stakeBalance).fixedNumberMatch(gqlBalance.stakeBalance)
+        expect(rpcBalance.userRewardPerTokenPaid).fixedNumberMatch(gqlBalance.userRewardPerTokenPaid)
+      }
     });
   });
 });

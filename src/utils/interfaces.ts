@@ -220,14 +220,20 @@ export interface ISafeHistory {
 }
 
 export interface IncentivesCampaign {
-  duration: string;
-  instantExitPercentage: string;
-  reward: string;
-  rewardDelay: string;
-  startTime: string;
-  lastUpdateTime: string;
+  // TODO: Remove this
+  duration?: string;
+  // TODO: Remove this
+  instantExitPercentage?: string;
+  // TODO: Remove this
+  reward?: string;
+  // TODO: Remove this
+  rewardDelay?: string;
+  // TODO: Remove this
+  startTime?: string;
+  // TODO: Remove this
+  lastUpdateTime?: string;
 
-  // new
+  // TODO: remove campaign id or campaign address, they are the same
   id: string;
   campaignAddress: string;
   campaignNumber: string;
@@ -236,13 +242,19 @@ export interface IncentivesCampaign {
   totalSupply: string;
   rewardToken: string;
   rewardPerTokenStored: string;
+
+  // TODO: I needed to add these to match the response from GQL
+  periodFinish: string;
+  lastUpdatedTime: string
+
 }
 
 export interface IncentiveBalance {
-  campaignId: string;
-  delayedRewardTotalAmount: string;
-  delayedRewardExitedAmount: string;
-  delayedRewardLatestExitTime: string;
+  // TODO: CLEANUPS these
+  campaignId?: string;
+  delayedRewardTotalAmount?: string;
+  delayedRewardExitedAmount?: string;
+  delayedRewardLatestExitTime?: string;
 
   // new
   id: string;
