@@ -41,9 +41,9 @@ yarn start
 To have the app default to a different network when a wallet is not connected:
 
 1. Create a file and name it `.env.development.local`
-2. Change `REACT_APP_NETWORK_ID` to `"{YOUR_NETWORK_ID}"`
-3. Change `REACT_APP_NETWORK_URL` to e.g. `"https://{YOUR_NETWORK_ID}.infura.io/v3/{YOUR_INFURA_KEY}"`
-4. Change `REACT_APP_COIN_TICKER_STAGING` to e.g `"RAI"`
+2. Change `REACT_APP_NETWORK_ID` to `"42"`
+3. Change `REACT_APP_NETWORK_URL` to e.g. `"https://kovan.infura.io/v3/{YOUR_INFURA_KEY}"`
+4. Change `REACT_APP_COIN_TICKER_STAGING` to `"RAI"`
 
 ## Testing
 
