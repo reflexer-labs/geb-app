@@ -5,10 +5,10 @@
   </a>
 </p>
 <h1 align="center">
-  Reflexer Website
+  Reflexer App
 </h1>
 
-Reflexer App -- Deposit your crypto assets, generate RAI and lever up your position.
+Deposit your crypto assets, generate RAI and lever up your position.
 
 - Website: [reflexer.finance](https://reflexer.finance/)
 - App: [app.reflexer.finance](https://app.reflexer.finance)
