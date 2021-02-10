@@ -244,7 +244,5 @@ export const fetchIncentivesCampaigns = async (
 export const fetchAuctions = async (address: string) => {
   const res = await request(JSON.stringify({ query: auctionsQuery(address) }));
   const response = res.data.data;
-  console.log(response);
-
   return response;
 };
