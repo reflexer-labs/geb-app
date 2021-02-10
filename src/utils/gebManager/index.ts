@@ -1,5 +1,4 @@
 import { BigNumber } from 'ethers';
-import { zeroPad } from 'ethers/lib/utils';
 import { Geb, utils, contracts } from 'geb.js';
 import {
   IIncentivesCampaignData,

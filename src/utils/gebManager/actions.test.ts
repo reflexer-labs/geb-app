@@ -1,17 +1,17 @@
 // tests
-import gebManager from ".";
-import "../../setupTests";
-import axios from "axios";
-import { GRAPH_API_URLS } from "../constants";
+import gebManager from '.';
+import '../../setupTests';
+import axios from 'axios';
+import { GRAPH_API_URLS } from '../constants';
 import {
   getSafeByIdQuery,
   getUserSafesListQuery,
   liquidationQuery,
-} from "../queries/safe";
-import { BigNumber, FixedNumber } from "ethers";
-import { IncentiveBalance, ISafeQuery, IUserSafeList } from "../interfaces";
-import { geb } from "../../setupTests";
-import { fetchIncentivesCampaigns } from "../../services/graphql";
+} from '../queries/safe';
+import { BigNumber, FixedNumber } from 'ethers';
+import { IncentiveBalance, ISafeQuery, IUserSafeList } from '../interfaces';
+import { geb } from '../../setupTests';
+import { fetchIncentivesCampaigns } from '../../services/graphql';
 
 // Add custom match type
 declare global {
@@ -29,8 +29,8 @@ expect.extend({
   // And work with the gql endpoint way of handling BigDecimals
   fixedNumberMatch(received, other: string) {
     // Use format 45 decimal
-    const fixReceived = FixedNumber.from(received, "fixed256x45");
-    const fixOther = FixedNumber.from(other, "fixed256x45");
+    const fixReceived = FixedNumber.from(received, 'fixed256x45');
+    const fixOther = FixedNumber.from(other, 'fixed256x45');
 
     // The GQL endpoint will allow only up to 33-34 digits base 10 for the mantissa
     // So we truncate it
@@ -49,7 +49,7 @@ expect.extend({
       truncatedMantissaReceived === truncatedMantissaOther &&
       fixReceived.format.decimals === fixOther.format.decimals
     ) {
-      return { pass: true, message: () => "Good" };
+      return { pass: true, message: () => 'Good' };
     } else {
       return {
         pass: false,
@@ -61,7 +61,7 @@ expect.extend({
   almostEqual(received: string, other: string, maxAbsoluteDeviation: number) {
     const deviation = Math.abs(Number(received) - Number(other));
     if (deviation <= maxAbsoluteDeviation) {
-      return { pass: true, message: () => "Good" };
+      return { pass: true, message: () => 'Good' };
     } else {
       return {
         pass: false,
@@ -109,7 +109,7 @@ const verifyKeys = (objA: any, objB: any, matchArrays = true) => {
         verifyKeys(arrayA[j], arrayB[j], matchArrays);
       }
     } else if (
-      typeof objA[keyA[i]] === "object" &&
+      typeof objA[keyA[i]] === 'object' &&
       !Array.isArray(objA[keyA[i]]) &&
       objA[keyA[i]]
     ) {
@@ -118,15 +118,15 @@ const verifyKeys = (objA: any, objB: any, matchArrays = true) => {
   }
 };
 
-describe("actions", () => {
+describe('actions', () => {
   // Address and safe to run the test against
   // !! This safe needs to exist on the deployment tested against
-  const address = "0x7eb8caf136Ba45DD16483188cbe8b615f6251ca7".toLowerCase();
-  const safeId = "2";
+  const address = '0x7eb8caf136Ba45DD16483188cbe8b615f6251ca7'.toLowerCase();
+  const safeId = '2';
 
-  describe("FetchLiquidationData", () => {
+  describe('FetchLiquidationData', () => {
     // prettier-ignore
-    it("Data from RPC and GQL should be the same for liquidation data", async () => {
+    it('Data from RPC and GQL should be the same for liquidation data', async () => {
       const rpcResponse = await gebManager.getLiquidationDataRpc(geb);
 
       const gqlQuery = `{ ${liquidationQuery} }`;
@@ -160,8 +160,8 @@ describe("actions", () => {
     });
   });
 
-  describe("FetchUserSafeList", () => {
-    it("fetches a list of user safes", async () => {
+  describe('FetchUserSafeList', () => {
+    it('fetches a list of user safes', async () => {
       const rpcResponse = await gebManager.getUserSafesRpc({ geb, address });
       const gqlResponse: IUserSafeList = (
         await axios.post(
@@ -198,9 +198,9 @@ describe("actions", () => {
     });
   });
 
-  describe("FetchSafeById", () => {
+  describe('FetchSafeById', () => {
     // prettier-ignore
-    it("fetches a safe by id", async () => {
+    it('fetches a safe by id', async () => {
       const rpcResponse = await gebManager.getSafeByIdRpc({ geb, safeId, address });
       const gqlResponse: ISafeQuery = (
         await axios.post(
@@ -248,9 +248,9 @@ describe("actions", () => {
     });
   });
 
-  describe("FetchIncentivesCampaigns", () => {
+  describe('FetchIncentivesCampaigns', () => {
     // prettier-ignore
-    it("Fetch incentive campaigns", async () => {
+    it('Fetch incentive campaigns', async () => {
       const blockNumber = 23390141
       const rpcResponse = await gebManager.getIncentives({geb, address});
       const gqlResponse = await fetchIncentivesCampaigns(address, blockNumber)
