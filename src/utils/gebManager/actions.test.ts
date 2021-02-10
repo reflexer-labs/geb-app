@@ -11,7 +11,6 @@ import {
 import { BigNumber, FixedNumber } from "ethers";
 import { ISafeQuery, IUserSafeList } from "../interfaces";
 import { geb } from "../../setupTests";
-import { incentiveCampaignsQuery } from "../queries/incentives";
 import { fetchIncentivesCampaigns } from "../../services/graphql";
 
 // Add custom match type
@@ -75,8 +74,6 @@ expect.extend({
 
 // Recursively checks that 2 objects have the same keys and number of array element
 const verifyKeys = (objA: any, objB: any, matchArrays = true) => {
-  // console.log(objA)
-  // console.log(objB)
   const keyA = Object.keys(objA).sort();
   const keyB = Object.keys(objB).sort();
 
@@ -142,8 +139,7 @@ describe("actions", () => {
 
       verifyKeys(rpcResponse, gqlResponse)
 
-      // TODO: Small deviation with Redemption price to fix on the subgraph
-      // expect(rpcResponse.systemState.currentRedemptionPrice.value).fixedNumberMatch(gqlResponse.systemState.currentRedemptionPrice.value);
+      expect(rpcResponse.systemState.currentRedemptionPrice.value).fixedNumberMatch(gqlResponse.systemState.currentRedemptionPrice.value);
       // Since we're using JS instead of solidity for the exponentiation, an approximation is enough
       expect(rpcResponse.systemState.currentRedemptionRate.eightHourlyRate).almostEqual(gqlResponse.systemState.currentRedemptionRate.eightHourlyRate, 0.00001)
       expect(rpcResponse.systemState.globalDebt).fixedNumberMatch(gqlResponse.systemState.globalDebt);

@@ -241,8 +241,6 @@ const getIncentives = async (
     old24hData: null,
     praiBalance: parseWad(multiCall1[0]),
     protBalance: parseWad(multiCall1[1]),
-    // TODO: Remove
-    stakedBalance: "REMOVE ME",
     systemState: {
       coinAddress: geb.contracts.coin.address.toLowerCase(),
       coinUniswapPair: {
