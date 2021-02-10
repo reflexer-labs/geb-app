@@ -8,9 +8,9 @@
   Reflexer Website
 </h1>
 
-Reflexer App -- Volatility dampened synthetic instruments.
+Reflexer App -- Deposit your crypto assets, generate RAI and lever up your position.
 
-- Website: [reflexer.finance](hhttps://reflexer.finance/)
+- Website: [reflexer.finance](https://reflexer.finance/)
 - App: [app.reflexer.finance](https://app.reflexer.finance)
 - Analytics: [stats.reflexer.finance](https://stats.reflexer.finance/)
 - Docs: [docs.reflexer.finance](https://docs.reflexer.finance/)
@@ -40,7 +40,7 @@ yarn start
 
 To have the app default to a different network when a wallet is not connected:
 
-1. Make a copy of `.env` named `.env.development.local`
+1. Create a file and name it `.env.development.local`
 2. Change `REACT_APP_NETWORK_ID` to `"{YOUR_NETWORK_ID}"`
 3. Change `REACT_APP_NETWORK_URL` to e.g. `"https://{YOUR_NETWORK_ID}.infura.io/v3/{YOUR_INFURA_KEY}"`
 4. Change `REACT_APP_COIN_TICKER_STAGING` to e.g `"RAI"`

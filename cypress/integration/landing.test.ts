@@ -2,9 +2,9 @@
 
 import { TEST_ADDRESS_NEVER_USE_SHORTENED } from '../support/commands';
 
-describe('Landing Page', () => {
+describe('App Page', () => {
   beforeEach(() => cy.visit('/'));
-  it('loads Onboarding page', () => {
+  it('loads App page', () => {
     cy.get('#app-page');
   });
 
@@ -20,7 +20,7 @@ describe('Landing Page', () => {
     );
   });
 
-  it('it has create safe', () => {
+  it('has create safe', () => {
     cy.get('#create-safe').contains('Safe');
     cy.get('#create-safe').click();
     cy.get('#safe-header').contains('Create a Safe');

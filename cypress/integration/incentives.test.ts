@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-describe('Landing Page', () => {
+describe('Incentives Page', () => {
   beforeEach(() => cy.visit('/incentives'));
   it('loads Incentives page', () => {
     cy.get('#incentives-page');
