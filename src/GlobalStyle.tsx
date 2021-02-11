@@ -1,14 +1,14 @@
-import { createGlobalStyle, css } from 'styled-components';
+import { createGlobalStyle, css } from 'styled-components'
 
 interface Props {
-  bodyOverflow?: boolean;
+    bodyOverflow?: boolean
 }
 
 const GlobalStyle = createGlobalStyle`
         body {
           background:${(props) => props.theme.colors.foreground};
             overflow: ${(props: Props) =>
-              props.bodyOverflow ? 'hidden' : 'visible'};
+                props.bodyOverflow ? 'hidden' : 'visible'};
 
 .web3modal-modal-lightbox {
   z-index: 999;
@@ -52,39 +52,39 @@ const GlobalStyle = createGlobalStyle`
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.16);
   }
         }
-`;
+`
 
 export const ExternalLinkArrow = css`
-  border: 0;
-  cursor: pointer;
-  box-shadow: none;
-  outline: none;
-  padding: 0;
-  margin: 0;
-  background: ${(props) => props.theme.colors.gradient};
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: ${(props) => props.theme.colors.inputBorderColor};
-  font-size: ${(props) => props.theme.font.small};
-  font-weight: 600;
-  line-height: 24px;
-  letter-spacing: -0.18px;
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-    &:hover {
-      opacity: 0.5;
+    border: 0;
+    cursor: pointer;
+    box-shadow: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    background: ${(props) => props.theme.colors.gradient};
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: ${(props) => props.theme.colors.inputBorderColor};
+    font-size: ${(props) => props.theme.font.small};
+    font-weight: 600;
+    line-height: 24px;
+    letter-spacing: -0.18px;
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+        &:hover {
+            opacity: 0.5;
+        }
     }
-  }
-  transition: all 0.3s ease;
-  &:hover {
-    opacity: 0.8;
-  }
-  img {
-    position: relative;
-    top: 1px;
-  }
-`;
+    transition: all 0.3s ease;
+    &:hover {
+        opacity: 0.8;
+    }
+    img {
+        position: relative;
+        top: 1px;
+    }
+`
 
-export default GlobalStyle;
+export default GlobalStyle

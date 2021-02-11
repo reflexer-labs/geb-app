@@ -1,65 +1,64 @@
-import React from 'react';
-import { DollarSign } from 'react-feather';
-import { useTranslation } from 'react-i18next';
-import { NavLink } from 'react-router-dom';
-import styled from 'styled-components';
-import { NETWORK_ID } from '../connectors';
-import { useStoreActions } from '../store';
-import AnalyticsIcon from './Icons/AnalyticsIcon';
-import SafeIcon from './Icons/SafeIcon';
+import React from 'react'
+import { DollarSign } from 'react-feather'
+import { useTranslation } from 'react-i18next'
+import { NavLink } from 'react-router-dom'
+import styled from 'styled-components'
+import { NETWORK_ID } from '../connectors'
+import { useStoreActions } from '../store'
+import AnalyticsIcon from './Icons/AnalyticsIcon'
+import SafeIcon from './Icons/SafeIcon'
 
 const NavLinks = () => {
-  const { t } = useTranslation();
-  const { popupsModel: popupsActions } = useStoreActions((state) => state);
+    const { t } = useTranslation()
+    const { popupsModel: popupsActions } = useStoreActions((state) => state)
 
-  const handleLinkClick = (
-    e: React.MouseEvent<HTMLElement>,
-    disable = false,
-    externalLink = ''
-  ) => {
-    if (disable) {
-      e.preventDefault();
-    }
-    popupsActions.setShowSideMenu(false);
-    if (externalLink) {
-      window.open(externalLink, '_blank');
-      e.preventDefault();
-    }
-  };
-
-  return (
-    <Nav>
-      <NavBarLink
-        id="app-link"
-        to="/"
-        onClick={(e) => handleLinkClick(e, false)}
-      >
-        <SafeIcon className="opacity" /> {t('app')}
-      </NavBarLink>
-      <NavBarLink
-        id="incentives-link"
-        to="/incentives"
-        onClick={(e) => handleLinkClick(e, false)}
-      >
-        <DollarSign size="18" /> {t('incentives')}
-      </NavBarLink>
-
-      <NavBarLink
-        to="/"
-        onClick={(e) =>
-          handleLinkClick(
-            e,
-            false,
-            NETWORK_ID === 1
-              ? 'https://stats.reflexer.finance/'
-              : 'https://stats-kovan.reflexer.finance/'
-          )
+    const handleLinkClick = (
+        e: React.MouseEvent<HTMLElement>,
+        disable = false,
+        externalLink = ''
+    ) => {
+        if (disable) {
+            e.preventDefault()
         }
-      >
-        <AnalyticsIcon className="fill" /> {t('analytics')}
-      </NavBarLink>
+        popupsActions.setShowSideMenu(false)
+        if (externalLink) {
+            window.open(externalLink, '_blank')
+            e.preventDefault()
+        }
+    }
 
-      {/* <SepBlock className="disableDesktop">
+    return (
+        <Nav>
+            <NavBarLink
+                id="app-link"
+                to="/"
+                onClick={(e) => handleLinkClick(e, false)}
+            >
+                <SafeIcon className="opacity" /> {t('app')}
+            </NavBarLink>
+            <NavBarLink
+                id="incentives-link"
+                to="/incentives"
+                onClick={(e) => handleLinkClick(e, false)}
+            >
+                <DollarSign size="18" /> {t('incentives')}
+            </NavBarLink>
+            <NavBarLink
+                to="/"
+                onClick={(e) =>
+                    handleLinkClick(
+                        e,
+                        false,
+                        NETWORK_ID === 1
+                            ? 'https://stats.reflexer.finance/'
+                            : 'https://stats-kovan.reflexer.finance/'
+                    )
+                }
+            >
+                <AnalyticsIcon className="fill" /> {t('analytics')}
+            </NavBarLink>
+
+            {/* <SepBlock className="disableDesktop">
         <NavBarLink to="" onClick={(e) => handleLinkClick(e, false)}>
           {t('request_features')}
         </NavBarLink>
@@ -77,20 +76,20 @@ const NavLinks = () => {
           {t('talk_to_us')}
         </NavBarLink>
       </SepBlock> */}
-    </Nav>
-  );
-};
+        </Nav>
+    )
+}
 
-export default NavLinks;
+export default NavLinks
 
 const Nav = styled.div`
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 
-  svg {
-    display: none;
-  }
-  ${({ theme }) => theme.mediaWidth.upToSmall`
+    svg {
+        display: none;
+    }
+    ${({ theme }) => theme.mediaWidth.upToSmall`
   
     flex-direction: column;
     a,
@@ -115,42 +114,42 @@ const Nav = styled.div`
       }
     }
   `}
-`;
+`
 
 const NavBarLink = styled(NavLink)`
-  color: ${(props) => props.theme.colors.secondary};
-  font-weight: 600;
-  transition: all 0.3s ease;
+    color: ${(props) => props.theme.colors.secondary};
+    font-weight: 600;
+    transition: all 0.3s ease;
 
-  &:hover {
-    background: ${(props) => props.theme.colors.gradient};
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: ${(props) => props.theme.colors.inputBorderColor};
-  }
-
-  svg {
-    &.fill {
-      fill: ${(props) => props.theme.colors.secondary};
+    &:hover {
+        background: ${(props) => props.theme.colors.gradient};
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: ${(props) => props.theme.colors.inputBorderColor};
     }
-    &.opacity {
-      opacity: 0.5;
+
+    svg {
+        &.fill {
+            fill: ${(props) => props.theme.colors.secondary};
+        }
+        &.opacity {
+            opacity: 0.5;
+        }
     }
-  }
 
-  margin-right: 20px;
-  &:last-child {
-    margin-right: 0;
-  }
+    margin-right: 20px;
+    &:last-child {
+        margin-right: 0;
+    }
 
-  ${({ theme }) => theme.mediaWidth.upToSmall`
+    ${({ theme }) => theme.mediaWidth.upToSmall`
   border-bottom: 1px solid ${(props) => props.theme.colors.border};
   &:first-child {
     border-top: 1px solid ${(props) => props.theme.colors.border};
   }
   `}
-`;
+`
 
 // const NavBarBtn = styled.div`
 //   background: none;
