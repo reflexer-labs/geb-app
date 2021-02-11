@@ -50,6 +50,7 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
     const {
         incentivesModel: incentivesState,
         connectWalletModel: connectWalletState,
+        settingsModel: settingsState,
     } = useStoreState((state) => state)
 
     const {
@@ -63,6 +64,8 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
         uniPoolAmount,
         uniswapShare,
     } = incentivesState
+
+    const { isRPCAdapterOn } = settingsState
 
     const ethBalance = connectWalletState.ethBalance[NETWORK_ID]
     const raiBalance = _.get(
@@ -232,12 +235,19 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
         }
 
         const valueBN = BigNumber.from(toFixedString(val, 'WAD'))
-        const raiValueBN = BigNumber.from(toFixedString(raiValue, 'RAD')).div(
-            gebUtils.RAY
-        )
+        const raiValueBN =
+            isRPCAdapterOn && !isEth
+                ? BigNumber.from(toFixedString(raiValue, 'RAD'))
+                : BigNumber.from(toFixedString(raiValue, 'RAD')).div(
+                      gebUtils.RAY
+                  )
 
         const reflectValue = gebUtils
-            .wadToFixed(valueBN.mul(raiValueBN).div(gebUtils.WAD))
+            .wadToFixed(
+                valueBN
+                    .mul(raiValueBN)
+                    .div(isRPCAdapterOn && !isEth ? gebUtils.RAY : gebUtils.WAD)
+            )
             .toString()
 
         const raiVal = isEth ? reflectValue : val
