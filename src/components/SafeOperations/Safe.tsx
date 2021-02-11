@@ -1,13 +1,13 @@
-import React from 'react';
-import SafeBody from './SafeBody';
-import SafeContent from './SafeContent';
+import React from 'react'
+import SafeBody from './SafeBody'
+import SafeContent from './SafeContent'
 
 const Safe = () => {
-  return (
-    <SafeContent>
-      <SafeBody />
-    </SafeContent>
-  );
-};
+    return (
+        <SafeContent>
+            <SafeBody />
+        </SafeContent>
+    )
+}
 
-export default Safe;
+export default Safe

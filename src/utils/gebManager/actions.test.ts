@@ -1,132 +1,144 @@
 // tests
-import gebManager from '.';
-import '../../setupTests';
-import axios from 'axios';
-import { GRAPH_API_URLS } from '../constants';
+import gebManager from '.'
+import '../../setupTests'
+import axios from 'axios'
+import { GRAPH_API_URLS } from '../constants'
+import { liquidationQuery } from '../queries/safe'
+import { BigNumber, FixedNumber } from 'ethers'
+import { IncentiveBalance, ISafeQuery, IUserSafeList } from '../interfaces'
+import { geb } from '../../setupTests'
 import {
-  getSafeByIdQuery,
-  getUserSafesListQuery,
-  liquidationQuery,
-} from '../queries/safe';
-import { BigNumber, FixedNumber } from 'ethers';
-import { IncentiveBalance, ISafeQuery, IUserSafeList } from '../interfaces';
-import { geb } from '../../setupTests';
-import { fetchIncentivesCampaigns } from '../../services/graphql';
+    fetchIncentivesCampaigns,
+    fetchSafeById,
+    fetchUserSafes,
+} from '../../services/graphql'
 
 // Add custom match type
 declare global {
-  namespace jest {
-    interface Matchers<R> {
-      fixedNumberMatch: (other: string) => void;
-      almostEqual: (other: string, maxAbsoluteDeviation: number) => void;
+    namespace jest {
+        interface Matchers<R> {
+            fixedNumberMatch: (other: string) => void
+            almostEqual: (other: string, maxAbsoluteDeviation: number) => void
+        }
     }
-  }
 }
 
 // Add some custom matchers
 expect.extend({
-  // Compare numbers as string regardless of things like trailing/leading zeros
-  // And work with the gql endpoint way of handling BigDecimals
-  fixedNumberMatch(received, other: string) {
-    // Use format 45 decimal
-    const fixReceived = FixedNumber.from(received, 'fixed256x45');
-    const fixOther = FixedNumber.from(other, 'fixed256x45');
+    // Compare numbers as string regardless of things like trailing/leading zeros
+    // And work with the gql endpoint way of handling BigDecimals
+    fixedNumberMatch(received, other: string) {
+        // Use format 45 decimal
+        const fixReceived = FixedNumber.from(received, 'fixed256x45')
+        const fixOther = FixedNumber.from(other, 'fixed256x45')
 
-    // The GQL endpoint will allow only up to 33-34 digits base 10 for the mantissa
-    // So we truncate it
-    const gqlMaxMantissaSize = 33;
-    const mantissaReceived = BigNumber.from(
-      fixReceived.toHexString()
-    ).toString();
-    const mantissaOther = BigNumber.from(fixOther.toHexString()).toString();
-    const truncatedMantissaReceived = mantissaReceived.slice(
-      0,
-      gqlMaxMantissaSize
-    );
-    const truncatedMantissaOther = mantissaOther.slice(0, gqlMaxMantissaSize);
-    // Compare the mantissa and the decimal place
-    if (
-      truncatedMantissaReceived === truncatedMantissaOther &&
-      fixReceived.format.decimals === fixOther.format.decimals
-    ) {
-      return { pass: true, message: () => 'Good' };
-    } else {
-      return {
-        pass: false,
-        message: () => `Got ${received} not matching ${other}`,
-      };
-    }
-  },
-  // Equality with a specified tolerance
-  almostEqual(received: string, other: string, maxAbsoluteDeviation: number) {
-    const deviation = Math.abs(Number(received) - Number(other));
-    if (deviation <= maxAbsoluteDeviation) {
-      return { pass: true, message: () => 'Good' };
-    } else {
-      return {
-        pass: false,
-        message: () =>
-          `Got ${received} not matching ${other} \n Deviation of ${deviation} is too large`,
-      };
-    }
-  },
-});
+        // The GQL endpoint will allow only up to 33-34 digits base 10 for the mantissa
+        // So we truncate it
+        const gqlMaxMantissaSize = 33
+        const mantissaReceived = BigNumber.from(
+            fixReceived.toHexString()
+        ).toString()
+        const mantissaOther = BigNumber.from(fixOther.toHexString()).toString()
+        const truncatedMantissaReceived = mantissaReceived.slice(
+            0,
+            gqlMaxMantissaSize
+        )
+        const truncatedMantissaOther = mantissaOther.slice(
+            0,
+            gqlMaxMantissaSize
+        )
+        // Compare the mantissa and the decimal place
+        if (
+            truncatedMantissaReceived === truncatedMantissaOther &&
+            fixReceived.format.decimals === fixOther.format.decimals
+        ) {
+            return { pass: true, message: () => 'Good' }
+        } else {
+            return {
+                pass: false,
+                message: () => `Got ${received} not matching ${other}`,
+            }
+        }
+    },
+    // Equality with a specified tolerance
+    almostEqual(received: string, other: string, maxAbsoluteDeviation: number) {
+        const deviation = Math.abs(Number(received) - Number(other))
+        if (deviation <= maxAbsoluteDeviation) {
+            return { pass: true, message: () => 'Good' }
+        } else {
+            return {
+                pass: false,
+                message: () =>
+                    `Got ${received} not matching ${other} \n Deviation of ${deviation} is too large`,
+            }
+        }
+    },
+})
 
 // Recursively checks that 2 objects have the same keys and number of array element
 const verifyKeys = (objA: any, objB: any, matchArrays = true) => {
-  const keyA = Object.keys(objA).sort();
-  const keyB = Object.keys(objB).sort();
+    const keyA = Object.keys(objA).sort()
+    const keyB = Object.keys(objB).sort()
 
-  if (keyA.length !== keyB.length) {
-    fail("Objects don't have the same number of key");
-  }
-
-  for (let i = 0; i < keyA.length; i++) {
-    if (keyA[i] !== keyB[i]) {
-      fail(`Key names not matching: ${keyA[i]} ${keyB[i]}`);
+    if (keyA.length !== keyB.length) {
+        fail("Objects don't have the same number of key")
     }
 
-    const typeA = typeof objA[keyA[i]];
-    const typeB = typeof objA[keyB[i]];
+    for (let i = 0; i < keyA.length; i++) {
+        if (keyA[i] !== keyB[i]) {
+            fail(`Key names not matching: ${keyA[i]} ${keyB[i]}`)
+        }
 
-    if (typeA !== typeB && typeA !== null && typeB !== null) {
-      fail(
-        `Type of object not matching for: \n ${JSON.stringify(
-          objA
-        )} \n and: \n   ${JSON.stringify(objB)}`
-      );
+        const typeA = typeof objA[keyA[i]]
+        const typeB = typeof objA[keyB[i]]
+
+        if (typeA !== typeB && typeA !== null && typeB !== null) {
+            fail(
+                `Type of object not matching for: \n ${JSON.stringify(
+                    objA
+                )} \n and: \n   ${JSON.stringify(objB)}`
+            )
+        }
+
+        if (Array.isArray(objA[keyA[i]]) && matchArrays) {
+            // Process arrays
+            const arrayA = objA[keyA[i]]
+            const arrayB = objB[keyB[i]]
+            // Make sure that the arrays are of the same length
+            expect(arrayA.length).toEqual(arrayB.length)
+
+            // Check each individual objec within the aeeay
+            for (let j = 0; j < arrayA.length; j++) {
+                verifyKeys(arrayA[j], arrayB[j], matchArrays)
+            }
+        } else if (
+            typeof objA[keyA[i]] === 'object' &&
+            !Array.isArray(objA[keyA[i]]) &&
+            objA[keyA[i]]
+        ) {
+            verifyKeys(objA[keyA[i]], objB[keyB[i]], matchArrays)
+        }
     }
-
-    if (Array.isArray(objA[keyA[i]]) && matchArrays) {
-      // Process arrays
-      const arrayA = objA[keyA[i]];
-      const arrayB = objB[keyB[i]];
-      // Make sure that the arrays are of the same length
-      expect(arrayA.length).toEqual(arrayB.length);
-
-      // Check each individual objec within the aeeay
-      for (let j = 0; j < arrayA.length; j++) {
-        verifyKeys(arrayA[j], arrayB[j], matchArrays);
-      }
-    } else if (
-      typeof objA[keyA[i]] === 'object' &&
-      !Array.isArray(objA[keyA[i]]) &&
-      objA[keyA[i]]
-    ) {
-      verifyKeys(objA[keyA[i]], objB[keyB[i]], matchArrays);
-    }
-  }
-};
+}
 
 describe('actions', () => {
-  // Address and safe to run the test against
-  // !! This safe needs to exist on the deployment tested against
-  const address = '0x7eb8caf136Ba45DD16483188cbe8b615f6251ca7'.toLowerCase();
-  const safeId = '2';
+    // Address and safe to run the test against
+    // !! This safe needs to exist on the deployment tested against
+    const address = '0xe94D94eDdb2322975D73cA3f2086978e0f2953b1'.toLowerCase()
+    let safeId: string
 
-  describe('FetchLiquidationData', () => {
-    // prettier-ignore
-    it('Data from RPC and GQL should be the same for liquidation data', async () => {
+    beforeAll(async () => {
+        const userSafes = await gebManager.getUserSafesRpc({ geb, address })
+        if (!userSafes || !userSafes.safes.length) {
+            console.log(`WARNING => ADDRESS HAS NO PROXY OR HAS NO SAFES`)
+        } else {
+            safeId = userSafes.safes[0].safeId
+        }
+    })
+
+    describe('FetchLiquidationData', () => {
+        // prettier-ignore
+        it('Data from RPC and GQL should be the same for liquidation data', async () => {
       const rpcResponse = await gebManager.getLiquidationDataRpc(geb);
 
       const gqlQuery = `{ ${liquidationQuery} }`;
@@ -140,7 +152,8 @@ describe('actions', () => {
       verifyKeys(rpcResponse, gqlResponse)
 
       // It can't be an exact match since the the RPC read function is in reality a state changing function applying the price change every second  
-      expect(rpcResponse.systemState.currentRedemptionPrice.value).almostEqual(gqlResponse.systemState.currentRedemptionPrice.value, 0.0001);
+
+      expect(rpcResponse.systemState.currentRedemptionPrice.value).almostEqual(gqlResponse.systemState.currentRedemptionPrice.value, 0.0001);      
       // Since we're using JS instead of solidity for the exponentiation, an approximation is enough
       expect(rpcResponse.systemState.currentRedemptionRate.eightHourlyRate).almostEqual(gqlResponse.systemState.currentRedemptionRate.eightHourlyRate, 0.00001)
       expect(rpcResponse.systemState.globalDebt).fixedNumberMatch(gqlResponse.systemState.globalDebt);
@@ -159,56 +172,59 @@ describe('actions', () => {
       // Here we're using JS exponentiation again, so get an approximate value 
       expect(rpcResponse.collateralType.totalAnnualizedStabilityFee).almostEqual(gqlResponse.collateralType.totalAnnualizedStabilityFee, 0.00001)
     });
-  });
+    })
 
-  describe('FetchUserSafeList', () => {
-    it('fetches a list of user safes', async () => {
-      const rpcResponse = await gebManager.getUserSafesRpc({ geb, address });
-      const gqlResponse: IUserSafeList = (
-        await axios.post(
-          GRAPH_API_URLS[0],
-          JSON.stringify({ query: getUserSafesListQuery(address) })
-        )
-      ).data.data;
+    describe('FetchUserSafeList', () => {
+        it('fetches a list of user safes', async () => {
+            const rpcResponse = await gebManager.getUserSafesRpc({
+                geb,
+                address,
+            })
+            const gqlResponse: IUserSafeList = await fetchUserSafes(
+                { geb, address },
+                true
+            )
 
-      expect(gqlResponse).toBeTruthy();
-      expect(rpcResponse).toBeTruthy();
+            expect(gqlResponse).toBeTruthy()
+            expect(rpcResponse).toBeTruthy()
 
-      // This will als make that we have the same number of safe on both sides
-      verifyKeys(rpcResponse, gqlResponse);
+            // This will als make that we have the same number of safe on both sides
+            verifyKeys(rpcResponse, gqlResponse)
 
-      expect(rpcResponse.erc20Balances[0].balance).fixedNumberMatch(
-        gqlResponse.erc20Balances[0].balance
-      );
+            expect(rpcResponse.erc20Balances[0].balance).fixedNumberMatch(
+                gqlResponse.erc20Balances[0].balance
+            )
 
-      // Sort the safes by id to compare each
-      rpcResponse.safes.sort((a, b) => Number(a.safeId) - Number(b.safeId));
-      gqlResponse.safes.sort((a, b) => Number(a.safeId) - Number(b.safeId));
+            // Sort the safes by id to compare each
+            rpcResponse.safes.sort(
+                (a, b) => Number(a.safeId) - Number(b.safeId)
+            )
+            gqlResponse.safes.sort(
+                (a, b) => Number(a.safeId) - Number(b.safeId)
+            )
 
-      // Check that every safe is the same
-      for (let i = 0; i < rpcResponse.safes.length; i++) {
-        let rpcSafe = rpcResponse.safes[i];
-        let gqlSafe = gqlResponse.safes[i];
-        expect(rpcSafe.collateral).fixedNumberMatch(gqlSafe.collateral);
-        expect(rpcSafe.debt).fixedNumberMatch(gqlSafe.debt);
-        expect(rpcSafe.safeHandler).toEqual(gqlSafe.safeHandler);
-        expect(rpcSafe.safeId).toEqual(gqlSafe.safeId);
-        // !! There is no way to fetch this over RPC, so we return 0
-        expect(rpcSafe.createdAt).toBeNull();
-      }
-    });
-  });
+            // Check that every safe is the same
+            for (let i = 0; i < rpcResponse.safes.length; i++) {
+                let rpcSafe = rpcResponse.safes[i]
+                let gqlSafe = gqlResponse.safes[i]
+                expect(rpcSafe.collateral).fixedNumberMatch(gqlSafe.collateral)
+                expect(rpcSafe.debt).fixedNumberMatch(gqlSafe.debt)
+                expect(rpcSafe.safeHandler).toEqual(gqlSafe.safeHandler)
+                expect(rpcSafe.safeId).toEqual(gqlSafe.safeId)
+                // !! There is no way to fetch this over RPC, so we return 0
+                expect(rpcSafe.createdAt).toBeNull()
+            }
+        })
+    })
 
-  describe('FetchSafeById', () => {
-    // prettier-ignore
-    it('fetches a safe by id', async () => {
+    describe('FetchSafeById', () => {
+        // prettier-ignore
+        it('fetches a safe by id', async () => {
       const rpcResponse = await gebManager.getSafeByIdRpc({ geb, safeId, address });
-      const gqlResponse: ISafeQuery = (
-        await axios.post(
-          GRAPH_API_URLS[0],
-          JSON.stringify({ query: getSafeByIdQuery(safeId, address) })
-        )
-      ).data.data;
+      const gqlResponse: ISafeQuery = await fetchSafeById(
+        { geb, address, safeId },
+        true
+      );
 
       expect(gqlResponse).toBeTruthy();
       expect(rpcResponse).toBeTruthy();
@@ -247,14 +263,14 @@ describe('actions', () => {
         expect(rpcResponse.userProxies[0].coinAllowance.amount).fixedNumberMatch(gqlResponse.userProxies[0].coinAllowance.amount);
       }
     });
-  });
+    })
 
-  describe('FetchIncentivesCampaigns', () => {
-    // prettier-ignore
-    it('Fetch incentive campaigns', async () => {
+    describe('FetchIncentivesCampaigns', () => {
+        // prettier-ignore
+        it('Fetch incentive campaigns', async () => {
       const blockNumber = 23390141
       const rpcResponse = await gebManager.getIncentives({geb, address});
-      const gqlResponse = await fetchIncentivesCampaigns(address, blockNumber)
+      const gqlResponse = await fetchIncentivesCampaigns({address, blockNumber, geb})
 
       expect(gqlResponse).toBeTruthy();
       expect(rpcResponse).toBeTruthy();
@@ -263,7 +279,7 @@ describe('actions', () => {
 
       // It's not possible to get historical data over RPC
       expect(rpcResponse.old24hData).toBeNull()
-      expect(rpcResponse.praiBalance).fixedNumberMatch(gqlResponse.praiBalance)
+      expect(rpcResponse.raiBalance).fixedNumberMatch(gqlResponse.raiBalance)
       expect(rpcResponse.protBalance).fixedNumberMatch(gqlResponse.protBalance)
       expect(rpcResponse.uniswapCoinPool).fixedNumberMatch(gqlResponse.uniswapCoinPool)
       expect(rpcResponse.user).toEqual(gqlResponse.user)
@@ -303,7 +319,6 @@ describe('actions', () => {
         expect(rpcCampaign).toBeTruthy()
         expect(rpcCampaign.campaignAddress).toEqual(gqlCampaign.campaignAddress)
         expect(rpcCampaign.campaignNumber).toEqual(gqlCampaign.campaignNumber)
-        expect(rpcCampaign.id).toEqual(gqlCampaign.id)
         expect(rpcCampaign.lastUpdatedTime).toEqual(gqlCampaign.lastUpdatedTime)
         expect(rpcCampaign.periodFinish).toEqual(gqlCampaign.periodFinish)
         expect(rpcCampaign.rewardPerTokenStored).fixedNumberMatch(gqlCampaign.rewardPerTokenStored)
@@ -326,5 +341,5 @@ describe('actions', () => {
         expect(rpcBalance.userRewardPerTokenPaid).fixedNumberMatch(gqlBalance.userRewardPerTokenPaid)
       }
     });
-  });
-});
+    })
+})
