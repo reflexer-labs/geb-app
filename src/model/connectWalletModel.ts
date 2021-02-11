@@ -13,7 +13,7 @@ export interface ConnectWalletModel {
   coinAllowance: string;
   ctHash: string;
   ethBalance: ITokenBalance;
-  praiBalance: ITokenBalance;
+  raiBalance: ITokenBalance;
   isWrongNetwork: boolean;
   isStepLoading: boolean;
   fetchFiatPrice: Thunk<ConnectWalletModel>;
@@ -27,7 +27,7 @@ export interface ConnectWalletModel {
     ConnectWalletModel,
     { chainId: number; balance: number }
   >;
-  updatePraiBalance: Action<
+  updateRaiBalance: Action<
     ConnectWalletModel,
     { chainId: number; balance: number }
   >;
@@ -48,7 +48,7 @@ const blockNumberState = localStorage.getItem('blockNumber');
 const connectWalletModel: ConnectWalletModel = {
   blockNumber: blockNumberState ? JSON.parse(blockNumberState) : {},
   ethBalance: {},
-  praiBalance: {},
+  raiBalance: {},
   fiatPrice: 0,
   ethPriceChange: 0,
   step: 0,
@@ -99,9 +99,9 @@ const connectWalletModel: ConnectWalletModel = {
     const { chainId, balance } = payload;
     state.ethBalance[chainId] = balance;
   }),
-  updatePraiBalance: action((state, payload) => {
+  updateRaiBalance: action((state, payload) => {
     const { chainId, balance } = payload;
-    state.praiBalance[chainId] = balance;
+    state.raiBalance[chainId] = balance;
   }),
   setStep: action((state, payload) => {
     state.step = payload;

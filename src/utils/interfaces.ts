@@ -4,7 +4,7 @@ import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
 import { DefaultTheme, ThemedCssFunction } from 'styled-components';
 import { ChainId } from '@uniswap/sdk';
 import { IconName } from '../components/FeatherIconWrapper';
-import { ApproveMethod } from '../components/ApprovePRAI';
+import { ApproveMethod } from '../components/ApproveRAI';
 import { Geb } from 'geb.js';
 
 export interface DynamicObject {
@@ -220,21 +220,6 @@ export interface ISafeHistory {
 }
 
 export interface IncentivesCampaign {
-  // TODO: Remove this
-  duration?: string;
-  // TODO: Remove this
-  instantExitPercentage?: string;
-  // TODO: Remove this
-  reward?: string;
-  // TODO: Remove this
-  rewardDelay?: string;
-  // TODO: Remove this
-  startTime?: string;
-  // TODO: Remove this
-  lastUpdateTime?: string;
-
-  // TODO: remove campaign id or campaign address, they are the same
-  id: string;
   campaignAddress: string;
   campaignNumber: string;
   rewardsDuration: string;
@@ -242,21 +227,11 @@ export interface IncentivesCampaign {
   totalSupply: string;
   rewardToken: string;
   rewardPerTokenStored: string;
-
-  // TODO: I needed to add these to match the response from GQL
   periodFinish: string;
-  lastUpdatedTime: string
-
+  lastUpdatedTime: string;
 }
 
 export interface IncentiveBalance {
-  // TODO: CLEANUPS these
-  campaignId?: string;
-  delayedRewardTotalAmount?: string;
-  delayedRewardExitedAmount?: string;
-  delayedRewardLatestExitTime?: string;
-
-  // new
   id: string;
   stakeBalance: string;
   address: string;
@@ -285,7 +260,7 @@ export interface IIncentivesCampaignData {
       value: string;
     };
   };
-  praiBalance: string;
+  raiBalance: string;
   protBalance: string;
   uniswapCoinPool: string;
   // old24hData is null when using RPC as this can't be fetched over RPC
@@ -318,7 +293,6 @@ export interface IIncentivesFields {
 }
 
 export interface IIncentiveHook {
-  id: string;
   campaignNumber: string;
   periodFinish: string;
   campaignAddress: string;
@@ -485,4 +459,8 @@ export interface IFetchSafesPayload {
 
 export interface IFetchSafeById extends IFetchSafesPayload {
   safeId: string;
+}
+
+export interface IIncentivesConfig extends IFetchSafesPayload {
+  blockNumber: number;
 }

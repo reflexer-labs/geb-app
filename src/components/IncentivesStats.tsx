@@ -42,7 +42,7 @@ const IncentivesStats = () => {
       return;
     }
 
-    if (userCampaigns[0].id === '') {
+    if (userCampaigns[0].campaignAddress === '') {
       return;
     }
 
@@ -71,7 +71,7 @@ const IncentivesStats = () => {
   };
 
   const returnItemSelected = useCallback(() => {
-    if (userCampaigns[0].id === '') {
+    if (userCampaigns[0].campaignAddress === '') {
       if (campaignNumber && Date.now() < Number(periodFinish) * 1000) {
         return `#${campaignNumber}`;
       } else {
@@ -101,7 +101,7 @@ const IncentivesStats = () => {
                 width="200px"
                 itemPadding={'10px 20px'}
                 items={
-                  userCampaigns[0].id === ''
+                  userCampaigns[0].campaignAddress === ''
                     ? []
                     : userCampaigns.map(
                         (campaign: IIncentiveHook) =>

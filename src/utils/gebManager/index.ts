@@ -205,7 +205,7 @@ const getIncentives = async (
   config: UserListConfig
 ): Promise<IIncentivesCampaignData> => {
   const { geb, address } = config;
-  
+
   const multiCall1 = await geb.multiCall([
     geb.contracts.coin.balanceOf(address, true), // 0
     geb.contracts.protocolToken.balanceOf(address, true), // 1
@@ -216,8 +216,12 @@ const getIncentives = async (
     geb.contracts.proxyRegistry.proxies(address, true), // 6
   ]);
 
-  const proxyAddress = multiCall1[6].toLowerCase()
-  const campaignInfoRequest = Array(multiCall1[5].toNumber()).fill(null).map((_,i) => geb.contracts.stakingRewardFactory.stakingRewardsInfo(i, true))
+  const proxyAddress = multiCall1[6].toLowerCase();
+  const campaignInfoRequest = Array(multiCall1[5].toNumber())
+    .fill(null)
+    .map((_, i) =>
+      geb.contracts.stakingRewardFactory.stakingRewardsInfo(i, true)
+    );
 
   // @ts-ignore Typing only supported up to 7 queries
   const multiCall2: any = await geb.multiCall([
@@ -225,44 +229,49 @@ const getIncentives = async (
     geb.contracts.coin.allowance(address, proxyAddress, true), // 1
     geb.contracts.uniswapPairCoinEth.allowance(address, proxyAddress, true), // 2
     geb.contracts.medianizerCoin.read(true), // 3
-    ...campaignInfoRequest
+    ...campaignInfoRequest,
   ]);
 
   // Slice out the last requests that are the campaign info objects
-  const campaignInfo : {stakingRewards: string, rewardAmount: BigNumber}[] = multiCall2.slice(4) as any
+  const campaignInfo: {
+    stakingRewards: string;
+    rewardAmount: BigNumber;
+  }[] = multiCall2.slice(4) as any;
 
-  const incentivesCampaigns : IncentivesCampaign[] = []
-  let incentiveBalances : IncentiveBalance[] = []
+  const incentivesCampaigns: IncentivesCampaign[] = [];
+  let incentiveBalances: IncentiveBalance[] = [];
 
   // Typing this is a nightmare, so nope.
-  const multicall3Req : any[] = []
+  const multicall3Req: any[] = [];
 
   // This next round of multicall will gather all the data we need for each campaign and incentive balance.
-  for(let i = 0; i < campaignInfo.length; i++){
+  for (let i = 0; i < campaignInfo.length; i++) {
     // Get the campaign contract object
-    const contract = geb.getGebContract(contracts.StakingRewards, campaignInfo[i].stakingRewards)
-    multicall3Req.push(contract.lastUpdateTime(true))  // 0
-    multicall3Req.push(contract.periodFinish(true)) // 1
-    multicall3Req.push(contract.rewardPerTokenStored(true)) // 2
-    multicall3Req.push(contract.rewardRate(true)) // 3
-    multicall3Req.push(contract.rewardsToken(true)) // 4
-    multicall3Req.push(contract.rewardsDuration(true)) // 5
-    multicall3Req.push(contract.totalSupply(true)) // 6
-    multicall3Req.push(contract.rewards(proxyAddress, true)) // 7
-    multicall3Req.push(contract.balanceOf(proxyAddress, true)) // 8
-    multicall3Req.push(contract.userRewardPerTokenPaid(proxyAddress, true)) // 9
+    const contract = geb.getGebContract(
+      contracts.StakingRewards,
+      campaignInfo[i].stakingRewards
+    );
+    multicall3Req.push(contract.lastUpdateTime(true)); // 0
+    multicall3Req.push(contract.periodFinish(true)); // 1
+    multicall3Req.push(contract.rewardPerTokenStored(true)); // 2
+    multicall3Req.push(contract.rewardRate(true)); // 3
+    multicall3Req.push(contract.rewardsToken(true)); // 4
+    multicall3Req.push(contract.rewardsDuration(true)); // 5
+    multicall3Req.push(contract.totalSupply(true)); // 6
+    multicall3Req.push(contract.rewards(proxyAddress, true)); // 7
+    multicall3Req.push(contract.balanceOf(proxyAddress, true)); // 8
+    multicall3Req.push(contract.userRewardPerTokenPaid(proxyAddress, true)); // 9
   }
 
-  const multicall3 = await geb.multiCall(multicall3Req as any)
-  
-  // Split data into separated arrays for each campaign
-  const campaignData : any[][] = chunkArrayInGroups(multicall3, 10)
+  const multicall3 = await geb.multiCall(multicall3Req as any);
 
-  for(let i = 0; i < campaignInfo.length; i++) {
+  // Split data into separated arrays for each campaign
+  const campaignData: any[][] = chunkArrayInGroups(multicall3, 10);
+
+  for (let i = 0; i < campaignInfo.length; i++) {
     incentivesCampaigns.push({
       campaignAddress: campaignInfo[i].stakingRewards.toLowerCase(),
       campaignNumber: i.toString(),
-      id: campaignInfo[i].stakingRewards.toLowerCase(),
       lastUpdatedTime: campaignData[i][0].toString(),
       periodFinish: campaignData[i][1].toString(),
       rewardPerTokenStored: parseWad(campaignData[i][2]),
@@ -270,7 +279,7 @@ const getIncentives = async (
       rewardToken: campaignData[i][4].toLowerCase(),
       rewardsDuration: campaignData[i][5].toString(),
       totalSupply: parseWad(campaignData[i][6]),
-    })
+    });
 
     incentiveBalances.push({
       address: proxyAddress,
@@ -278,28 +287,37 @@ const getIncentives = async (
       owner: { id: address },
       reward: parseWad(campaignData[i][7]),
       stakeBalance: parseWad(campaignData[i][8]),
-      userRewardPerTokenPaid: parseWad(campaignData[i][9])
-    })
+      userRewardPerTokenPaid: parseWad(campaignData[i][9]),
+    });
   }
 
   // Sort similar to the graphQl query
-  incentivesCampaigns.sort((a,b) => (a.campaignNumber < b.campaignNumber) ? 1 : ((b.campaignNumber < a.campaignNumber) ? -1 : 0))
-  
+  incentivesCampaigns.sort((a, b) =>
+    a.campaignNumber < b.campaignNumber
+      ? 1
+      : b.campaignNumber < a.campaignNumber
+      ? -1
+      : 0
+  );
+
   // Filter out these because the graphQL endpoint will not have created incentive balance for empty balance
-  incentiveBalances = incentiveBalances.filter(x => Number(x.stakeBalance) !== 0 || Number(x.userRewardPerTokenPaid) !== 0)
+  incentiveBalances = incentiveBalances.filter(
+    (x) =>
+      Number(x.stakeBalance) !== 0 || Number(x.userRewardPerTokenPaid) !== 0
+  );
 
   return {
     incentiveBalances: incentiveBalances,
     allCampaigns: incentivesCampaigns,
     old24hData: null,
-    praiBalance: parseWad(multiCall1[0]),
+    raiBalance: parseWad(multiCall1[0]),
     protBalance: parseWad(multiCall1[1]),
     systemState: {
       coinAddress: geb.contracts.coin.address.toLowerCase(),
       coinUniswapPair: {
         reserve0: parseWad(multiCall1[2]._reserve0),
         reserve1: parseWad(multiCall1[2]._reserve1),
-        token0: multiCall1[3],
+        token0: multiCall1[3].toLowerCase(),
         token0Price: String(
           Number(parseWad(multiCall1[2]._reserve0)) /
             Number(parseWad(multiCall1[2]._reserve1))
@@ -311,7 +329,7 @@ const getIncentives = async (
         totalSupply: parseWad(multiCall1[4]),
       },
       currentCoinMedianizerUpdate: {
-        value: parseRay(multiCall2[3]),
+        value: parseWad(multiCall2[3]),
       },
       wethAddress: geb.contracts.weth.address.toLowerCase(),
     },
@@ -325,7 +343,7 @@ const getIncentives = async (
             coinAllowance: multiCall2[1].isZero()
               ? null
               : { amount: parseWad(multiCall2[1]) },
-            uniCoinLpAllowance:  multiCall2[2].isZero()
+            uniCoinLpAllowance: multiCall2[2].isZero()
               ? null
               : { amount: parseWad(multiCall2[2]) },
           },
@@ -339,13 +357,13 @@ export default {
   getIncentives,
 };
 
-// Helper functions 
+// Helper functions
 const parseWad = (val: BigNumber) => utils.wadToFixed(val).toString();
 const parseRay = (val: BigNumber) => utils.rayToFixed(val).toString();
 const parseRad = (val: BigNumber) => utils.radToFixed(val).toString();
 
 // Split an array into groups of arrays [..] => [[..], [..], ..]
-function chunkArrayInGroups<T>(arr: T[] , size: number) {
+function chunkArrayInGroups<T>(arr: T[], size: number) {
   const result = [];
   let j = 0;
   for (let i = 0; i < Math.ceil(arr.length / size); i++) {

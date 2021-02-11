@@ -63,7 +63,7 @@ const SafeBody = ({ isChecked }: Props) => {
     globalDebtCeiling,
   } = safeState.liquidationData;
 
-  const praiBalance = connectWalletState.praiBalance[NETWORK_ID];
+  const raiBalance = connectWalletState.raiBalance[NETWORK_ID];
 
   const getTotalCollateral = () => {
     if (singleSafe) {
@@ -150,7 +150,7 @@ const SafeBody = ({ isChecked }: Props) => {
     if (type === 'repay_withdraw' && singleSafe && !isLeft) {
       return `Repay ${COIN_TICKER} (Owe: ${formatNumber(
         getAvailableRai()
-      )}, Avail: ${formatNumber(praiBalance.toString())})`;
+      )}, Avail: ${formatNumber(raiBalance.toString())})`;
     }
     return '';
   };
@@ -180,8 +180,8 @@ const SafeBody = ({ isChecked }: Props) => {
       toFixedString(getAvailableRai().toString(), 'WAD')
     );
 
-    const praiBalanceBN = praiBalance
-      ? BigNumber.from(toFixedString(praiBalance.toString(), 'WAD'))
+    const raiBalanceBN = raiBalance
+      ? BigNumber.from(toFixedString(raiBalance.toString(), 'WAD'))
       : BigNumber.from('0');
 
     const leftInputBN = defaultSafe.leftInput
@@ -257,7 +257,7 @@ const SafeBody = ({ isChecked }: Props) => {
         }
       }
 
-      if (!rightInputBN.isZero() && rightInputBN.gt(praiBalanceBN)) {
+      if (!rightInputBN.isZero() && rightInputBN.gt(raiBalanceBN)) {
         setError(`ballance_issue`);
         return false;
       }
@@ -333,11 +333,11 @@ const SafeBody = ({ isChecked }: Props) => {
     const availableRaiBN = BigNumber.from(
       toFixedString(getAvailableRai().toString(), 'WAD')
     );
-    const praiBalanceBN = BigNumber.from(
-      toFixedString(praiBalance.toString(), 'WAD')
+    const raiBalanceBN = BigNumber.from(
+      toFixedString(raiBalance.toString(), 'WAD')
     );
     const diff = gebUtils
-      .wadToFixed(availableRaiBN.sub(praiBalanceBN))
+      .wadToFixed(availableRaiBN.sub(raiBalanceBN))
       .toString();
 
     return `Insufficient balance. You are ${diff} short`;

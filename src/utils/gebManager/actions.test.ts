@@ -121,8 +121,17 @@ const verifyKeys = (objA: any, objB: any, matchArrays = true) => {
 describe('actions', () => {
   // Address and safe to run the test against
   // !! This safe needs to exist on the deployment tested against
-  const address = '0x7eb8caf136Ba45DD16483188cbe8b615f6251ca7'.toLowerCase();
-  const safeId = '2';
+  const address = '0xe94D94eDdb2322975D73cA3f2086978e0f2953b1'.toLowerCase();
+  let safeId: string;
+
+  beforeAll(async () => {
+    const userSafes = await gebManager.getUserSafesRpc({ geb, address });
+    if (!userSafes || !userSafes.safes.length) {
+      console.log(`WARNING => ADDRESS HAS NO PROXY OR HAS NO SAFES`);
+    } else {
+      safeId = userSafes.safes[0].safeId;
+    }
+  });
 
   describe('FetchLiquidationData', () => {
     // prettier-ignore
@@ -139,7 +148,8 @@ describe('actions', () => {
 
       verifyKeys(rpcResponse, gqlResponse)
 
-      expect(rpcResponse.systemState.currentRedemptionPrice.value).fixedNumberMatch(gqlResponse.systemState.currentRedemptionPrice.value);
+      // It can't be an exact match since the the RPC read function is in reality a state changing function applying the price change every second  
+      expect(rpcResponse.systemState.currentRedemptionPrice.value).almostEqual(gqlResponse.systemState.currentRedemptionPrice.value, 0.0001);      
       // Since we're using JS instead of solidity for the exponentiation, an approximation is enough
       expect(rpcResponse.systemState.currentRedemptionRate.eightHourlyRate).almostEqual(gqlResponse.systemState.currentRedemptionRate.eightHourlyRate, 0.00001)
       expect(rpcResponse.systemState.globalDebt).fixedNumberMatch(gqlResponse.systemState.globalDebt);
@@ -253,7 +263,7 @@ describe('actions', () => {
     it('Fetch incentive campaigns', async () => {
       const blockNumber = 23390141
       const rpcResponse = await gebManager.getIncentives({geb, address});
-      const gqlResponse = await fetchIncentivesCampaigns(address, blockNumber)
+      const gqlResponse = await fetchIncentivesCampaigns({address, blockNumber, geb})
 
       expect(gqlResponse).toBeTruthy();
       expect(rpcResponse).toBeTruthy();
@@ -262,7 +272,7 @@ describe('actions', () => {
 
       // It's not possible to get historical data over RPC
       expect(rpcResponse.old24hData).toBeNull()
-      expect(rpcResponse.praiBalance).fixedNumberMatch(gqlResponse.praiBalance)
+      expect(rpcResponse.raiBalance).fixedNumberMatch(gqlResponse.raiBalance)
       expect(rpcResponse.protBalance).fixedNumberMatch(gqlResponse.protBalance)
       expect(rpcResponse.uniswapCoinPool).fixedNumberMatch(gqlResponse.uniswapCoinPool)
       expect(rpcResponse.user).toEqual(gqlResponse.user)
@@ -302,7 +312,6 @@ describe('actions', () => {
         expect(rpcCampaign).toBeTruthy()
         expect(rpcCampaign.campaignAddress).toEqual(gqlCampaign.campaignAddress)
         expect(rpcCampaign.campaignNumber).toEqual(gqlCampaign.campaignNumber)
-        expect(rpcCampaign.id).toEqual(gqlCampaign.id)
         expect(rpcCampaign.lastUpdatedTime).toEqual(gqlCampaign.lastUpdatedTime)
         expect(rpcCampaign.periodFinish).toEqual(gqlCampaign.periodFinish)
         expect(rpcCampaign.rewardPerTokenStored).fixedNumberMatch(gqlCampaign.rewardPerTokenStored)

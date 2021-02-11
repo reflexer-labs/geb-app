@@ -17,7 +17,6 @@ export const incentiveCampaignsQuery = (
       }
     }
     incentiveCampaigns(orderBy: campaignNumber, orderDirection: desc) {
-        id
         campaignAddress
         campaignNumber
         rewardsDuration
@@ -43,7 +42,7 @@ export const incentiveCampaignsQuery = (
           value
         }
       }
-    incentiveBalances(where: {owner: "${address}"}, orderDirection: desc) {
+    incentiveBalances(where: {owner: "${address}"}) {
         id
         stakeBalance
         address
@@ -54,7 +53,7 @@ export const incentiveCampaignsQuery = (
         userRewardPerTokenPaid
       }
 
-      praiBalance:erc20Balances(where: {address: "${address}", label: "COIN"}) {
+      raiBalance:erc20Balances(where: {address: "${address}", label: "COIN"}) {
         balance
         }
       protBalance:erc20Balances(where: {address: "${address}", label: "PROT_TOKEN"}) {

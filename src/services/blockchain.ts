@@ -67,14 +67,14 @@ export const handleRepayAndWithdraw = async (
   const totalDebtBN = ethersUtils.parseEther(safeData.totalDebt);
   const totalCollateralBN = ethersUtils.parseEther(safeData.totalCollateral);
   const ethToFree = ethersUtils.parseEther(safeData.leftInput);
-  const praiToRepay = ethersUtils.parseEther(safeData.rightInput);
+  const raiToRepay = ethersUtils.parseEther(safeData.rightInput);
   const proxy = await geb.getProxyAction(signer._address);
 
   let txData: TransactionRequest = {};
 
   if (
     !ethToFree.isZero() &&
-    !praiToRepay.isZero() &&
+    !raiToRepay.isZero() &&
     totalCollateralBN.isZero() &&
     totalDebtBN.isZero()
   ) {
@@ -82,15 +82,15 @@ export const handleRepayAndWithdraw = async (
   } else if (
     ethToFree.isZero() &&
     totalDebtBN.isZero() &&
-    !praiToRepay.isZero()
+    !raiToRepay.isZero()
   ) {
     txData = proxy.repayAllDebt(safeId);
-  } else if (ethToFree.isZero() && !praiToRepay.isZero()) {
-    txData = proxy.repayDebt(safeId, praiToRepay);
-  } else if (!ethToFree.isZero() && praiToRepay.isZero()) {
+  } else if (ethToFree.isZero() && !raiToRepay.isZero()) {
+    txData = proxy.repayDebt(safeId, raiToRepay);
+  } else if (!ethToFree.isZero() && raiToRepay.isZero()) {
     txData = proxy.freeETH(safeId, ethToFree);
   } else {
-    txData = proxy.repayDebtAndFreeETH(safeId, ethToFree, praiToRepay);
+    txData = proxy.repayDebtAndFreeETH(safeId, ethToFree, raiToRepay);
   }
 
   if (!txData) throw new Error('No transaction request!');
@@ -150,11 +150,16 @@ export const handleIncentiveDeposit = async (
   const geb = new Geb(ETH_NETWORK, signer.provider);
   const proxy = await geb.getProxyAction(signer._address);
 
+  console.log(geb);
+  console.log(proxy);
+
   let txData;
 
   if (isUniSwapShareChecked) {
     if (!uniswapShare) throw new Error('No uniSwapShare deposited amount!');
     const uniswapShareBN = ethersUtils.parseEther(uniswapShare);
+    console.log(uniswapShareBN.toString(), campaignAddress);
+
     txData = proxy.stakeInMine(uniswapShareBN, campaignAddress);
   } else {
     if (!incentiveFields) throw new Error('No incentives fields!');

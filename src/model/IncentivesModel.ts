@@ -1,6 +1,5 @@
 import { action, Action, thunk, Thunk } from 'easy-peasy';
 import { StoreModel } from '.';
-import { NETWORK_ID } from '../connectors';
 import {
   handleIncentiveClaim,
   handleIncentiveDeposit,
@@ -13,6 +12,7 @@ import {
   IIncentivesFields,
   IIncentiveClaim,
   IIncentiveWithdraw,
+  IIncentivesConfig,
 } from '../utils/interfaces';
 
 const INITIAL_STATE = {
@@ -30,7 +30,12 @@ export interface IncentivesModel {
   uniPoolAmount: string;
   incentivesFields: IIncentivesFields;
   incentivesCampaignData: IIncentivesCampaignData | null;
-  fetchIncentivesCampaigns: Thunk<IncentivesModel, string, any, StoreModel>;
+  fetchIncentivesCampaigns: Thunk<
+    IncentivesModel,
+    IIncentivesConfig,
+    any,
+    StoreModel
+  >;
   incentiveDeposit: Thunk<IncentivesModel, IIncentivePayload, any, StoreModel>;
   incentiveClaim: Thunk<IncentivesModel, IIncentiveClaim, any, StoreModel>;
   incentiveWithdraw: Thunk<
@@ -65,16 +70,10 @@ const incentivesModel: IncentivesModel = {
     state.operation = payload;
   }),
   fetchIncentivesCampaigns: thunk(
-    async (actions, payload, { getStoreActions, getStoreState }) => {
+    async (actions, payload, { getStoreActions }) => {
       const storeActions = getStoreActions();
-      const storeState = getStoreState();
+      const res = await fetchIncentivesCampaigns(payload);
 
-      const blockNumber = storeState.connectWalletModel.blockNumber[NETWORK_ID];
-
-      const res = await fetchIncentivesCampaigns(
-        payload ? payload.toLowerCase() : '',
-        blockNumber
-      );
       actions.setIncentivesCampaignData(res);
       if (res.proxyData) {
         const { address, coinAllowance } = res.proxyData;
@@ -117,8 +116,13 @@ const incentivesModel: IncentivesModel = {
         hash: txResponse.hash,
         status: 'success',
       });
+      actions.setOperation(0);
+      actions.setUniPoolAmount('');
+      actions.setClaimableFLX('');
       actions.setIncentivesFields(INITIAL_STATE);
-      storeActions.incentivesModel.setOperation(0);
+      actions.setIsUniSwapShareChecked(false);
+      actions.setUniswapShare('');
+      actions.setUniPoolAmount('');
       await txResponse.wait();
     }
   }),
@@ -144,8 +148,13 @@ const incentivesModel: IncentivesModel = {
         hash: txResponse.hash,
         status: 'success',
       });
+      actions.setOperation(0);
+      actions.setUniPoolAmount('');
       actions.setClaimableFLX('');
-      storeActions.incentivesModel.setOperation(0);
+      actions.setIncentivesFields(INITIAL_STATE);
+      actions.setIsUniSwapShareChecked(false);
+      actions.setUniswapShare('');
+      actions.setUniPoolAmount('');
       await txResponse.wait();
     }
   }),
@@ -168,8 +177,13 @@ const incentivesModel: IncentivesModel = {
         hash: txResponse.hash,
         status: 'success',
       });
+      actions.setOperation(0);
       actions.setUniPoolAmount('');
-      storeActions.incentivesModel.setOperation(0);
+      actions.setClaimableFLX('');
+      actions.setIncentivesFields(INITIAL_STATE);
+      actions.setIsUniSwapShareChecked(false);
+      actions.setUniswapShare('');
+      actions.setUniPoolAmount('');
       await txResponse.wait();
     }
   }),

@@ -22,7 +22,7 @@ interface Props {
   coinName: string;
 }
 
-const ApprovePRAI = ({
+const ApproveRAI = ({
   amount,
   allowance,
   handleBackBtn,
@@ -100,7 +100,7 @@ const ApprovePRAI = ({
     passedCheckCB(allowance, amount, isPaid);
   }, [passedCheckCB, allowance, amount, isPaid]);
 
-  const unlockPRAI = async () => {
+  const unlockRAI = async () => {
     try {
       if (!account || !library) return false;
       if (!proxyAddress) {
@@ -128,8 +128,8 @@ const ApprovePRAI = ({
       });
       addTransaction(txResponse, `Unlocking ${coinName}`);
       await txResponse.wait();
-      setIsPaid(true);
       await timeout(10000);
+      setIsPaid(true);
     } catch (e) {
       popupsActions.setBlockBackdrop(false);
       if (e?.code === 4001) {
@@ -168,7 +168,7 @@ const ApprovePRAI = ({
           <BtnContainer>
             <Button
               text={textPayload.status === 'error' ? 'Try again' : 'Unlock'}
-              onClick={unlockPRAI}
+              onClick={unlockRAI}
             />
           </BtnContainer>
         ) : null}
@@ -177,7 +177,7 @@ const ApprovePRAI = ({
   );
 };
 
-export default ApprovePRAI;
+export default ApproveRAI;
 
 const Container = styled.div`
   max-width: 400px;

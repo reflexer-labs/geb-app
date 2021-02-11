@@ -79,9 +79,7 @@ export default function useIncentives() {
         (campaign: IncentivesCampaign, i: number) => {
           const campaignNumber = _.get(campaign, 'campaignNumber', '0');
           const periodFinish = _.get(campaign, 'periodFinish', '0');
-          const campaignAddress = _.get(campaign, 'campaignAddress', '0');
-
-          const id = _.get(campaign, 'id', '0');
+          const campaignAddress = _.get(campaign, 'campaignAddress', '');
           const rewardRate = _.get(campaign, 'rewardRate', '0');
           const totalSupply = _.get(campaign, 'totalSupply', '0');
           const lastUpdatedTime = _.get(campaign, 'lastUpdatedTime', '0');
@@ -169,7 +167,6 @@ export default function useIncentives() {
           const user = _.get(incentivesCampaignData, 'user', null);
 
           return {
-            id,
             campaignNumber: String(Number(campaignNumber) + 1),
             periodFinish,
             campaignAddress,
@@ -285,7 +282,7 @@ export function useUserCampaigns() {
             Number(x.stakedBalance) > 0 ||
             incentivesCampaignData.incentiveBalances.find(
               (y: IncentiveBalance) => {
-                return x.id === y.campaignId && !userCampaignChecker(x, y);
+                return x.campaignAddress === y.id && !userCampaignChecker(x, y);
               }
             )
           );
@@ -376,14 +373,15 @@ export function useIncentivesAssets() {
         ) || '0';
 
       const raiBalance = numeral(
-        _.get(incentivesCampaignData, 'praiBalance', '0')
+        _.get(incentivesCampaignData, 'raiBalance', '0')
       ).value();
 
       const raiPrice = numeral(raiCurrentPrice).value();
 
-      const raiPriceDiff = numeral(raiCurrentPrice)
-        .subtract(raiOld24HPrice)
-        .value();
+      const raiPriceDiff =
+        raiOld24HPrice !== '0'
+          ? numeral(raiCurrentPrice).subtract(raiOld24HPrice).value()
+          : 0;
 
       const raiVolValue = numeral(raiBalance).multiply(raiPrice).value();
 

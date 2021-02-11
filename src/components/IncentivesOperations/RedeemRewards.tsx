@@ -50,7 +50,7 @@ const RedeemRewards = () => {
 
   useOnceCall(() => {
     getResultData(selectedCampaign);
-  }, selectedCampaign.id !== '');
+  }, selectedCampaign.campaignAddress !== '');
 
   return (
     <Body>
@@ -59,7 +59,7 @@ const RedeemRewards = () => {
           items={[]}
           getSelectedItem={() => {}}
           itemSelected={
-            selectedCampaign.id === ''
+            selectedCampaign.campaignAddress === ''
               ? 'Nothing to claim'
               : `Campaign #${selectedCampaign.campaignNumber}`
           }
@@ -82,8 +82,8 @@ const RedeemRewards = () => {
       <Footer>
         <Button dimmed text={t('cancel')} onClick={handleCancel} />
         <Button
-          disabled={selectedCampaign.id === ''}
-          dimmed={selectedCampaign.id === ''}
+          disabled={selectedCampaign.campaignAddress === ''}
+          dimmed={selectedCampaign.campaignAddress === ''}
           withArrow
           onClick={handleSubmit}
           text={t('review_transaction')}
