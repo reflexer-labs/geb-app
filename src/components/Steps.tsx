@@ -86,6 +86,7 @@ const Steps = () => {
             case 0:
                 return (
                     <StepsContent
+                        stepNumber={0}
                         title={'getting_started'}
                         text={'getting_started_text'}
                         btnText={'connect_wallet'}
@@ -97,6 +98,7 @@ const Steps = () => {
             case 1:
                 return (
                     <StepsContent
+                        stepNumber={1}
                         title={'create_account'}
                         text={'create_account_text'}
                         btnText={'create_account'}
@@ -108,6 +110,7 @@ const Steps = () => {
             case 2:
                 return (
                     <StepsContent
+                        stepNumber={2}
                         title={'create_safe'}
                         text={t('create_safe_text', {
                             coin_ticker: COIN_TICKER,

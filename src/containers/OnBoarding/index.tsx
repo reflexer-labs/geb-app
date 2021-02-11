@@ -20,7 +20,7 @@ const OnBoarding = () => {
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
 
     return (
-        <Container>
+        <Container id="app-page">
             <GridContainer>
                 <Content>
                     <PageHeader
@@ -40,6 +40,7 @@ const OnBoarding = () => {
                     {safeState.safeCreated ? (
                         <BtnContainer>
                             <Button
+                                id="create-safe"
                                 disabled={connectWalletState.isWrongNetwork}
                                 onClick={() =>
                                     popupsActions.setSafeOperationPayload({

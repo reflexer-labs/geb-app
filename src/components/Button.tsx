@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import Arrow from './Icons/Arrow'
 import Loader from './Loader'
 
-interface Props {
+interface Props extends React.HTMLAttributes<HTMLButtonElement> {
     text?: string
     onClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void
     dimmed?: boolean
@@ -30,11 +30,14 @@ const Button = ({
     isBordered,
     arrowPlacement = 'left',
     children,
+    ...rest
 }: Props) => {
+    const { t } = useTranslation()
+
     const returnType = () => {
         if (dimmed) {
             return (
-                <DimmedBtn disabled={disabled} onClick={onClick}>
+                <DimmedBtn {...rest} disabled={disabled} onClick={onClick}>
                     {text && t(text)}
                 </DimmedBtn>
             )
@@ -42,7 +45,7 @@ const Button = ({
 
         if (dimmedWithArrow) {
             return (
-                <DimmedBtn disabled={disabled} onClick={onClick}>
+                <DimmedBtn {...rest} disabled={disabled} onClick={onClick}>
                     {arrowPlacement === 'left' ? (
                         <img
                             src={require('../assets/dark-arrow.svg')}
@@ -61,19 +64,20 @@ const Button = ({
             )
         } else if (withArrow) {
             return (
-                <ArrowBtn disabled={disabled} onClick={onClick}>
+                <ArrowBtn {...rest} disabled={disabled} onClick={onClick}>
                     <span>{text && t(text)}</span> <Arrow />
                 </ArrowBtn>
             )
         } else if (isBordered) {
             return (
-                <BorderedBtn disabled={disabled} onClick={onClick}>
+                <BorderedBtn {...rest} disabled={disabled} onClick={onClick}>
                     <Inner> {text && t(text)}</Inner>
                 </BorderedBtn>
             )
         } else {
             return (
                 <Container
+                    {...rest}
                     className={dimmedNormal ? 'dimmedNormal' : ''}
                     disabled={disabled}
                     isLoading={isLoading}
@@ -86,7 +90,6 @@ const Button = ({
             )
         }
     }
-    const { t } = useTranslation()
     return returnType()
 }
 

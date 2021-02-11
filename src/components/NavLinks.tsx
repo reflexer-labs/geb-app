@@ -29,16 +29,20 @@ const NavLinks = () => {
 
     return (
         <Nav>
-            <NavBarLink to="/" onClick={(e) => handleLinkClick(e, false)}>
+            <NavBarLink
+                id="app-link"
+                to="/"
+                onClick={(e) => handleLinkClick(e, false)}
+            >
                 <SafeIcon className="opacity" /> {t('app')}
             </NavBarLink>
             <NavBarLink
+                id="incentives-link"
                 to="/incentives"
                 onClick={(e) => handleLinkClick(e, false)}
             >
                 <DollarSign size="18" /> {t('incentives')}
             </NavBarLink>
-
             <NavBarLink
                 to="/"
                 onClick={(e) =>

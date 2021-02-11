@@ -118,7 +118,7 @@ const ConnectedWalletInfo = () => {
                     )}
                 </Connection>
 
-                <Address>
+                <Address id="web3-account-identifier-row">
                     <ConnectedWalletIcon size={20} />
                     {account && active ? returnWalletAddress(account) : 'N/A'}
                 </Address>

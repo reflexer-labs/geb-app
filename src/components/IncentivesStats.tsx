@@ -96,7 +96,9 @@ const IncentivesStats = () => {
             <StatsGrid>
                 <StatItem>
                     <StateInner>
-                        <Label className="top">{'Campaign'} </Label>
+                        <Label className="top" id="campaign-box">
+                            {'Campaign'}{' '}
+                        </Label>
                         {/* <Value>{`#${campaignNumber}`}</Value> */}
                         <Value>
                             <Dropdown
@@ -128,7 +130,9 @@ const IncentivesStats = () => {
 
                 <StatItem>
                     <StateInner>
-                        <Label className="top">{'My Reward Rate'}</Label>
+                        <Label className="top" id="reward-box">
+                            {'My Reward Rate'}
+                        </Label>
                         <Value>{`${
                             account ? formatNumber(myRewardRate, 2, true) : 0
                         } FLX/Day`}</Value>
@@ -142,7 +146,9 @@ const IncentivesStats = () => {
 
                 <StatItem>
                     <StateInner>
-                        <Label className="top">{'My Stake'}</Label>
+                        <Label className="top" id="stake-box">
+                            {'My Stake'}
+                        </Label>
                         <Value>{`${ethStake || 0} ETH + ${
                             raiStake || 0
                         } RAI`}</Value>
@@ -166,6 +172,7 @@ const IncentivesStats = () => {
             >
                 <div>
                     <Button
+                        id="withdraw-btn"
                         text={t('withdraw')}
                         onClick={() => handleClick('withdraw')}
                         dimmed
@@ -182,6 +189,7 @@ const IncentivesStats = () => {
 
                 <div>
                     <Button
+                        id="deposit-btn"
                         withArrow
                         onClick={() => handleClick('deposit')}
                         text={t('deposit')}

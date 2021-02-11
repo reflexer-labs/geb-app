@@ -21,7 +21,9 @@ const SafeContent = ({ width, maxWidth, children }: Props) => {
                 maxWidth: maxWidth || '720px',
             }}
         >
-            <Header>{isCreate ? t('create_safe') : `Safe ${t(type)}`}</Header>
+            <Header id="safe-header">
+                {isCreate ? t('create_safe') : `Safe ${t(type)}`}
+            </Header>
             {children}
         </ModalContent>
     )
