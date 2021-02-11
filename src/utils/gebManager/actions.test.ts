@@ -3,15 +3,15 @@ import gebManager from '.';
 import '../../setupTests';
 import axios from 'axios';
 import { GRAPH_API_URLS } from '../constants';
-import {
-  getSafeByIdQuery,
-  getUserSafesListQuery,
-  liquidationQuery,
-} from '../queries/safe';
+import { liquidationQuery } from '../queries/safe';
 import { BigNumber, FixedNumber } from 'ethers';
 import { IncentiveBalance, ISafeQuery, IUserSafeList } from '../interfaces';
 import { geb } from '../../setupTests';
-import { fetchIncentivesCampaigns } from '../../services/graphql';
+import {
+  fetchIncentivesCampaigns,
+  fetchSafeById,
+  fetchUserSafes,
+} from '../../services/graphql';
 
 // Add custom match type
 declare global {
@@ -173,12 +173,10 @@ describe('actions', () => {
   describe('FetchUserSafeList', () => {
     it('fetches a list of user safes', async () => {
       const rpcResponse = await gebManager.getUserSafesRpc({ geb, address });
-      const gqlResponse: IUserSafeList = (
-        await axios.post(
-          GRAPH_API_URLS[0],
-          JSON.stringify({ query: getUserSafesListQuery(address) })
-        )
-      ).data.data;
+      const gqlResponse: IUserSafeList = await fetchUserSafes(
+        { geb, address },
+        true
+      );
 
       expect(gqlResponse).toBeTruthy();
       expect(rpcResponse).toBeTruthy();
@@ -212,12 +210,10 @@ describe('actions', () => {
     // prettier-ignore
     it('fetches a safe by id', async () => {
       const rpcResponse = await gebManager.getSafeByIdRpc({ geb, safeId, address });
-      const gqlResponse: ISafeQuery = (
-        await axios.post(
-          GRAPH_API_URLS[0],
-          JSON.stringify({ query: getSafeByIdQuery(safeId, address) })
-        )
-      ).data.data;
+      const gqlResponse: ISafeQuery = await fetchSafeById(
+        { geb, address, safeId },
+        true
+      );
 
       expect(gqlResponse).toBeTruthy();
       expect(rpcResponse).toBeTruthy();

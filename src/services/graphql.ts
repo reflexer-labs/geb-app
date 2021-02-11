@@ -80,7 +80,10 @@ export const fetchUser = (address: string) => {
   );
 };
 
-export const fetchUserSafes = async (config: IFetchSafesPayload) => {
+export const fetchUserSafes = async (
+  config: IFetchSafesPayload,
+  returnRaw = false
+) => {
   const { address, geb, isRPCAdapterOn } = config;
 
   let response;
@@ -97,17 +100,12 @@ export const fetchUserSafes = async (config: IFetchSafesPayload) => {
     const res = await request(
       JSON.stringify({ query: getUserSafesListQuery(address.toLowerCase()) })
     );
-    response = res
-      ? res.data.data
-      : geb
-      ? await gebManager.getUserSafesRpc({
-          address: address.toLowerCase(),
-          geb,
-        })
-      : false;
+    response = res.data.data;
   }
 
   if (!response) return false;
+
+  if (returnRaw) return response;
 
   const safesResponse: IUserSafeList = response;
 
@@ -133,7 +131,10 @@ export const fetchUserSafes = async (config: IFetchSafesPayload) => {
   };
 };
 
-export const fetchSafeById = async (config: IFetchSafeById) => {
+export const fetchSafeById = async (
+  config: IFetchSafeById,
+  returnRaw = false
+) => {
   const { address, safeId, geb, isRPCAdapterOn } = config;
   let response;
 
@@ -150,19 +151,13 @@ export const fetchSafeById = async (config: IFetchSafeById) => {
     const res = await request(
       JSON.stringify({ query: getSafeByIdQuery(safeId, address) })
     );
-
-    response = res
-      ? res.data.data
-      : geb
-      ? await gebManager.getSafeByIdRpc({
-          address: address.toLowerCase(),
-          safeId,
-          geb,
-        })
-      : false;
+    response = res.data.data;
   }
 
   if (!response) return false;
+
+  if (returnRaw) return response;
+
   const safeResponse: ISafeQuery = response;
 
   const liquidationData = {
