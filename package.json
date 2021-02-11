@@ -53,7 +53,7 @@
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
-        "prettier": "prettier --write \"{,**/*.{ts,json,js,md}}\"",
+        "prettier": "prettier --write \"{,**/*.{ts,tsx,json,js,md}}\"",
         "test": "react-scripts test",
         "eject": "react-scripts eject"
     },
@@ -92,6 +92,6 @@
         }
     },
     "lint-staged": {
-        "*.{js,md,json,ts}": "prettier --write"
+        "*.{js,tsx,md,json,ts}": "prettier --write"
     }
 }
