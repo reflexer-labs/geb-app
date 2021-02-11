@@ -1,4 +1,4 @@
-import { COLLATERAL_TYPE_ID } from '../constants';
+import { COLLATERAL_TYPE_ID } from '../constants'
 
 export const liquidationQuery = `
   collateralType(id: "${COLLATERAL_TYPE_ID}") {
@@ -25,7 +25,7 @@ systemState(id: "current") {
   currentRedemptionPrice {
     value
   }
-}`;
+}`
 
 export const getUserSafesListQuery = (address: string) => `{
   safes(where: { owner: "${address}",  proxy_not: null, safeId_not: null }) {
@@ -39,7 +39,7 @@ export const getUserSafesListQuery = (address: string) => `{
   balance
   }
   ${liquidationQuery}
-}`;
+}`
 
 export const getSafeByIdQuery = (safeId: string, address: string) => `{
   safes(where: { safeId: "${safeId}" , proxy_not: null, safeId_not: null}) {
@@ -74,4 +74,4 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
    balance
    }
    ${liquidationQuery}
-}`;
+}`

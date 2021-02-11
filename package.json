@@ -53,6 +53,7 @@
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
+        "prettier": "prettier --write \"{,**/*.{ts,json,js,md}}\"",
         "test": "react-scripts test",
         "eject": "react-scripts eject"
     },
