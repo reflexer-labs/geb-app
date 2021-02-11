@@ -139,7 +139,8 @@ describe('actions', () => {
 
       verifyKeys(rpcResponse, gqlResponse)
 
-      expect(rpcResponse.systemState.currentRedemptionPrice.value).fixedNumberMatch(gqlResponse.systemState.currentRedemptionPrice.value);
+      // It can't be an exact match since the the RPC read function is in reality a state changing function applying the price change every second  
+      expect(rpcResponse.systemState.currentRedemptionPrice.value).almostEqual(gqlResponse.systemState.currentRedemptionPrice.value, 0.0001);
       // Since we're using JS instead of solidity for the exponentiation, an approximation is enough
       expect(rpcResponse.systemState.currentRedemptionRate.eightHourlyRate).almostEqual(gqlResponse.systemState.currentRedemptionRate.eightHourlyRate, 0.00001)
       expect(rpcResponse.systemState.globalDebt).fixedNumberMatch(gqlResponse.systemState.globalDebt);
