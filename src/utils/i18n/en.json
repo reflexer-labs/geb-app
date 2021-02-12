@@ -110,5 +110,6 @@
     "fullyUnlocked": "You can claim all your FLX rewards right after you earn them.",
     "proxy_wallet_text": "Your wallet is connected! Now, let's create your Reflexer Account",
     "shutdown_text": "The global settlement procedure was triggered for this system. You can't manage your Safes from this application anymore.",
-    "block_connection": "Blockchain Connection"
+    "block_connection": "Blockchain Connection",
+    "insurance": "Insurance"
 }
