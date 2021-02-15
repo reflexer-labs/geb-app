@@ -87,13 +87,11 @@ export const fetchUserSafes = async (
 
     if (isRPCAdapterOn) {
         if (!geb) return
-        console.log('isRPCAdapterOn')
         response = await gebManager.getUserSafesRpc({
             address: address.toLowerCase(),
             geb,
         })
     } else {
-        console.log('GRAPHQL')
         const res = await request(
             JSON.stringify({
                 query: getUserSafesListQuery(address.toLowerCase()),
@@ -140,14 +138,12 @@ export const fetchSafeById = async (
 
     if (isRPCAdapterOn) {
         if (!geb) return
-        console.log('isRPCAdapterOn')
         response = await gebManager.getSafeByIdRpc({
             address: address.toLowerCase(),
             safeId,
             geb,
         })
     } else {
-        console.log('GRAPHQL')
         const res = await request(
             JSON.stringify({ query: getSafeByIdQuery(safeId, address) })
         )
@@ -207,14 +203,11 @@ export const fetchIncentivesCampaigns = async (
     let response
 
     if (isRPCAdapterOn) {
-        console.log('isRPCAdapterOn')
         response = await gebManager.getIncentives({
             address: address.toLowerCase(),
             geb,
         })
     } else {
-        console.log('GRAPHQL')
-
         const res = await request(
             JSON.stringify({
                 query: incentiveCampaignsQuery(
