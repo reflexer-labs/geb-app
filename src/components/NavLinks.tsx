@@ -36,13 +36,15 @@ const NavLinks = () => {
             >
                 <SafeIcon className="opacity" /> {t('app')}
             </NavBarLink>
-            <NavBarLink
-                id="incentives-link"
-                to="/incentives"
-                onClick={(e) => handleLinkClick(e, false)}
-            >
-                <DollarSign size="18" /> {t('incentives')}
-            </NavBarLink>
+            {NETWORK_ID === 1 ? null : (
+                <NavBarLink
+                    id="incentives-link"
+                    to="/incentives"
+                    onClick={(e) => handleLinkClick(e, false)}
+                >
+                    <DollarSign size="18" /> {t('incentives')}
+                </NavBarLink>
+            )}
             <NavBarLink
                 to="/"
                 onClick={(e) =>

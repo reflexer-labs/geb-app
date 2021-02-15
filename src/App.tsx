@@ -23,6 +23,7 @@ import SafeDetails from './containers/OnBoarding/SafeDetails'
 import Privacy from './containers/Privacy'
 import CustomToast from './components/CustomToast'
 import Incentives from './containers/Incentives'
+import { NETWORK_ID } from './connectors'
 
 // Toast css
 
@@ -50,11 +51,13 @@ const App = () => {
                             <Suspense fallback={null}>
                                 <Web3ReactManager>
                                     <Switch>
-                                        <Route
-                                            exact
-                                            component={Incentives}
-                                            path={'/incentives'}
-                                        />
+                                        {NETWORK_ID === 1 ? null : (
+                                            <Route
+                                                exact
+                                                component={Incentives}
+                                                path={'/incentives'}
+                                            />
+                                        )}
                                         <Route
                                             exact
                                             component={Privacy}
