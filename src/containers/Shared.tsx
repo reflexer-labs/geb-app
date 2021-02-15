@@ -81,27 +81,29 @@ const Shared = ({ children }: Props) => {
             status: 'loading',
         })
         popupsActions.setIsWaitingModalOpen(true)
-        const isUserCreated = await geb.getProxyAction(account)
-
-        if (isUserCreated) {
-            connectWalletActions.setIsUserCreated(true)
-        }
-        const txs = localStorage.getItem(`${account}-${chainId}`)
-        if (txs) {
-            transactionsActions.setTransactions(JSON.parse(txs))
-        }
-        await timeout(200)
-        if (isUserCreated && !connectWalletState.ctHash) {
-            connectWalletActions.setStep(2)
-            await safeActions.fetchUserSafes({
-                address: account as string,
-                geb,
-            })
-        } else {
+        try {
+            const isUserCreated = await geb.getProxyAction(account)
+            if (isUserCreated) {
+                connectWalletActions.setIsUserCreated(true)
+            }
+            const txs = localStorage.getItem(`${account}-${chainId}`)
+            if (txs) {
+                transactionsActions.setTransactions(JSON.parse(txs))
+            }
+            await timeout(200)
+            if (!connectWalletState.ctHash) {
+                connectWalletActions.setStep(2)
+                await safeActions.fetchUserSafes({
+                    address: account as string,
+                    geb,
+                })
+            }
+        } catch (error) {
             safeActions.setIsSafeCreated(false)
             connectWalletActions.setStep(1)
             history.push('/')
         }
+
         await timeout(1000)
         popupsActions.setIsWaitingModalOpen(false)
     }
