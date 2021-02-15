@@ -82,9 +82,10 @@ const SafeStats = () => {
                             <Info size="16" />
                         </InfoIcon>
                         <Value>{`${
-                            Number(currentRedemptionRate) > 0.001
-                                ? currentRedemptionRate
-                                : '< 0.001'
+                            Number(currentRedemptionRate) > 0 &&
+                            Number(currentRedemptionRate) < 0.001
+                                ? '< 0.001'
+                                : currentRedemptionRate
                         }%`}</Value>
                         <Label>{`8-Hourly Redemption Rate`}</Label>
                     </StateInner>
