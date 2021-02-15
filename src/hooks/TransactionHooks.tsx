@@ -1,105 +1,104 @@
-import { utils as gebUtils } from 'geb.js';
+import { utils as gebUtils } from 'geb.js'
 import {
-  TransactionResponse,
-  TransactionRequest,
-} from '@ethersproject/providers';
-import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider';
-import { useCallback } from 'react';
-import { useActiveWeb3React } from '.';
-import store from '../store';
-import { ITransaction } from '../utils/interfaces';
-import { BigNumber } from 'ethers';
+    TransactionResponse,
+    TransactionRequest,
+} from '@ethersproject/providers'
+import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
+import { useCallback } from 'react'
+import { useActiveWeb3React } from '.'
+import store from '../store'
+import { ITransaction } from '../utils/interfaces'
+import { BigNumber } from 'ethers'
 
 export function useTransactionAdder(): (
-  response: TransactionResponse,
-  summary?: string
+    response: TransactionResponse,
+    summary?: string
 ) => void {
-  const { chainId, account } = useActiveWeb3React();
-  return useCallback(
-    (response: TransactionResponse, summary?: string) => {
-      if (!account) return;
-      if (!chainId) return;
+    const { chainId, account } = useActiveWeb3React()
+    return useCallback(
+        (response: TransactionResponse, summary?: string) => {
+            if (!account) return
+            if (!chainId) return
 
-      const { hash } = response;
-      if (!hash) {
-        throw Error('No transaction hash found.');
-      }
+            const { hash } = response
+            if (!hash) {
+                throw Error('No transaction hash found.')
+            }
 
-      const tx: ITransaction = {
-        chainId,
-        hash,
-        from: account,
-        summary,
-        addedTime: new Date().getTime(),
-        originalTx: response,
-      };
+            const tx: ITransaction = {
+                chainId,
+                hash,
+                from: account,
+                summary,
+                addedTime: new Date().getTime(),
+                originalTx: response,
+            }
 
-      store.dispatch.transactionsModel.addTransaction(tx);
-    },
-    [chainId, account]
-  );
+            store.dispatch.transactionsModel.addTransaction(tx)
+        },
+        [chainId, account]
+    )
 }
 
 export function isTransactionRecent(tx: ITransaction): boolean {
-  return new Date().getTime() - tx.addedTime < 86_400_000;
+    return new Date().getTime() - tx.addedTime < 86_400_000
 }
 
 export function useIsTransactionPending(transactionHash?: string): boolean {
-  const transactions = store.getState().transactionsModel.transactions;
+    const transactions = store.getState().transactionsModel.transactions
 
-  if (!transactionHash || !transactions[transactionHash]) return false;
+    if (!transactionHash || !transactions[transactionHash]) return false
 
-  return !transactions[transactionHash].receipt;
+    return !transactions[transactionHash].receipt
 }
 
 export async function handlePreTxGasEstimate(
-  signer: JsonRpcSigner,
-  tx: TransactionRequest
+    signer: JsonRpcSigner,
+    tx: TransactionRequest
 ): Promise<TransactionRequest> {
-  let gasLimit: BigNumber;
-
-  try {
-    gasLimit = await signer.estimateGas(tx);
-  } catch (err) {
-    let gebError: string | null;
+    let gasLimit: BigNumber
     try {
-      const res = await signer.call(tx);
-      gebError = gebUtils.getRequireString(res);
+        gasLimit = await signer.estimateGas(tx)
     } catch (err) {
-      gebError = gebUtils.getRequireString(err);
-    }
+        let gebError: string | null
+        try {
+            const res = await signer.call(tx)
+            gebError = gebUtils.getRequireString(res)
+        } catch (err) {
+            gebError = gebUtils.getRequireString(err)
+        }
 
-    let errorMessage: string;
-    if (gebError) {
-      errorMessage = 'Geb error: ' + gebError;
-    } else {
-      errorMessage = 'Provider error: ' + (err || err.message);
+        let errorMessage: string
+        if (gebError) {
+            errorMessage = 'Geb error: ' + gebError
+        } else {
+            errorMessage = 'Provider error: ' + (err || err.message)
+        }
+        store.dispatch.popupsModel.setIsWaitingModalOpen(true)
+        store.dispatch.popupsModel.setWaitingPayload({
+            title: 'Transaction Failed.',
+            status: 'error',
+        })
+        console.error(errorMessage)
+        throw errorMessage
     }
-
-    store.dispatch.popupsModel.setWaitingPayload({
-      title: 'Transaction Failed.',
-      status: 'error',
-    });
-    console.error(errorMessage);
-    throw errorMessage;
-  }
-  // Add 15% slack in the gas limit
-  tx.gasLimit = gasLimit.mul(115).div(100).toHexString();
-  return tx;
+    // Add 15% slack in the gas limit
+    tx.gasLimit = gasLimit.mul(115).div(100).toHexString()
+    return tx
 }
 
 export function handleTransactionError(e: any) {
-  if (e?.code === 4001) {
+    if (e?.code === 4001) {
+        store.dispatch.popupsModel.setWaitingPayload({
+            title: 'Transaction Rejected.',
+            status: 'error',
+        })
+        return
+    }
     store.dispatch.popupsModel.setWaitingPayload({
-      title: 'Transaction Rejected.',
-      status: 'error',
-    });
-    return;
-  }
-  store.dispatch.popupsModel.setWaitingPayload({
-    title: 'Transaction Failed.',
-    status: 'error',
-  });
-  console.error(`Transaction failed`, e);
-  console.log('Required String', gebUtils.getRequireString(e));
+        title: 'Transaction Failed.',
+        status: 'error',
+    })
+    console.error(`Transaction failed`, e)
+    console.log('Required String', gebUtils.getRequireString(e))
 }
