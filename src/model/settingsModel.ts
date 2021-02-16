@@ -15,15 +15,17 @@ export interface SettingsModel {
     setBlockBody: Action<SettingsModel, boolean>
     setIsRPCAdapterOn: Action<SettingsModel, boolean>
 }
-const blockchain_connection = localStorage.getItem('blockchain_connection')
+const local_blockchain_connection = localStorage.getItem(
+    'blockchain_connection'
+)
 
 const settingsModel: SettingsModel = {
     isLightTheme: isLight ? JSON.parse(isLight) : true,
     lang: language || 'en',
     bodyOverflow: false,
     blockBody: false,
-    isRPCAdapterOn: blockchain_connection
-        ? blockchain_connection.toLowerCase().includes('infura')
+    isRPCAdapterOn: local_blockchain_connection
+        ? local_blockchain_connection.toLowerCase().includes('rpc')
         : false,
     setIsLightTheme: action((state, payload) => {
         state.isLightTheme = payload
