@@ -40,9 +40,24 @@ const SafeStats = () => {
         ? formatNumber(liquidationData.currentPrice.value, 2)
         : '0'
 
-    const currentRedemptionRate = singleSafe
-        ? getRatePercentage(singleSafe.currentRedemptionRate)
-        : '0'
+    const returnRedRate = () => {
+        const currentRedemptionRate = singleSafe
+            ? getRatePercentage(singleSafe.currentRedemptionRate)
+            : '0'
+        if (
+            Number(currentRedemptionRate) > 0 &&
+            Number(currentRedemptionRate) < 0.001
+        ) {
+            return '< 0.001'
+        } else if (
+            Number(currentRedemptionRate) < 0 &&
+            Number(currentRedemptionRate) > -0.001
+        ) {
+            return '> -0.001'
+        } else {
+            return currentRedemptionRate
+        }
+    }
 
     const handleCollectSurplus = async () => {
         if (!library || !account) throw new Error('No library or account')
@@ -81,12 +96,7 @@ const SafeStats = () => {
                         <InfoIcon data-tip={t('annual_redemption_tip')}>
                             <Info size="16" />
                         </InfoIcon>
-                        <Value>{`${
-                            Number(currentRedemptionRate) > 0 &&
-                            Number(currentRedemptionRate) < 0.001
-                                ? '< 0.001'
-                                : currentRedemptionRate
-                        }%`}</Value>
+                        <Value>{`${returnRedRate()}%`}</Value>
                         <Label>{`8-Hourly Redemption Rate`}</Label>
                     </StateInner>
                 </StatItem>
