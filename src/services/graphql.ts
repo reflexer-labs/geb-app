@@ -97,7 +97,14 @@ export const fetchUserSafes = async (
                 query: getUserSafesListQuery(address.toLowerCase()),
             })
         )
-        response = res.data.data
+        response = res
+            ? res.data.data
+            : geb
+            ? await gebManager.getUserSafesRpc({
+                  address: address.toLowerCase(),
+                  geb,
+              })
+            : false
     }
 
     if (!response) return false
@@ -145,9 +152,19 @@ export const fetchSafeById = async (
         })
     } else {
         const res = await request(
-            JSON.stringify({ query: getSafeByIdQuery(safeId, address) })
+            JSON.stringify({
+                query: getSafeByIdQuery(safeId, address.toLowerCase()),
+            })
         )
-        response = res.data.data
+        response = res
+            ? res.data.data
+            : geb
+            ? await gebManager.getSafeByIdRpc({
+                  address: address.toLowerCase(),
+                  safeId,
+                  geb,
+              })
+            : false
     }
 
     if (!response) return false
