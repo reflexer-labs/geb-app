@@ -150,16 +150,11 @@ export const handleIncentiveDeposit = async (
     const geb = new Geb(ETH_NETWORK, signer.provider)
     const proxy = await geb.getProxyAction(signer._address)
 
-    console.log(geb)
-    console.log(proxy)
-
     let txData
 
     if (isUniSwapShareChecked) {
         if (!uniswapShare) throw new Error('No uniSwapShare deposited amount!')
         const uniswapShareBN = ethersUtils.parseEther(uniswapShare)
-        console.log(uniswapShareBN.toString(), campaignAddress)
-
         txData = proxy.stakeInMine(uniswapShareBN, campaignAddress)
     } else {
         if (!incentiveFields) throw new Error('No incentives fields!')

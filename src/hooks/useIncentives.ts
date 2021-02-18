@@ -332,8 +332,10 @@ export function useIncentivesAssets() {
     const {
         incentivesModel: incentivesState,
         connectWalletModel: connectWalletState,
+        settingsModel: settingsState,
     } = useStoreState((state) => state)
     const { incentivesCampaignData } = incentivesState
+    const { isRPCAdapterOn } = settingsState
     const { ethBalance, fiatPrice, ethPriceChange } = connectWalletState
 
     useEffect(() => {
@@ -521,17 +523,15 @@ export function useIncentivesAssets() {
                           .value()
                     : 0
 
-            const setToZero = true
-
             const uni = {
                 name: 'UNI-V2',
                 token: `${COIN_TICKER}/ETH Uni V2 LP Token`,
                 img: require('../assets/uni-lp.svg'),
                 amount: uniPoolBalance,
-                price: setToZero ? 0 : uniPoolPrice,
-                diff: setToZero ? 0 : uniPoolPriceDiff,
-                value: setToZero ? 0 : uniPoolValue,
-                diffPercentage: setToZero
+                price: isRPCAdapterOn ? 0 : uniPoolPrice,
+                diff: isRPCAdapterOn ? 0 : uniPoolPriceDiff,
+                value: isRPCAdapterOn ? 0 : uniPoolValue,
+                diffPercentage: isRPCAdapterOn
                     ? 0
                     : uniPoolPercentageDiff === 100
                     ? 0
@@ -547,6 +547,7 @@ export function useIncentivesAssets() {
         fiatPrice,
         ethBalance,
         ethPriceChange,
+        isRPCAdapterOn,
     ])
 
     return state
