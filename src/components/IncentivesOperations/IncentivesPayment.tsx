@@ -50,6 +50,7 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
     const {
         incentivesModel: incentivesState,
         connectWalletModel: connectWalletState,
+        settingsModel: settingsState,
     } = useStoreState((state) => state)
 
     const {
@@ -64,10 +65,12 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
         uniswapShare,
     } = incentivesState
 
+    const { isRPCAdapterOn } = settingsState
+
     const ethBalance = connectWalletState.ethBalance[NETWORK_ID]
-    const praiBalance = _.get(
+    const raiBalance = _.get(
         incentivesState.incentivesCampaignData,
-        'praiBalance',
+        'raiBalance',
         '0'
     )
 
@@ -90,8 +93,8 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
                 ? BigNumber.from(toFixedString(ethBalance.toString(), 'WAD'))
                 : BigNumber.from('0')
 
-            const praiBalanceBN = praiBalance
-                ? BigNumber.from(toFixedString(praiBalance.toString(), 'WAD'))
+            const raiBalanceBN = raiBalance
+                ? BigNumber.from(toFixedString(raiBalance.toString(), 'WAD'))
                 : BigNumber.from('0')
 
             const uniShareBN = uniShare
@@ -103,14 +106,6 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
                       toFixedString(assets?.uni.amount.toString(), 'WAD')
                   )
                 : BigNumber.from('0')
-
-            // if (
-            //   incentivesState.incentivesCampaignData?.allCampaigns &&
-            //   !incentivesState.incentivesCampaignData.allCampaigns.length
-            // ) {
-            //   setError(`Deposits are currently blocked`);
-            //   return;
-            // }
 
             if (isUniSwapChecked) {
                 if (uniShareBN.isZero()) {
@@ -142,7 +137,7 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
                 setError(`Deposited ETH cannot exceed available amount.`)
                 return
             }
-            if (raiAmountBN.gt(praiBalanceBN)) {
+            if (raiAmountBN.gt(raiBalanceBN)) {
                 setError(
                     `Deposited ${COIN_TICKER} cannot exceed available amount.`
                 )
@@ -187,10 +182,11 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
         const uniShareBN = uniShare
             ? BigNumber.from(toFixedString(uniShare, 'WAD'))
             : BigNumber.from('0')
-        if (isChecked && uniCoinLpAllowance) {
-            const uniCoinLpAllowanceBN = BigNumber.from(
-                toFixedString(uniCoinLpAllowance, 'WAD')
-            )
+
+        if (isChecked) {
+            const uniCoinLpAllowanceBN = uniCoinLpAllowance
+                ? BigNumber.from(toFixedString(uniCoinLpAllowance, 'WAD'))
+                : BigNumber.from('0')
             incentivesActions.setAllowanceType('uniCoin')
             return uniCoinLpAllowanceBN.gte(uniShareBN)
         } else if (coinAllowance) {
@@ -227,23 +223,31 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
             })
             return
         }
+
         if (!coinAddress || !token0) return
 
-        let praiValue: string
+        let raiValue: string
 
         if (isEth) {
-            praiValue = coinAddress === token0 ? token0Price : token1Price
+            raiValue = coinAddress === token0 ? token0Price : token1Price
         } else {
-            praiValue = coinAddress === token0 ? token1Price : token0Price
+            raiValue = coinAddress === token0 ? token1Price : token0Price
         }
 
         const valueBN = BigNumber.from(toFixedString(val, 'WAD'))
-        const praiValueBN = BigNumber.from(toFixedString(praiValue, 'RAD')).div(
-            gebUtils.RAY
-        )
+        const raiValueBN =
+            isRPCAdapterOn && !isEth
+                ? BigNumber.from(toFixedString(raiValue, 'RAD'))
+                : BigNumber.from(toFixedString(raiValue, 'RAD')).div(
+                      gebUtils.RAY
+                  )
 
         const reflectValue = gebUtils
-            .wadToFixed(valueBN.mul(praiValueBN).div(gebUtils.WAD))
+            .wadToFixed(
+                valueBN
+                    .mul(raiValueBN)
+                    .div(isRPCAdapterOn && !isEth ? gebUtils.RAY : gebUtils.WAD)
+            )
             .toString()
 
         const raiVal = isEth ? reflectValue : val
@@ -347,7 +351,7 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
                         label={`${
                             incentivesState.type
                         } ${COIN_TICKER} (Avail ${formatNumber(
-                            praiBalance.toString()
+                            raiBalance.toString()
                         )})`}
                         value={raiAmount}
                         onChange={(val: string) => handleChange(val, false)}

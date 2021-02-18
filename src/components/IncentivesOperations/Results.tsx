@@ -154,7 +154,7 @@ const Results = () => {
 
     useOnceCall(() => {
         setResultData(returnFLX(campaign))
-    }, campaign.id !== '')
+    }, campaign.campaignAddress !== '')
 
     return (
         <Result>

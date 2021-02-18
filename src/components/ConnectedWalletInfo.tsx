@@ -20,7 +20,7 @@ const ConnectedWalletInfo = () => {
     const { t } = useTranslation()
     const { ethereum } = window
 
-    const connections = ['Subgraph', 'Infura RPC']
+    const connections = ['Subgraph Endpoint', 'RPC Endpoint']
 
     const { active, account, connector, chainId } = useWeb3React()
 
@@ -118,7 +118,7 @@ const ConnectedWalletInfo = () => {
                     )}
                 </Connection>
 
-                <Address>
+                <Address id="web3-account-identifier-row">
                     <ConnectedWalletIcon size={20} />
                     {account && active ? returnWalletAddress(account) : 'N/A'}
                 </Address>
@@ -160,7 +160,7 @@ const ConnectedWalletInfo = () => {
                 {t('block_connection')}
                 <Dropdown
                     padding={'10px'}
-                    width={'150px'}
+                    width={'170px'}
                     fontSize={'14px'}
                     items={connections}
                     itemSelected={selectedConnection}

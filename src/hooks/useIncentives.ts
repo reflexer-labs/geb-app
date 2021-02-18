@@ -86,10 +86,8 @@ export default function useIncentives() {
                     const campaignAddress = _.get(
                         campaign,
                         'campaignAddress',
-                        '0'
+                        ''
                     )
-
-                    const id = _.get(campaign, 'id', '0')
                     const rewardRate = _.get(campaign, 'rewardRate', '0')
                     const totalSupply = _.get(campaign, 'totalSupply', '0')
                     const lastUpdatedTime = _.get(
@@ -193,7 +191,6 @@ export default function useIncentives() {
                     const user = _.get(incentivesCampaignData, 'user', null)
 
                     return {
-                        id,
                         campaignNumber: String(Number(campaignNumber) + 1),
                         periodFinish,
                         campaignAddress,
@@ -311,7 +308,7 @@ export function useUserCampaigns() {
                         incentivesCampaignData.incentiveBalances.find(
                             (y: IncentiveBalance) => {
                                 return (
-                                    x.id === y.campaignId &&
+                                    x.campaignAddress === y.id &&
                                     !userCampaignChecker(x, y)
                                 )
                             }
@@ -404,14 +401,15 @@ export function useIncentivesAssets() {
                 ) || '0'
 
             const raiBalance = numeral(
-                _.get(incentivesCampaignData, 'praiBalance', '0')
+                _.get(incentivesCampaignData, 'raiBalance', '0')
             ).value()
 
             const raiPrice = numeral(raiCurrentPrice).value()
 
-            const raiPriceDiff = numeral(raiCurrentPrice)
-                .subtract(raiOld24HPrice)
-                .value()
+            const raiPriceDiff =
+                raiOld24HPrice !== '0'
+                    ? numeral(raiCurrentPrice).subtract(raiOld24HPrice).value()
+                    : 0
 
             const raiVolValue = numeral(raiBalance).multiply(raiPrice).value()
 

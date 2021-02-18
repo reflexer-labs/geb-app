@@ -33,16 +33,23 @@ const NavLinks = () => {
 
     return (
         <Nav>
-            <NavBarLink to="/" onClick={(e) => handleLinkClick(e, false)}>
-                <SafeIcon className="opacity" /> {t('app')}
-            </NavBarLink>
             <NavBarLink
-                to="/incentives"
+                id="app-link"
+                to="/"
                 onClick={(e) => handleLinkClick(e, false)}
             >
-                <DollarSign size="18" /> {t('incentives')}
+                <SafeIcon className="opacity" /> {t('app')}
             </NavBarLink>
-            {isRPCAdapterOn ? null : (
+            {NETWORK_ID === 1 ? null : (
+                <NavBarLink
+                    id="incentives-link"
+                    to="/incentives"
+                    onClick={(e) => handleLinkClick(e, false)}
+                >
+                    <DollarSign size="18" /> {t('incentives')}
+                </NavBarLink>
+            )}
+             {isRPCAdapterOn ? null : (
                 <NavBarLink
                     to="/auctions"
                     onClick={(e) => handleLinkClick(e, false)}
@@ -50,7 +57,6 @@ const NavLinks = () => {
                     <AuctionIcon className="opacity" /> {t('auctions')}
                 </NavBarLink>
             )}
-
             <NavBarLink
                 to="/"
                 onClick={(e) =>

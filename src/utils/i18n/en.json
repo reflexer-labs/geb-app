@@ -109,14 +109,10 @@
     "app": "App",
     "fullyUnlocked": "You can claim all your FLX rewards right after you earn them.",
     "proxy_wallet_text": "Your wallet is connected! Now, let's create your Reflexer Account",
-    "auctions": "Auctions",
-    "auctions_header_text": "Dashboard to bid in debt auctions.",
-    "claim_tokens": "Claim Tokens",
-    "claim_flx": "Claim FLX",
-    "hide_faq": "Hide FAQ",
-    "show_faq": "Show FAQ",
     "shutdown_text": "The global settlement procedure was triggered for this system. You can't manage your Safes from this application anymore.",
-    "rai_bid": "{{rai}} Bid",
     "block_connection": "Blockchain Connection",
-    "no_auctions": "No debt auctions to bid"
+    "redemption_price_tip": "The 'moving peg' that the RAI market price should return to",
+    "collateral_ratio_tip": "The ratio between the value of the collateral and the value of debt in your Safe",
+    "auctions": "Auctions",
+    "auctions_header_text": "Dashboard to bid in debt auctions."
 }

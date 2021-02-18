@@ -5,7 +5,7 @@ import { getSafeByIdQuery, getUserSafesListQuery } from '../utils/queries/safe'
 import { GRAPH_API_URLS } from '../utils/constants'
 import { formatUserSafe, formatHistoryArray } from '../utils/helper'
 import { incentiveCampaignsQuery } from '../utils/queries/incentives'
-import { IIncentivesCampaignData } from '../utils/interfaces'
+import { IIncentivesCampaignData, IIncentivesConfig } from '../utils/interfaces'
 import { getSubgraphBlock, getUserQuery } from '../utils/queries/user'
 import {
     IFetchSafeById,
@@ -78,20 +78,21 @@ export const fetchUser = (address: string) => {
     )
 }
 
-export const fetchUserSafes = async (config: IFetchSafesPayload) => {
+export const fetchUserSafes = async (
+    config: IFetchSafesPayload,
+    returnRaw = false
+) => {
     const { address, geb, isRPCAdapterOn } = config
 
     let response
 
     if (isRPCAdapterOn) {
         if (!geb) return
-        console.log('isRPCAdapterOn')
         response = await gebManager.getUserSafesRpc({
             address: address.toLowerCase(),
             geb,
         })
     } else {
-        console.log('GRAPHQL')
         const res = await request(
             JSON.stringify({
                 query: getUserSafesListQuery(address.toLowerCase()),
@@ -109,6 +110,8 @@ export const fetchUserSafes = async (config: IFetchSafesPayload) => {
 
     if (!response) return false
 
+    if (returnRaw) return response
+
     const safesResponse: IUserSafeList = response
 
     const liquidationData = {
@@ -125,7 +128,7 @@ export const fetchUserSafes = async (config: IFetchSafesPayload) => {
     const userSafes = formatUserSafe(safesResponse.safes, liquidationData)
     return {
         userSafes,
-        availablePRAI:
+        availableRAI:
             safesResponse.erc20Balances &&
             safesResponse.erc20Balances.length > 0
                 ? safesResponse.erc20Balances[0].balance
@@ -134,24 +137,26 @@ export const fetchUserSafes = async (config: IFetchSafesPayload) => {
     }
 }
 
-export const fetchSafeById = async (config: IFetchSafeById) => {
+export const fetchSafeById = async (
+    config: IFetchSafeById,
+    returnRaw = false
+) => {
     const { address, safeId, geb, isRPCAdapterOn } = config
     let response
 
     if (isRPCAdapterOn) {
         if (!geb) return
-        console.log('isRPCAdapterOn')
         response = await gebManager.getSafeByIdRpc({
             address: address.toLowerCase(),
             safeId,
             geb,
         })
     } else {
-        console.log('GRAPHQL')
         const res = await request(
-            JSON.stringify({ query: getSafeByIdQuery(safeId, address) })
+            JSON.stringify({
+                query: getSafeByIdQuery(safeId, address.toLowerCase()),
+            })
         )
-
         response = res
             ? res.data.data
             : geb
@@ -164,6 +169,9 @@ export const fetchSafeById = async (config: IFetchSafeById) => {
     }
 
     if (!response) return false
+
+    if (returnRaw) return response
+
     const safeResponse: ISafeQuery = response
 
     const liquidationData = {
@@ -206,40 +214,55 @@ export const fetchSafeById = async (config: IFetchSafeById) => {
 }
 
 export const fetchIncentivesCampaigns = async (
-    address: string,
-    blockNumber: number
-) => {
-    const res = await request(
-        JSON.stringify({ query: incentiveCampaignsQuery(address, blockNumber) })
-    )
+    config: IIncentivesConfig
+): Promise<IIncentivesCampaignData> => {
+    const { address, blockNumber, geb, isRPCAdapterOn } = config
 
-    const response = res.data.data
+    let response
 
-    const proxyData =
-        response.userProxies && response.userProxies.length > 0
-            ? response.userProxies[0]
-            : null
-
-    const payload: IIncentivesCampaignData = {
-        user: response.user ? response.user.id : null,
-        proxyData,
-        praiBalance:
-            response.praiBalance && response.praiBalance.length > 0
-                ? response.praiBalance[0].balance
-                : '0',
-        protBalance:
-            response.protBalance && response.protBalance.length > 0
-                ? response.protBalance[0].balance
-                : '0',
-        uniswapCoinPool:
-            response.uniswapCoinPool && response.uniswapCoinPool.length > 0
-                ? response.uniswapCoinPool[0].balance
-                : '0',
-        old24hData: response.old24hData,
-        allCampaigns: response.incentiveCampaigns,
-        systemState: response.systemState,
-        incentiveBalances: response.incentiveBalances,
+    if (isRPCAdapterOn) {
+        response = await gebManager.getIncentives({
+            address: address.toLowerCase(),
+            geb,
+        })
+    } else {
+        const res = await request(
+            JSON.stringify({
+                query: incentiveCampaignsQuery(
+                    address.toLowerCase(),
+                    blockNumber
+                ),
+            })
+        )
+        response = res.data.data
     }
+
+    const payload: IIncentivesCampaignData = isRPCAdapterOn
+        ? response
+        : {
+              user: response.user ? response.user.id : null,
+              proxyData:
+                  response.userProxies && response.userProxies.length > 0
+                      ? response.userProxies[0]
+                      : null,
+              raiBalance:
+                  response.raiBalance && response.raiBalance.length > 0
+                      ? response.raiBalance[0].balance
+                      : '0',
+              protBalance:
+                  response.protBalance && response.protBalance.length > 0
+                      ? response.protBalance[0].balance
+                      : '0',
+              uniswapCoinPool:
+                  response.uniswapCoinPool &&
+                  response.uniswapCoinPool.length > 0
+                      ? response.uniswapCoinPool[0].balance
+                      : '0',
+              old24hData: response.old24hData,
+              allCampaigns: response.incentiveCampaigns,
+              systemState: response.systemState,
+              incentiveBalances: response.incentiveBalances,
+          }
 
     return payload
 }

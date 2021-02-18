@@ -4,7 +4,7 @@ import { CSSTransition, SwitchTransition } from 'react-transition-group'
 import styled from 'styled-components'
 import _ from '../../utils/lodash'
 import { useStoreActions, useStoreState } from '../../store'
-import ApprovePRAI from '../ApprovePRAI'
+import ApproveRAI from '../ApproveRAI'
 import IncentivesPayment from './IncentivesPayment'
 import IncentivesTransaction from './IncentivesTransaction'
 import RedeemRewards from './RedeemRewards'
@@ -81,7 +81,7 @@ const IncentivesOperations = () => {
                     }}
                 >
                     {incentivesState.operation === 2 ? (
-                        <ApprovePRAI
+                        <ApproveRAI
                             handleBackBtn={() =>
                                 incentivesActions.setOperation(0)
                             }

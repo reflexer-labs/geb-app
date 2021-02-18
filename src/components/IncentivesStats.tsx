@@ -42,7 +42,7 @@ const IncentivesStats = () => {
             return
         }
 
-        if (userCampaigns[0].id === '') {
+        if (userCampaigns[0].campaignAddress === '') {
             return
         }
 
@@ -73,7 +73,7 @@ const IncentivesStats = () => {
     }
 
     const returnItemSelected = useCallback(() => {
-        if (userCampaigns[0].id === '') {
+        if (userCampaigns[0].campaignAddress === '') {
             if (campaignNumber && Date.now() < Number(periodFinish) * 1000) {
                 return `#${campaignNumber}`
             } else {
@@ -96,14 +96,16 @@ const IncentivesStats = () => {
             <StatsGrid>
                 <StatItem>
                     <StateInner>
-                        <Label className="top">{'Campaign'} </Label>
+                        <Label className="top" id="campaign-box">
+                            {'Campaign'}{' '}
+                        </Label>
                         {/* <Value>{`#${campaignNumber}`}</Value> */}
                         <Value>
                             <Dropdown
                                 width="200px"
                                 itemPadding={'10px 20px'}
                                 items={
-                                    userCampaigns[0].id === ''
+                                    userCampaigns[0].campaignAddress === ''
                                         ? []
                                         : userCampaigns.map(
                                               (campaign: IIncentiveHook) =>
@@ -128,7 +130,9 @@ const IncentivesStats = () => {
 
                 <StatItem>
                     <StateInner>
-                        <Label className="top">{'My Reward Rate'}</Label>
+                        <Label className="top" id="reward-box">
+                            {'My Reward Rate'}
+                        </Label>
                         <Value>{`${
                             account ? formatNumber(myRewardRate, 2, true) : 0
                         } FLX/Day`}</Value>
@@ -142,7 +146,9 @@ const IncentivesStats = () => {
 
                 <StatItem>
                     <StateInner>
-                        <Label className="top">{'My Stake'}</Label>
+                        <Label className="top" id="stake-box">
+                            {'My Stake'}
+                        </Label>
                         <Value>{`${ethStake || 0} ETH + ${
                             raiStake || 0
                         } RAI`}</Value>
@@ -166,6 +172,7 @@ const IncentivesStats = () => {
             >
                 <div>
                     <Button
+                        id="withdraw-btn"
                         text={t('withdraw')}
                         onClick={() => handleClick('withdraw')}
                         dimmed
@@ -182,6 +189,7 @@ const IncentivesStats = () => {
 
                 <div>
                     <Button
+                        id="deposit-btn"
                         withArrow
                         onClick={() => handleClick('deposit')}
                         text={t('deposit')}

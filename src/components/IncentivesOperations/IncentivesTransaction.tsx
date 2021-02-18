@@ -15,7 +15,7 @@ const IncentivesTransaction = () => {
     const { t } = useTranslation()
 
     const userCampaigns = useUserCampaigns()
-    const { id, reserveRAI, reserveETH, coinTotalSupply } = userCampaigns[0]
+    const { reserveRAI, reserveETH, coinTotalSupply } = userCampaigns[0]
 
     const { incentivesModel: incentivesState } = useStoreState((state) => state)
 
@@ -51,11 +51,9 @@ const IncentivesTransaction = () => {
     }
 
     const reset = () => {
-        popupsActions.setIsIncentivesModalOpen(false)
         incentivesActions.setOperation(0)
         incentivesActions.setUniPoolAmount('')
         incentivesActions.setIncentivesFields({ ethAmount: '', raiAmount: '' })
-        popupsActions.setIsWaitingModalOpen(false)
         incentivesActions.setIsUniSwapShareChecked(false)
         incentivesActions.setUniswapShare('')
         incentivesActions.setUniPoolAmount('')
@@ -94,7 +92,7 @@ const IncentivesTransaction = () => {
                 }
 
                 if (type === 'withdraw') {
-                    if (!id) {
+                    if (!campaignAddress) {
                         throw new Error('No CampaignId specified')
                     }
                     await incentivesActions.incentiveWithdraw({
@@ -107,12 +105,11 @@ const IncentivesTransaction = () => {
                         isUniSwapShareChecked,
                     })
                 }
-                if (userCampaigns[0].id !== '') {
+                if (userCampaigns[0].campaignAddress !== '') {
                     incentivesActions.setSelectedCampaignAddress(
                         userCampaigns[0].campaignAddress
                     )
                 }
-                reset()
             } catch (e) {
                 reset()
                 handleTransactionError(e)

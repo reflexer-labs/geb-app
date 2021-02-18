@@ -141,7 +141,6 @@ export const jdenticonConfig = {
 
 export const INITIAL_INCENTIVE_STATE = [
     {
-        id: '',
         campaignNumber: '',
         periodFinish: '',
         campaignAddress: '',

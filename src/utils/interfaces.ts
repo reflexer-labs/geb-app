@@ -4,7 +4,7 @@ import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { DefaultTheme, ThemedCssFunction } from 'styled-components'
 import { ChainId } from '@uniswap/sdk'
 import { IconName } from '../components/FeatherIconWrapper'
-import { ApproveMethod } from '../components/ApprovePRAI'
+import { ApproveMethod } from '../components/ApproveRAI'
 import { Geb } from 'geb.js'
 
 export interface DynamicObject {
@@ -220,15 +220,6 @@ export interface ISafeHistory {
 }
 
 export interface IncentivesCampaign {
-    duration: string
-    instantExitPercentage: string
-    reward: string
-    rewardDelay: string
-    startTime: string
-    lastUpdateTime: string
-
-    // new
-    id: string
     campaignAddress: string
     campaignNumber: string
     rewardsDuration: string
@@ -236,15 +227,11 @@ export interface IncentivesCampaign {
     totalSupply: string
     rewardToken: string
     rewardPerTokenStored: string
+    periodFinish: string
+    lastUpdatedTime: string
 }
 
 export interface IncentiveBalance {
-    campaignId: string
-    delayedRewardTotalAmount: string
-    delayedRewardExitedAmount: string
-    delayedRewardLatestExitTime: string
-
-    // new
     id: string
     stakeBalance: string
     address: string
@@ -273,9 +260,10 @@ export interface IIncentivesCampaignData {
             value: string
         }
     }
-    praiBalance: string
+    raiBalance: string
     protBalance: string
     uniswapCoinPool: string
+    // old24hData is null when using RPC as this can't be fetched over RPC
     old24hData: {
         coinAddress: string
         wethAddress: string
@@ -287,13 +275,16 @@ export interface IIncentivesCampaignData {
         currentCoinMedianizerUpdate: {
             value: string
         }
-    }
+    } | null
     incentiveBalances: Array<IncentiveBalance>
+    // proxyData is null when user does not have a proxy
     proxyData: {
         address: string
-        coinAllowance: { amount: string }
-        uniCoinLpAllowance: { amount: string }
-    }
+        // coinAllowance when allowance is 0 TODO: need uniform behavior when 0
+        coinAllowance: { amount: string } | null
+        // uniCoinLpAllowance when allowance is 0 TODO: need uniform behavior when 0
+        uniCoinLpAllowance: { amount: string } | null
+    } | null
 }
 
 export interface IIncentivesFields {
@@ -302,7 +293,6 @@ export interface IIncentivesFields {
 }
 
 export interface IIncentiveHook {
-    id: string
     campaignNumber: string
     periodFinish: string
     campaignAddress: string
@@ -379,54 +369,6 @@ export interface IApprove {
     coinName: string
     methodName: ApproveMethod
     amount: string
-}
-
-export interface IAuctionBidder {
-    bidder: string
-    buyAmount: string
-    createdAt: string
-    sellAmount: string
-    createdAtTransaction: string
-}
-
-export interface IAuction {
-    auctionDeadline: string
-    auctionId: string
-    buyAmount: string
-    buyInitialAmount: string
-    buyToken: string
-    startedBy: string
-    createdAt: string
-    createdAtTransaction: string
-    englishAuctionBids: Array<IAuctionBidder>
-    englishAuctionConfiguration: {
-        bidDuration: string
-        bidIncrease: string
-        totalAuctionLength: string
-    }
-    englishAuctionType: string
-    isClaimed: boolean
-    sellAmount: string
-    sellInitialAmount: string
-    sellToken: string
-    winner: string
-}
-
-export interface UserProxy {
-    address: string
-}
-
-export interface IPaging {
-    from: number
-    to: number
-}
-
-export interface IAuctionBid {
-    amount?: string
-    auctionId: string
-    title: string
-    signer: JsonRpcSigner
-    auctionType: 'DEBT'
 }
 export interface ISafeResponse {
     collateral: string
@@ -517,4 +459,52 @@ export interface IFetchSafesPayload {
 
 export interface IFetchSafeById extends IFetchSafesPayload {
     safeId: string
+}
+
+export interface IIncentivesConfig extends IFetchSafesPayload {
+    blockNumber: number
+}
+
+export interface IAuctionBidder {
+    bidder: string
+    buyAmount: string
+    createdAt: string
+    sellAmount: string
+    createdAtTransaction: string
+}
+
+export interface IAuction {
+    auctionDeadline: string
+    auctionId: string
+    buyAmount: string
+    buyInitialAmount: string
+    buyToken: string
+    startedBy: string
+    createdAt: string
+    createdAtTransaction: string
+    englishAuctionBids: Array<IAuctionBidder>
+    englishAuctionConfiguration: {
+        bidDuration: string
+        bidIncrease: string
+        totalAuctionLength: string
+    }
+    englishAuctionType: string
+    isClaimed: boolean
+    sellAmount: string
+    sellInitialAmount: string
+    sellToken: string
+    winner: string
+}
+
+export interface IAuctionBid {
+    amount?: string
+    auctionId: string
+    title: string
+    signer: JsonRpcSigner
+    auctionType: 'DEBT'
+}
+
+export interface IPaging {
+    from: number
+    to: number
 }

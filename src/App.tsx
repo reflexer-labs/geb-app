@@ -24,6 +24,7 @@ import Privacy from './containers/Privacy'
 import CustomToast from './components/CustomToast'
 import Incentives from './containers/Incentives'
 import Auctions from './containers/Auctions'
+import { NETWORK_ID } from './connectors'
 
 // Toast css
 
@@ -56,11 +57,13 @@ const App = () => {
                                             component={Auctions}
                                             path={'/auctions'}
                                         />
-                                        <Route
-                                            exact
-                                            component={Incentives}
-                                            path={'/incentives'}
-                                        />
+                                        {NETWORK_ID === 1 ? null : (
+                                            <Route
+                                                exact
+                                                component={Incentives}
+                                                path={'/incentives'}
+                                            />
+                                        )}
                                         <Route
                                             exact
                                             component={Privacy}

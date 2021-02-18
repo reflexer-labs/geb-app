@@ -214,10 +214,10 @@ const safeModel: SafeModel = {
             }
             actions.setLiquidationData(fetched.liquidationData)
             const chainId = NETWORK_ID
-            if (fetched.availablePRAI && chainId) {
-                storeActions.connectWalletModel.updatePraiBalance({
+            if (fetched.availableRAI && chainId) {
+                storeActions.connectWalletModel.updateRaiBalance({
                     chainId,
-                    balance: numeral(fetched.availablePRAI).value(),
+                    balance: numeral(fetched.availableRAI).value(),
                 })
             }
             await timeout(200)
@@ -234,7 +234,7 @@ const safeModel: SafeModel = {
                 actions.setSafeHistoryList(res.safeHistory)
             }
             actions.setLiquidationData(res.liquidationData)
-            storeActions.connectWalletModel.updatePraiBalance({
+            storeActions.connectWalletModel.updateRaiBalance({
                 chainId: NETWORK_ID,
                 balance: numeral(res.erc20Balance).value(),
             })
