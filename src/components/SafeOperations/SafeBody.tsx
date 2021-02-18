@@ -152,7 +152,7 @@ const SafeBody = ({ isChecked }: Props) => {
         }
         if (type === 'deposit_borrow' && !isLeft) {
             return `Borrow ${COIN_TICKER} (${
-                isCreate ? 'Max to Borrow' : 'Available'
+                isCreate ? 'Max' : 'Available'
             } ${getAvailableRai()})`
         }
         if (type === 'repay_withdraw' && isLeft) {
