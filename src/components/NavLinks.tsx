@@ -1,5 +1,5 @@
 import React from 'react'
-import { DollarSign } from 'react-feather'
+import { DollarSign, Shield } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
@@ -60,6 +60,31 @@ const NavLinks = () => {
                 <AnalyticsIcon className="fill" /> {t('analytics')}
             </NavBarLink>
 
+            <Box className="has-menu">
+                <LinkItem>
+                    <Shield /> {t('insurance')}
+                </LinkItem>
+                <MenuBox className="menu-box">
+                    {/* <ExtLink href="https://nexusmutual.io/" target="_blank">
+                        Nexus Mutual{' '}
+                        <img
+                            src={require('../assets/dark-arrow.svg')}
+                            alt="arrow"
+                        />
+                    </ExtLink> */}
+                    <ExtLink
+                        href="https://www.coverprotocol.com/"
+                        target="_blank"
+                    >
+                        Cover Protocol
+                        <img
+                            src={require('../assets/dark-arrow.svg')}
+                            alt="arrow"
+                        />
+                    </ExtLink>
+                </MenuBox>
+            </Box>
+
             {/* <SepBlock className="disableDesktop">
         <NavBarLink to="" onClick={(e) => handleLinkClick(e, false)}>
           {t('request_features')}
@@ -88,33 +113,10 @@ const Nav = styled.div`
     display: flex;
     align-items: center;
 
-    svg {
-        display: none;
-    }
     ${({ theme }) => theme.mediaWidth.upToSmall`
   
     flex-direction: column;
-    a,
-    div {
-      flex: 0 0 100%;
-      min-width: 100%;
-      font-weight: normal;
-      padding: 15px 25px;
-      display: flex;
-      align-items:center;
-      text-align: left;
-      margin: 0;
-      color :${(props) => props.theme.colors.primary};
-      svg {
-         width: 18px;
-         height: 18px;
-         display: inline;
-         margin-right:10px;
-         color: ${(props) => props.theme.colors.secondary}
-      
-        
-      }
-    }
+    
   `}
 `
 
@@ -132,12 +134,20 @@ const NavBarLink = styled(NavLink)`
     }
 
     svg {
+        display: none;
         &.fill {
             fill: ${(props) => props.theme.colors.secondary};
         }
         &.opacity {
             opacity: 0.5;
         }
+        ${({ theme }) => theme.mediaWidth.upToSmall`
+   width: 18px;
+         height: 18px;
+         display: inline !important;
+         margin-right:10px;
+         color: ${(props) => props.theme.colors.secondary}
+        `}
     }
 
     margin-right: 20px;
@@ -150,7 +160,122 @@ const NavBarLink = styled(NavLink)`
   &:first-child {
     border-top: 1px solid ${(props) => props.theme.colors.border};
   }
+      flex: 0 0 100%;
+      min-width: 100%;
+      font-weight: normal;
+      padding: 15px 25px;
+      display: flex;
+      align-items:center;
+      text-align: left;
+      margin: 0;
+      color :${(props) => props.theme.colors.primary};
+    
   `}
+`
+
+const Box = styled.div`
+    position: relative;
+    cursor: pointer;
+    &:hover {
+        .menu-box {
+            display: block;
+        }
+    }
+
+    svg {
+        display: none;
+    }
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+      flex: 0 0 100%;
+      min-width: 100%;
+      font-weight: normal;
+      padding: 15px 25px;
+      svg {
+        width: 18px;
+         height: 18px;
+         display: inline !important;
+         margin-right:10px;
+         color: ${(props) => props.theme.colors.secondary}
+    }
+    `}
+`
+
+const LinkItem = styled.div`
+    color: ${(props) => props.theme.colors.secondary};
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 5px 0;
+    &:hover {
+        background: ${(props) => props.theme.colors.gradient};
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: ${(props) => props.theme.colors.inputBorderColor};
+        svg {
+            color: ${(props) => props.theme.colors.secondary};
+        }
+    }
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+        font-weight:normal;
+    `}
+`
+
+const MenuBox = styled.div`
+    display: none;
+    position: absolute;
+    top: 30px;
+    z-index: 99;
+    border-radius: 4px;
+    background: #fff;
+    padding: 20px;
+    min-width: 200px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.06);
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+        display:block;
+        position:static;
+        box-shadow:none;
+        padding:0;
+        margin-bottom:20px;
+        padding-left:28px;
+        margin-top:15px;
+    `}
+`
+
+const ExtLink = styled.a`
+    color: ${(props) => props.theme.colors.primary};
+    font-size: 15px;
+    line-height: 24px;
+    letter-spacing: -0.18px;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 5px 0;
+    cursor: pointer;
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    &:hover {
+        text-decoration: none;
+        transform: translateX(5px);
+        color: ${(props) => props.theme.colors.secondary};
+    }
+
+    img {
+        display: none;
+    }
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+        color: ${(props) => props.theme.colors.secondary};
+        transform: translateX(0px) !important;
+        img {
+            display:inline;
+            transform:rotate(180deg);
+            margin-left:5px;
+        }
+
+    `}
 `
 
 // const NavBarBtn = styled.div`
