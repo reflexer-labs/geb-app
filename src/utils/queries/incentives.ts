@@ -1,10 +1,10 @@
-import { userQuery } from './user';
+import { userQuery } from './user'
 
-const past24HBlocks = (blockNumber: number) => blockNumber - (24 * 3600) / 15;
+const past24HBlocks = (blockNumber: number) => blockNumber - (24 * 3600) / 15
 
 export const incentiveCampaignsQuery = (
-  address: string,
-  blockNumber: number
+    address: string,
+    blockNumber: number
 ) => `{
     ${userQuery(address)}
     userProxies(where: {owner: "${address}"}) {
@@ -67,7 +67,7 @@ export const incentiveCampaignsQuery = (
         balance
         }
       old24hData:systemState(id: "current", block: {number: ${past24HBlocks(
-        blockNumber
+          blockNumber
       )}}) {
         coinAddress
         wethAddress
@@ -80,4 +80,4 @@ export const incentiveCampaignsQuery = (
           value
         }
         }
-}`;
+}`

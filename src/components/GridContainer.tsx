@@ -1,28 +1,28 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from 'react'
+import styled from 'styled-components'
 interface Props {
-  children: React.ReactNode;
+    children: React.ReactNode
 }
 
 const GridContainer = ({ children }: Props) => {
-  return (
-    <Container>
-      <InnerContent>{children}</InnerContent>
-    </Container>
-  );
-};
+    return (
+        <Container>
+            <InnerContent>{children}</InnerContent>
+        </Container>
+    )
+}
 
-export default GridContainer;
+export default GridContainer
 
 const Container = styled.div`
-  background: ${(props) => props.theme.colors.foreground};
-  padding-bottom: 20px;
-  @media (max-width: ${(props) => props.theme.global.gridMaxWidth}) {
-    padding: 0 20px 20px 20px;
-  }
-`;
+    background: ${(props) => props.theme.colors.foreground};
+    padding-bottom: 20px;
+    @media (max-width: ${(props) => props.theme.global.gridMaxWidth}) {
+        padding: 0 20px 20px 20px;
+    }
+`
 const InnerContent = styled.div`
-  max-width: ${(props) => props.theme.global.gridMaxWidth};
-  width: 100%;
-  margin: 0 auto;
-`;
+    max-width: ${(props) => props.theme.global.gridMaxWidth};
+    width: 100%;
+    margin: 0 auto;
+`

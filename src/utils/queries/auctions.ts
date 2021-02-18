@@ -1,4 +1,4 @@
-import { userQuery } from './user';
+import { userQuery } from './user'
 
 export const auctionsQuery = (address: string) => `{
   englishAuctions (orderBy:auctionId, orderDirection: desc, where:{englishAuctionType: DEBT}){
@@ -39,4 +39,4 @@ export const auctionsQuery = (address: string) => `{
     balance
   }
   ${userQuery(address)}
-  }`;
+  }`
