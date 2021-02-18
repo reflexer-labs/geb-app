@@ -87,19 +87,24 @@ export const fetchUserSafes = async (
 
     if (isRPCAdapterOn) {
         if (!geb) return
-        console.log('isRPCAdapterOn')
         response = await gebManager.getUserSafesRpc({
             address: address.toLowerCase(),
             geb,
         })
     } else {
-        console.log('GRAPHQL')
         const res = await request(
             JSON.stringify({
                 query: getUserSafesListQuery(address.toLowerCase()),
             })
         )
-        response = res.data.data
+        response = res
+            ? res.data.data
+            : geb
+            ? await gebManager.getUserSafesRpc({
+                  address: address.toLowerCase(),
+                  geb,
+              })
+            : false
     }
 
     if (!response) return false
@@ -140,18 +145,26 @@ export const fetchSafeById = async (
 
     if (isRPCAdapterOn) {
         if (!geb) return
-        console.log('isRPCAdapterOn')
         response = await gebManager.getSafeByIdRpc({
             address: address.toLowerCase(),
             safeId,
             geb,
         })
     } else {
-        console.log('GRAPHQL')
         const res = await request(
-            JSON.stringify({ query: getSafeByIdQuery(safeId, address) })
+            JSON.stringify({
+                query: getSafeByIdQuery(safeId, address.toLowerCase()),
+            })
         )
-        response = res.data.data
+        response = res
+            ? res.data.data
+            : geb
+            ? await gebManager.getSafeByIdRpc({
+                  address: address.toLowerCase(),
+                  safeId,
+                  geb,
+              })
+            : false
     }
 
     if (!response) return false
@@ -207,14 +220,11 @@ export const fetchIncentivesCampaigns = async (
     let response
 
     if (isRPCAdapterOn) {
-        console.log('isRPCAdapterOn')
         response = await gebManager.getIncentives({
             address: address.toLowerCase(),
             geb,
         })
     } else {
-        console.log('GRAPHQL')
-
         const res = await request(
             JSON.stringify({
                 query: incentiveCampaignsQuery(

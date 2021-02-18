@@ -36,13 +36,15 @@ const NavLinks = () => {
             >
                 <SafeIcon className="opacity" /> {t('app')}
             </NavBarLink>
-            <NavBarLink
-                id="incentives-link"
-                to="/incentives"
-                onClick={(e) => handleLinkClick(e, false)}
-            >
-                <DollarSign size="18" /> {t('incentives')}
-            </NavBarLink>
+            {NETWORK_ID === 1 ? null : (
+                <NavBarLink
+                    id="incentives-link"
+                    to="/incentives"
+                    onClick={(e) => handleLinkClick(e, false)}
+                >
+                    <DollarSign size="18" /> {t('incentives')}
+                </NavBarLink>
+            )}
             <NavBarLink
                 to="/"
                 onClick={(e) =>
@@ -63,13 +65,13 @@ const NavLinks = () => {
                     <Shield /> {t('insurance')}
                 </LinkItem>
                 <MenuBox className="menu-box">
-                    <ExtLink href="https://nexusmutual.io/" target="_blank">
+                    {/* <ExtLink href="https://nexusmutual.io/" target="_blank">
                         Nexus Mutual{' '}
                         <img
                             src={require('../assets/dark-arrow.svg')}
                             alt="arrow"
                         />
-                    </ExtLink>
+                    </ExtLink> */}
                     <ExtLink
                         href="https://www.coverprotocol.com/"
                         target="_blank"

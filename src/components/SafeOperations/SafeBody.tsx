@@ -26,6 +26,8 @@ import {
     COIN_TICKER,
     COLLATERAL_TYPE_ID,
 } from '../../utils/constants'
+import { Info } from 'react-feather'
+import ReactTooltip from 'react-tooltip'
 
 interface Props {
     isChecked?: boolean
@@ -149,7 +151,7 @@ const SafeBody = ({ isChecked }: Props) => {
             return `Deposit ETH (Available ${getAvailableEth()})`
         }
         if (type === 'deposit_borrow' && !isLeft) {
-            return `Borrow ${COIN_TICKER} (Available ${getAvailableRai()})`
+            return `Borrow ${COIN_TICKER} (Max ${getAvailableRai()})`
         }
         if (type === 'repay_withdraw' && isLeft) {
             return `Withdraw ETH (Available ${getAvailableEth()})`
@@ -498,7 +500,7 @@ const SafeBody = ({ isChecked }: Props) => {
                 <Result>
                     <Block>
                         <Item>
-                            <Label>{'Total ETH Collateral'}</Label>{' '}
+                            <Label>{'Total ETH Collateral'}</Label>
                             <Value>{`${
                                 totalCollateral ? totalCollateral : 0
                             }`}</Value>
@@ -515,7 +517,12 @@ const SafeBody = ({ isChecked }: Props) => {
                             )}`}</Value>
                         </Item>
                         <Item>
-                            <Label>{`${COIN_TICKER} Redemption Price`}</Label>{' '}
+                            <Label>
+                                {`${COIN_TICKER} Redemption Price`}
+                                <InfoIcon data-tip={t('redemption_price_tip')}>
+                                    <Info size="16" />
+                                </InfoIcon>
+                            </Label>{' '}
                             <Value>{`$${formatNumber(
                                 currentRedemptionPrice,
                                 3
@@ -527,6 +534,9 @@ const SafeBody = ({ isChecked }: Props) => {
                                 {!isCreate
                                     ? 'New Collateral Ratio'
                                     : 'Collateral Ratio'}
+                                <InfoIcon data-tip={t('collateral_ratio_tip')}>
+                                    <Info size="16" />
+                                </InfoIcon>
                             </Label>{' '}
                             <Value>{`${
                                 collateralRatio > 0 ? collateralRatio : '∞'
@@ -537,16 +547,27 @@ const SafeBody = ({ isChecked }: Props) => {
                                 {!isCreate
                                     ? 'New Liquidation Price'
                                     : 'Liquidation Price'}
+                                <InfoIcon data-tip={t('liquidation_price_tip')}>
+                                    <Info size="16" />
+                                </InfoIcon>
                             </Label>{' '}
                             <Value>{`$${
                                 liquidationPrice > 0 ? liquidationPrice : 0
                             }`}</Value>
                         </Item>
                         <Item>
-                            <Label>{'Liquidation Penalty'}</Label>{' '}
+                            <Label>
+                                {'Liquidation Penalty'}
+                                <InfoIcon
+                                    data-tip={t('liquidation_penalty_tip')}
+                                >
+                                    <Info size="16" />
+                                </InfoIcon>
+                            </Label>{' '}
                             <Value>{`${liquidationPenaltyPercentage}%`}</Value>
                         </Item>
                     </Block>
+                    <ReactTooltip multiline type="light" data-effect="solid" />
                 </Result>
 
                 {/*{isChecked ? null : (
@@ -675,6 +696,7 @@ const Label = styled.div`
     color: ${(props) => props.theme.colors.secondary};
     letter-spacing: -0.09px;
     line-height: 21px;
+    position: relative;
 `
 
 const Value = styled.div`
@@ -726,3 +748,14 @@ const Error = styled.p`
 //     color: ${(props) => props.theme.colors.inputBorderColor};
 //   }
 // `;
+
+const InfoIcon = styled.div`
+    position: absolute;
+    top: 4px;
+    right: -20px;
+    cursor: pointer;
+    svg {
+        fill: ${(props) => props.theme.colors.secondary};
+        color: ${(props) => props.theme.colors.neutral};
+    }
+`
