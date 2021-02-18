@@ -22,17 +22,23 @@ export default function useAuctions() {
             )
         })
 
-        const myAuctions = filteredAuctions.filter(
-            (auction: IAuction) =>
-                auction.winner &&
-                userProxy &&
-                auction.winner.toLowerCase() === userProxy.toLowerCase() &&
-                !auction.isClaimed
-        )
+        const myAuctions = filteredAuctions
+            .filter(
+                (auction: IAuction) =>
+                    auction.winner &&
+                    userProxy &&
+                    auction.winner.toLowerCase() === userProxy.toLowerCase() &&
+                    !auction.isClaimed
+            )
+            .sort(
+                (a, b) => Number(b.auctionDeadline) - Number(a.auctionDeadline)
+            )
 
-        const auctionsToRestart = filteredAuctions.filter(
-            (auction: IAuction) => !auction.englishAuctionBids.length
-        )
+        const auctionsToRestart = filteredAuctions
+            .filter((auction: IAuction) => !auction.englishAuctionBids.length)
+            .sort(
+                (a, b) => Number(b.auctionDeadline) - Number(a.auctionDeadline)
+            )
 
         const auctionsData = Array.from(
             new Set([...myAuctions, ...auctionsToRestart, ...filteredAuctions])

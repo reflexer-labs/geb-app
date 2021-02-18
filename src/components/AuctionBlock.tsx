@@ -200,7 +200,9 @@ const AuctionBlock = (auction: Props) => {
                             </InfoCol>
 
                             <InfoCol>
-                                <InfoLabel>ENDS ON</InfoLabel>
+                                <InfoLabel>
+                                    {isOngoingAuction ? 'ENDS ON' : 'ENDED ON'}
+                                </InfoLabel>
                                 <InfoValue>{endsOn}</InfoValue>
                             </InfoCol>
                         </Info>
@@ -411,9 +413,14 @@ const RightAucInfo = styled.div`
 `
 
 const AlertContainer = styled.div`
+    width: 240px;
+    text-align: right;
+    > div {
+        display: inline-block;
+        margin-left: auto;
+    }
     div {
         font-size: 13px;
-        margin-left: 80px;
         ${({ theme }) => theme.mediaWidth.upToSmall`
     margin-left:0;
     width:100%;
