@@ -176,7 +176,6 @@ const NavBarLink = styled(NavLink)`
 const Box = styled.div`
     position: relative;
     cursor: pointer;
-    border-bottom: 1px solid ${(props) => props.theme.colors.border};
     &:hover {
         .menu-box {
             display: block;
@@ -187,6 +186,7 @@ const Box = styled.div`
         display: none;
     }
     ${({ theme }) => theme.mediaWidth.upToSmall`
+      border-bottom: 1px solid ${(props) => props.theme.colors.border};
       flex: 0 0 100%;
       min-width: 100%;
       font-weight: normal;
