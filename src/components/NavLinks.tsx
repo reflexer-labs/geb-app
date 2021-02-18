@@ -45,20 +45,6 @@ const NavLinks = () => {
                     <DollarSign size="18" /> {t('incentives')}
                 </NavBarLink>
             )}
-            <NavBarLink
-                to="/"
-                onClick={(e) =>
-                    handleLinkClick(
-                        e,
-                        false,
-                        NETWORK_ID === 1
-                            ? 'https://stats.reflexer.finance/'
-                            : 'https://stats-kovan.reflexer.finance/'
-                    )
-                }
-            >
-                <AnalyticsIcon className="fill" /> {t('analytics')}
-            </NavBarLink>
 
             <Box className="has-menu">
                 <LinkItem>
@@ -73,7 +59,7 @@ const NavLinks = () => {
                         />
                     </ExtLink> */}
                     <ExtLink
-                        href="https://www.coverprotocol.com/"
+                        href="https://app.coverprotocol.com/app/marketplace/protocols/RAI"
                         target="_blank"
                     >
                         Cover Protocol
@@ -84,6 +70,20 @@ const NavLinks = () => {
                     </ExtLink>
                 </MenuBox>
             </Box>
+            <NavBarLink
+                to="/"
+                onClick={(e) =>
+                    handleLinkClick(
+                        e,
+                        false,
+                        NETWORK_ID === 1
+                            ? 'https://stats.reflexer.finance/'
+                            : 'https://stats-kovan.reflexer.finance/'
+                    )
+                }
+            >
+                <AnalyticsIcon className="fill" /> {t('analytics')}
+            </NavBarLink>
 
             {/* <SepBlock className="disableDesktop">
         <NavBarLink to="" onClick={(e) => handleLinkClick(e, false)}>
@@ -176,6 +176,7 @@ const NavBarLink = styled(NavLink)`
 const Box = styled.div`
     position: relative;
     cursor: pointer;
+    border-bottom: 1px solid ${(props) => props.theme.colors.border};
     &:hover {
         .menu-box {
             display: block;
@@ -208,6 +209,7 @@ const LinkItem = styled.div`
     display: flex;
     align-items: center;
     padding: 5px 0;
+    margin-right: 20px;
     &:hover {
         background: ${(props) => props.theme.colors.gradient};
         background-clip: text;
@@ -231,6 +233,7 @@ const MenuBox = styled.div`
     border-radius: 4px;
     background: #fff;
     padding: 20px;
+
     min-width: 200px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.06);
     ${({ theme }) => theme.mediaWidth.upToSmall`
