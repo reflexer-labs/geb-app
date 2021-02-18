@@ -11,10 +11,7 @@ import Dropdown from '../Dropdown'
 import { formatNumber, toFixedString } from '../../utils/helper'
 import { NETWORK_ID } from '../../connectors'
 import Results from './Results'
-import {
-    useIncentivesAssets,
-    useSelectedCampaign,
-} from '../../hooks/useIncentives'
+import { useSelectedCampaign } from '../../hooks/useIncentives'
 import _ from '../../utils/lodash'
 import CheckBox from '../CheckBox'
 
@@ -36,8 +33,6 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
         stakedBalance,
         campaignAddress,
     } = useSelectedCampaign()
-
-    const assets = useIncentivesAssets()
 
     const [isUniSwapChecked, setIsUniSwapChecked] = useState(isChecked || false)
 
@@ -73,6 +68,11 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
         'raiBalance',
         '0'
     )
+    const uniPoolBalance = _.get(
+        incentivesState.incentivesCampaignData,
+        'uniswapCoinPool',
+        '0'
+    )
 
     const uniCoinLpAllowance = _.get(
         incentivesState,
@@ -101,9 +101,9 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
                 ? BigNumber.from(toFixedString(uniShare.toString(), 'WAD'))
                 : BigNumber.from('0')
 
-            const uniShareBalanceBN = assets?.uni.amount
+            const uniShareBalanceBN = uniPoolBalance
                 ? BigNumber.from(
-                      toFixedString(assets?.uni.amount.toString(), 'WAD')
+                      toFixedString(uniPoolBalance.toString(), 'WAD')
                   )
                 : BigNumber.from('0')
 
@@ -320,19 +320,13 @@ const IncentivesPayment = ({ isChecked }: { isChecked: boolean }) => {
                 </SingleInput>
             ) : isChecked ? (
                 <DecimalInput
-                    label={`Deposit Uniswap V2 ETH/${COIN_TICKER} LP shares (Avail ${
-                        assets?.uni.amount
-                            ? formatNumber(assets?.uni.amount.toString())
-                            : '0'
-                    })`}
+                    label={`Deposit Uniswap V2 ETH/${COIN_TICKER} LP shares (Avail ${formatNumber(
+                        uniPoolBalance.toString()
+                    )})`}
                     value={uniShare}
                     onChange={handleUniShareChange}
                     handleMaxClick={() =>
-                        handleUniShareChange(
-                            assets?.uni.amount
-                                ? assets?.uni.amount.toString()
-                                : ''
-                        )
+                        handleUniShareChange(uniPoolBalance.toString())
                     }
                 />
             ) : (

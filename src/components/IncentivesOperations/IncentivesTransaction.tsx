@@ -6,6 +6,7 @@ import Button from '../Button'
 import TransactionOverview from '../TransactionOverview'
 import { useActiveWeb3React } from '../../hooks'
 import { returnConnectorName } from '../../utils/helper'
+import _ from '../../utils/lodash'
 import Results from './Results'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
 import { useUserCampaigns } from '../../hooks/useIncentives'
@@ -29,9 +30,11 @@ const IncentivesTransaction = () => {
         incentivesFields,
         selectedCampaignAddress: campaignAddress,
         uniPoolAmount,
-        uniswapShare,
+        incentivesCampaignData,
         isUniSwapShareChecked,
     } = incentivesState
+
+    const uniswapShare = _.get(incentivesCampaignData, 'uniswapCoinPool', '0')
 
     const handleBack = () => {
         incentivesActions.setOperation(0)
