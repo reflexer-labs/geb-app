@@ -151,9 +151,7 @@ const SafeBody = ({ isChecked }: Props) => {
             return `Deposit ETH (Available ${getAvailableEth()})`
         }
         if (type === 'deposit_borrow' && !isLeft) {
-            return `Borrow ${COIN_TICKER} (${
-                isCreate ? 'Max' : 'Available'
-            } ${getAvailableRai()})`
+            return `Borrow ${COIN_TICKER} (Max ${getAvailableRai()})`
         }
         if (type === 'repay_withdraw' && isLeft) {
             return `Withdraw ETH (Available ${getAvailableEth()})`
