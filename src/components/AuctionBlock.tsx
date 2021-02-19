@@ -65,11 +65,12 @@ const AuctionBlock = (auction: Props) => {
     const userProxy = _.get(connectWalletState, 'proxyAddress', '')
     const isUserCreated = _.get(connectWalletState, 'isUserCreated', false)
 
-    const returnEventType = (bidder: IAuctionBidder) => {
+    const returnEventType = (bidder: IAuctionBidder, i: number) => {
         if (
             !isOngoingAuction &&
             bidder.sellAmount === sellAmount &&
-            isClaimed
+            isClaimed &&
+            i === 0
         ) {
             return 'Settle'
         }
@@ -78,6 +79,16 @@ const AuctionBlock = (auction: Props) => {
         }
         return 'Bid'
     }
+
+    const returnTotalBids = () => {
+        const initialBids = [...[kickBidder], ...bidders.reverse()]
+        if (winner && !isOngoingAuction && isClaimed) {
+            initialBids.push(bidders[bidders.length - 1])
+        }
+        return initialBids
+    }
+
+    const biddersList = returnTotalBids().reverse()
 
     const handleClick = (type: string) => {
         if (!account) {
@@ -105,20 +116,28 @@ const AuctionBlock = (auction: Props) => {
     }
 
     const returnBtn = () => {
-        if (
-            !isOngoingAuction &&
-            userProxy &&
-            winner &&
-            userProxy === winner.toLowerCase() &&
-            !isClaimed
-        ) {
+        if (!isOngoingAuction && !isClaimed && bidders.length) {
             return (
                 <BtnContainer>
                     <Button
-                        text={t('claim_flx')}
+                        text={t(
+                            userProxy &&
+                                winner &&
+                                userProxy === winner.toLowerCase()
+                                ? 'claim_flx'
+                                : 'Settle'
+                        )}
                         withArrow
                         disabled={auctionsState.isSubmitting}
-                        onClick={() => handleClick('claim_flx')}
+                        onClick={() =>
+                            handleClick(
+                                userProxy &&
+                                    winner &&
+                                    userProxy === winner.toLowerCase()
+                                    ? 'claim_flx'
+                                    : 'settle'
+                            )
+                        }
                     />
                 </BtnContainer>
             )
@@ -169,7 +188,7 @@ const AuctionBlock = (auction: Props) => {
             }
         } else {
             return {
-                text: 'Auction Won / Not Claimed',
+                text: 'Auction Completed / Not Settled',
                 label: 'greenish',
             }
         }
@@ -229,82 +248,90 @@ const AuctionBlock = (auction: Props) => {
                                 <Head>TX</Head>
                             </Heads>
 
-                            {[...[kickBidder], ...bidders.reverse()]
-                                .reverse()
-                                .map((bidder: IAuctionBidder, i: number) => (
-                                    <List
-                                        key={bidder.bidder + i}
-                                        className={
-                                            bidders.length > 0 &&
-                                            winner &&
-                                            !isOngoingAuction &&
-                                            bidder.sellAmount === sellAmount &&
-                                            bidder.bidder.toLowerCase() ===
-                                                winner.toLowerCase()
-                                                ? 'winner'
-                                                : ''
-                                        }
-                                    >
-                                        <ListItem>
-                                            <ListItemLabel>
-                                                Event Type
-                                            </ListItemLabel>
-                                            {returnEventType(bidder)}
-                                        </ListItem>
-                                        <ListItem>
-                                            <ListItemLabel>
-                                                Bidder
-                                            </ListItemLabel>
-                                            <Link
-                                                href={getEtherscanLink(
-                                                    chainId as ChainId,
-                                                    bidder.bidder,
-                                                    'address'
-                                                )}
-                                                target="_blank"
-                                            >
-                                                {returnWalletAddress(
-                                                    bidder.bidder
-                                                )}
-                                            </Link>
-                                        </ListItem>
-                                        <ListItem>
-                                            <ListItemLabel>
-                                                Timestamp
-                                            </ListItemLabel>
-                                            {dayjs
-                                                .unix(Number(bidder.createdAt))
-                                                .format('MMM D, h:mm A')}
-                                        </ListItem>
-                                        <ListItem>
-                                            <ListItemLabel>
-                                                Sell Amount
-                                            </ListItemLabel>
-                                            {bidder.sellAmount} {sellSymbol}
-                                        </ListItem>
-                                        <ListItem>
-                                            <ListItemLabel>
-                                                Buy Amount
-                                            </ListItemLabel>
-                                            {bidder.buyAmount} {buySymbol}
-                                        </ListItem>
-                                        <ListItem>
-                                            <ListItemLabel>TX</ListItemLabel>
-                                            <Link
-                                                href={getEtherscanLink(
-                                                    chainId as ChainId,
-                                                    bidder.createdAtTransaction,
-                                                    'transaction'
-                                                )}
-                                                target="_blank"
-                                            >
-                                                {returnWalletAddress(
-                                                    bidder.createdAtTransaction
-                                                )}
-                                            </Link>
-                                        </ListItem>
-                                    </List>
-                                ))}
+                            {biddersList.map(
+                                (bidder: IAuctionBidder, i: number) => {
+                                    return (
+                                        <List
+                                            key={bidder.bidder + i}
+                                            className={
+                                                bidders.length > 0 &&
+                                                winner &&
+                                                !isOngoingAuction &&
+                                                bidder.sellAmount ===
+                                                    sellAmount &&
+                                                bidder.bidder.toLowerCase() ===
+                                                    winner.toLowerCase() &&
+                                                i === 0
+                                                    ? 'winner'
+                                                    : ''
+                                            }
+                                        >
+                                            <ListItem>
+                                                <ListItemLabel>
+                                                    Event Type
+                                                </ListItemLabel>
+                                                {returnEventType(bidder, i)}
+                                            </ListItem>
+                                            <ListItem>
+                                                <ListItemLabel>
+                                                    Bidder
+                                                </ListItemLabel>
+                                                <Link
+                                                    href={getEtherscanLink(
+                                                        chainId as ChainId,
+                                                        bidder.bidder,
+                                                        'address'
+                                                    )}
+                                                    target="_blank"
+                                                >
+                                                    {returnWalletAddress(
+                                                        bidder.bidder
+                                                    )}
+                                                </Link>
+                                            </ListItem>
+                                            <ListItem>
+                                                <ListItemLabel>
+                                                    Timestamp
+                                                </ListItemLabel>
+                                                {dayjs
+                                                    .unix(
+                                                        Number(bidder.createdAt)
+                                                    )
+                                                    .format('MMM D, h:mm A')}
+                                            </ListItem>
+                                            <ListItem>
+                                                <ListItemLabel>
+                                                    Sell Amount
+                                                </ListItemLabel>
+                                                {bidder.sellAmount} {sellSymbol}
+                                            </ListItem>
+                                            <ListItem>
+                                                <ListItemLabel>
+                                                    Buy Amount
+                                                </ListItemLabel>
+                                                {bidder.buyAmount} {buySymbol}
+                                            </ListItem>
+                                            <ListItem>
+                                                <ListItemLabel>
+                                                    TX
+                                                </ListItemLabel>
+                                                <Link
+                                                    href={getEtherscanLink(
+                                                        chainId as ChainId,
+                                                        bidder.createdAtTransaction,
+                                                        'transaction'
+                                                    )}
+                                                    target="_blank"
+                                                >
+                                                    {returnWalletAddress(
+                                                        bidder.createdAtTransaction
+                                                    )}
+                                                </Link>
+                                            </ListItem>
+                                        </List>
+                                    )
+                                }
+                            )}
                         </Bidders>
 
                         {returnBtn()}

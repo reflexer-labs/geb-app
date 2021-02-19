@@ -31,6 +31,8 @@ const AuctionsTransactions = () => {
 
     const isClaim = popupsState.auctionOperationPayload.type.includes('claim')
 
+    const isSettle = popupsState.auctionOperationPayload.type.includes('settle')
+
     const handleBack = () => auctionsActions.setOperation(0)
 
     const reset = () => {
@@ -44,6 +46,8 @@ const AuctionsTransactions = () => {
             case 'DEBT':
                 return isClaim
                     ? 'Claiming FLX'
+                    : isSettle
+                    ? 'Settling Auction'
                     : `Bid ${COIN_TICKER} and Receive FLX`
             default:
                 return ''
@@ -65,14 +69,22 @@ const AuctionsTransactions = () => {
                     status: 'loading',
                 })
                 const signer = library.getSigner(account)
-                if (auctionType === 'DEBT' && isClaim) {
+                if (auctionType === 'DEBT' && (isClaim || isSettle)) {
                     await auctionsActions.auctionClaim({
                         signer,
                         auctionId,
-                        title: 'Claiming FLX',
+                        title: isClaim ? 'Claiming FLX' : 'Settling Auction',
                         auctionType,
                     })
-                } else if (auctionType === 'DEBT' && !isClaim) {
+                } else if (auctionType === 'DEBT' && (!isClaim || !isSettle)) {
+                    console.log({
+                        signer,
+                        auctionId,
+                        title: handleWaitingTitle(),
+                        auctionType,
+                        amount,
+                    })
+
                     await auctionsActions.auctionBid({
                         signer,
                         auctionId,

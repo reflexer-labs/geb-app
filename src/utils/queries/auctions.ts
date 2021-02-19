@@ -20,6 +20,7 @@ export const auctionsQuery = (address: string) => `{
       bidIncrease
       bidDuration
       totalAuctionLength
+      DEBT_amountSoldIncrease
     }
     englishAuctionBids {
       bidder

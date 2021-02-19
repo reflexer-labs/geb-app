@@ -487,6 +487,7 @@ export interface IAuction {
         bidDuration: string
         bidIncrease: string
         totalAuctionLength: string
+        DEBT_amountSoldIncrease: string
     }
     englishAuctionType: string
     isClaimed: boolean

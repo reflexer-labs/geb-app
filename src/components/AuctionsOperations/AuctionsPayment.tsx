@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { utils as gebUtils } from 'geb.js'
 import Button from '../Button'
+import numeral from 'numeral'
 import DecimalInput from '../DecimalInput'
 import Results from './Results'
 import { useStoreActions, useStoreState } from '../../store'
 import _ from '../../utils/lodash'
 import { COIN_TICKER } from '../../utils/constants'
 import { BigNumber } from 'ethers'
-import {
-    formatNumber,
-    getRatePercentage,
-    toFixedString,
-} from '../../utils/helper'
+import { toFixedString } from '../../utils/helper'
 
 const AuctionsPayment = () => {
     const { t } = useTranslation()
@@ -31,21 +27,30 @@ const AuctionsPayment = () => {
     } = useStoreActions((state) => state)
     const { selectedAuction, amount, coinBalances } = auctionsState
 
-    const isClaim = popupsState.auctionOperationPayload.type.includes('claim')
+    const isClaim =
+        popupsState.auctionOperationPayload.type.includes('claim') ||
+        popupsState.auctionOperationPayload.type.includes('settle')
 
     const auctionType = _.get(selectedAuction, 'englishAuctionType', 'DEBT')
     const buyInititalAmount = _.get(selectedAuction, 'buyInitialAmount', '0')
     const bids = _.get(selectedAuction, 'englishAuctionBids', '[]')
-    const buyAmount = _.get(selectedAuction, 'buyAmount', '0')
     const sellAmount = _.get(selectedAuction, 'sellAmount', '0')
-    const sellInititalAmount = _.get(selectedAuction, 'sellInitialAmount', '0')
     const buyToken = _.get(selectedAuction, 'buyToken', 'COIN')
     const sellToken = _.get(selectedAuction, 'sellToken', 'PROTOCOL_TOKEN')
-    const bidIncrease = _.get(
+    const bidIncrease: string = _.get(
         selectedAuction,
         'englishAuctionConfiguration.bidIncrease',
         '1'
     )
+    const debt_amountSoldIncrease: string = _.get(
+        selectedAuction,
+        'englishAuctionConfiguration.DEBT_amountSoldIncrease',
+        '1'
+    )
+    const auctionDeadline = _.get(selectedAuction, 'auctionDeadline', '')
+    const isOngoingAuction = auctionDeadline
+        ? Number(auctionDeadline) * 1000 > Date.now()
+        : false
 
     const praiBalance = _.get(coinBalances, 'prai', '0')
 
@@ -60,24 +65,37 @@ const AuctionsPayment = () => {
         auctionsActions.setAmount(val)
     }
 
+    const maxBid = (): string => {
+        if (bids.length === 0) {
+            if (isOngoingAuction) {
+                // Auction ongoing but no bids so far
+                return sellAmount
+            } else {
+                // Auction restart (no bids and passed the dealine)
+                // When doing restart we're allowed to accept more FLX, DEBT_amountSoldIncrease=1.2
+                return numeral(sellAmount)
+                    .multiply(debt_amountSoldIncrease)
+                    .value()
+                    .toString()
+            }
+        } else {
+            // We need to bid 3% less than the current best bid
+            return numeral(sellAmount)
+                .multiply(1 - Number(bidIncrease))
+                .value()
+                .toString()
+        }
+    }
+
     const passedChecks = () => {
+        const maxBidAmountBN = BigNumber.from(toFixedString(maxBid(), 'WAD'))
         const valueBN = value
             ? BigNumber.from(toFixedString(value, 'WAD'))
             : BigNumber.from('0')
-        const sellAmountBN = sellAmount
-            ? BigNumber.from(toFixedString(sellAmount, 'WAD'))
-            : BigNumber.from('0')
 
         if (auctionType.toLowerCase() === 'debt') {
-            const rate = getRatePercentage(bidIncrease, 0, true) as number
-            const decreaseRate = rate * 100
-
             const praiBalanceBN = praiBalance
                 ? BigNumber.from(toFixedString(praiBalance, 'WAD'))
-                : BigNumber.from('0')
-
-            const buyAmountBN = buyAmount
-                ? BigNumber.from(toFixedString(buyAmount, 'WAD'))
                 : BigNumber.from('0')
 
             if (valueBN.isZero()) {
@@ -85,29 +103,16 @@ const AuctionsPayment = () => {
                 return false
             }
 
-            if (buyAmountBN.gt(praiBalanceBN)) {
+            if (maxBidAmountBN.gt(praiBalanceBN)) {
                 setError(`Insufficient ${COIN_TICKER} balance.`)
                 return false
             }
 
-            const decreasedAmount = BigNumber.from(
-                toFixedString(rate.toString(), 'WAD')
-            )
-
-            const leastAmount = sellAmountBN.sub(decreasedAmount)
-
-            if (
-                (bids.length > 0 &&
-                    sellAmountBN.sub(decreasedAmount).gt(valueBN)) ||
-                valueBN.gt(sellAmountBN)
-            ) {
+            if (bids.length > 0 && valueBN.gt(maxBidAmountBN)) {
                 setError(
-                    `You must accept at least (${formatNumber(
-                        gebUtils.wadToFixed(leastAmount).toString(),
-                        2
-                    )} FLX) ${decreaseRate.toFixed(
-                        0
-                    )}% less FLX vs the lowest bid`
+                    `You need to bid ${
+                        1 - Number(bidIncrease)
+                    }% less FLX vs the lowest bid`
                 )
                 return false
             }
@@ -121,8 +126,10 @@ const AuctionsPayment = () => {
                 ? BigNumber.from(toFixedString(praiAllowance, 'WAD'))
                 : BigNumber.from('0')
 
-            const buyAmountBN = BigNumber.from(toFixedString(buyAmount, 'WAD'))
-            return praiAllowanceBN.gte(buyAmountBN)
+            const valueBN = value
+                ? BigNumber.from(toFixedString(value, 'WAD'))
+                : BigNumber.from('0')
+            return praiAllowanceBN.gte(valueBN)
         }
         return false
     }
@@ -165,9 +172,7 @@ const AuctionsPayment = () => {
                         onChange={handleAmountChange}
                         value={value}
                         label={`${sellSymbol} to Receive`}
-                        handleMaxClick={() =>
-                            handleAmountChange(sellInititalAmount)
-                        }
+                        handleMaxClick={() => handleAmountChange(maxBid())}
                     />
                 </>
             ) : (
