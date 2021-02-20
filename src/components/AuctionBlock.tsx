@@ -116,28 +116,21 @@ const AuctionBlock = (auction: Props) => {
     }
 
     const returnBtn = () => {
-        if (!isOngoingAuction && !isClaimed && bidders.length) {
+        if (
+            !isOngoingAuction &&
+            !isClaimed &&
+            userProxy &&
+            winner &&
+            userProxy === winner.toLowerCase() &&
+            bidders.length
+        ) {
             return (
                 <BtnContainer>
                     <Button
-                        text={t(
-                            userProxy &&
-                                winner &&
-                                userProxy === winner.toLowerCase()
-                                ? 'claim_flx'
-                                : 'Settle'
-                        )}
+                        text={t('Settle')}
                         withArrow
                         disabled={auctionsState.isSubmitting}
-                        onClick={() =>
-                            handleClick(
-                                userProxy &&
-                                    winner &&
-                                    userProxy === winner.toLowerCase()
-                                    ? 'claim_flx'
-                                    : 'settle'
-                            )
-                        }
+                        onClick={() => handleClick('settle')}
                     />
                 </BtnContainer>
             )

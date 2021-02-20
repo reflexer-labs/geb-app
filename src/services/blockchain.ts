@@ -156,8 +156,6 @@ export const handleIncentiveDeposit = async (
     if (isUniSwapShareChecked) {
         if (!uniswapShare) throw new Error('No uniSwapShare deposited amount!')
         const uniswapShareBN = ethersUtils.parseEther(uniswapShare)
-        console.log(uniswapShareBN.toString(), campaignAddress)
-
         txData = proxy.stakeInMine(uniswapShareBN, campaignAddress)
     } else {
         if (!incentiveFields) throw new Error('No incentives fields!')
@@ -278,7 +276,7 @@ export const handleAuctionBid = async ({
     }
 
     if (!txData) throw new Error('No transaction request!')
-    const tx = await handlePreTxGasEstimate(signer, txData)
+    let tx = await handlePreTxGasEstimate(signer, txData)
     const txResponse = await signer.sendTransaction(tx)
     return txResponse
 }
