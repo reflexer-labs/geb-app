@@ -31,6 +31,7 @@ export interface SafeModel {
     isES: boolean
     isUniSwapPoolChecked: boolean
     stage: number
+    isSuccessfulTx: boolean
     safeData: ISafeData
     liquidationData: ILiquidationData
     uniSwapPool: ISafeData
@@ -68,6 +69,7 @@ export interface SafeModel {
     setIsUniSwapPoolChecked: Action<SafeModel, boolean>
     setStage: Action<SafeModel, number>
     setSafeHistoryList: Action<SafeModel, Array<ISafeHistory>>
+    setIsSuccessfulTx: Action<SafeModel, boolean>
 }
 
 const safeModel: SafeModel = {
@@ -77,6 +79,7 @@ const safeModel: SafeModel = {
     singleSafe: null,
     totalEth: '0.00',
     totalRAI: '0.00',
+    isSuccessfulTx: true,
     isES: true,
     isUniSwapPoolChecked: true,
     stage: 0,
@@ -141,6 +144,9 @@ const safeModel: SafeModel = {
             actions.setUniSwapPool(DEFAULT_SAFE_STATE)
             actions.setSafeData(DEFAULT_SAFE_STATE)
             await txResponse.wait()
+        } else {
+            storeActions.connectWalletModel.setIsStepLoading(false)
+            storeActions.connectWalletModel.setStep(2)
         }
     }),
     repayAndWithdraw: thunk(
@@ -197,33 +203,40 @@ const safeModel: SafeModel = {
             await txResponse.wait()
         }
     }),
-    fetchUserSafes: thunk(async (actions, payload, { getStoreActions }) => {
-        const storeActions = getStoreActions()
-        const fetched = await fetchUserSafes(payload)
-        if (fetched) {
-            actions.setList(fetched.userSafes)
-            if (fetched.userSafes.length > 0) {
-                actions.setIsSafeCreated(true)
-                storeActions.connectWalletModel.setStep(2)
-            } else {
-                storeActions.popupsModel.setWaitingPayload({
-                    title: 'Fetching user safes',
-                    status: 'loading',
-                })
-                actions.setIsSafeCreated(false)
+    fetchUserSafes: thunk(
+        async (actions, payload, { getStoreActions, getState }) => {
+            const storeActions = getStoreActions()
+            const state = getState()
+            const { isSuccessfulTx } = state
+            const fetched = await fetchUserSafes(payload)
+            if (fetched) {
+                actions.setList(fetched.userSafes)
+                if (fetched.userSafes.length > 0) {
+                    actions.setIsSafeCreated(true)
+                    storeActions.connectWalletModel.setStep(2)
+                } else if (!fetched.userSafes.length && !isSuccessfulTx) {
+                    actions.setIsSafeCreated(false)
+                    storeActions.connectWalletModel.setIsStepLoading(false)
+                } else {
+                    storeActions.popupsModel.setWaitingPayload({
+                        title: 'Fetching user safes',
+                        status: 'loading',
+                    })
+                    actions.setIsSafeCreated(false)
+                }
+                actions.setLiquidationData(fetched.liquidationData)
+                const chainId = NETWORK_ID
+                if (fetched.availableRAI && chainId) {
+                    storeActions.connectWalletModel.updateRaiBalance({
+                        chainId,
+                        balance: numeral(fetched.availableRAI).value(),
+                    })
+                }
+                await timeout(200)
+                return fetched
             }
-            actions.setLiquidationData(fetched.liquidationData)
-            const chainId = NETWORK_ID
-            if (fetched.availableRAI && chainId) {
-                storeActions.connectWalletModel.updateRaiBalance({
-                    chainId,
-                    balance: numeral(fetched.availableRAI).value(),
-                })
-            }
-            await timeout(200)
-            return fetched
         }
-    }),
+    ),
 
     fetchSafeById: thunk(async (actions, payload, { getStoreActions }) => {
         const storeActions = getStoreActions()
@@ -294,6 +307,9 @@ const safeModel: SafeModel = {
     }),
     setSafeHistoryList: action((state, payload) => {
         state.historyList = payload
+    }),
+    setIsSuccessfulTx: action((state, payload) => {
+        state.isSuccessfulTx = payload
     }),
 }
 

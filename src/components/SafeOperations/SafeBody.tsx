@@ -570,6 +570,12 @@ const SafeBody = ({ isChecked }: Props) => {
                     <ReactTooltip multiline type="light" data-effect="solid" />
                 </Result>
 
+                <Note>
+                    {isCreate
+                        ? `Note* The minimum amount to mint per safe is ${debtFloor} RAI`
+                        : null}
+                </Note>
+
                 {/*{isChecked ? null : (
           <UniSwapCheckContainer>
             <Text>{t('uniswap_modal_check_text',{coin_ticker: COIN_TICKER})}</Text>
@@ -758,4 +764,10 @@ const InfoIcon = styled.div`
         fill: ${(props) => props.theme.colors.secondary};
         color: ${(props) => props.theme.colors.neutral};
     }
+`
+
+const Note = styled.div`
+    color: ${(props) => props.theme.colors.secondary};
+    font-size: ${(props) => props.theme.font.extraSmall};
+    margin-top: 5px;
 `
