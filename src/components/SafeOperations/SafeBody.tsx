@@ -467,7 +467,12 @@ const SafeBody = ({ isChecked }: Props) => {
                         disabled={isChecked}
                         disableMax={type !== 'repay_withdraw'}
                         handleMaxClick={() =>
-                            onChangeRight(getAvailableRai().toString())
+                            onChangeRight(
+                                Math.min(
+                                    Number(getAvailableRai()),
+                                    raiBalance
+                                ).toString()
+                            )
                         }
                     />
                 </DoubleInput>

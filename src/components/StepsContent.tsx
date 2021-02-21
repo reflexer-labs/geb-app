@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { X } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import { useStoreState } from '../store'
+import { fetchDebtFloor } from '../services/graphql'
 import Button from './Button'
 
 interface Props {
@@ -25,11 +25,19 @@ const StepsContent = ({
     isLoading,
 }: Props) => {
     const { t } = useTranslation()
+    const [debtFloor, setDebtFloor] = useState('')
     const [isOpen, setIsOpen] = useState(true)
-    const { safeModel: safeState } = useStoreState((state) => state)
-    const { debtFloor } = safeState.liquidationData
+
+    useEffect(() => {
+        async function getDebtFloor() {
+            const res = await fetchDebtFloor()
+            setDebtFloor(res)
+        }
+        getDebtFloor()
+    }, [])
 
     const handleOpenState = () => setIsOpen(!isOpen)
+
     return (
         <Container>
             <Title>{t(title)}</Title>
