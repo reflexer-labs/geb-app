@@ -1,7 +1,11 @@
 import axios from 'axios'
 import retry from 'async-retry'
 import store from '../store'
-import { getSafeByIdQuery, getUserSafesListQuery } from '../utils/queries/safe'
+import {
+    fetchDebtFloorQuery,
+    getSafeByIdQuery,
+    getUserSafesListQuery,
+} from '../utils/queries/safe'
 import { GRAPH_API_URLS } from '../utils/constants'
 import { formatUserSafe, formatHistoryArray } from '../utils/helper'
 import { incentiveCampaignsQuery } from '../utils/queries/incentives'
@@ -55,6 +59,26 @@ export const checkSubgraphBlockDiff = async (latesBlockNumber: number) => {
     } catch (error) {
         throw Error('Error with subgraph query: ' + error)
     }
+}
+
+export const fetchDebtFloor = () => {
+    return retry(
+        async (bail, attempt) => {
+            const res = await axios.post(
+                GRAPH_API_URLS[attempt - 1],
+                JSON.stringify({ query: fetchDebtFloorQuery })
+            )
+
+            if (!res.data.data && attempt < GRAPH_API_URLS.length) {
+                throw new Error('retry')
+            }
+
+            return res.data.data.collateralType.debtFloor
+        },
+        {
+            retries: GRAPH_API_URLS.length - 1,
+        }
+    )
 }
 
 export const fetchUser = (address: string) => {
