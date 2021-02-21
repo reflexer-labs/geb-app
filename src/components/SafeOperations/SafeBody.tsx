@@ -467,7 +467,12 @@ const SafeBody = ({ isChecked }: Props) => {
                         disabled={isChecked}
                         disableMax={type !== 'repay_withdraw'}
                         handleMaxClick={() =>
-                            onChangeRight(getAvailableRai().toString())
+                            onChangeRight(
+                                Math.min(
+                                    Number(getAvailableRai()),
+                                    raiBalance
+                                ).toString()
+                            )
                         }
                     />
                 </DoubleInput>
@@ -569,6 +574,12 @@ const SafeBody = ({ isChecked }: Props) => {
                     </Block>
                     <ReactTooltip multiline type="light" data-effect="solid" />
                 </Result>
+
+                <Note>
+                    {isCreate
+                        ? `Note: The minimum amount to mint per safe is ${debtFloor} RAI`
+                        : null}
+                </Note>
 
                 {/*{isChecked ? null : (
           <UniSwapCheckContainer>
@@ -758,4 +769,10 @@ const InfoIcon = styled.div`
         fill: ${(props) => props.theme.colors.secondary};
         color: ${(props) => props.theme.colors.neutral};
     }
+`
+
+const Note = styled.div`
+    color: ${(props) => props.theme.colors.secondary};
+    font-size: ${(props) => props.theme.font.extraSmall};
+    margin-top: 5px;
 `

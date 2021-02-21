@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { X } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+import { fetchDebtFloor } from '../services/graphql'
 import Button from './Button'
 
 interface Props {
@@ -23,10 +25,40 @@ const StepsContent = ({
     isLoading,
 }: Props) => {
     const { t } = useTranslation()
+    const [debtFloor, setDebtFloor] = useState('')
+    const [isOpen, setIsOpen] = useState(true)
+
+    useEffect(() => {
+        async function getDebtFloor() {
+            const res = await fetchDebtFloor()
+            setDebtFloor(res)
+        }
+        getDebtFloor()
+    }, [])
+
+    const handleOpenState = () => setIsOpen(!isOpen)
+
     return (
         <Container>
             <Title>{t(title)}</Title>
-            <Text>{t(text)}</Text>
+            <Text>
+                {t(text)}{' '}
+                {isOpen ? null : (
+                    <ReadLink onClick={handleOpenState}>Show more</ReadLink>
+                )}
+            </Text>
+            {isOpen ? (
+                <Notes>
+                    <CloseBtn onClick={handleOpenState}>
+                        <X size="14" />
+                    </CloseBtn>
+                    <Heading>Important Notes</Heading>
+                    <List>
+                        <Item>{`You do not need to create a new account if you already have a MakerDAO or Balancer proxy`}</Item>
+                        <Item>{`The minimum amount to mint per safe is ${debtFloor} RAI`}</Item>
+                    </List>
+                </Notes>
+            ) : null}
             <Button
                 id={stepNumber === 2 ? 'create-safe' : ''}
                 disabled={isDisabled || isLoading}
@@ -57,4 +89,49 @@ const Text = styled.div`
     color: ${(props) => props.theme.colors.secondary};
     margin-bottom: 20px;
     line-height: 21px;
+`
+
+const Notes = styled.div`
+    background: ${(props) => props.theme.colors.foreground};
+    border: 1px solid ${(props) => props.theme.colors.border};
+    border-radius: ${(props) => props.theme.global.borderRadius};
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+`
+
+const Heading = styled.div`
+    font-size: 15px;
+    text-align: center;
+    font-weight: bold;
+    color: ${(props) => props.theme.colors.secondary};
+    margin-bottom: 15px;
+`
+
+const List = styled.ul`
+    margin: 0;
+    padding-left: 20px;
+`
+
+const Item = styled.li`
+    font-size: ${(props) => props.theme.font.small};
+    text-align: left;
+    color: ${(props) => props.theme.colors.secondary};
+    margin-top: 5px;
+`
+
+const CloseBtn = styled.div`
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+    svg {
+        color: ${(props) => props.theme.colors.secondary};
+    }
+`
+
+const ReadLink = styled.span`
+    color: ${(props) => props.theme.colors.inputBorderColor};
+    text-decoration: underline;
+    cursor: pointer;
 `
