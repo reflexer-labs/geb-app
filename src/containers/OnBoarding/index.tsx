@@ -30,11 +30,9 @@ const OnBoarding = () => {
     const { isRPCAdapterOn } = settingsState
 
     useEffect(() => {
-        if (!account || !library) return
-
         async function fetchSafes() {
             await safeActions.fetchUserSafes({
-                address: account as string,
+                address: (account as string) || '',
                 geb,
                 isRPCAdapterOn,
             })
