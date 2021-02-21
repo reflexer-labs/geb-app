@@ -572,7 +572,7 @@ const SafeBody = ({ isChecked }: Props) => {
 
                 <Note>
                     {isCreate
-                        ? `Note* The minimum amount to mint per safe is ${debtFloor} RAI`
+                        ? `Note: The minimum amount to mint per safe is ${debtFloor} RAI`
                         : null}
                 </Note>
 
