@@ -28,7 +28,7 @@ const SideMenu = () => {
         if (chainId) {
             const balance = connectWalletState.ethBalance[chainId] || 0
             const fiat = connectWalletState.fiatPrice
-            return amountToFiat(balance, fiat)
+            return amountToFiat(balance as number, fiat)
         }
         return 0
     }
