@@ -90,8 +90,8 @@ export async function handlePreTxGasEstimate(
     if (floorGasLimit) {
         const floorGasLimitBN = BigNumber.from(floorGasLimit)
         tx.gasLimit = floorGasLimitBN.gt(gasPlus20Percent)
-            ? gasPlus20Percent
-            : floorGasLimitBN
+            ? floorGasLimitBN
+            : gasPlus20Percent
     } else {
         tx.gasLimit = gasPlus20Percent
     }
