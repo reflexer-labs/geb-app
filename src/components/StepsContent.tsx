@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { X } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import { fetchDebtFloor } from '../services/graphql'
+import _ from '../utils/lodash'
+import { useStoreActions, useStoreState } from '../store'
 import Button from './Button'
 
 interface Props {
@@ -25,16 +26,19 @@ const StepsContent = ({
     isLoading,
 }: Props) => {
     const { t } = useTranslation()
-    const [debtFloor, setDebtFloor] = useState('')
+    const { safeModel: safeActions } = useStoreActions((state) => state)
+    const { safeModel: safeState } = useStoreState((state) => state)
+
     const [isOpen, setIsOpen] = useState(true)
+
+    const debtFloorVal = _.get(safeState, 'debtFloor', '0')
 
     useEffect(() => {
         async function getDebtFloor() {
-            const res = await fetchDebtFloor()
-            setDebtFloor(res)
+            await safeActions.fetchDebtFloor()
         }
         getDebtFloor()
-    }, [])
+    }, [safeActions])
 
     const handleOpenState = () => setIsOpen(!isOpen)
 
@@ -55,7 +59,7 @@ const StepsContent = ({
                     <Heading>Important Notes</Heading>
                     <List>
                         <Item>{`You do not need to create a new account if you already have a MakerDAO or Balancer proxy`}</Item>
-                        <Item>{`The minimum amount to mint per safe is ${debtFloor} RAI`}</Item>
+                        <Item>{`The minimum amount to mint per safe is ${debtFloorVal} RAI`}</Item>
                     </List>
                 </Notes>
             ) : null}

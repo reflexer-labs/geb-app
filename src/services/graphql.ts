@@ -19,6 +19,8 @@ import {
 } from '../utils/interfaces'
 import gebManager from '../utils/gebManager'
 
+export const cancelTokenSource = axios.CancelToken.source()
+
 export const request = async (query: string, index = 0): Promise<any> => {
     try {
         const res = await axios.post(GRAPH_API_URLS[index], query)
@@ -60,13 +62,13 @@ export const checkSubgraphBlockDiff = async (latesBlockNumber: number) => {
         throw Error('Error with subgraph query: ' + error)
     }
 }
-
 export const fetchDebtFloor = () => {
     return retry(
         async (bail, attempt) => {
             const res = await axios.post(
                 GRAPH_API_URLS[attempt - 1],
-                JSON.stringify({ query: fetchDebtFloorQuery })
+                JSON.stringify({ query: fetchDebtFloorQuery }),
+                { cancelToken: cancelTokenSource.token }
             )
 
             if (!res.data.data && attempt < GRAPH_API_URLS.length) {

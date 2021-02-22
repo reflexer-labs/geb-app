@@ -54,7 +54,8 @@ export function useIsTransactionPending(transactionHash?: string): boolean {
 
 export async function handlePreTxGasEstimate(
     signer: JsonRpcSigner,
-    tx: TransactionRequest
+    tx: TransactionRequest,
+    floorGasLimit?: string | null
 ): Promise<TransactionRequest> {
     let gasLimit: BigNumber
     try {
@@ -82,8 +83,19 @@ export async function handlePreTxGasEstimate(
         console.error(errorMessage)
         throw errorMessage
     }
-    // Add 15% slack in the gas limit
-    tx.gasLimit = gasLimit.mul(115).div(100).toHexString()
+
+    // Add 20% slack in the gas limit
+    const gasPlus20Percent = gasLimit.mul(120).div(100)
+
+    if (floorGasLimit) {
+        const floorGasLimitBN = BigNumber.from(floorGasLimit)
+        tx.gasLimit = floorGasLimitBN.gt(gasPlus20Percent)
+            ? gasPlus20Percent
+            : floorGasLimitBN
+    } else {
+        tx.gasLimit = gasPlus20Percent
+    }
+
     return tx
 }
 
