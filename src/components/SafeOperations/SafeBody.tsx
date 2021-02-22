@@ -67,7 +67,7 @@ const SafeBody = ({ isChecked }: Props) => {
         globalDebtCeiling,
     } = safeState.liquidationData
 
-    const raiBalance = connectWalletState.raiBalance[NETWORK_ID]
+    const raiBalance = connectWalletState.raiBalance[NETWORK_ID].toString()
 
     const getTotalCollateral = () => {
         if (singleSafe) {
@@ -146,6 +146,7 @@ const SafeBody = ({ isChecked }: Props) => {
         }
         return ''
     }
+
     const returnInputType = (isLeft = true) => {
         if (type === 'deposit_borrow' && isLeft) {
             return `Deposit ETH (Available ${getAvailableEth()})`
@@ -159,7 +160,11 @@ const SafeBody = ({ isChecked }: Props) => {
         if (type === 'repay_withdraw' && singleSafe && !isLeft) {
             return `Repay ${COIN_TICKER} (Owe: ${formatNumber(
                 getAvailableRai()
-            )}, Avail: ${formatNumber(raiBalance.toString())})`
+            )}, Avail: ${
+                Number(raiBalance.toString()) > 0.0001
+                    ? formatNumber(raiBalance.toString())
+                    : '< 0.0001'
+            })`
         }
         return ''
     }
@@ -439,6 +444,21 @@ const SafeBody = ({ isChecked }: Props) => {
         }
     }
 
+    const handleMaxRai = () => {
+        const availableRaiBN = BigNumber.from(
+            toFixedString(getAvailableRai().toString(), 'WAD')
+        )
+        const raiBalanceBN = BigNumber.from(
+            toFixedString(raiBalance.toString(), 'WAD')
+        )
+
+        const isMore = raiBalanceBN.gt(availableRaiBN)
+
+        onChangeRight(
+            isMore ? getAvailableRai().toString() : raiBalance.toString()
+        )
+    }
+
     useEffect(() => {
         setDefaultSafe(safeData)
         setUniSwapVal(uniSwapPool)
@@ -466,9 +486,7 @@ const SafeBody = ({ isChecked }: Props) => {
                         onChange={onChangeRight}
                         disabled={isChecked}
                         disableMax={type !== 'repay_withdraw'}
-                        handleMaxClick={() =>
-                            onChangeRight(getAvailableRai().toString())
-                        }
+                        handleMaxClick={handleMaxRai}
                     />
                 </DoubleInput>
 

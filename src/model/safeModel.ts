@@ -1,4 +1,3 @@
-import numeral from 'numeral'
 import { action, Action, thunk, Thunk } from 'easy-peasy'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import {
@@ -15,7 +14,11 @@ import {
     handleDepositAndBorrow,
     handleRepayAndWithdraw,
 } from '../services/blockchain'
-import { fetchSafeById, fetchUserSafes } from '../services/graphql'
+import {
+    fetchDebtFloor,
+    fetchSafeById,
+    fetchUserSafes,
+} from '../services/graphql'
 import { DEFAULT_SAFE_STATE } from '../utils/constants'
 import { timeout } from '../utils/helper'
 import { StoreModel } from '.'
@@ -31,6 +34,7 @@ export interface SafeModel {
     isES: boolean
     isUniSwapPoolChecked: boolean
     stage: number
+    debtFloor: string
     isSuccessfulTx: boolean
     safeData: ISafeData
     liquidationData: ILiquidationData
@@ -50,6 +54,7 @@ export interface SafeModel {
     >
     fetchSafeById: Thunk<SafeModel, IFetchSafeById, any, StoreModel>
     fetchUserSafes: Thunk<SafeModel, IFetchSafesPayload, any, StoreModel>
+    fetchDebtFloor: Thunk<SafeModel>
     collectETH: Thunk<
         SafeModel,
         { signer: JsonRpcSigner; safe: ISafe },
@@ -70,6 +75,7 @@ export interface SafeModel {
     setStage: Action<SafeModel, number>
     setSafeHistoryList: Action<SafeModel, Array<ISafeHistory>>
     setIsSuccessfulTx: Action<SafeModel, boolean>
+    setDebtFloor: Action<SafeModel, string>
 }
 
 const safeModel: SafeModel = {
@@ -83,6 +89,7 @@ const safeModel: SafeModel = {
     isES: true,
     isUniSwapPoolChecked: true,
     stage: 0,
+    debtFloor: '',
     safeData: DEFAULT_SAFE_STATE,
     liquidationData: {
         accumulatedRate: '0',
@@ -218,10 +225,6 @@ const safeModel: SafeModel = {
                     actions.setIsSafeCreated(false)
                     storeActions.connectWalletModel.setIsStepLoading(false)
                 } else {
-                    storeActions.popupsModel.setWaitingPayload({
-                        title: 'Fetching user safes',
-                        status: 'loading',
-                    })
                     actions.setIsSafeCreated(false)
                 }
                 actions.setLiquidationData(fetched.liquidationData)
@@ -229,7 +232,7 @@ const safeModel: SafeModel = {
                 if (fetched.availableRAI && chainId) {
                     storeActions.connectWalletModel.updateRaiBalance({
                         chainId,
-                        balance: numeral(fetched.availableRAI).value(),
+                        balance: fetched.availableRAI,
                     })
                 }
                 await timeout(200)
@@ -249,7 +252,7 @@ const safeModel: SafeModel = {
             actions.setLiquidationData(res.liquidationData)
             storeActions.connectWalletModel.updateRaiBalance({
                 chainId: NETWORK_ID,
-                balance: numeral(res.erc20Balance).value(),
+                balance: res.erc20Balance,
             })
             if (res.proxyData) {
                 const { address, coinAllowance } = res.proxyData
@@ -265,6 +268,12 @@ const safeModel: SafeModel = {
                 }
             }
         }
+    }),
+
+    fetchDebtFloor: thunk(async (actions) => {
+        const res = await fetchDebtFloor()
+        actions.setDebtFloor(res)
+        return res
     }),
 
     setIsSafeCreated: action((state, payload) => {
@@ -310,6 +319,9 @@ const safeModel: SafeModel = {
     }),
     setIsSuccessfulTx: action((state, payload) => {
         state.isSuccessfulTx = payload
+    }),
+    setDebtFloor: action((state, payload) => {
+        state.debtFloor = payload
     }),
 }
 

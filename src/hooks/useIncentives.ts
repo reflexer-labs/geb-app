@@ -436,7 +436,7 @@ export function useIncentivesAssets() {
             }
 
             // ETH token Data
-            const totalEth = ethBalance[NETWORK_ID]
+            const totalEth = ethBalance[NETWORK_ID] as number
             const ethPrice = fiatPrice
             const ethPriceDiff =
                 numeral(ethPriceChange).value() !== 0
