@@ -48,6 +48,13 @@ const OnBoarding = () => {
         return () => clearInterval(interval)
     }, [account, library, safeActions, isRPCAdapterOn, geb])
 
+    useEffect(() => {
+        async function getDebtFloor() {
+            await safeActions.fetchDebtFloor()
+        }
+        getDebtFloor()
+    }, [safeActions])
+
     return (
         <Container id="app-page">
             <GridContainer>

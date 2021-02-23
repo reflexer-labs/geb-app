@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { X } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import _ from '../utils/lodash'
-import { useStoreActions, useStoreState } from '../store'
+import { useStoreState } from '../store'
 import Button from './Button'
 
 interface Props {
@@ -26,19 +26,11 @@ const StepsContent = ({
     isLoading,
 }: Props) => {
     const { t } = useTranslation()
-    const { safeModel: safeActions } = useStoreActions((state) => state)
     const { safeModel: safeState } = useStoreState((state) => state)
 
     const [isOpen, setIsOpen] = useState(true)
 
     const debtFloorVal = _.get(safeState, 'debtFloor', '0')
-
-    useEffect(() => {
-        async function getDebtFloor() {
-            await safeActions.fetchDebtFloor()
-        }
-        getDebtFloor()
-    }, [safeActions])
 
     const handleOpenState = () => setIsOpen(!isOpen)
 
