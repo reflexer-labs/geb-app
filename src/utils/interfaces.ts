@@ -94,7 +94,7 @@ export interface IBlockNumber {
 }
 
 export interface ITokenBalance {
-    [chainId: number]: number
+    [chainId: number]: number | string
 }
 
 export interface WalletInfo {

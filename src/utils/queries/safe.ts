@@ -1,4 +1,9 @@
 import { COLLATERAL_TYPE_ID } from '../constants'
+export const fetchDebtFloorQuery = `{
+  collateralType(id: "${COLLATERAL_TYPE_ID}") {
+    debtFloor
+  }
+}`
 
 export const liquidationQuery = `
   collateralType(id: "${COLLATERAL_TYPE_ID}") {

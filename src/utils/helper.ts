@@ -71,8 +71,12 @@ export const getRatePercentage = (
     returnRate = false
 ) => {
     const rate = Number(value)
-    let ratePercentage = rate < 1 ? (1 - rate) * -1 : rate - 1
+    let ratePercentage =
+        rate < 1
+            ? numeral(1).subtract(rate).value() * -1
+            : numeral(rate).subtract(1).value()
     if (returnRate) return ratePercentage
+
     return formatNumber(String(ratePercentage * 100), digits)
 }
 

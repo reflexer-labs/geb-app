@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { Plus } from 'react-feather'
@@ -8,16 +8,52 @@ import GridContainer from '../../components/GridContainer'
 import PageHeader from '../../components/PageHeader'
 import SafeList from './SafeList'
 import Button from '../../components/Button'
+import useGeb from '../../hooks/useGeb'
+import { useActiveWeb3React } from '../../hooks'
 
 const OnBoarding = () => {
     const { t } = useTranslation()
+    const { account, library } = useActiveWeb3React()
+    const geb = useGeb()
 
     const {
         connectWalletModel: connectWalletState,
+        settingsModel: settingsState,
         safeModel: safeState,
         popupsModel: popupsState,
     } = useStoreState((state) => state)
-    const { popupsModel: popupsActions } = useStoreActions((state) => state)
+    const {
+        popupsModel: popupsActions,
+        safeModel: safeActions,
+    } = useStoreActions((state) => state)
+
+    const { isRPCAdapterOn } = settingsState
+
+    useEffect(() => {
+        if (!account || !library) return
+
+        async function fetchSafes() {
+            await safeActions.fetchUserSafes({
+                address: account as string,
+                geb,
+                isRPCAdapterOn,
+            })
+        }
+        fetchSafes()
+        const ms = isRPCAdapterOn ? 5000 : 2000
+        const interval = setInterval(() => {
+            fetchSafes()
+        }, ms)
+
+        return () => clearInterval(interval)
+    }, [account, library, safeActions, isRPCAdapterOn, geb])
+
+    useEffect(() => {
+        async function getDebtFloor() {
+            await safeActions.fetchDebtFloor()
+        }
+        getDebtFloor()
+    }, [safeActions])
 
     return (
         <Container id="app-page">

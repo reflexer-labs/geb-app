@@ -47,7 +47,11 @@ export const handleDepositAndBorrow = async (
 
     if (!txData) throw new Error('No transaction request!')
 
-    const tx = await handlePreTxGasEstimate(signer, txData)
+    const tx = await handlePreTxGasEstimate(
+        signer,
+        txData,
+        safeId ? null : '865000'
+    )
 
     const txResponse = await signer.sendTransaction(tx)
     return txResponse
