@@ -75,6 +75,7 @@ const AuctionsPayment = () => {
                 // When doing restart we're allowed to accept more FLX, DEBT_amountSoldIncrease=1.2
                 return numeral(sellAmount)
                     .multiply(debt_amountSoldIncrease)
+                    .divide(bidIncrease)
                     .value()
                     .toString()
             }
