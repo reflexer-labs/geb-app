@@ -67,7 +67,10 @@ export const formatNumber = (value: string, digits = 4, round = false) => {
 
 export const getRatePercentage = (value: string, digits = 4) => {
     const rate = Number(value)
-    let ratePercentage = rate < 1 ? (1 - rate) * -1 : rate - 1
+    let ratePercentage =
+        rate < 1
+            ? numeral(1).subtract(rate).value() * -1
+            : numeral(rate).subtract(1).value()
     return formatNumber(String(ratePercentage * 100), digits)
 }
 
