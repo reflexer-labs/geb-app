@@ -8,7 +8,7 @@ export interface AuctionsModel {
     operation: number
     amount: string
     coinBalances: {
-        prai: string
+        rai: string
         flx: string
     }
     isSubmitting: boolean
@@ -24,7 +24,7 @@ export interface AuctionsModel {
     setCoinBalances: Action<
         AuctionsModel,
         {
-            prai: string
+            rai: string
             flx: string
         }
     >
@@ -36,7 +36,7 @@ const auctionsModel: AuctionsModel = {
     autctionsData: [],
     isSubmitting: false,
     coinBalances: {
-        prai: '',
+        rai: '',
         flx: '',
     },
     selectedAuction: null,
@@ -45,6 +45,7 @@ const auctionsModel: AuctionsModel = {
         async (actions, payload, { getState, getStoreActions }) => {
             const storeActions = getStoreActions()
             const res = await fetchAuctions(payload.address.toLowerCase())
+            if (!res) return
             if (res.userProxies && res.userProxies.length > 0) {
                 storeActions.connectWalletModel.setProxyAddress(
                     res.userProxies[0].address
@@ -62,7 +63,7 @@ const auctionsModel: AuctionsModel = {
             if (res.praiBalance && res.praiBalance.length > 0) {
                 actions.setCoinBalances({
                     ...getState().coinBalances,
-                    prai: res.praiBalance[0].balance,
+                    rai: res.praiBalance[0].balance,
                 })
             }
 

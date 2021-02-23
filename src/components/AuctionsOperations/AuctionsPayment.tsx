@@ -52,7 +52,7 @@ const AuctionsPayment = () => {
         ? Number(auctionDeadline) * 1000 > Date.now()
         : false
 
-    const praiBalance = _.get(coinBalances, 'prai', '0')
+    const raiBalance = _.get(coinBalances, 'rai', '0')
 
     const praiAllowance = _.get(connectWalletState, 'coinAllowance', '0')
 
@@ -94,8 +94,8 @@ const AuctionsPayment = () => {
             : BigNumber.from('0')
 
         if (auctionType.toLowerCase() === 'debt') {
-            const praiBalanceBN = praiBalance
-                ? BigNumber.from(toFixedString(praiBalance, 'WAD'))
+            const raiBalanceBN = raiBalance
+                ? BigNumber.from(toFixedString(raiBalance, 'WAD'))
                 : BigNumber.from('0')
 
             if (valueBN.isZero()) {
@@ -103,7 +103,7 @@ const AuctionsPayment = () => {
                 return false
             }
 
-            if (maxBidAmountBN.gt(praiBalanceBN)) {
+            if (maxBidAmountBN.gt(raiBalanceBN)) {
                 setError(`Insufficient ${COIN_TICKER} balance.`)
                 return false
             }
