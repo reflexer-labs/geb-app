@@ -15,12 +15,40 @@ export default function useAuctions() {
     useEffect(() => {
         const oneMonthOld =
             Date.now() - new Date().setMonth(new Date().getMonth() - 1)
-        const filteredAuctions = autctionsData.filter((auction: IAuction) => {
-            return (
-                Number(auction.auctionDeadline) * 1000 > Date.now() ||
-                Number(auction.createdAt) * 1000 > oneMonthOld
-            )
-        })
+        const filteredAuctions = autctionsData
+            .filter((auction: IAuction) => {
+                return (
+                    Number(auction.auctionDeadline) * 1000 > Date.now() ||
+                    Number(auction.createdAt) * 1000 > oneMonthOld
+                )
+            })
+            .map((auc: IAuction) => {
+                const {
+                    englishAuctionBids,
+                    isClaimed,
+                    auctionDeadline,
+                    startedBy,
+                    buyInitialAmount,
+                    createdAt,
+                    sellInitialAmount,
+                    createdAtTransaction,
+                } = auc
+                const isOngoingAuction =
+                    Number(auctionDeadline) * 1000 > Date.now()
+                const bidders = englishAuctionBids
+                const kickBidder = {
+                    bidder: startedBy,
+                    buyAmount: buyInitialAmount,
+                    createdAt,
+                    sellAmount: sellInitialAmount,
+                    createdAtTransaction,
+                }
+                const initialBids = [...[kickBidder], ...bidders]
+                if (!isOngoingAuction && isClaimed) {
+                    initialBids.push(bidders[bidders.length - 1])
+                }
+                return { ...auc, biddersList: initialBids.reverse() }
+            })
 
         const onGoingAuctions = filteredAuctions.filter(
             (auction: IAuction) =>

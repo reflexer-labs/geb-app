@@ -54,8 +54,8 @@ const AuctionBlock = (auction: Props) => {
     const isOngoingAuction = auctionDeadline
         ? Number(auctionDeadline) * 1000 > Date.now()
         : false
-
     const bidders = _.get(auction, 'englishAuctionBids', [])
+    const biddersList = _.get(auction, 'biddersList', [])
     const winner = _.get(auction, 'winner', '')
 
     const kickBidder = {
@@ -83,16 +83,6 @@ const AuctionBlock = (auction: Props) => {
         }
         return 'Bid'
     }
-
-    const returnTotalBids = () => {
-        const initialBids = [...[kickBidder], ...bidders.reverse()]
-        if (winner && !isOngoingAuction && isClaimed) {
-            initialBids.push(bidders[bidders.length - 1])
-        }
-        return initialBids
-    }
-
-    const biddersList = returnTotalBids().reverse()
 
     const handleClick = (type: string) => {
         if (!account) {
@@ -252,7 +242,6 @@ const AuctionBlock = (auction: Props) => {
                                         <List
                                             key={bidder.bidder + i}
                                             className={
-                                                bidders.length > 0 &&
                                                 winner &&
                                                 !isOngoingAuction &&
                                                 bidder.sellAmount ===

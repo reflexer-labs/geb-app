@@ -489,6 +489,7 @@ export interface IAuction {
         totalAuctionLength: string
         DEBT_amountSoldIncrease: string
     }
+    biddersList: Array<IAuctionBidder>
     englishAuctionType: string
     isClaimed: boolean
     sellAmount: string

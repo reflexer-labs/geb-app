@@ -49,7 +49,10 @@ const AuctionsList = () => {
         <Container>
             <InfoBox>
                 <Title>Debt Auctions</Title>
-                {auctions && auctions.length && Number(internalBalance) > 0 ? (
+                {account &&
+                auctions &&
+                auctions.length &&
+                Number(internalBalance) > 0 ? (
                     <Button
                         text={t('claim_tokens')}
                         onClick={() => handleClick('claim_tokens')}

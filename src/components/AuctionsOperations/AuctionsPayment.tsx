@@ -33,7 +33,7 @@ const AuctionsPayment = () => {
     } = auctionsState
 
     const isSettle = popupsState.auctionOperationPayload.type.includes('settle')
-
+    const isBid = popupsState.auctionOperationPayload.type.includes('bid')
     const isClaim = popupsState.auctionOperationPayload.type.includes('claim')
 
     const auctionType = _.get(selectedAuction, 'englishAuctionType', 'DEBT')
@@ -59,7 +59,7 @@ const AuctionsPayment = () => {
 
     const raiBalance = _.get(coinBalances, 'rai', '0')
 
-    const praiAllowance = _.get(connectWalletState, 'coinAllowance', '0')
+    const raiAllowance = _.get(connectWalletState, 'coinAllowance', '0')
 
     const buySymbol = buyToken === 'COIN' ? COIN_TICKER : 'FLX'
     const sellSymbol = sellToken === 'COIN' ? COIN_TICKER : 'FLX'
@@ -111,6 +111,13 @@ const AuctionsPayment = () => {
                 return false
             }
 
+            if (!bids.length && valueBN.gt(maxBidAmountBN)) {
+                setError(
+                    `You can only bid a maximum of ${maxBid()} ${sellSymbol}`
+                )
+                return false
+            }
+
             if (bids.length > 0 && valueBN.gt(maxBidAmountBN)) {
                 setError(
                     `You need to bid ${
@@ -124,30 +131,30 @@ const AuctionsPayment = () => {
         return true
     }
     const hasAllowance = () => {
-        if (auctionType === 'DEBT') {
-            const praiAllowanceBN = praiAllowance
-                ? BigNumber.from(toFixedString(praiAllowance, 'WAD'))
-                : BigNumber.from('0')
+        const raiAllowanceBN = raiAllowance
+            ? BigNumber.from(toFixedString(raiAllowance, 'WAD'))
+            : BigNumber.from('0')
 
-            const valueBN = value
-                ? BigNumber.from(toFixedString(value, 'WAD'))
-                : BigNumber.from('0')
-            return praiAllowanceBN.gte(valueBN)
-        }
-        return false
+        const valueBN = value
+            ? BigNumber.from(toFixedString(value, 'WAD'))
+            : BigNumber.from('0')
+        return raiAllowanceBN.gte(valueBN)
     }
 
     const handleSubmit = () => {
-        if (!isClaim && !isSettle && passedChecks()) {
-            if (hasAllowance()) {
-                auctionsActions.setOperation(2)
-            } else {
-                auctionsActions.setOperation(1)
+        if (isBid) {
+            if (passedChecks()) {
+                if (hasAllowance()) {
+                    auctionsActions.setOperation(2)
+                } else {
+                    auctionsActions.setOperation(1)
+                }
             }
             return
         }
         auctionsActions.setOperation(2)
     }
+
     const handleCancel = () => {
         popupsActions.setAuctionOperationPayload({ isOpen: false, type: '' })
         auctionsActions.setOperation(0)
