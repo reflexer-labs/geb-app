@@ -308,3 +308,19 @@ export const handleAuctionClaim = async ({
     const txResponse = await signer.sendTransaction(tx)
     return txResponse
 }
+
+export const handleClaimInternalBalance = async ({ signer }: IAuctionBid) => {
+    if (!signer) {
+        return false
+    }
+
+    const geb = new Geb(ETH_NETWORK, signer.provider)
+    const proxy = await geb.getProxyAction(signer._address)
+
+    const txData = proxy.exitAllCoin()
+
+    if (!txData) throw new Error('No transaction request!')
+    const tx = await handlePreTxGasEstimate(signer, txData)
+    const txResponse = await signer.sendTransaction(tx)
+    return txResponse
+}

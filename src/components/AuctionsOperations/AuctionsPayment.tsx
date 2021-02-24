@@ -25,11 +25,16 @@ const AuctionsPayment = () => {
         auctionsModel: auctionsActions,
         popupsModel: popupsActions,
     } = useStoreActions((state) => state)
-    const { selectedAuction, amount, coinBalances } = auctionsState
+    const {
+        selectedAuction,
+        amount,
+        coinBalances,
+        internalBalance,
+    } = auctionsState
 
-    const isClaim =
-        popupsState.auctionOperationPayload.type.includes('claim') ||
-        popupsState.auctionOperationPayload.type.includes('settle')
+    const isSettle = popupsState.auctionOperationPayload.type.includes('settle')
+
+    const isClaim = popupsState.auctionOperationPayload.type.includes('claim')
 
     const auctionType = _.get(selectedAuction, 'englishAuctionType', 'DEBT')
     const buyInititalAmount = _.get(selectedAuction, 'buyInitialAmount', '0')
@@ -81,10 +86,7 @@ const AuctionsPayment = () => {
             }
         } else {
             // We need to bid 3% less than the current best bid
-            return numeral(sellAmount)
-                .multiply(1 - Number(bidIncrease))
-                .value()
-                .toString()
+            return numeral(sellAmount).divide(bidIncrease).value().toString()
         }
     }
 
@@ -136,16 +138,15 @@ const AuctionsPayment = () => {
     }
 
     const handleSubmit = () => {
-        if (!isClaim && passedChecks()) {
+        if (!isClaim && !isSettle && passedChecks()) {
             if (hasAllowance()) {
                 auctionsActions.setOperation(2)
             } else {
                 auctionsActions.setOperation(1)
             }
+            return
         }
-        if (isClaim) {
-            auctionsActions.setOperation(2)
-        }
+        auctionsActions.setOperation(2)
     }
     const handleCancel = () => {
         popupsActions.setAuctionOperationPayload({ isOpen: false, type: '' })
@@ -160,7 +161,7 @@ const AuctionsPayment = () => {
 
     return (
         <Container>
-            {!isClaim ? (
+            {!isSettle && !isClaim ? (
                 <>
                     <DecimalInput
                         disabled
@@ -180,8 +181,8 @@ const AuctionsPayment = () => {
                 <DecimalInput
                     disabled
                     onChange={() => {}}
-                    value={sellAmount}
-                    label={`Claimable ${sellSymbol}`}
+                    value={isClaim ? internalBalance : sellAmount}
+                    label={`Claimable ${isClaim ? 'RAI' : sellSymbol}`}
                 />
             )}
             {error && <Error>{error}</Error>}

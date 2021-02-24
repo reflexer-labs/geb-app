@@ -11,7 +11,7 @@ const Results = () => {
         popupsModel: popupsState,
     } = useStoreState((state) => state)
 
-    const { selectedAuction, amount } = auctionsState
+    const { selectedAuction, amount, internalBalance } = auctionsState
     const buyInititalAmount = _.get(selectedAuction, 'buyInitialAmount', '0')
 
     const auctionId = _.get(selectedAuction, 'auctionId', '')
@@ -23,30 +23,40 @@ const Results = () => {
     const sellSymbol = sellToken === 'COIN' ? COIN_TICKER : 'FLX'
 
     const isClaim = popupsState.auctionOperationPayload.type.includes('claim')
+    const isSettle = popupsState.auctionOperationPayload.type.includes('settle')
     return (
         <Result>
             <Block>
-                <Item>
-                    <Label>{`Auction #`}</Label>
-                    <Value>{`${auctionId}`}</Value>
-                </Item>
                 {isClaim ? (
                     <Item>
-                        <Label>{`Claimable ${sellSymbol}`}</Label>
-                        <Value>{`${sellAmount}`}</Value>
+                        <Label>{`RAI Amount`}</Label>
+                        <Value>{`${formatNumber(internalBalance)}`}</Value>
                     </Item>
                 ) : (
                     <>
                         <Item>
-                            <Label>{`${buySymbol} to Bid`}</Label>
-                            <Value>{`${formatNumber(
-                                buyInititalAmount
-                            )}`}</Value>
+                            <Label>{`Auction #`}</Label>
+                            <Value>{`${auctionId}`}</Value>
                         </Item>
-                        <Item>
-                            <Label>{`${sellSymbol} to Receive`}</Label>
-                            <Value>{`${formatNumber(amount)}`}</Value>
-                        </Item>
+                        {isSettle ? (
+                            <Item>
+                                <Label>{`Claimable ${sellSymbol}`}</Label>
+                                <Value>{`${formatNumber(sellAmount)}`}</Value>
+                            </Item>
+                        ) : (
+                            <>
+                                <Item>
+                                    <Label>{`${buySymbol} to Bid`}</Label>
+                                    <Value>{`${formatNumber(
+                                        buyInititalAmount
+                                    )}`}</Value>
+                                </Item>
+                                <Item>
+                                    <Label>{`${sellSymbol} to Receive`}</Label>
+                                    <Value>{`${formatNumber(amount)}`}</Value>
+                                </Item>
+                            </>
+                        )}
                     </>
                 )}
             </Block>

@@ -9,7 +9,11 @@ import AlertLabel from './AlertLabel'
 import Button from './Button'
 import _ from '../utils/lodash'
 import { IAuction, IAuctionBidder } from '../utils/interfaces'
-import { getEtherscanLink, returnWalletAddress } from '../utils/helper'
+import {
+    formatNumber,
+    getEtherscanLink,
+    returnWalletAddress,
+} from '../utils/helper'
 import { useActiveWeb3React } from '../hooks'
 import { ChainId } from '@uniswap/sdk'
 
@@ -137,11 +141,11 @@ const AuctionBlock = (auction: Props) => {
         }
 
         if (
-            (isOngoingAuction && !winner) ||
+            isOngoingAuction ||
             !bidders.length ||
             (userProxy &&
                 winner &&
-                userProxy === winner.toLowerCase() &&
+                userProxy.toLowerCase() === winner.toLowerCase() &&
                 !isClaimed)
         ) {
             return (
@@ -153,7 +157,8 @@ const AuctionBlock = (auction: Props) => {
                             auctionsState.isSubmitting ||
                             (isOngoingAuction &&
                                 userProxy &&
-                                userProxy === winner.toLowerCase())
+                                userProxy.toLowerCase() ===
+                                    winner.toLowerCase())
                         }
                         onClick={() => handleClick('rai_bid')}
                     />
@@ -296,13 +301,17 @@ const AuctionBlock = (auction: Props) => {
                                                 <ListItemLabel>
                                                     Sell Amount
                                                 </ListItemLabel>
-                                                {bidder.sellAmount} {sellSymbol}
+                                                {formatNumber(
+                                                    bidder.sellAmount
+                                                )}{' '}
+                                                {sellSymbol}
                                             </ListItem>
                                             <ListItem>
                                                 <ListItemLabel>
                                                     Buy Amount
                                                 </ListItemLabel>
-                                                {bidder.buyAmount} {buySymbol}
+                                                {formatNumber(bidder.buyAmount)}{' '}
+                                                {buySymbol}
                                             </ListItem>
                                             <ListItem>
                                                 <ListItemLabel>

@@ -6,18 +6,54 @@ import Button from '../../components/Button'
 import useAuctions from '../../hooks/useAuctions'
 import Pagination from '../../components/Pagination'
 import { IPaging } from '../../utils/interfaces'
+import { useStoreActions, useStoreState } from '../../store'
+import { useActiveWeb3React } from '../../hooks'
 
 const AuctionsList = () => {
     const { t } = useTranslation()
+    const { account } = useActiveWeb3React()
     const [paging, setPaging] = useState<IPaging>({ from: 0, to: 5 })
+    const {
+        auctionsModel: auctionsState,
+        connectWalletModel: connectWalletState,
+    } = useStoreState((state) => state)
+    const { popupsModel: popupsActions } = useStoreActions((state) => state)
+    const { internalBalance } = auctionsState
+    const { isUserCreated } = connectWalletState
     const auctions = useAuctions()
+
+    const handleClick = (type: string) => {
+        if (!account) {
+            popupsActions.setIsConnectorsWalletOpen(true)
+            return
+        }
+
+        if (!isUserCreated) {
+            popupsActions.setIsProxyModalOpen(true)
+            popupsActions.setReturnProxyFunction((storeActions: any) => {
+                storeActions.popupsModel.setAuctionOperationPayload({
+                    isOpen: true,
+                    type,
+                })
+            })
+            return
+        }
+
+        popupsActions.setAuctionOperationPayload({
+            isOpen: true,
+            type,
+        })
+    }
 
     return (
         <Container>
             <InfoBox>
                 <Title>Debt Auctions</Title>
-                {auctions && auctions.length ? (
-                    <Button text={t('claim_tokens')} />
+                {auctions && auctions.length && Number(internalBalance) > 0 ? (
+                    <Button
+                        text={t('claim_tokens')}
+                        onClick={() => handleClick('claim_tokens')}
+                    />
                 ) : null}
             </InfoBox>
             {auctions && auctions.length > 0 ? (

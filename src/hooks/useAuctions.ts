@@ -22,6 +22,11 @@ export default function useAuctions() {
             )
         })
 
+        const onGoingAuctions = filteredAuctions.filter(
+            (auction: IAuction) =>
+                Number(auction.auctionDeadline) * 1000 > Date.now()
+        )
+
         const myAuctions = filteredAuctions
             .filter(
                 (auction: IAuction) =>
@@ -41,7 +46,12 @@ export default function useAuctions() {
             )
 
         const auctionsData = Array.from(
-            new Set([...myAuctions, ...auctionsToRestart, ...filteredAuctions])
+            new Set([
+                ...onGoingAuctions,
+                ...myAuctions,
+                ...auctionsToRestart,
+                ...filteredAuctions,
+            ])
         )
 
         setState(auctionsData)

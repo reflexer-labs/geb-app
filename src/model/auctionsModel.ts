@@ -1,12 +1,17 @@
 import { action, Action, thunk, Thunk } from 'easy-peasy'
 import { StoreModel } from '.'
-import { handleAuctionBid, handleAuctionClaim } from '../services/blockchain'
-import { fetchAuctions } from '../services/graphql'
+import {
+    handleAuctionBid,
+    handleAuctionClaim,
+    handleClaimInternalBalance,
+} from '../services/blockchain'
+import { fetchAuctions, fetchInternalBalance } from '../services/graphql'
 import { IAuction, IAuctionBid } from '../utils/interfaces'
 
 export interface AuctionsModel {
     operation: number
     amount: string
+    internalBalance: string
     coinBalances: {
         rai: string
         flx: string
@@ -16,6 +21,12 @@ export interface AuctionsModel {
     selectedAuction: IAuction | null
     fetchAuctions: Thunk<AuctionsModel, { address: string }, any, StoreModel>
     auctionBid: Thunk<AuctionsModel, IAuctionBid, any, StoreModel>
+    auctionClaimInternalBalance: Thunk<
+        AuctionsModel,
+        IAuctionBid,
+        any,
+        StoreModel
+    >
     auctionClaim: Thunk<AuctionsModel, IAuctionBid, any, StoreModel>
     setAuctionsData: Action<AuctionsModel, Array<IAuction>>
     setSelectedAuction: Action<AuctionsModel, IAuction | null>
@@ -29,11 +40,13 @@ export interface AuctionsModel {
         }
     >
     setIsSubmitting: Action<AuctionsModel, boolean>
+    setInternalBalance: Action<AuctionsModel, string>
 }
 
 const auctionsModel: AuctionsModel = {
     operation: 0,
     autctionsData: [],
+    internalBalance: '0',
     isSubmitting: false,
     coinBalances: {
         rai: '',
@@ -47,9 +60,15 @@ const auctionsModel: AuctionsModel = {
             const res = await fetchAuctions(payload.address.toLowerCase())
             if (!res) return
             if (res.userProxies && res.userProxies.length > 0) {
-                storeActions.connectWalletModel.setProxyAddress(
-                    res.userProxies[0].address
-                )
+                const proxyAddress = res.userProxies[0].address
+                const balanceRes = await fetchInternalBalance(proxyAddress)
+
+                if (balanceRes && balanceRes.internalCoinBalances.length > 0) {
+                    actions.setInternalBalance(
+                        balanceRes.internalCoinBalances[0].balance
+                    )
+                }
+                storeActions.connectWalletModel.setProxyAddress(proxyAddress)
                 if (res.userProxies[0].coinAllowance) {
                     storeActions.connectWalletModel.setCoinAllowance(
                         res.userProxies[0].coinAllowance.amount
@@ -116,6 +135,33 @@ const auctionsModel: AuctionsModel = {
             actions.setIsSubmitting(false)
         }
     }),
+
+    auctionClaimInternalBalance: thunk(
+        async (actions, payload, { getStoreActions }) => {
+            const storeActions = getStoreActions()
+            const txResponse = await handleClaimInternalBalance(payload)
+            if (txResponse) {
+                actions.setIsSubmitting(true)
+                const { hash, chainId } = txResponse
+                storeActions.transactionsModel.addTransaction({
+                    chainId,
+                    hash,
+                    from: txResponse.from,
+                    summary: payload.title,
+                    addedTime: new Date().getTime(),
+                    originalTx: txResponse,
+                })
+                storeActions.popupsModel.setIsWaitingModalOpen(true)
+                storeActions.popupsModel.setWaitingPayload({
+                    title: 'Transaction Submitted',
+                    hash: txResponse.hash,
+                    status: 'success',
+                })
+                await txResponse.wait()
+                actions.setIsSubmitting(false)
+            }
+        }
+    ),
     setOperation: action((state, payload) => {
         state.operation = payload
     }),
@@ -133,6 +179,9 @@ const auctionsModel: AuctionsModel = {
     }),
     setIsSubmitting: action((state, payload) => {
         state.isSubmitting = payload
+    }),
+    setInternalBalance: action((state, payload) => {
+        state.internalBalance = payload
     }),
 }
 
