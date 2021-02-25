@@ -147,6 +147,7 @@ const AuctionBlock = (auction: Props) => {
                             auctionsState.isSubmitting ||
                             (isOngoingAuction &&
                                 userProxy &&
+                                winner &&
                                 userProxy.toLowerCase() ===
                                     winner.toLowerCase())
                         }

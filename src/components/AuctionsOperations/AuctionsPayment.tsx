@@ -38,8 +38,11 @@ const AuctionsPayment = () => {
 
     const auctionType = _.get(selectedAuction, 'englishAuctionType', 'DEBT')
     const buyInititalAmount = _.get(selectedAuction, 'buyInitialAmount', '0')
+    const sellInitialAmount = _.get(selectedAuction, 'sellInitialAmount', '0')
     const bids = _.get(selectedAuction, 'englishAuctionBids', '[]')
     const sellAmount = _.get(selectedAuction, 'sellAmount', '0')
+    const buyAmount = _.get(selectedAuction, 'buyAmount', '0')
+
     const buyToken = _.get(selectedAuction, 'buyToken', 'COIN')
     const sellToken = _.get(selectedAuction, 'sellToken', 'PROTOCOL_TOKEN')
     const bidIncrease: string = _.get(
@@ -85,6 +88,11 @@ const AuctionsPayment = () => {
                     .toString()
             }
         } else {
+            const sellInitialAmountVal = numeral(sellInitialAmount).value()
+            const sellAmountVal = numeral(sellAmount).value()
+            if (sellAmountVal > sellInitialAmountVal) {
+                return sellInitialAmount
+            }
             // We need to bid 3% less than the current best bid
             return numeral(sellAmount).divide(bidIncrease).value().toString()
         }
@@ -96,17 +104,27 @@ const AuctionsPayment = () => {
             ? BigNumber.from(toFixedString(value, 'WAD'))
             : BigNumber.from('0')
 
-        if (auctionType.toLowerCase() === 'debt') {
-            const raiBalanceBN = raiBalance
-                ? BigNumber.from(toFixedString(raiBalance, 'WAD'))
-                : BigNumber.from('0')
+        const raiBalanceBN = raiBalance
+            ? BigNumber.from(toFixedString(raiBalance, 'WAD'))
+            : BigNumber.from('0')
 
+        const internalBalanceBN = internalBalance
+            ? BigNumber.from(toFixedString(internalBalance, 'WAD'))
+            : BigNumber.from('internalBalance')
+
+        const totalRaiBalance = raiBalanceBN.add(internalBalanceBN)
+
+        const buyAmountBN = buyAmount
+            ? BigNumber.from(toFixedString(buyAmount, 'WAD'))
+            : BigNumber.from('0')
+
+        if (auctionType.toLowerCase() === 'debt') {
             if (valueBN.isZero()) {
                 setError(`You cannot submit nothing`)
                 return false
             }
 
-            if (maxBidAmountBN.gt(raiBalanceBN)) {
+            if (buyAmountBN.gt(totalRaiBalance)) {
                 setError(`Insufficient ${COIN_TICKER} balance.`)
                 return false
             }

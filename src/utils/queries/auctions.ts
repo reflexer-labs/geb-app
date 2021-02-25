@@ -36,7 +36,7 @@ export const auctionsQuery = (address: string) => `{
       amount
     }
   }
-  praiBalance:erc20Balances(where: {address: "${address}", label: "COIN"}) {
+  raiBalance:erc20Balances(where: {address: "${address}", label: "COIN"}) {
     balance
   }
   ${userQuery(address)}

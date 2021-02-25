@@ -79,10 +79,10 @@ const auctionsModel: AuctionsModel = {
             if (res.user) {
                 storeActions.connectWalletModel.setIsUserCreated(true)
             }
-            if (res.praiBalance && res.praiBalance.length > 0) {
+            if (res.raiBalance && res.raiBalance.length > 0) {
                 actions.setCoinBalances({
                     ...getState().coinBalances,
-                    rai: res.praiBalance[0].balance,
+                    rai: res.raiBalance[0].balance,
                 })
             }
 
