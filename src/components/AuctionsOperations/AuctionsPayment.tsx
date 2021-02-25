@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
+import { utils as gebUtils } from 'geb.js'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import Button from '../Button'
-import numeral from 'numeral'
 import DecimalInput from '../DecimalInput'
 import Results from './Results'
 import { useStoreActions, useStoreState } from '../../store'
@@ -38,7 +38,6 @@ const AuctionsPayment = () => {
 
     const auctionType = _.get(selectedAuction, 'englishAuctionType', 'DEBT')
     const buyInititalAmount = _.get(selectedAuction, 'buyInitialAmount', '0')
-    const sellInitialAmount = _.get(selectedAuction, 'sellInitialAmount', '0')
     const bids = _.get(selectedAuction, 'englishAuctionBids', '[]')
     const sellAmount = _.get(selectedAuction, 'sellAmount', '0')
     const buyAmount = _.get(selectedAuction, 'buyAmount', '0')
@@ -74,6 +73,10 @@ const AuctionsPayment = () => {
     }
 
     const maxBid = (): string => {
+        const sellAmountBN = sellAmount
+            ? BigNumber.from(toFixedString(sellAmount, 'WAD'))
+            : BigNumber.from('0')
+        const bidIncreaseBN = BigNumber.from(toFixedString(bidIncrease, 'WAD'))
         if (bids.length === 0) {
             if (isOngoingAuction) {
                 // Auction ongoing but no bids so far
@@ -81,20 +84,20 @@ const AuctionsPayment = () => {
             } else {
                 // Auction restart (no bids and passed the dealine)
                 // When doing restart we're allowed to accept more FLX, DEBT_amountSoldIncrease=1.2
-                return numeral(sellAmount)
-                    .multiply(debt_amountSoldIncrease)
-                    .divide(bidIncrease)
-                    .value()
+                const numerator = sellAmountBN.mul(
+                    BigNumber.from(
+                        toFixedString(debt_amountSoldIncrease, 'WAD')
+                    )
+                )
+                return gebUtils
+                    .wadToFixed(numerator.div(bidIncreaseBN))
                     .toString()
             }
         } else {
-            const sellInitialAmountVal = numeral(sellInitialAmount).value()
-            const sellAmountVal = numeral(sellAmount).value()
-            if (sellAmountVal > sellInitialAmountVal) {
-                return sellInitialAmount
-            }
             // We need to bid 3% less than the current best bid
-            return numeral(sellAmount).divide(bidIncrease).value().toString()
+            return gebUtils
+                .wadToFixed(sellAmountBN.mul(gebUtils.WAD).div(bidIncreaseBN))
+                .toString()
         }
     }
 

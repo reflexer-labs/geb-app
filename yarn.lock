@@ -1796,26 +1796,26 @@
     randombytes "^2.1.0"
 
 "@reflexer-finance/geb-contract-api@^0.4.10":
-  version "0.4.10"
-  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-contract-api/-/geb-contract-api-0.4.10.tgz#bd97cb01643ad1573e8676b33549befff3a53c7a"
-  integrity sha512-D2OBvMYWCT2iRpTDx/qNdRuBmMLLSJoPbWy2omBN+eYDKRV5qS2wK05ZcgMAVE9+nDun3F16cIBg/GkU/NzKEA==
+  version "0.4.11"
+  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-contract-api/-/geb-contract-api-0.4.11.tgz#4478ca766e203d71c0493344d35f02f437b9e181"
+  integrity sha512-+aRQQ3MRIG4j4KSggn2Iox+QeOsMbvlQ2SyRvQSN0N1WVDuunWvhrBAnm48ICc24vGLZss0Wo8E05KVx333gZg==
   dependencies:
     "@ethersproject/bignumber" "5.x"
-    "@reflexer-finance/geb-contract-base" "^0.4.10"
+    "@reflexer-finance/geb-contract-base" "^0.4.11"
 
-"@reflexer-finance/geb-contract-base@^0.4.10":
-  version "0.4.10"
-  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-contract-base/-/geb-contract-base-0.4.10.tgz#444c345117a0e272e85cc862124a691b1f86d6cd"
-  integrity sha512-p4H5phNiGoyPFY/3E7Oomob5UFjns7kTyaMJ6PUd6mAT0ZEFXA5x7YRRynMI1kvtU/8zO+rvVWt4SzIACpa47g==
+"@reflexer-finance/geb-contract-base@^0.4.10", "@reflexer-finance/geb-contract-base@^0.4.11":
+  version "0.4.11"
+  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-contract-base/-/geb-contract-base-0.4.11.tgz#515fc7b9bd9baa41a14bfb4e58a34fdc1c42fcfb"
+  integrity sha512-grIviZAQu81IVVu+J/6mZojQ/QkZEDwCpuyKkp2Jztwx5GzY/Di5sKTkKLW7LX1EQkLVpQo/aNtgwKdTwpNMbA==
   dependencies:
     "@ethersproject/bignumber" "5.x"
 
 "@reflexer-finance/geb-ethers-provider@^0.4.10":
-  version "0.4.10"
-  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-ethers-provider/-/geb-ethers-provider-0.4.10.tgz#2e991c6ca0221276ee160e6c5cbcb94f605f22c1"
-  integrity sha512-8ClK8Nxy3QE6u2fD3euXTGGHIsI978zPtqg/ia/r6cdOw+qeSwj1hSxeF7G3nv/tb4dxCzgQRz1wH7d9l+CJqA==
+  version "0.4.11"
+  resolved "https://registry.yarnpkg.com/@reflexer-finance/geb-ethers-provider/-/geb-ethers-provider-0.4.11.tgz#7f1a01e0e7c387f950b5c707cd389d43e5b8edf4"
+  integrity sha512-0ZemX15ExF6k2uYlvTDXuHalHLmtUw8dKIktKwU4ZEO80eqgoy7RnI01eh95TtDKqBt48PMDVbz7QkCpAWMWEQ==
   dependencies:
-    "@reflexer-finance/geb-contract-base" "^0.4.10"
+    "@reflexer-finance/geb-contract-base" "^0.4.11"
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.1"
