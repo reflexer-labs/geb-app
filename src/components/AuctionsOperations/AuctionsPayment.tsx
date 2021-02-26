@@ -79,8 +79,12 @@ const AuctionsPayment = () => {
         const bidIncreaseBN = BigNumber.from(toFixedString(bidIncrease, 'WAD'))
         if (bids.length === 0) {
             if (isOngoingAuction) {
-                // Auction ongoing but no bids so far
-                return sellAmount
+                // We need to bid 3% less than the current best bid
+                return gebUtils
+                    .wadToFixed(
+                        sellAmountBN.mul(gebUtils.WAD).div(bidIncreaseBN)
+                    )
+                    .toString()
             } else {
                 // Auction restart (no bids and passed the dealine)
                 // When doing restart we're allowed to accept more FLX, DEBT_amountSoldIncrease=1.2
