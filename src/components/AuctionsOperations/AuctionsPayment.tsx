@@ -126,6 +126,10 @@ const AuctionsPayment = () => {
             : BigNumber.from('0')
 
         if (auctionType.toLowerCase() === 'debt') {
+            if (valueBN.lt(BigNumber.from('0'))) {
+                setError(`You cannot bid a negative number`)
+                return false
+            }
             if (valueBN.isZero()) {
                 setError(`You cannot submit nothing`)
                 return false
