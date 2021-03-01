@@ -47,10 +47,10 @@ const App = () => {
                 <GlobalStyle bodyOverflow={bodyOverflow} />
                 <CustomToast />
                 <ErrorBoundary>
-                    <GoogleTagManager />
                     <Router>
                         <Shared>
                             <Suspense fallback={null}>
+                                <Route component={GoogleTagManager} />
                                 <Web3ReactManager>
                                     <Switch>
                                         {NETWORK_ID === 1 ? null : (
