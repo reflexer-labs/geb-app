@@ -24,7 +24,7 @@ import Privacy from './containers/Privacy'
 import CustomToast from './components/CustomToast'
 import Incentives from './containers/Incentives'
 import { NETWORK_ID } from './connectors'
-import GoogleAnalyticsReporter from './components/Analytics/GoogleAnalyticsReporter'
+import GoogleTagManager from './components/Analytics/GoogleTagManager'
 
 // Toast css
 
@@ -47,10 +47,10 @@ const App = () => {
                 <GlobalStyle bodyOverflow={bodyOverflow} />
                 <CustomToast />
                 <ErrorBoundary>
+                    <GoogleTagManager />
                     <Router>
                         <Shared>
                             <Suspense fallback={null}>
-                                <Route component={GoogleAnalyticsReporter} />
                                 <Web3ReactManager>
                                     <Switch>
                                         {NETWORK_ID === 1 ? null : (
