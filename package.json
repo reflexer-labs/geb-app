@@ -81,7 +81,6 @@
         "@types/numeral": "^0.0.28",
         "@types/react-copy-to-clipboard": "^4.3.0",
         "@types/react-custom-scrollbars": "^4.0.7",
-        "@types/react-gtm-module": "^2.0.0",
         "@types/react-paginate": "^6.2.1",
         "@types/react-router-dom": "^5.1.5",
         "@types/react-transition-group": "^4.4.0",
