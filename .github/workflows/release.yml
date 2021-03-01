@@ -18,6 +18,7 @@ jobs:
             REACT_APP_NETWORK_URL: ${{ secrets.REACT_APP_NETWORK_URL_PRODUCTION }}
             REACT_APP_COIN_TICKER_PRODUCTION: ${{ secrets.REACT_APP_COIN_TICKER_PRODUCTION }}
             REACT_APP_SYSTEM_STATUS: ${{ secrets.REACT_APP_SYSTEM_STATUS }}
+            REACT_APP_GOOGLE_ANALYTICS_ID: ${{ secrets.REACT_APP_GOOGLE_ANALYTICS_ID_PRODUCTION }}
 
         steps:
             - uses: actions/checkout@v2

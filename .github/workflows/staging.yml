@@ -18,6 +18,7 @@ jobs:
             REACT_APP_NETWORK_ID: ${{ secrets.REACT_APP_NETWORK_ID_STAGING }}
             REACT_APP_NETWORK_URL: ${{ secrets.REACT_APP_NETWORK_URL_STAGING }}
             REACT_APP_SYSTEM_STATUS: ${{ secrets.REACT_APP_SYSTEM_STATUS_STAGING }}
+            REACT_APP_GOOGLE_ANALYTICS_ID: ${{ secrets.REACT_APP_GOOGLE_ANALYTICS_ID_STAGING }}
 
         steps:
             - uses: actions/checkout@v2
