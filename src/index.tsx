@@ -7,6 +7,7 @@ import App from './App'
 import store from './store'
 import { NetworkContextName } from './utils/constants'
 import getLibrary from './utils/getLibrary'
+import { HelmetProvider } from 'react-helmet-async'
 
 const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName)
 
@@ -16,13 +17,15 @@ if ('ethereum' in window) {
 
 ReactDOM.render(
     <React.StrictMode>
-        <Web3ReactProvider getLibrary={getLibrary}>
-            <Web3ProviderNetwork getLibrary={getLibrary}>
-                <StoreProvider store={store}>
-                    <App />
-                </StoreProvider>
-            </Web3ProviderNetwork>
-        </Web3ReactProvider>
+        <HelmetProvider>
+            <Web3ReactProvider getLibrary={getLibrary}>
+                <Web3ProviderNetwork getLibrary={getLibrary}>
+                    <StoreProvider store={store}>
+                        <App />
+                    </StoreProvider>
+                </Web3ProviderNetwork>
+            </Web3ReactProvider>
+        </HelmetProvider>
     </React.StrictMode>,
     document.getElementById('root')
 )
