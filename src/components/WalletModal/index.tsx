@@ -19,7 +19,6 @@ import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core'
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
 import React, { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
-import ReactGA from 'react-ga'
 import styled from 'styled-components'
 import { injected } from '../../connectors'
 import { SUPPORTED_WALLETS } from '../../utils/constants'
@@ -105,11 +104,7 @@ export default function WalletModal() {
             return true
         })
         // log selected wallet
-        ReactGA.event({
-            category: 'Wallet',
-            action: 'Change Wallet',
-            label: name,
-        })
+        console.log(`Change wallet, ${name}`)
         setPendingWallet(connector) // set wallet for pending view
         setWalletView(WALLET_VIEWS.PENDING)
 

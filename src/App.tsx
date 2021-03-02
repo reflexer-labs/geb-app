@@ -25,6 +25,7 @@ import CustomToast from './components/CustomToast'
 import Incentives from './containers/Incentives'
 import Auctions from './containers/Auctions'
 import { NETWORK_ID } from './connectors'
+import GoogleTagManager from './components/Analytics/GoogleTagManager'
 
 // Toast css
 
@@ -50,6 +51,7 @@ const App = () => {
                     <Router>
                         <Shared>
                             <Suspense fallback={null}>
+                                <Route component={GoogleTagManager} />
                                 <Web3ReactManager>
                                     <Switch>
                                         <Route
