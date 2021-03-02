@@ -23,6 +23,7 @@ import SafeDetails from './containers/OnBoarding/SafeDetails'
 import Privacy from './containers/Privacy'
 import CustomToast from './components/CustomToast'
 import Incentives from './containers/Incentives'
+import Auctions from './containers/Auctions'
 import { NETWORK_ID } from './connectors'
 import GoogleTagManager from './components/Analytics/GoogleTagManager'
 
@@ -53,6 +54,11 @@ const App = () => {
                                 <Route component={GoogleTagManager} />
                                 <Web3ReactManager>
                                     <Switch>
+                                        <Route
+                                            exact
+                                            component={Auctions}
+                                            path={'/auctions'}
+                                        />
                                         {NETWORK_ID === 1 ? null : (
                                             <Route
                                                 exact

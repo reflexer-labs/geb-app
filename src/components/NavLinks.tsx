@@ -4,13 +4,17 @@ import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { NETWORK_ID } from '../connectors'
-import { useStoreActions } from '../store'
+import { useStoreActions, useStoreState } from '../store'
 import AnalyticsIcon from './Icons/AnalyticsIcon'
+import AuctionIcon from './Icons/AuctionIcon'
 import SafeIcon from './Icons/SafeIcon'
 
 const NavLinks = () => {
     const { t } = useTranslation()
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
+    const { settingsModel: settingsState } = useStoreState((state) => state)
+
+    const { isRPCAdapterOn } = settingsState
 
     const handleLinkClick = (
         e: React.MouseEvent<HTMLElement>,
@@ -43,6 +47,14 @@ const NavLinks = () => {
                     onClick={(e) => handleLinkClick(e, false)}
                 >
                     <DollarSign size="18" /> {t('incentives')}
+                </NavBarLink>
+            )}
+            {isRPCAdapterOn ? null : (
+                <NavBarLink
+                    to="/auctions"
+                    onClick={(e) => handleLinkClick(e, false)}
+                >
+                    <AuctionIcon className="opacity" /> {t('auctions')}
                 </NavBarLink>
             )}
 

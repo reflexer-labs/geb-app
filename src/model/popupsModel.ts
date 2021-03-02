@@ -18,6 +18,7 @@ export interface PopupsModel {
     isScreenModalOpen: boolean
     isVotingModalOpen: boolean
     isIncentivesModalOpen: boolean
+    auctionOperationPayload: IOperation
     alertPayload: IAlert | null
     ESMOperationPayload: IOperation
     safeOperationPayload: IOperation & { isCreate: boolean }
@@ -39,6 +40,7 @@ export interface PopupsModel {
     setESMOperationPayload: Action<PopupsModel, IOperation>
     setIsVotingModalOpen: Action<PopupsModel, boolean>
     setIsIncentivesModalOpen: Action<PopupsModel, boolean>
+    setAuctionOperationPayload: Action<PopupsModel, IOperation>
     setIsWaitingModalOpen: Action<PopupsModel, boolean>
     setWaitingPayload: Action<PopupsModel, IWaitingPayload>
     setBlockBackdrop: Action<PopupsModel, boolean>
@@ -86,6 +88,10 @@ const popupsModel: PopupsModel = {
         isOpen: false,
         text: '',
     },
+    auctionOperationPayload: {
+        isOpen: false,
+        type: '',
+    },
 
     setIsSettingModalOpen: action((state, payload) => {
         state.isSettingsModalOpen = payload
@@ -122,6 +128,9 @@ const popupsModel: PopupsModel = {
     }),
     setIsIncentivesModalOpen: action((state, payload) => {
         state.isIncentivesModalOpen = payload
+    }),
+    setAuctionOperationPayload: action((state, payload) => {
+        state.auctionOperationPayload = payload
     }),
     setIsWaitingModalOpen: action((state, payload) => {
         state.isWaitingModalOpen = payload

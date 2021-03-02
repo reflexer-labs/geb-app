@@ -12,3 +12,9 @@ export const getSubgraphBlock = (blockNunber: number) => `{
 export const getUserQuery = (address: string) => `{
   ${userQuery(address)}
  }`
+
+export const internalBalanceQuery = (proxyAddress: string) => `{
+  internalCoinBalances(where: {accountHandler: "${proxyAddress}"}) {
+    balance
+  }
+}`

@@ -10,7 +10,11 @@ import { GRAPH_API_URLS } from '../utils/constants'
 import { formatUserSafe, formatHistoryArray } from '../utils/helper'
 import { incentiveCampaignsQuery } from '../utils/queries/incentives'
 import { IIncentivesCampaignData, IIncentivesConfig } from '../utils/interfaces'
-import { getSubgraphBlock, getUserQuery } from '../utils/queries/user'
+import {
+    getSubgraphBlock,
+    getUserQuery,
+    internalBalanceQuery,
+} from '../utils/queries/user'
 import {
     IFetchSafeById,
     IFetchSafesPayload,
@@ -18,6 +22,7 @@ import {
     IUserSafeList,
 } from '../utils/interfaces'
 import gebManager from '../utils/gebManager'
+import { auctionsQuery } from '../utils/queries/auctions'
 
 export const cancelTokenSource = axios.CancelToken.source()
 
@@ -290,4 +295,18 @@ export const fetchIncentivesCampaigns = async (
           }
 
     return payload
+}
+
+export const fetchAuctions = async (address: string) => {
+    const res = await request(JSON.stringify({ query: auctionsQuery(address) }))
+    const response = res.data.data
+    return response
+}
+
+export const fetchInternalBalance = async (proxyAddress: string) => {
+    const res = await request(
+        JSON.stringify({ query: internalBalanceQuery(proxyAddress) })
+    )
+    const response = res.data.data
+    return response
 }
