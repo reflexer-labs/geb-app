@@ -31,9 +31,12 @@ export const COLLATERAL_TYPE_ID = 'ETH-A'
 
 export const SYSTEM_STATUS = REACT_APP_SYSTEM_STATUS || ''
 
+//'https://api.thegraph.com/subgraphs/name/guifel/kovan_1_3_0'
 export const GRAPH_API_URLS = REACT_APP_GRAPH_API_URLS
     ? REACT_APP_GRAPH_API_URLS.split(',')
-    : ['https://api.thegraph.com/subgraphs/name/guifel/kovan_1_3_0']
+    : [
+          'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai',
+      ]
 
 export const MAILCHIMP_URL = REACT_APP_MAILCHIMP_URL
 
