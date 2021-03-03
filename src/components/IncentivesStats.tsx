@@ -168,7 +168,13 @@ const IncentivesStats = () => {
             </StatsGrid>
 
             <BtnContainer
-                className={account && Number(stakedBalance) !== 0 ? '' : 'hide'}
+                className={
+                    account && Number(stakedBalance) !== 0
+                        ? userCampaigns.length < 2
+                            ? 'hide-migrate'
+                            : ''
+                        : 'hide'
+                }
             >
                 <div>
                     <Button
@@ -176,6 +182,15 @@ const IncentivesStats = () => {
                         text={t('withdraw')}
                         onClick={() => handleClick('withdraw')}
                         dimmed
+                    />
+                </div>
+
+                <div className="migrate-btn">
+                    <Button
+                        id="migrate-btn"
+                        text={t('migrate')}
+                        onClick={() => handleClick('migrate')}
+                        withArrow
                     />
                 </div>
 
@@ -326,7 +341,7 @@ const BtnContainer = styled.div`
     margin: 20px auto 35px;
 
     div {
-        flex: 0 0 33.3%;
+        flex: 0 0 25%;
         text-align: center;
         &:first-child {
             border-right: 1px solid ${(props) => props.theme.colors.border};
@@ -350,10 +365,25 @@ const BtnContainer = styled.div`
         }
     }
 
+    #migrate-btn {
+        border-right: 1px solid ${(props) => props.theme.colors.border};
+        img {
+            display: none;
+        }
+    }
+    &.hide-migrate {
+        div {
+            flex: 0 0 33.3%;
+        }
+        .migrate-btn {
+            display: none;
+        }
+    }
+
     &.hide {
         max-width: 500px;
         div {
-            flex: 0 0 50%;
+            flex: 0 0 33.3%;
             &.mid-btn {
                 display: none;
             }

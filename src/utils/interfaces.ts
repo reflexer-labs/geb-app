@@ -510,3 +510,9 @@ export interface IPaging {
     from: number
     to: number
 }
+
+export interface IIncentivesMigrate {
+    from: string
+    to: string
+    signer: JsonRpcSigner
+}
