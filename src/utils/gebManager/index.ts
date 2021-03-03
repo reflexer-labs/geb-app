@@ -216,11 +216,13 @@ const getIncentives = async (
         geb.contracts.uniswapPairCoinEth.getReserves(true), // 2
         geb.contracts.uniswapPairCoinEth.token0(true), // 3
         geb.contracts.uniswapPairCoinEth.totalSupply(true), // 4
+        //@ts-ignore
         geb.contracts.stakingRewardFactory.totalCampaignCount(true), // 5
         geb.contracts.proxyRegistry.proxies(address, true), // 6
     ])
 
     const proxyAddress = multiCall1[6].toLowerCase()
+    //@ts-ignore
     const campaignInfoRequest = Array(multiCall1[5].toNumber())
         .fill(null)
         .map((_, i) =>

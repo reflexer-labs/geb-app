@@ -27,6 +27,7 @@ import { useHistory } from 'react-router-dom'
 import IncentivesModal from '../components/Modals/IncentivesModal'
 import ProxyModal from '../components/Modals/ProxyModal'
 import ImagePreloader from '../components/ImagePreloader'
+import AuctionsModal from '../components/Modals/AuctionsModal'
 import AlertLabel from '../components/AlertLabel'
 import useGeb from '../hooks/useGeb'
 
@@ -192,6 +193,7 @@ const Shared = ({ children }: Props) => {
             <TransactionUpdater />
             <LoadingModal />
             <IncentivesModal />
+            <AuctionsModal />
             <CreateAccountModal />
             <ProxyModal />
             <ConnectedWalletModal />
