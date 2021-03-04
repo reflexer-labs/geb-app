@@ -53,8 +53,7 @@ export default function ApplicationUpdater(): null {
     const debouncedState = useDebounce(state, 100)
 
     useEffect(() => {
-        if (!debouncedState.chainId) return
-
+        if (!debouncedState.chainId || !debouncedState.balance) return
         store.dispatch.connectWalletModel.updateEthBalance({
             chainId: debouncedState.chainId,
             balance: debouncedState.balance,

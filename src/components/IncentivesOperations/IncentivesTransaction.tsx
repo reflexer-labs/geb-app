@@ -32,6 +32,7 @@ const IncentivesTransaction = () => {
         uniPoolAmount,
         incentivesCampaignData,
         isUniSwapShareChecked,
+        migrate,
     } = incentivesState
 
     const uniswapShare = _.get(incentivesCampaignData, 'uniswapCoinPool', '0')
@@ -60,6 +61,7 @@ const IncentivesTransaction = () => {
         incentivesActions.setIsUniSwapShareChecked(false)
         incentivesActions.setUniswapShare('')
         incentivesActions.setUniPoolAmount('')
+        incentivesActions.setMigration({ from: '', to: '' })
     }
 
     const handleConfirm = async () => {
@@ -78,6 +80,13 @@ const IncentivesTransaction = () => {
             const signer = library.getSigner(account)
 
             try {
+                if (type === 'migrate') {
+                    await incentivesActions.incentiveMigrate({
+                        signer,
+                        ...migrate,
+                    })
+                }
+
                 if (type === 'deposit') {
                     await incentivesActions.incentiveDeposit({
                         signer,
@@ -125,7 +134,7 @@ const IncentivesTransaction = () => {
             <Body>
                 <TransactionOverview
                     title={t('confirm_transaction_details')}
-                    isChecked={incentivesState.type !== 'redeem_rewards'}
+                    isChecked={isUniSwapShareChecked}
                     description={
                         t('confirm_details_text') +
                         (returnConnectorName(connector)
@@ -134,7 +143,7 @@ const IncentivesTransaction = () => {
                     }
                 />
 
-                <Results />
+                {type === 'migrate' ? null : <Results />}
 
                 <UniSwapCheckContainer>
                     <Text>{t('confirm_text')}</Text>
