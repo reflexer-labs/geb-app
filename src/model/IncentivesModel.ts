@@ -223,6 +223,7 @@ const incentivesModel: IncentivesModel = {
                 hash: txResponse.hash,
                 status: 'success',
             })
+            actions.setOperation(0)
             actions.setMigration({ from: '', to: '' })
             await txResponse.wait()
         }

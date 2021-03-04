@@ -66,7 +66,7 @@ const IncentivesTransaction = () => {
 
     const handleConfirm = async () => {
         if (account && library) {
-            if (!campaignAddress) {
+            if (type !== 'migrate' && !campaignAddress) {
                 throw new Error('No campaignAddress specified')
             }
             popupsActions.setIsIncentivesModalOpen(false)

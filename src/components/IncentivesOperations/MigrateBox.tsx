@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { useStoreActions } from '../../store'
@@ -14,17 +14,38 @@ const MigrateBox = () => {
 
     const userCampaigns = useUserCampaigns()
 
+    const returnStakedIncentives = useCallback(() => {
+        if (userCampaigns[0].campaignAddress !== '') {
+            return userCampaigns.filter(
+                (campaign) => Number(campaign.stakedBalance) > 0
+            )
+        }
+        return userCampaigns
+    }, [userCampaigns])
+
+    const returnToCampaigns = useCallback(() => {
+        if (userCampaigns[0].campaignAddress !== '') {
+            if (!migrate.from) {
+                return userCampaigns.filter(
+                    (campaign) =>
+                        campaign.campaignAddress !==
+                        returnStakedIncentives()[
+                            returnStakedIncentives().length - 1
+                        ].campaignAddress
+                )
+            }
+
+            return userCampaigns.filter(
+                (campaign) => campaign.campaignAddress !== migrate.from
+            )
+        }
+        return userCampaigns
+    }, [migrate.from, returnStakedIncentives, userCampaigns])
+
     const {
         incentivesModel: incentivesActions,
         popupsModel: popupsActions,
     } = useStoreActions((state) => state)
-
-    const returnCampaigns = () => {
-        const list = userCampaigns.slice(0, userCampaigns.length - 1)
-        return list.length > 2
-            ? list.map((campaign) => `#${campaign.campaignNumber}`)
-            : []
-    }
 
     const handleCancel = () => {
         popupsActions.setIsIncentivesModalOpen(false)
@@ -32,28 +53,36 @@ const MigrateBox = () => {
     }
 
     const handleSelectedItem = (selected: string, isFrom = true) => {
-        const selectedCampaign = userCampaigns.find(
-            (campaign) => campaign.campaignNumber === selected
-        )
-        if (selectedCampaign) {
-            if (isFrom) {
-                setMigrate({
-                    ...migrate,
-                    from: selectedCampaign.campaignAddress,
-                })
-            } else {
-                setMigrate({ ...migrate, to: selectedCampaign.campaignAddress })
+        const id = selected.split('#').pop()
+        if (userCampaigns.length > 0) {
+            const selectedCampaign = userCampaigns.find(
+                (campaign) => campaign.campaignNumber === id
+            )
+            if (selectedCampaign) {
+                if (isFrom) {
+                    setMigrate({
+                        ...migrate,
+                        from: selectedCampaign.campaignAddress,
+                    })
+                } else {
+                    setMigrate({
+                        ...migrate,
+                        to: selectedCampaign.campaignAddress,
+                    })
+                }
             }
         }
     }
 
     const handleSubmit = () => {
         let { from, to } = migrate
+
         if (!from) {
-            from = userCampaigns[userCampaigns.length - 1].campaignAddress
+            from = returnStakedIncentives()[returnStakedIncentives().length - 1]
+                .campaignAddress
         }
         if (!to) {
-            to = userCampaigns[0].campaignAddress
+            to = returnToCampaigns()[0].campaignAddress
         }
         if (from === to) {
             setError('Cannot migrate to the same campaign')
@@ -68,12 +97,16 @@ const MigrateBox = () => {
         <Body>
             <DropdownContainer>
                 <Dropdown
-                    items={[]}
+                    items={returnStakedIncentives().map(
+                        (campaign) => `#${campaign.campaignNumber}`
+                    )}
                     getSelectedItem={(selected: string) =>
                         handleSelectedItem(selected)
                     }
                     itemSelected={`#${
-                        userCampaigns[userCampaigns.length - 1].campaignNumber
+                        returnStakedIncentives()[
+                            returnStakedIncentives().length - 1
+                        ].campaignNumber
                     }`}
                     label={'Migrate From'}
                 />
@@ -81,11 +114,13 @@ const MigrateBox = () => {
 
             <DropdownContainer>
                 <Dropdown
-                    items={returnCampaigns()}
+                    items={returnToCampaigns().map(
+                        (campaign) => `#${campaign.campaignNumber}`
+                    )}
                     getSelectedItem={(selected: string) =>
                         handleSelectedItem(selected, false)
                     }
-                    itemSelected={`#${userCampaigns[0].campaignNumber}`}
+                    itemSelected={`#${returnToCampaigns()[0].campaignNumber}`}
                     label={'Migrate To'}
                 />
             </DropdownContainer>
