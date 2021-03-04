@@ -19,6 +19,13 @@ const MigrateBox = () => {
         popupsModel: popupsActions,
     } = useStoreActions((state) => state)
 
+    const returnCampaigns = () => {
+        const list = userCampaigns.slice(0, userCampaigns.length - 1)
+        return list.length > 2
+            ? list.map((campaign) => `#${campaign.campaignNumber}`)
+            : []
+    }
+
     const handleCancel = () => {
         popupsActions.setIsIncentivesModalOpen(false)
         incentivesActions.setOperation(0)
@@ -61,9 +68,7 @@ const MigrateBox = () => {
         <Body>
             <DropdownContainer>
                 <Dropdown
-                    items={userCampaigns.map(
-                        (campaign) => `#${campaign.campaignNumber}`
-                    )}
+                    items={[]}
                     getSelectedItem={(selected: string) =>
                         handleSelectedItem(selected)
                     }
@@ -76,9 +81,7 @@ const MigrateBox = () => {
 
             <DropdownContainer>
                 <Dropdown
-                    items={userCampaigns.map(
-                        (campaign) => `#${campaign.campaignNumber}`
-                    )}
+                    items={returnCampaigns()}
                     getSelectedItem={(selected: string) =>
                         handleSelectedItem(selected, false)
                     }

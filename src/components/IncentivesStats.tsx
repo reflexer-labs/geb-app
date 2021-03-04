@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { useStoreActions, useStoreState } from '../store'
 import Button from './Button'
 import ReactTooltip from 'react-tooltip'
+import classNames from 'classnames'
 import Arrow from './Icons/Arrow'
 import { useUserCampaigns, useSelectedCampaign } from '../hooks/useIncentives'
 import { useActiveWeb3React } from '../hooks'
@@ -35,6 +36,13 @@ const IncentivesStats = () => {
         popupsModel: popupsActions,
         incentivesModel: incentivesActions,
     } = useStoreActions((state) => state)
+
+    const classes = classNames({
+        'hide-migrate':
+            campaignNumber === userCampaigns[0].campaignNumber ||
+            (account && Number(stakedBalance) === 0),
+        hide: account && Number(stakedBalance) === 0,
+    })
 
     const handleClick = (type: string) => {
         if (!account) {
@@ -167,15 +175,7 @@ const IncentivesStats = () => {
                 <ReactTooltip multiline type="light" data-effect="solid" />
             </StatsGrid>
 
-            <BtnContainer
-                className={
-                    account && Number(stakedBalance) !== 0
-                        ? userCampaigns.length < 2
-                            ? 'hide-migrate'
-                            : ''
-                        : 'hide'
-                }
-            >
+            <BtnContainer className={classes}>
                 <div>
                     <Button
                         id="withdraw-btn"
@@ -385,6 +385,19 @@ const BtnContainer = styled.div`
         div {
             flex: 0 0 33.3%;
             &.mid-btn {
+                display: none;
+            }
+        }
+    }
+
+    &.hide-migrate.hide {
+        max-width: 500px;
+        div {
+            flex: 0 0 50%;
+            &.mid-btn {
+                display: none;
+            }
+            .migrate-btn {
                 display: none;
             }
         }
