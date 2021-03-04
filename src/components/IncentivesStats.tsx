@@ -38,7 +38,9 @@ const IncentivesStats = () => {
     } = useStoreActions((state) => state)
 
     const classes = classNames({
-        'hide-migrate': userCampaigns.length <= 1,
+        'hide-migrate':
+            campaignNumber === userCampaigns[0].campaignNumber ||
+            (account && Number(stakedBalance) === 0),
         hide: account && Number(stakedBalance) === 0,
     })
 
