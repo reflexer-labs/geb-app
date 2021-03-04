@@ -80,3 +80,12 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
    }
    ${liquidationQuery}
 }`
+
+export const safeOwnershipQuery = (safeId: string) => `{
+  safes(where: { safeId: "${safeId}" , proxy_not: null, safeId_not: null}) {
+    safeId
+    owner{
+      id
+    }
+  }
+}`

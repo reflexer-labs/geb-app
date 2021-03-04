@@ -114,7 +114,7 @@ const Content = styled.div`
 
 const BtnContainer = styled.div`
     position: absolute;
-    top: 15px;
+    top: 25px;
     right: 0px;
     button {
         min-width: 100px;

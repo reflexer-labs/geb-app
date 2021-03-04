@@ -209,10 +209,6 @@ const SafeBody = ({ isChecked }: Props) => {
         const debtFloorBN = BigNumber.from(toFixedString(debtFloor, 'WAD'))
         const totalDebtBN = BigNumber.from(toFixedString(totalDebt, 'WAD'))
 
-        const accumlatedRateBN = BigNumber.from(
-            toFixedString(accumulatedRate, 'RAY')
-        )
-
         const debtCeilingBN = BigNumber.from(toFixedString(debtCeiling, 'RAD'))
         const globalDebtCeilingBN = globalDebtCeiling
             ? BigNumber.from(toFixedString(globalDebtCeiling, 'RAD'))
@@ -295,7 +291,7 @@ const SafeBody = ({ isChecked }: Props) => {
             defaultSafe.rightInput &&
             !rightInputBN.isZero() &&
             !totalDebtBN.isZero() &&
-            totalDebtBN.mul(accumlatedRateBN).lt(debtFloorBN.mul(gebUtils.RAY))
+            totalDebtBN.lt(debtFloorBN)
         ) {
             setError(
                 `The resulting debt should be at least ${debtFloor} ${COIN_TICKER} or zero.`
