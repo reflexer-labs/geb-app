@@ -30,7 +30,7 @@ const Incentives = () => {
     const { isRPCAdapterOn } = settingsState
 
     useEffect(() => {
-        if (!geb) return
+        if (!geb || !account) return
         async function fetchIncentivesCampaigns() {
             await incentivesActions.fetchIncentivesCampaigns({
                 address: account as string,

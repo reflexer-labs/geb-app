@@ -30,6 +30,7 @@ import ImagePreloader from '../components/ImagePreloader'
 import AuctionsModal from '../components/Modals/AuctionsModal'
 import AlertLabel from '../components/AlertLabel'
 import useGeb from '../hooks/useGeb'
+import SafeManagerModal from '../components/Modals/SafeManagerModal'
 
 interface Props {
     children: ReactNode
@@ -197,7 +198,7 @@ const Shared = ({ children }: Props) => {
             <CreateAccountModal />
             <ProxyModal />
             <ConnectedWalletModal />
-
+            <SafeManagerModal />
             <ScreenLoader />
             <WaitingModal />
             <EmptyDiv>

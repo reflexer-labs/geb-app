@@ -19,6 +19,7 @@ jobs:
             REACT_APP_COIN_TICKER_PRODUCTION: ${{ secrets.REACT_APP_COIN_TICKER_PRODUCTION }}
             REACT_APP_SYSTEM_STATUS: ${{ secrets.REACT_APP_SYSTEM_STATUS }}
             REACT_APP_GOOGLE_ANALYTICS_ID: ${{ secrets.REACT_APP_GOOGLE_ANALYTICS_ID_PRODUCTION }}
+            REACT_APP_SENTRY_KEY: ${{ secrets.REACT_APP_SENTRY_KEY_PRODUCTION }}
 
         steps:
             - uses: actions/checkout@v2

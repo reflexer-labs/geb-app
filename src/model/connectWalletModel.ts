@@ -47,8 +47,8 @@ const blockNumberState = localStorage.getItem('blockNumber')
 
 const connectWalletModel: ConnectWalletModel = {
     blockNumber: blockNumberState ? JSON.parse(blockNumberState) : {},
-    ethBalance: {},
-    raiBalance: {},
+    ethBalance: { 1: 0, 42: 0 },
+    raiBalance: { 1: '0', 42: '0' },
     fiatPrice: 0,
     ethPriceChange: 0,
     step: 0,

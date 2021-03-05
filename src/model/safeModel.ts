@@ -8,6 +8,7 @@ import {
     ISafeHistory,
     IFetchSafesPayload,
     IFetchSafeById,
+    IManageSafe,
 } from '../utils/interfaces'
 import {
     handleCollectETH,
@@ -16,6 +17,7 @@ import {
 } from '../services/blockchain'
 import {
     fetchDebtFloor,
+    fetchManagedSafe,
     fetchSafeById,
     fetchUserSafes,
 } from '../services/graphql'
@@ -30,6 +32,7 @@ export interface SafeModel {
     singleSafe: ISafe | null
     operation: number
     totalEth: string
+    managedSafe: IManageSafe
     totalRAI: string
     isES: boolean
     isUniSwapPoolChecked: boolean
@@ -55,6 +58,7 @@ export interface SafeModel {
     fetchSafeById: Thunk<SafeModel, IFetchSafeById, any, StoreModel>
     fetchUserSafes: Thunk<SafeModel, IFetchSafesPayload, any, StoreModel>
     fetchDebtFloor: Thunk<SafeModel>
+    fetchManagedSafe: Thunk<SafeModel, string>
     collectETH: Thunk<
         SafeModel,
         { signer: JsonRpcSigner; safe: ISafe },
@@ -76,12 +80,19 @@ export interface SafeModel {
     setSafeHistoryList: Action<SafeModel, Array<ISafeHistory>>
     setIsSuccessfulTx: Action<SafeModel, boolean>
     setDebtFloor: Action<SafeModel, string>
+    setManagedSafe: Action<SafeModel, IManageSafe>
 }
 
 const safeModel: SafeModel = {
     list: [],
     safeCreated: false,
     operation: 0,
+    managedSafe: {
+        safeId: '',
+        owner: {
+            id: '',
+        },
+    },
     singleSafe: null,
     totalEth: '0.00',
     totalRAI: '0.00',
@@ -272,10 +283,20 @@ const safeModel: SafeModel = {
 
     fetchDebtFloor: thunk(async (actions) => {
         const res = await fetchDebtFloor()
-        actions.setDebtFloor(res)
-        return res
+        if (res) {
+            actions.setDebtFloor(res)
+            return res
+        }
     }),
-
+    fetchManagedSafe: thunk(async (actions, payload) => {
+        const res = await fetchManagedSafe(payload)
+        if (res) {
+            if (res.safes.length > 0) {
+                actions.setManagedSafe(res.safes[0])
+            }
+            return res
+        }
+    }),
     setIsSafeCreated: action((state, payload) => {
         state.safeCreated = payload
     }),
@@ -322,6 +343,9 @@ const safeModel: SafeModel = {
     }),
     setDebtFloor: action((state, payload) => {
         state.debtFloor = payload
+    }),
+    setManagedSafe: action((state, payload) => {
+        state.managedSafe = payload
     }),
 }
 

@@ -3,6 +3,7 @@ import { StoreModel } from '.'
 import {
     handleIncentiveClaim,
     handleIncentiveDeposit,
+    handleIncentiveMigrate,
     handleIncentiveWithdraw,
 } from '../services/blockchain'
 import { fetchIncentivesCampaigns } from '../services/graphql'
@@ -13,6 +14,7 @@ import {
     IIncentiveClaim,
     IIncentiveWithdraw,
     IIncentivesConfig,
+    IIncentivesMigrate,
 } from '../utils/interfaces'
 
 const INITIAL_STATE = {
@@ -22,6 +24,10 @@ const INITIAL_STATE = {
 export interface IncentivesModel {
     operation: number
     type: string
+    migrate: {
+        from: string
+        to: string
+    }
     isUniSwapShareChecked: boolean
     claimableFLX: string
     uniswapShare: string
@@ -44,6 +50,12 @@ export interface IncentivesModel {
         any,
         StoreModel
     >
+    incentiveMigrate: Thunk<
+        IncentivesModel,
+        IIncentivesMigrate,
+        any,
+        StoreModel
+    >
     setOperation: Action<IncentivesModel, number>
     setType: Action<IncentivesModel, string>
     setIncentivesCampaignData: Action<IncentivesModel, IIncentivesCampaignData>
@@ -54,10 +66,15 @@ export interface IncentivesModel {
     setUniswapShare: Action<IncentivesModel, string>
     setIsUniSwapShareChecked: Action<IncentivesModel, boolean>
     setAllowanceType: Action<IncentivesModel, string>
+    setMigration: Action<IncentivesModel, { from: string; to: string }>
 }
 const incentivesModel: IncentivesModel = {
     operation: 0,
     type: 'withdraw',
+    migrate: {
+        from: '',
+        to: '',
+    },
     incentivesFields: INITIAL_STATE,
     claimableFLX: '0.00',
     uniswapShare: '',
@@ -187,6 +204,30 @@ const incentivesModel: IncentivesModel = {
             await txResponse.wait()
         }
     }),
+    incentiveMigrate: thunk(async (actions, payload, { getStoreActions }) => {
+        const storeActions = getStoreActions()
+        const txResponse = await handleIncentiveMigrate(payload)
+        if (txResponse) {
+            const { hash, chainId } = txResponse
+            storeActions.transactionsModel.addTransaction({
+                chainId,
+                hash,
+                from: txResponse.from,
+                summary: 'Incentive Migrate',
+                addedTime: new Date().getTime(),
+                originalTx: txResponse,
+            })
+            storeActions.popupsModel.setIsWaitingModalOpen(true)
+            storeActions.popupsModel.setWaitingPayload({
+                title: 'Transaction Submitted',
+                hash: txResponse.hash,
+                status: 'success',
+            })
+            actions.setOperation(0)
+            actions.setMigration({ from: '', to: '' })
+            await txResponse.wait()
+        }
+    }),
     setType: action((state, payload) => {
         state.type = payload
     }),
@@ -213,6 +254,9 @@ const incentivesModel: IncentivesModel = {
     }),
     setAllowanceType: action((state, payload) => {
         state.allowanceType = payload
+    }),
+    setMigration: action((state, payload) => {
+        state.migrate = payload
     }),
 }
 
