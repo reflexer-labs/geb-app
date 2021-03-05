@@ -28,6 +28,7 @@ import {
 } from '../../utils/constants'
 import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
+import { useActiveWeb3React } from '../../hooks'
 
 interface Props {
     isChecked?: boolean
@@ -35,9 +36,11 @@ interface Props {
 
 const SafeBody = ({ isChecked }: Props) => {
     const { t } = useTranslation()
+    const { account } = useActiveWeb3React()
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || false)
     const [error, setError] = useState('')
+    const [isOwner, setIsOwner] = useState(true)
     const [defaultSafe, setDefaultSafe] = useState<ISafeData>(
         DEFAULT_SAFE_STATE
     )
@@ -118,7 +121,7 @@ const SafeBody = ({ isChecked }: Props) => {
                 return singleSafe.collateral
             }
         }
-        return ''
+        return '0'
     }
 
     const getAvailableRai = () => {
@@ -144,7 +147,7 @@ const SafeBody = ({ isChecked }: Props) => {
                 ) as string
             }
         }
-        return ''
+        return '0'
     }
 
     const returnInputType = (isLeft = true) => {
@@ -208,10 +211,6 @@ const SafeBody = ({ isChecked }: Props) => {
 
         const debtFloorBN = BigNumber.from(toFixedString(debtFloor, 'WAD'))
         const totalDebtBN = BigNumber.from(toFixedString(totalDebt, 'WAD'))
-
-        const accumlatedRateBN = BigNumber.from(
-            toFixedString(accumulatedRate, 'RAY')
-        )
 
         const debtCeilingBN = BigNumber.from(toFixedString(debtCeiling, 'RAD'))
         const globalDebtCeilingBN = globalDebtCeiling
@@ -295,7 +294,7 @@ const SafeBody = ({ isChecked }: Props) => {
             defaultSafe.rightInput &&
             !rightInputBN.isZero() &&
             !totalDebtBN.isZero() &&
-            totalDebtBN.mul(accumlatedRateBN).lt(debtFloorBN.mul(gebUtils.RAY))
+            totalDebtBN.lt(debtFloorBN)
         ) {
             setError(
                 `The resulting debt should be at least ${debtFloor} ${COIN_TICKER} or zero.`
@@ -464,6 +463,16 @@ const SafeBody = ({ isChecked }: Props) => {
         setUniSwapVal(uniSwapPool)
     }, [safeData, uniSwapPool])
 
+    useEffect(() => {
+        if (!account || !safeState.managedSafe.owner.id) return
+        if (
+            account.toLowerCase() !==
+            safeState.managedSafe.owner.id.toLowerCase()
+        ) {
+            setIsOwner(false)
+        }
+    }, [account, safeState.managedSafe.owner.id])
+
     return (
         <>
             <Body>
@@ -474,7 +483,9 @@ const SafeBody = ({ isChecked }: Props) => {
                         label={returnInputType()}
                         value={defaultSafe.leftInput}
                         onChange={onChangeLeft}
-                        disabled={isChecked}
+                        disabled={
+                            isChecked || (type === 'repay_withdraw' && !isOwner)
+                        }
                         disableMax={type !== 'repay_withdraw'}
                         handleMaxClick={() =>
                             onChangeLeft(getAvailableEth().toString())
@@ -484,7 +495,9 @@ const SafeBody = ({ isChecked }: Props) => {
                         label={returnInputType(false)}
                         value={defaultSafe.rightInput}
                         onChange={onChangeRight}
-                        disabled={isChecked}
+                        disabled={
+                            isChecked || (type === 'deposit_borrow' && !isOwner)
+                        }
                         disableMax={type !== 'repay_withdraw'}
                         handleMaxClick={handleMaxRai}
                     />

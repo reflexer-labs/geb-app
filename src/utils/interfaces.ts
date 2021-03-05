@@ -516,3 +516,10 @@ export interface IIncentivesMigrate {
     to: string
     signer: JsonRpcSigner
 }
+
+export interface IManageSafe {
+    safeId: string
+    owner: {
+        id: string
+    }
+}

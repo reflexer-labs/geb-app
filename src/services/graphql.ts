@@ -5,6 +5,7 @@ import {
     fetchDebtFloorQuery,
     getSafeByIdQuery,
     getUserSafesListQuery,
+    managedSafeQuery,
 } from '../utils/queries/safe'
 import { GRAPH_API_URLS } from '../utils/constants'
 import { formatUserSafe, formatHistoryArray } from '../utils/helper'
@@ -67,6 +68,7 @@ export const checkSubgraphBlockDiff = async (latesBlockNumber: number) => {
         throw Error('Error with subgraph query: ' + error)
     }
 }
+
 export const fetchDebtFloor = () => {
     return retry(
         async (bail, attempt) => {
@@ -81,6 +83,26 @@ export const fetchDebtFloor = () => {
             }
 
             return res.data.data.collateralType.debtFloor
+        },
+        {
+            retries: GRAPH_API_URLS.length - 1,
+        }
+    )
+}
+
+export const fetchManagedSafe = (safeId: string) => {
+    return retry(
+        async (bail, attempt) => {
+            const res = await axios.post(
+                GRAPH_API_URLS[attempt - 1],
+                JSON.stringify({ query: managedSafeQuery(safeId) })
+            )
+
+            if (!res.data.data && attempt < GRAPH_API_URLS.length) {
+                throw new Error('retry')
+            }
+
+            return res.data.data
         },
         {
             retries: GRAPH_API_URLS.length - 1,
@@ -198,7 +220,7 @@ export const fetchSafeById = async (
             : false
     }
 
-    if (!response) return false
+    if (!response || !response.safes.length) return false
 
     if (returnRaw) return response
 

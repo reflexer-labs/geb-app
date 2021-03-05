@@ -123,5 +123,7 @@
     "rai_bid": "{{rai}} Bid",
     "no_auctions": "No debt auctions to bid into",
     "settle": "Settle",
-    "migrate": "Migrate"
+    "migrate": "Migrate",
+    "manage_other_safes": "Top-up Other Safes",
+    "managed_safe_warning": "CAUTION: You are not the owner of this Safe. You can only deposit collateral or repay debt. Note that these operations are irreversible."
 }

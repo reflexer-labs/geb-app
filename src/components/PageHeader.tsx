@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
+import Button from './Button'
 
 interface IBC {
     [route: string]: string
@@ -8,9 +9,11 @@ interface IBC {
 interface Props {
     text?: string
     breadcrumbs: IBC
+    btnText?: string
+    btnFn?: () => void
 }
 
-const PageHeader = ({ text, breadcrumbs }: Props) => {
+const PageHeader = ({ text, breadcrumbs, btnText, btnFn }: Props) => {
     return (
         <Container>
             <Title>
@@ -21,7 +24,17 @@ const PageHeader = ({ text, breadcrumbs }: Props) => {
                     </TitleBlock>
                 ))}
             </Title>
-            {text ? <Text>{text}</Text> : null}
+            {text ? (
+                <Text>
+                    {text}{' '}
+                    {btnText && btnFn ? (
+                        <>
+                            or{' '}
+                            <Button withArrow text={btnText} onClick={btnFn} />
+                        </>
+                    ) : null}
+                </Text>
+            ) : null}
         </Container>
     )
 }
@@ -50,6 +63,11 @@ const Text = styled.div`
     font-size: 14px;
     line-height: 21px;
     color: ${(props) => props.theme.colors.secondary};
+    button {
+        img {
+            display: none;
+        }
+    }
 `
 
 const TitleBlock = styled.div`

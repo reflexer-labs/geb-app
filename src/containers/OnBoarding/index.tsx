@@ -55,24 +55,51 @@ const OnBoarding = () => {
         getDebtFloor()
     }, [safeActions])
 
+    const handleOpenManageSafes = () => popupsActions.setIsSafeManagerOpen(true)
+
     return (
         <Container id="app-page">
             <GridContainer>
                 <Content>
-                    <PageHeader
-                        breadcrumbs={{
-                            '/': t(
+                    <HeaderContainer>
+                        <PageHeader
+                            breadcrumbs={{
+                                '/': t(
+                                    safeState.safeCreated
+                                        ? 'accounts'
+                                        : 'onboarding'
+                                ),
+                            }}
+                            text={t(
                                 safeState.safeCreated
-                                    ? 'accounts'
-                                    : 'onboarding'
-                            ),
-                        }}
-                        text={t(
-                            safeState.safeCreated
-                                ? 'accounts_header_text'
-                                : 'onboarding_header_text'
-                        )}
-                    />
+                                    ? 'accounts_header_text'
+                                    : 'onboarding_header_text'
+                            )}
+                            btnText={
+                                account && safeState.safeCreated
+                                    ? 'top-up other Safes'
+                                    : ''
+                            }
+                            btnFn={
+                                account && safeState.safeCreated
+                                    ? handleOpenManageSafes
+                                    : undefined
+                            }
+                        />
+                    </HeaderContainer>
+                    {account && !safeState.safeCreated ? (
+                        <BtnContainer>
+                            <Button
+                                id="create-safe"
+                                disabled={connectWalletState.isWrongNetwork}
+                                onClick={() =>
+                                    popupsActions.setIsSafeManagerOpen(true)
+                                }
+                            >
+                                <BtnInner>{t('manage_other_safes')}</BtnInner>
+                            </Button>
+                        </BtnContainer>
+                    ) : null}
                     {safeState.safeCreated ? (
                         <BtnContainer>
                             <Button
@@ -114,7 +141,7 @@ const Content = styled.div`
 
 const BtnContainer = styled.div`
     position: absolute;
-    top: 15px;
+    top: 25px;
     right: 0px;
     button {
         min-width: 100px;
@@ -126,4 +153,8 @@ const BtnInner = styled.div`
     display: flex;
     align-items: center;
     gap: 5px;
+`
+
+const HeaderContainer = styled.div`
+    position: relative;
 `
