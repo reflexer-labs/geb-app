@@ -26,6 +26,7 @@ import Incentives from './containers/Incentives'
 import Auctions from './containers/Auctions'
 import { NETWORK_ID } from './connectors'
 import GoogleTagManager from './components/Analytics/GoogleTagManager'
+import EmergencyShutdown from './containers/EmergencyShutdown'
 
 // Toast css
 
@@ -54,6 +55,11 @@ const App = () => {
                                 <Route component={GoogleTagManager} />
                                 <Web3ReactManager>
                                     <Switch>
+                                        <Route
+                                            exact
+                                            component={EmergencyShutdown}
+                                            path={'/esm'}
+                                        />
                                         <Route
                                             exact
                                             component={Auctions}

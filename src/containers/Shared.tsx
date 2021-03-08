@@ -31,6 +31,7 @@ import AuctionsModal from '../components/Modals/AuctionsModal'
 import AlertLabel from '../components/AlertLabel'
 import useGeb from '../hooks/useGeb'
 import SafeManagerModal from '../components/Modals/SafeManagerModal'
+import ESMOperationModal from '../components/Modals/ESMOperationModal'
 
 interface Props {
     children: ReactNode
@@ -189,6 +190,7 @@ const Shared = ({ children }: Props) => {
             <ApplicationUpdater />
             <BalanceUpdater />
             <TransactionUpdater />
+            <ESMOperationModal />
             <LoadingModal />
             <IncentivesModal />
             <AuctionsModal />

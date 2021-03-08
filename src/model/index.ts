@@ -5,6 +5,7 @@ import safeModel, { SafeModel } from './safeModel'
 import transactionsModel, { TransactionsModel } from './transactionsModel'
 import incentivesModel, { IncentivesModel } from './IncentivesModel'
 import auctionsModel, { AuctionsModel } from './auctionsModel'
+import esmModel, { EsmModel } from './esmModel'
 
 export interface StoreModel {
     settingsModel: SettingsModel
@@ -14,6 +15,7 @@ export interface StoreModel {
     transactionsModel: TransactionsModel
     incentivesModel: IncentivesModel
     auctionsModel: AuctionsModel
+    esmModel: EsmModel
 }
 
 const model: StoreModel = {
@@ -24,6 +26,7 @@ const model: StoreModel = {
     transactionsModel,
     incentivesModel,
     auctionsModel,
+    esmModel,
 }
 
 export default model

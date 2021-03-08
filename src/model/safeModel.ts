@@ -31,10 +31,7 @@ export interface SafeModel {
     safeCreated: boolean
     singleSafe: ISafe | null
     operation: number
-    totalEth: string
     managedSafe: IManageSafe
-    totalRAI: string
-    isES: boolean
     isUniSwapPoolChecked: boolean
     stage: number
     debtFloor: string
@@ -69,9 +66,6 @@ export interface SafeModel {
     setList: Action<SafeModel, Array<ISafe>>
     setSingleSafe: Action<SafeModel, ISafe | null>
     setOperation: Action<SafeModel, number>
-    setTotalEth: Action<SafeModel, string>
-    setTotalRAI: Action<SafeModel, string>
-    setIsES: Action<SafeModel, boolean>
     setLiquidationData: Action<SafeModel, ILiquidationData>
     setSafeData: Action<SafeModel, ISafeData>
     setUniSwapPool: Action<SafeModel, ISafeData>
@@ -94,10 +88,9 @@ const safeModel: SafeModel = {
         },
     },
     singleSafe: null,
-    totalEth: '0.00',
-    totalRAI: '0.00',
+
     isSuccessfulTx: true,
-    isES: true,
+
     isUniSwapPoolChecked: true,
     stage: 0,
     debtFloor: '',
@@ -308,15 +301,6 @@ const safeModel: SafeModel = {
     }),
     setOperation: action((state, payload) => {
         state.operation = payload
-    }),
-    setTotalEth: action((state, payload) => {
-        state.totalEth = payload
-    }),
-    setTotalRAI: action((state, payload) => {
-        state.totalRAI = payload
-    }),
-    setIsES: action((state, payload) => {
-        state.isES = payload
     }),
 
     setLiquidationData: action((state, payload) => {

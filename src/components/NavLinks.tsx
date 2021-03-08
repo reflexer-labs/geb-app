@@ -58,6 +58,10 @@ const NavLinks = () => {
                 </NavBarLink>
             )}
 
+            <NavBarLink to="/esm" onClick={(e) => handleLinkClick(e, false)}>
+                {t('ESM')}
+            </NavBarLink>
+
             <Box className="has-menu">
                 <LinkItem>
                     <Shield /> {t('insurance')}
