@@ -12,6 +12,7 @@ export interface PopupsModel {
     isConnectedWalletModalOpen: boolean
     isConnectorsWalletOpen: boolean
     showSideMenu: boolean
+    isSafeManagerOpen: boolean
     returnProxyFunction: (actions: any) => void | null
     blockBackdrop: boolean
     isProxyModalOpen: boolean
@@ -45,6 +46,7 @@ export interface PopupsModel {
     setWaitingPayload: Action<PopupsModel, IWaitingPayload>
     setBlockBackdrop: Action<PopupsModel, boolean>
     setIsProxyModalOpen: Action<PopupsModel, boolean>
+    setIsSafeManagerOpen: Action<PopupsModel, boolean>
     setReturnProxyFunction: Action<
         PopupsModel,
         (storeActions: any) => void | null
@@ -60,6 +62,7 @@ const popupsModel: PopupsModel = {
     isScreenModalOpen: false,
     isIncentivesModalOpen: false,
     isWaitingModalOpen: false,
+    isSafeManagerOpen: false,
     returnProxyFunction: () => {},
     waitingPayload: {
         title: '',
@@ -155,6 +158,9 @@ const popupsModel: PopupsModel = {
     }),
     setReturnProxyFunction: action((state, payload) => {
         state.returnProxyFunction = payload
+    }),
+    setIsSafeManagerOpen: action((state, payload) => {
+        state.isSafeManagerOpen = payload
     }),
 }
 

@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { useStoreActions, useStoreState } from '../store'
 import Button from './Button'
 import ReactTooltip from 'react-tooltip'
+import classNames from 'classnames'
 import Arrow from './Icons/Arrow'
 import { useUserCampaigns, useSelectedCampaign } from '../hooks/useIncentives'
 import { useActiveWeb3React } from '../hooks'
@@ -35,6 +36,13 @@ const IncentivesStats = () => {
         popupsModel: popupsActions,
         incentivesModel: incentivesActions,
     } = useStoreActions((state) => state)
+
+    const classes = classNames({
+        'hide-migrate':
+            campaignNumber === userCampaigns[0].campaignNumber ||
+            (account && Number(stakedBalance) === 0),
+        hide: account && Number(stakedBalance) === 0,
+    })
 
     const handleClick = (type: string) => {
         if (!account) {
@@ -167,15 +175,22 @@ const IncentivesStats = () => {
                 <ReactTooltip multiline type="light" data-effect="solid" />
             </StatsGrid>
 
-            <BtnContainer
-                className={account && Number(stakedBalance) !== 0 ? '' : 'hide'}
-            >
+            <BtnContainer className={classes}>
                 <div>
                     <Button
                         id="withdraw-btn"
                         text={t('withdraw')}
                         onClick={() => handleClick('withdraw')}
                         dimmed
+                    />
+                </div>
+
+                <div className="migrate-btn">
+                    <Button
+                        id="migrate-btn"
+                        text={t('migrate')}
+                        onClick={() => handleClick('migrate')}
+                        withArrow
                     />
                 </div>
 
@@ -326,7 +341,7 @@ const BtnContainer = styled.div`
     margin: 20px auto 35px;
 
     div {
-        flex: 0 0 33.3%;
+        flex: 0 0 25%;
         text-align: center;
         &:first-child {
             border-right: 1px solid ${(props) => props.theme.colors.border};
@@ -350,11 +365,39 @@ const BtnContainer = styled.div`
         }
     }
 
+    #migrate-btn {
+        border-right: 1px solid ${(props) => props.theme.colors.border};
+        img {
+            display: none;
+        }
+    }
+    &.hide-migrate {
+        div {
+            flex: 0 0 33.3%;
+        }
+        .migrate-btn {
+            display: none;
+        }
+    }
+
     &.hide {
+        max-width: 500px;
+        div {
+            flex: 0 0 33.3%;
+            &.mid-btn {
+                display: none;
+            }
+        }
+    }
+
+    &.hide-migrate.hide {
         max-width: 500px;
         div {
             flex: 0 0 50%;
             &.mid-btn {
+                display: none;
+            }
+            .migrate-btn {
                 display: none;
             }
         }

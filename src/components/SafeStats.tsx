@@ -10,6 +10,9 @@ import { handleTransactionError } from '../hooks/TransactionHooks'
 import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
 
+interface Props {
+    isNotOwner: boolean
+}
 const SafeStats = () => {
     const { t } = useTranslation()
     const { library, account } = useActiveWeb3React()

@@ -30,6 +30,7 @@ import ImagePreloader from '../components/ImagePreloader'
 import AuctionsModal from '../components/Modals/AuctionsModal'
 import AlertLabel from '../components/AlertLabel'
 import useGeb from '../hooks/useGeb'
+import SafeManagerModal from '../components/Modals/SafeManagerModal'
 
 interface Props {
     children: ReactNode
@@ -94,10 +95,6 @@ const Shared = ({ children }: Props) => {
             await timeout(200)
             if (!connectWalletState.ctHash) {
                 connectWalletActions.setStep(2)
-                await safeActions.fetchUserSafes({
-                    address: account as string,
-                    geb,
-                })
             }
         } catch (error) {
             safeActions.setIsSafeCreated(false)
@@ -129,6 +126,7 @@ const Shared = ({ children }: Props) => {
         accountChange()
         const id: ChainId = NETWORK_ID
         connectWalletActions.fetchFiatPrice()
+        popupsActions.setIsSafeManagerOpen(false)
         if (chainId && chainId !== id) {
             const chainName = ETHERSCAN_PREFIXES[id]
             connectWalletActions.setIsWrongNetwork(true)
@@ -197,7 +195,7 @@ const Shared = ({ children }: Props) => {
             <CreateAccountModal />
             <ProxyModal />
             <ConnectedWalletModal />
-
+            <SafeManagerModal />
             <ScreenLoader />
             <WaitingModal />
             <EmptyDiv>

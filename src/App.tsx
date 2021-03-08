@@ -79,6 +79,11 @@ const App = () => {
                                         <Route
                                             exact
                                             component={OnBoarding}
+                                            path={'/:address'}
+                                        />
+                                        <Route
+                                            exact
+                                            component={OnBoarding}
                                             path={'/'}
                                         />
                                         <Redirect from="*" to="/" />

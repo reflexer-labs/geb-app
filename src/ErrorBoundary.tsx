@@ -1,9 +1,12 @@
 import React from 'react'
 import styled from 'styled-components'
+import * as Sentry from '@sentry/react'
+import Button from './components/Button'
 
 interface State {
     error: string | null
     errorInfo: any
+    eventId: any
 }
 
 interface Props {
@@ -11,12 +14,19 @@ interface Props {
 }
 
 class ErrorBoundary extends React.Component<Props, State> {
-    state: State = { error: null, errorInfo: null }
+    state: State = { error: null, errorInfo: null, eventId: null }
 
     componentDidCatch(error: any, errorInfo: any) {
         this.setState({
-            error: error,
-            errorInfo: errorInfo,
+            error,
+            errorInfo,
+        })
+        Sentry.withScope((scope) => {
+            scope.setExtras(errorInfo)
+            const eventId = Sentry.captureException(error)
+            this.setState({
+                eventId,
+            })
         })
     }
 
@@ -28,6 +38,16 @@ class ErrorBoundary extends React.Component<Props, State> {
                     <Content>
                         <img src={require('./assets/error.svg')} alt="" />
                         <h2>Something went wrong.</h2>
+                        <br />
+                        <Button
+                            onClick={() =>
+                                Sentry.showReportDialog({
+                                    eventId: this.state.eventId,
+                                })
+                            }
+                        >
+                            Report Feedback
+                        </Button>
                         <Details>
                             {this.state.error && this.state.error.toString()}
                             <br />
