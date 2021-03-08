@@ -95,10 +95,6 @@ const Shared = ({ children }: Props) => {
             await timeout(200)
             if (!connectWalletState.ctHash) {
                 connectWalletActions.setStep(2)
-                await safeActions.fetchUserSafes({
-                    address: account as string,
-                    geb,
-                })
             }
         } catch (error) {
             safeActions.setIsSafeCreated(false)

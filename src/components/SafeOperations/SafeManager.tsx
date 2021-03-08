@@ -1,40 +1,53 @@
+import { isAddress } from '@ethersproject/address'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
-import { useStoreActions } from '../../store'
+import useGeb from '../../hooks/useGeb'
+import { fetchUserSafes } from '../../services/graphql'
+import { useStoreActions, useStoreState } from '../../store'
+import { timeout } from '../../utils/helper'
 import Button from '../Button'
-import DecimalInput from '../DecimalInput'
 
 const SafeManager = () => {
     const { t } = useTranslation()
+    const geb = useGeb()
     const [error, setError] = useState('')
     const [value, setValue] = useState('')
 
     const history = useHistory()
 
-    const {
-        popupsModel: popupsActions,
-        safeModel: safeActions,
-    } = useStoreActions((state) => state)
+    const { settingsModel: settingsState } = useStoreState((state) => state)
+
+    const { popupsModel: popupsActions } = useStoreActions((state) => state)
+
+    const { isRPCAdapterOn } = settingsState
 
     const handleCancel = () => {
         popupsActions.setIsSafeManagerOpen(false)
     }
 
     const handleSubmit = async () => {
-        if (!value) {
-            setError('Enter Safe ID')
+        if (!value || (value && !isAddress(value))) {
+            setError('Enter a valid ETH address')
             return
         }
+
         try {
-            const safeData = await safeActions.fetchManagedSafe(value)
-            if (safeData && !safeData.safes.length) {
-                setError('Not a valid Safe ID')
+            const userSafes = await fetchUserSafes(
+                { address: value, geb, isRPCAdapterOn },
+                true
+            )
+
+            if (!userSafes || (userSafes && !userSafes.safes.length)) {
+                setError('Address has no Safes')
                 return
             }
+            popupsActions.setIsWaitingModalOpen(true)
+            history.push(`/${value}`)
             handleCancel()
-            history.push(`/safes/${safeData.safes[0].safeId}`)
+            await timeout(3000)
+            popupsActions.setIsWaitingModalOpen(false)
         } catch (error) {
             console.log(error)
         }
@@ -42,12 +55,11 @@ const SafeManager = () => {
 
     return (
         <Body>
-            <DecimalInput
+            <Label>ETH Address</Label>
+            <CustomInput
                 value={value}
-                placeholder={'ie: 32'}
-                label={'Safe ID'}
-                onChange={setValue}
-                disableMax
+                placeholder={'Enter a valid ETH address'}
+                onChange={(e) => setValue(e.target.value)}
             />
 
             {error && <Error>{error}</Error>}
@@ -81,4 +93,27 @@ const Error = styled.p`
     font-size: ${(props) => props.theme.font.extraSmall};
     width: 100%;
     margin: 16px 0;
+`
+
+const CustomInput = styled.input`
+    font-size: ${(props) => props.theme.font.default};
+    transition: all 0.3s ease;
+    width: 100%;
+    padding: 20px;
+    background: ${(props) => props.theme.colors.background};
+    color: ${(props) => props.theme.colors.primary};
+    line-height: 24px;
+    outline: none;
+    border: 1px solid ${(props) => props.theme.colors.border};
+    border-radius: ${(props) => props.theme.global.borderRadius};
+    transition: all 0.3s ease;
+`
+
+const Label = styled.div`
+    line-height: 21px;
+    color: ${(props) => props.theme.colors.secondary};
+    font-size: ${(props) => props.theme.font.small};
+    letter-spacing: -0.09px;
+    margin-bottom: 4px;
+    text-transform: capitalize;
 `
