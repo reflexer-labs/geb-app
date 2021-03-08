@@ -583,7 +583,12 @@ const SafeBody = ({ isChecked }: Props) => {
                                 </InfoIcon>
                             </Label>{' '}
                             <Value>{`$${
-                                liquidationPrice > 0 ? liquidationPrice : 0
+                                liquidationPrice > 0
+                                    ? (liquidationPrice as number) >
+                                      Number(currentPrice.value)
+                                        ? 'Invalid'
+                                        : liquidationPrice
+                                    : 0
                             }`}</Value>
                         </Item>
                         <Item>

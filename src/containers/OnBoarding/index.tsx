@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { Plus } from 'react-feather'
@@ -10,9 +10,11 @@ import SafeList from './SafeList'
 import Button from '../../components/Button'
 import useGeb from '../../hooks/useGeb'
 import { useActiveWeb3React } from '../../hooks'
+import { isAddress } from '@ethersproject/address'
 
-const OnBoarding = () => {
+const OnBoarding = ({ ...props }) => {
     const { t } = useTranslation()
+    const [isOwner, setIsOwner] = useState(true)
     const { account, library } = useActiveWeb3React()
     const geb = useGeb()
 
@@ -29,12 +31,19 @@ const OnBoarding = () => {
 
     const { isRPCAdapterOn } = settingsState
 
+    const address: string = props.match.params.address ?? ''
+
     useEffect(() => {
-        if (!account || !library) return
+        if (
+            (!account && !address) ||
+            (address && !isAddress(address.toLowerCase())) ||
+            !library
+        )
+            return
 
         async function fetchSafes() {
             await safeActions.fetchUserSafes({
-                address: account as string,
+                address: address || (account as string),
                 geb,
                 isRPCAdapterOn,
             })
@@ -46,7 +55,7 @@ const OnBoarding = () => {
         }, ms)
 
         return () => clearInterval(interval)
-    }, [account, library, safeActions, isRPCAdapterOn, geb])
+    }, [account, library, safeActions, isRPCAdapterOn, geb, address])
 
     useEffect(() => {
         async function getDebtFloor() {
@@ -54,6 +63,12 @@ const OnBoarding = () => {
         }
         getDebtFloor()
     }, [safeActions])
+
+    useEffect(() => {
+        if (account && address) {
+            setIsOwner(account.toLowerCase() === address.toLowerCase())
+        }
+    }, [address, account])
 
     const handleOpenManageSafes = () => popupsActions.setIsSafeManagerOpen(true)
 
@@ -76,21 +91,20 @@ const OnBoarding = () => {
                                     : 'onboarding_header_text'
                             )}
                             btnText={
-                                account && safeState.safeCreated
-                                    ? 'top-up other Safes'
+                                account && safeState.safeCreated && isOwner
+                                    ? 'view / top-up other Safes'
                                     : ''
                             }
                             btnFn={
-                                account && safeState.safeCreated
+                                account && safeState.safeCreated && isOwner
                                     ? handleOpenManageSafes
                                     : undefined
                             }
                         />
                     </HeaderContainer>
-                    {account && !safeState.safeCreated ? (
+                    {(account && !safeState.safeCreated) || !isOwner ? (
                         <BtnContainer>
                             <Button
-                                id="create-safe"
                                 disabled={connectWalletState.isWrongNetwork}
                                 onClick={() =>
                                     popupsActions.setIsSafeManagerOpen(true)
@@ -100,7 +114,7 @@ const OnBoarding = () => {
                             </Button>
                         </BtnContainer>
                     ) : null}
-                    {safeState.safeCreated ? (
+                    {safeState.safeCreated && isOwner ? (
                         <BtnContainer>
                             <Button
                                 id="create-safe"

@@ -95,10 +95,6 @@ const Shared = ({ children }: Props) => {
             await timeout(200)
             if (!connectWalletState.ctHash) {
                 connectWalletActions.setStep(2)
-                await safeActions.fetchUserSafes({
-                    address: account as string,
-                    geb,
-                })
             }
         } catch (error) {
             safeActions.setIsSafeCreated(false)
@@ -130,6 +126,7 @@ const Shared = ({ children }: Props) => {
         accountChange()
         const id: ChainId = NETWORK_ID
         connectWalletActions.fetchFiatPrice()
+        popupsActions.setIsSafeManagerOpen(false)
         if (chainId && chainId !== id) {
             const chainName = ETHERSCAN_PREFIXES[id]
             connectWalletActions.setIsWrongNetwork(true)

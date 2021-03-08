@@ -84,12 +84,11 @@ const SafeDetails = ({ ...props }) => {
     ])
 
     useEffect(() => {
-        if (!account || !safeState.managedSafe.owner.id) return
-        if (
-            account.toLowerCase() !==
-            safeState.managedSafe.owner.id.toLowerCase()
-        ) {
-            setIsOwner(false)
+        if (account && safeState.managedSafe.owner.id) {
+            setIsOwner(
+                account.toLowerCase() ===
+                    safeState.managedSafe.owner.id.toLowerCase()
+            )
         }
     }, [account, safeState.managedSafe.owner.id])
 

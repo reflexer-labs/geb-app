@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
+        "@ethersproject/address": "^5.0.10",
         "@ethersproject/experimental": "^5.0.1",
         "@sentry/react": "^6.2.1",
         "@sentry/tracing": "^6.2.1",
