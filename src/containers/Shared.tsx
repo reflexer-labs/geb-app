@@ -126,6 +126,7 @@ const Shared = ({ children }: Props) => {
         accountChange()
         const id: ChainId = NETWORK_ID
         connectWalletActions.fetchFiatPrice()
+        popupsActions.setIsSafeManagerOpen(false)
         if (chainId && chainId !== id) {
             const chainName = ETHERSCAN_PREFIXES[id]
             connectWalletActions.setIsWrongNetwork(true)

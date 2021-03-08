@@ -65,9 +65,8 @@ const OnBoarding = ({ ...props }) => {
     }, [safeActions])
 
     useEffect(() => {
-        if (!account || !address) return
-        if (account.toLowerCase() !== address.toLowerCase()) {
-            setIsOwner(false)
+        if (account && address) {
+            setIsOwner(account.toLowerCase() === address.toLowerCase())
         }
     }, [address, account])
 
@@ -93,7 +92,7 @@ const OnBoarding = ({ ...props }) => {
                             )}
                             btnText={
                                 account && safeState.safeCreated && isOwner
-                                    ? 'top-up other Safes'
+                                    ? 'view / top-up other Safes'
                                     : ''
                             }
                             btnFn={
@@ -106,7 +105,6 @@ const OnBoarding = ({ ...props }) => {
                     {(account && !safeState.safeCreated) || !isOwner ? (
                         <BtnContainer>
                             <Button
-                                id="create-safe"
                                 disabled={connectWalletState.isWrongNetwork}
                                 onClick={() =>
                                     popupsActions.setIsSafeManagerOpen(true)
@@ -116,7 +114,7 @@ const OnBoarding = ({ ...props }) => {
                             </Button>
                         </BtnContainer>
                     ) : null}
-                    {safeState.list.length && isOwner ? (
+                    {safeState.safeCreated && isOwner ? (
                         <BtnContainer>
                             <Button
                                 id="create-safe"

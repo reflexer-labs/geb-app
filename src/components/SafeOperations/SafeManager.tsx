@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
+import { useActiveWeb3React } from '../../hooks'
 import useGeb from '../../hooks/useGeb'
 import { fetchUserSafes } from '../../services/graphql'
 import { useStoreActions, useStoreState } from '../../store'
@@ -11,6 +12,7 @@ import Button from '../Button'
 
 const SafeManager = () => {
     const { t } = useTranslation()
+    const { account } = useActiveWeb3React()
     const geb = useGeb()
     const [error, setError] = useState('')
     const [value, setValue] = useState('')
@@ -30,6 +32,11 @@ const SafeManager = () => {
     const handleSubmit = async () => {
         if (!value || (value && !isAddress(value))) {
             setError('Enter a valid ETH address')
+            return
+        }
+
+        if (account && value.toLowerCase() === account.toLowerCase()) {
+            setError('Cannot use your own address')
             return
         }
 
