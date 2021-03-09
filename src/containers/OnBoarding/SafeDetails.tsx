@@ -9,7 +9,6 @@ import SafeStats from '../../components/SafeStats'
 import { useActiveWeb3React } from '../../hooks'
 import useGeb from '../../hooks/useGeb'
 import { useStoreActions, useStoreState } from '../../store'
-import { timeout } from '../../utils/helper'
 import { isNumeric } from '../../utils/validations'
 
 const SafeDetails = ({ ...props }) => {
@@ -46,12 +45,7 @@ const SafeDetails = ({ ...props }) => {
                 geb,
                 isRPCAdapterOn,
             })
-            const safeData = await safeActions.fetchManagedSafe(safeId)
-            if (safeData && !safeData.safes.length) {
-                await timeout(200)
-                props.history.push('/')
-                return
-            }
+            await safeActions.fetchManagedSafe(safeId)
             popupsActions.setIsWaitingModalOpen(false)
         }
 
