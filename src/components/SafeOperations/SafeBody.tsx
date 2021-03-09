@@ -92,17 +92,11 @@ const SafeBody = ({ isChecked }: Props) => {
 
     const getTotalDebt = () => {
         if (singleSafe) {
-            if (type === 'repay_withdraw') {
-                return returnTotalValue(
-                    returnTotalDebt(singleSafe.debt, accumulatedRate) as string,
-                    defaultSafe.rightInput,
-                    true,
-                    true
-                ).toString()
-            }
             return returnTotalValue(
-                singleSafe.debt,
-                defaultSafe.rightInput
+                returnTotalDebt(singleSafe.debt, accumulatedRate) as string,
+                defaultSafe.rightInput,
+                true,
+                true
             ).toString()
         }
         return defaultSafe.rightInput
