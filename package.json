@@ -34,6 +34,7 @@
         "numeral": "^2.0.6",
         "query-string": "^6.13.5",
         "react": "^16.13.1",
+        "react-confetti": "^6.0.1",
         "react-cookie-consent": "^5.2.0",
         "react-copy-to-clipboard": "^5.0.2",
         "react-custom-scrollbars": "^4.2.1",

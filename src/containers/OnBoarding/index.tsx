@@ -161,6 +161,12 @@ const BtnContainer = styled.div`
         min-width: 100px;
         padding: 4px 12px;
     }
+
+    ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+    position:static;
+    margin:0 0 10px 0
+    
+  `}
 `
 
 const BtnInner = styled.div`

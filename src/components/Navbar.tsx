@@ -44,6 +44,22 @@ const Navbar = () => {
                 <NavLinks />
             </HideMobile>
             <RightSide>
+                {active && account ? (
+                    <FLXButton
+                        onClick={() =>
+                            popupsActions.setIsDistributionsModalOpen(true)
+                        }
+                    >
+                        <Balance>15.32</Balance>
+                        <FLXInfo>
+                            <img
+                                src={require('../assets/flx-logo@2x.png')}
+                                alt="FLX token logo"
+                            />
+                            FLX
+                        </FLXInfo>
+                    </FLXButton>
+                ) : null}
                 <BtnContainer>
                     <Button
                         id="web3-status-connected"
@@ -110,6 +126,8 @@ const MenuBtn = styled.div`
 `
 
 const BtnContainer = styled.div`
+    display: flex;
+    align-items: center;
     ${({ theme }) => theme.mediaWidth.upToSmall`
     display: none;
   `}
@@ -151,4 +169,52 @@ const Left = styled.div`
     min-width: 194px;
     display: flex;
     align-items: center;
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+    min-width:auto;
+  `}
+`
+
+const FLXButton = styled.button`
+    box-shadow: none;
+    border: 0;
+    background: transparent;
+    display: flex;
+    padding: 0;
+    outline: none;
+    align-items: center;
+    font-weight: bold;
+    height: 40px;
+    line-height: 24px;
+    position: relative;
+    cursor: pointer;
+    margin-right: 15px;
+`
+const Balance = styled.div`
+    border-radius: 4px;
+    background: ${(props) => props.theme.colors.gradient};
+    color: ${(props) => props.theme.colors.neutral};
+    font-weight: bold;
+    position: relative;
+    font-size: 15px;
+    height: 40px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    margin-right: -10px;
+`
+
+const FLXInfo = styled.div`
+    display: flex;
+    align-items: center;
+    background: #34496c;
+    height: 40px;
+    color: ${(props) => props.theme.colors.neutral};
+    border-radius: 0 4px 4px 0;
+    padding: 0 10px;
+    img {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin: 0 5px;
+    }
 `
