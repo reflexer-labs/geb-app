@@ -50,7 +50,7 @@ const Navbar = () => {
                             popupsActions.setIsDistributionsModalOpen(true)
                         }
                     >
-                        <Balance>15.32</Balance>
+                        <Balance>10.32</Balance>
                         <FLXInfo>
                             <img
                                 src={require('../assets/flx-logo@2x.png')}

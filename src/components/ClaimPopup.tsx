@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { X } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { useActiveWeb3React } from '../hooks'
 import { useStoreActions, useStoreState } from '../store'
+import { timeout } from '../utils/helper'
 import Button from './Button'
 
 const ClaimPopup = () => {
@@ -17,6 +18,16 @@ const ClaimPopup = () => {
         popupsActions.setHasFLXClaim(true)
         popupsActions.setIsDistributionsModalOpen(true)
     }
+
+    useEffect(() => {
+        async function hideModal() {
+            await timeout(10000)
+            popupsActions.setIsClaimPopupOpen(false)
+        }
+        if (popupsState.isClaimPopupOpen) {
+            hideModal()
+        }
+    }, [popupsActions, popupsState.isClaimPopupOpen])
 
     return account && active && popupsState.isClaimPopupOpen ? (
         <Container>
@@ -34,7 +45,7 @@ const ClaimPopup = () => {
                     alt="FLX token logo"
                 />
 
-                <Balance>{'15.32'} FLX</Balance>
+                <Balance>{'13.32'} FLX</Balance>
 
                 <Blocks>
                     <Heading>{t('flx_is_live')}</Heading>

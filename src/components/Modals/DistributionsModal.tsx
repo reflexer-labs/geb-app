@@ -14,6 +14,7 @@ const DistributionsModal = () => {
         popupsActions.setHasFLXClaim(false)
         popupsActions.setIsDistributionsModalOpen(false)
     }
+
     return (
         <Modal
             width={'450px'}
@@ -66,7 +67,7 @@ const DistributionsModal = () => {
                             <Info>
                                 <ClaimTitle>Community Reward #2</ClaimTitle>
                                 <ClaimDesc>
-                                    You have 3 FLX unclaimed tokens
+                                    You have 3.32 FLX unclaimed tokens
                                 </ClaimDesc>
                             </Info>
                             <Action>
