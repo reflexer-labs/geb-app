@@ -26,11 +26,7 @@ const DistributionsModal = () => {
             <Container>
                 <Header>
                     <Title>{t('flx_breakdown')}</Title>
-                    <CloseBtn
-                        onClick={() =>
-                            popupsActions.setIsDistributionsModalOpen(false)
-                        }
-                    >
+                    <CloseBtn onClick={handleClose}>
                         <X color={'white'} />
                     </CloseBtn>
                 </Header>
