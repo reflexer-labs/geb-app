@@ -2,10 +2,12 @@ import React from 'react'
 import { X } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+import { useActiveWeb3React } from '../hooks'
 import { useStoreActions, useStoreState } from '../store'
 import Button from './Button'
 
 const ClaimPopup = () => {
+    const { active, account } = useActiveWeb3React()
     const { t } = useTranslation()
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
     const { popupsModel: popupsState } = useStoreState((state) => state)
@@ -16,7 +18,7 @@ const ClaimPopup = () => {
         popupsActions.setIsDistributionsModalOpen(true)
     }
 
-    return popupsState.isClaimPopupOpen ? (
+    return account && active && popupsState.isClaimPopupOpen ? (
         <Container>
             <Header>
                 <CloseBtn
