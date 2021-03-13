@@ -17,7 +17,7 @@ if (process.env.REACT_APP_SENTRY_KEY) {
     Sentry.init({
         dsn: process.env.REACT_APP_SENTRY_KEY,
         integrations: [new Integrations.BrowserTracing()],
-        tracesSampleRate: 0.1,
+        tracesSampleRate: 1.0,
     })
 }
 
