@@ -10,6 +10,7 @@ import { Integrations } from '@sentry/tracing'
 import { NetworkContextName } from './utils/constants'
 import getLibrary from './utils/getLibrary'
 import { HelmetProvider } from 'react-helmet-async'
+import { handlePickedEvents } from './utils/helper'
 
 const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName)
 
@@ -17,7 +18,11 @@ if (process.env.REACT_APP_SENTRY_KEY) {
     Sentry.init({
         dsn: process.env.REACT_APP_SENTRY_KEY,
         integrations: [new Integrations.BrowserTracing()],
-        tracesSampleRate: 0.1,
+        tracesSampleRate: 1.0,
+        beforeSend(event) {
+            const val = handlePickedEvents(event)
+            return val
+        },
     })
 }
 
