@@ -21,13 +21,16 @@ class ErrorBoundary extends React.Component<Props, State> {
             error,
             errorInfo,
         })
-        Sentry.withScope((scope) => {
-            scope.setExtras(errorInfo)
-            const eventId = Sentry.captureException(error)
-            this.setState({
-                eventId,
+
+        if (process.env.REACT_APP_SENTRY_KEY) {
+            Sentry.withScope((scope) => {
+                scope.setExtras(errorInfo)
+                const eventId = Sentry.captureException(error)
+                this.setState({
+                    eventId,
+                })
             })
-        })
+        }
     }
 
     render() {
@@ -39,15 +42,18 @@ class ErrorBoundary extends React.Component<Props, State> {
                         <img src={require('./assets/error.svg')} alt="" />
                         <h2>Something went wrong.</h2>
                         <br />
-                        <Button
-                            onClick={() =>
-                                Sentry.showReportDialog({
-                                    eventId: this.state.eventId,
-                                })
-                            }
-                        >
-                            Report Feedback
-                        </Button>
+                        {process.env.REACT_APP_SENTRY_KEY ? (
+                            <Button
+                                onClick={() =>
+                                    Sentry.showReportDialog({
+                                        eventId: this.state.eventId,
+                                    })
+                                }
+                            >
+                                Report Feedback
+                            </Button>
+                        ) : null}
+
                         <Details>
                             {this.state.error && this.state.error.toString()}
                             <br />
