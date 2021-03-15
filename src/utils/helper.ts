@@ -56,18 +56,13 @@ export const amountToFiat = (balance: number, fiatPrice: number) => {
 
 export const formatNumber = (value: string, digits = 4, round = false) => {
     const nOfDigits = Array.from(Array(digits), (_) => 0).join('')
-    if (!value) {
-        return '0'
-    }
-    const n = Number(value.slice(0, 6))
+    const n = Number(value)
     if (Number.isInteger(n) || value.length < 5) {
         return n
     }
-
     if (round) {
         return numeral(n).format(`0.${nOfDigits}`)
     }
-
     return numeral(n).format(`0.${nOfDigits}`, Math.floor)
 }
 
@@ -81,7 +76,6 @@ export const getRatePercentage = (
         rate < 1
             ? numeral(1).subtract(rate).value() * -1
             : numeral(rate).subtract(1).value()
-
     if (returnRate) return ratePercentage
 
     return formatNumber(String(ratePercentage * 100), digits)
@@ -128,6 +122,21 @@ export const formatUserSafe = (
 
     return safes
         .map((s) => {
+            const collateralRatio = getCollateralRatio(
+                s.collateral,
+                s.debt,
+                currentPrice?.liquidationPrice,
+                liquidationCRatio,
+                accumulatedRate
+            )
+            const liquidationPrice = getLiquidationPrice(
+                s.collateral,
+                s.debt,
+                liquidationCRatio,
+                accumulatedRate,
+                currentRedemptionPrice
+            )
+
             const availableDebt = returnAvaiableDebt(
                 currentPrice?.safetyPrice,
                 '0',
@@ -135,26 +144,7 @@ export const formatUserSafe = (
                 s.debt
             )
 
-            const totalDebt = returnTotalValue(
-                returnTotalDebt(s.debt, accumulatedRate) as string,
-                '0'
-            ).toString()
-
-            const liquidationPrice = getLiquidationPrice(
-                s.collateral,
-                totalDebt as string,
-                liquidationCRatio,
-                accumulatedRate,
-                currentRedemptionPrice
-            )
-
-            const collateralRatio = getCollateralRatio(
-                s.collateral,
-                totalDebt as string,
-                currentPrice?.liquidationPrice,
-                liquidationCRatio,
-                accumulatedRate
-            )
+            const totalDebt = returnTotalDebt(s.debt, accumulatedRate)
 
             return {
                 id: s.safeId,
