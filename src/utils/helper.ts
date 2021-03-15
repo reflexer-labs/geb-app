@@ -77,8 +77,6 @@ export const getRatePercentage = (
     returnRate = false
 ) => {
     const rate = Number(value)
-    // console.log(rate)
-
     let ratePercentage =
         rate < 1
             ? numeral(1).subtract(rate).value() * -1
