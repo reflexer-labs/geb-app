@@ -129,13 +129,6 @@ export const formatUserSafe = (
                 liquidationCRatio,
                 accumulatedRate
             )
-            const liquidationPrice = getLiquidationPrice(
-                s.collateral,
-                s.debt,
-                liquidationCRatio,
-                accumulatedRate,
-                currentRedemptionPrice
-            )
 
             const availableDebt = returnAvaiableDebt(
                 currentPrice?.safetyPrice,
@@ -145,6 +138,14 @@ export const formatUserSafe = (
             )
 
             const totalDebt = returnTotalDebt(s.debt, accumulatedRate)
+
+            const liquidationPrice = getLiquidationPrice(
+                s.collateral,
+                totalDebt as string,
+                liquidationCRatio,
+                accumulatedRate,
+                currentRedemptionPrice
+            )
 
             return {
                 id: s.safeId,
