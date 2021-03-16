@@ -1,6 +1,7 @@
 import { action, Action, Thunk, thunk } from 'easy-peasy'
+import { NETWORK_ID } from '../connectors'
 import api from '../services/api'
-import { fetchUser } from '../services/graphql'
+import { fetchFLXBalance, fetchUser } from '../services/graphql'
 import { IBlockNumber, ITokenBalance } from '../utils/interfaces'
 
 export interface ConnectWalletModel {
@@ -14,6 +15,7 @@ export interface ConnectWalletModel {
     ctHash: string
     ethBalance: ITokenBalance
     raiBalance: ITokenBalance
+    flxBalance: ITokenBalance
     isWrongNetwork: boolean
     isStepLoading: boolean
     fetchFiatPrice: Thunk<ConnectWalletModel>
@@ -29,9 +31,14 @@ export interface ConnectWalletModel {
     >
     updateRaiBalance: Action<
         ConnectWalletModel,
-        { chainId: number; balance: number }
+        { chainId: number; balance: string }
+    >
+    updateFlxBalance: Action<
+        ConnectWalletModel,
+        { chainId: number; balance: string }
     >
     fetchUser: Thunk<ConnectWalletModel, string>
+    fetchProtBalance: Thunk<ConnectWalletModel, string>
     setStep: Action<ConnectWalletModel, number>
     setIsUserCreated: Action<ConnectWalletModel, boolean>
     setProxyAddress: Action<ConnectWalletModel, string>
@@ -49,6 +56,7 @@ const connectWalletModel: ConnectWalletModel = {
     blockNumber: blockNumberState ? JSON.parse(blockNumberState) : {},
     ethBalance: { 1: 0, 42: 0 },
     raiBalance: { 1: '0', 42: '0' },
+    flxBalance: { 1: '0', 42: '0' },
     fiatPrice: 0,
     ethPriceChange: 0,
     step: 0,
@@ -72,6 +80,15 @@ const connectWalletModel: ConnectWalletModel = {
         } else {
             actions.setIsUserCreated(false)
             return false
+        }
+    }),
+    fetchProtBalance: thunk(async (actions, payload) => {
+        const res = await fetchFLXBalance(payload.toLowerCase())
+        if (res && res.protBalance.length > 0) {
+            actions.updateFlxBalance({
+                chainId: NETWORK_ID,
+                balance: res.protBalance[0].balance,
+            })
         }
     }),
     setFiatPrice: action((state, payload) => {
@@ -102,6 +119,10 @@ const connectWalletModel: ConnectWalletModel = {
     updateRaiBalance: action((state, payload) => {
         const { chainId, balance } = payload
         state.raiBalance[chainId] = balance
+    }),
+    updateFlxBalance: action((state, payload) => {
+        const { chainId, balance } = payload
+        state.flxBalance[chainId] = balance
     }),
     setStep: action((state, payload) => {
         state.step = payload

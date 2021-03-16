@@ -1,18 +1,62 @@
+import { utils } from 'ethers'
 import React from 'react'
 import { X } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+import { useActiveWeb3React } from '../../hooks'
+import {
+    useClaimableAmount,
+    useClaimableDistributions,
+    useClaimDistribution,
+    useHasClaimableDistributions,
+} from '../../hooks/useClaim'
 import { useStoreActions, useStoreState } from '../../store'
 import Modal from './Modal'
+import { NETWORK_ID } from '../../connectors'
+import { formatNumber } from '../../utils/helper'
+import { Distribution } from '../../utils/interfaces'
+import { handleTransactionError } from '../../hooks/TransactionHooks'
 
 const DistributionsModal = () => {
+    const { account, library } = useActiveWeb3React()
     const { t } = useTranslation()
-    const { popupsModel: popupsState } = useStoreState((state) => state)
+    const hasClaim = useHasClaimableDistributions(account)
+    const claimableDistributions = useClaimableDistributions(account)
+    const claimableAmount = useClaimableAmount(account)
+    const { claimCallBack } = useClaimDistribution()
+    const {
+        popupsModel: popupsState,
+        connectWalletModel: connectWalletState,
+    } = useStoreState((state) => state)
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
+
+    const flxBalance = connectWalletState.flxBalance[NETWORK_ID].toString()
 
     const handleClose = () => {
         popupsActions.setHasFLXClaim(false)
         popupsActions.setIsDistributionsModalOpen(false)
+    }
+
+    const handleClaim = async (distribution: Distribution) => {
+        if (!distribution || !account || !library) {
+            console.debug('no distribution, account or library')
+            return
+        }
+
+        try {
+            handleClose()
+            popupsActions.setIsWaitingModalOpen(true)
+            popupsActions.setWaitingPayload({
+                title: 'Waiting For Confirmation',
+                text: 'Claiming FLX',
+                hint: 'Confirm this transaction in your wallet',
+                status: 'loading',
+            })
+            const signer = library.getSigner(account)
+            await claimCallBack(account, signer, distribution)
+        } catch (e) {
+            handleTransactionError(e)
+        }
     }
 
     return (
@@ -38,43 +82,73 @@ const DistributionsModal = () => {
                         alt="FLX token logo"
                     />
 
-                    <Balance>{'15.32'} FLX</Balance>
+                    <Balance>
+                        {formatNumber(
+                            (
+                                Number(flxBalance) + Number(claimableAmount)
+                            ).toString(),
+                            2
+                        )}{' '}
+                        FLX
+                    </Balance>
 
                     <Blocks>
                         <Block>
                             <Label>{t('your_balance')}:</Label>
-                            <Value>2.00</Value>
+                            <Value>{formatNumber(flxBalance, 2)}</Value>
                         </Block>
                         <Block>
                             <Label>{t('unclaimed')}:</Label>
-                            <Value>13.32</Value>
+                            <Value>
+                                {formatNumber(claimableAmount.toString(), 2)}
+                            </Value>
                         </Block>
                     </Blocks>
-
-                    <Claims>
-                        <ClaimBlock>
-                            <Info>
-                                <ClaimTitle>Community Reward #1</ClaimTitle>
-                                <ClaimDesc>
-                                    You have 10 FLX unclaimed tokens
-                                </ClaimDesc>
-                            </Info>
-                            <Action>
-                                <ClaimBtn>{t('claim')}</ClaimBtn>
-                            </Action>
-                        </ClaimBlock>
-                        <ClaimBlock>
-                            <Info>
-                                <ClaimTitle>Community Reward #2</ClaimTitle>
-                                <ClaimDesc>
-                                    You have 3.32 FLX unclaimed tokens
-                                </ClaimDesc>
-                            </Info>
-                            <Action>
-                                <ClaimBtn>{t('claim')}</ClaimBtn>
-                            </Action>
-                        </ClaimBlock>
-                    </Claims>
+                    {hasClaim && account
+                        ? claimableDistributions.map(
+                              (distribution, index: number) => {
+                                  return (
+                                      <Claims
+                                          key={index + distribution.description}
+                                      >
+                                          <ClaimBlock>
+                                              <Info>
+                                                  <ClaimTitle>
+                                                      {distribution.description}
+                                                  </ClaimTitle>
+                                                  <ClaimDesc>
+                                                      You have{' '}
+                                                      <b>
+                                                          {formatNumber(
+                                                              utils.formatEther(
+                                                                  distribution
+                                                                      .recipients[
+                                                                      account
+                                                                  ].amount
+                                                              ),
+                                                              2
+                                                          )}
+                                                      </b>{' '}
+                                                      FLX unclaimed tokens
+                                                  </ClaimDesc>
+                                              </Info>
+                                              <Action>
+                                                  <ClaimBtn
+                                                      onClick={() =>
+                                                          handleClaim(
+                                                              distribution
+                                                          )
+                                                      }
+                                                  >
+                                                      {t('claim')}
+                                                  </ClaimBtn>
+                                              </Action>
+                                          </ClaimBlock>
+                                      </Claims>
+                                  )
+                              }
+                          )
+                        : null}
                 </Body>
             </Container>
         </Modal>

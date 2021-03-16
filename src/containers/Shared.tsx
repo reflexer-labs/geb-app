@@ -101,6 +101,8 @@ const Shared = ({ children, ...rest }: Props) => {
             if (!connectWalletState.ctHash) {
                 connectWalletActions.setStep(2)
                 const { pathname } = history.location
+                await connectWalletActions.fetchProtBalance(account)
+
                 let address = ''
                 if (pathname && pathname !== '/') {
                     const route = pathname.split('/')[1]

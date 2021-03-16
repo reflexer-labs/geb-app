@@ -71,7 +71,7 @@ const popupsModel: PopupsModel = {
     isDistributionsModalOpen: false,
     isWaitingModalOpen: false,
     isSafeManagerOpen: false,
-    isClaimPopupOpen: true,
+    isClaimPopupOpen: false,
     returnProxyFunction: () => {},
     waitingPayload: {
         title: '',

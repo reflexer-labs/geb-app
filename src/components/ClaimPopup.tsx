@@ -3,6 +3,10 @@ import { X } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { useActiveWeb3React } from '../hooks'
+import {
+    useHasClaimableDistributions,
+    useClaimableAmount,
+} from '../hooks/useClaim'
 import { useStoreActions, useStoreState } from '../store'
 import { timeout } from '../utils/helper'
 import Button from './Button'
@@ -19,6 +23,10 @@ const ClaimPopup = () => {
         popupsActions.setIsDistributionsModalOpen(true)
     }
 
+    const hasClaim = useHasClaimableDistributions(account)
+
+    const claimableAmount = useClaimableAmount(account)
+
     useEffect(() => {
         async function hideModal() {
             await timeout(10000)
@@ -29,7 +37,13 @@ const ClaimPopup = () => {
         }
     }, [popupsActions, popupsState.isClaimPopupOpen])
 
-    return account && active && popupsState.isClaimPopupOpen ? (
+    useEffect(() => {
+        if (hasClaim) {
+            popupsActions.setIsClaimPopupOpen(true)
+        }
+    }, [hasClaim, popupsActions])
+
+    return account && active && hasClaim && popupsState.isClaimPopupOpen ? (
         <Container>
             <Header>
                 <CloseBtn
@@ -45,7 +59,7 @@ const ClaimPopup = () => {
                     alt="FLX token logo"
                 />
 
-                <Balance>{'13.32'} FLX</Balance>
+                <Balance>{claimableAmount} FLX</Balance>
 
                 <Blocks>
                     <Heading>{t('flx_is_live')}</Heading>
