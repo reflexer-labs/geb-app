@@ -3,10 +3,7 @@ import { X } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { useActiveWeb3React } from '../hooks'
-import {
-    useHasClaimableDistributions,
-    useClaimableAmount,
-} from '../hooks/useClaim'
+import { useHasClaimableDistributions } from '../hooks/useClaim'
 import { useStoreActions, useStoreState } from '../store'
 import { timeout } from '../utils/helper'
 import Button from './Button'
@@ -15,7 +12,10 @@ const ClaimPopup = () => {
     const { active, account } = useActiveWeb3React()
     const { t } = useTranslation()
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
-    const { popupsModel: popupsState } = useStoreState((state) => state)
+    const {
+        popupsModel: popupsState,
+        connectWalletModel: connectWalletState,
+    } = useStoreState((state) => state)
 
     const handleClaimBtn = () => {
         popupsActions.setIsClaimPopupOpen(false)
@@ -24,8 +24,6 @@ const ClaimPopup = () => {
     }
 
     const hasClaim = useHasClaimableDistributions()
-
-    const claimableAmount = useClaimableAmount()
 
     useEffect(() => {
         async function hideModal() {
@@ -59,7 +57,9 @@ const ClaimPopup = () => {
                     alt="FLX token logo"
                 />
 
-                <Balance>{claimableAmount} FLX</Balance>
+                <Balance>
+                    {connectWalletState.claimableFLX.slice(0, 10)} FLX
+                </Balance>
 
                 <Blocks>
                     <Heading>{t('flx_is_live')}</Heading>

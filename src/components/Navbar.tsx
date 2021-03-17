@@ -7,12 +7,12 @@ import { newTransactionsFirst, returnWalletAddress } from '../utils/helper'
 import { useWeb3React } from '@web3-react/core'
 import { isTransactionRecent } from '../hooks/TransactionHooks'
 import NavLinks from './NavLinks'
-import { useClaimableAmount } from '../hooks/useClaim'
 
 const Navbar = () => {
-    const { transactionsModel: transactionsState } = useStoreState(
-        (state) => state
-    )
+    const {
+        transactionsModel: transactionsState,
+        connectWalletModel: connectWalletState,
+    } = useStoreState((state) => state)
 
     const { transactions } = transactionsState
 
@@ -36,8 +36,6 @@ const Navbar = () => {
         .map((tx) => tx.hash)
 
     const hasPendingTransactions = !!pending.length
-
-    const claimableAmount = useClaimableAmount()
     return (
         <Container>
             <Left>
@@ -53,7 +51,9 @@ const Navbar = () => {
                             popupsActions.setIsDistributionsModalOpen(true)
                         }
                     >
-                        <Balance>{claimableAmount}</Balance>
+                        <Balance>
+                            {connectWalletState.claimableFLX.slice(0, 10)}
+                        </Balance>
                         <FLXInfo>
                             <img
                                 src={require('../assets/flx-logo@2x.png')}

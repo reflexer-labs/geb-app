@@ -16,6 +16,7 @@ export interface ConnectWalletModel {
     ethBalance: ITokenBalance
     raiBalance: ITokenBalance
     flxBalance: ITokenBalance
+    claimableFLX: string
     isWrongNetwork: boolean
     isStepLoading: boolean
     fetchFiatPrice: Thunk<ConnectWalletModel>
@@ -46,6 +47,7 @@ export interface ConnectWalletModel {
     setIsStepLoading: Action<ConnectWalletModel, boolean>
     setCtHash: Action<ConnectWalletModel, string>
     setEthPriceChange: Action<ConnectWalletModel, number>
+    setClaimableFLX: Action<ConnectWalletModel, string>
 }
 
 const ctHashState = localStorage.getItem('ctHash')
@@ -57,6 +59,7 @@ const connectWalletModel: ConnectWalletModel = {
     ethBalance: { 1: 0, 42: 0 },
     raiBalance: { 1: '0', 42: '0' },
     flxBalance: { 1: '0', 42: '0' },
+    claimableFLX: '0',
     fiatPrice: 0,
     ethPriceChange: 0,
     step: 0,
@@ -147,6 +150,9 @@ const connectWalletModel: ConnectWalletModel = {
     }),
     setEthPriceChange: action((state, payload) => {
         state.ethPriceChange = payload
+    }),
+    setClaimableFLX: action((state, payload) => {
+        state.claimableFLX = payload
     }),
 }
 

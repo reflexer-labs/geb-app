@@ -1,13 +1,12 @@
 import { getAddress } from '@ethersproject/address'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { ChainId } from '@uniswap/sdk'
-import { utils } from 'ethers'
+import { BigNumber, utils } from 'ethers'
 import { Geb } from 'geb.js'
 import { useCallback, useEffect, useState } from 'react'
 import { useActiveWeb3React } from '.'
-import { useStoreActions } from '../store'
+import store, { useStoreActions } from '../store'
 import { ETH_NETWORK } from '../utils/constants'
-import { formatNumber } from '../utils/helper'
 import { Distribution, Distributions } from '../utils/interfaces'
 import { handlePreTxGasEstimate } from './TransactionHooks'
 import useGeb from './useGeb'
@@ -22,6 +21,28 @@ function isAddress(value: any): string | false {
 
 const CLAIM_PROMISES: { [key: string]: Promise<Distributions | null> } = {}
 
+function returnTotalClaimableAmount(distributions: Distributions) {
+    if (!distributions.length) return '0'
+    const amount = distributions.reduce((acc, claim) => {
+        return BigNumber.from(acc).add(claim.amount)
+    }, BigNumber.from('0'))
+    return utils.formatEther(amount)
+}
+
+function claimFetcher(network: string, formatted: string) {
+    return fetch(
+        `https://merkle-distributor.reflexer.workers.dev/${network}/${formatted}`
+    )
+        .then((res) => {
+            if (res.status === 200) {
+                return res.json()
+            }
+        })
+        .catch((error) => {
+            console.error('Failed to get distributions data', error)
+        })
+}
+
 // returns the claim for the given address, or null if not valid
 function fetchClaim(
     account: string,
@@ -32,20 +53,8 @@ function fetchClaim(
     const key = `${chainId}:${account}`
 
     const network = chainId === 1 ? 'mainnet' : 'kovan'
-
     return (CLAIM_PROMISES[key] =
-        CLAIM_PROMISES[key] ??
-        fetch(
-            `https://merkle-distributor.reflexer.workers.dev/${network}/${formatted}`
-        )
-            .then((res) => {
-                if (res.status === 200) {
-                    return res.json()
-                }
-            })
-            .catch((error) => {
-                console.error('Failed to get distributions data', error)
-            }))
+        CLAIM_PROMISES[key] ?? claimFetcher(network, formatted))
 }
 
 export function useUserClaimData(): Distributions | null | undefined {
@@ -98,6 +107,11 @@ export function useClaimableDistributions() {
                 }
             })
         )
+        store.dispatch.connectWalletModel.setClaimableFLX(
+            returnTotalClaimableAmount(
+                claims.filter((claim) => !claim.isClaimed)
+            )
+        )
         setState(claims)
     }
 
@@ -122,19 +136,6 @@ export function useHasClaimableDistributions(): boolean {
     const { claimableDistributions } = useClaimableDistributions()
     if (!claimableDistributions || !claimableDistributions.length) return false
     return claimableDistributions.length > 0
-}
-
-// return claimable amount of claimable distributions
-export function useClaimableAmount() {
-    const { account } = useActiveWeb3React()
-    const { claimableDistributions } = useClaimableDistributions()
-    if (!account || !claimableDistributions.length) return '0'
-
-    const amount = claimableDistributions.reduce(
-        (acc, claim) => Number(acc) + Number(utils.formatEther(claim.amount)),
-        0
-    )
-    return formatNumber(amount.toString(), 4)
 }
 
 // claim distribution

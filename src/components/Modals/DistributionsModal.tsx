@@ -1,19 +1,19 @@
-import { utils } from 'ethers'
-import React from 'react'
+import { BigNumber, BigNumberish, utils } from 'ethers'
+import React, { useState } from 'react'
 import { X } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { useActiveWeb3React } from '../../hooks'
 import {
-    useClaimableAmount,
     useClaimableDistributions,
     useClaimDistribution,
     useHasClaimableDistributions,
 } from '../../hooks/useClaim'
+import { utils as gebUtils } from 'geb.js'
 import { useStoreActions, useStoreState } from '../../store'
 import Modal from './Modal'
 import { NETWORK_ID } from '../../connectors'
-import { formatNumber } from '../../utils/helper'
+import { toFixedString } from '../../utils/helper'
 import { Distribution } from '../../utils/interfaces'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
 
@@ -25,7 +25,6 @@ const DistributionsModal = () => {
         checkClaimsCB,
         claimableDistributions,
     } = useClaimableDistributions()
-    const claimableAmount = useClaimableAmount()
     const { claimCallBack } = useClaimDistribution()
     const {
         popupsModel: popupsState,
@@ -33,11 +32,25 @@ const DistributionsModal = () => {
     } = useStoreState((state) => state)
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
 
+    const [isClaiming, setIsClaiming] = useState(false)
+
     const flxBalance = connectWalletState.flxBalance[NETWORK_ID].toString()
+    const claimableAmount = connectWalletState.claimableFLX
 
     const handleClose = () => {
         popupsActions.setHasFLXClaim(false)
         popupsActions.setIsDistributionsModalOpen(false)
+    }
+
+    const returnAmount = (value: BigNumberish) => utils.formatEther(value)
+
+    const totalBalance = (balance: string, totalClaim: string) => {
+        const balanaceBN = balance
+            ? BigNumber.from(toFixedString(balance))
+            : BigNumber.from('0')
+        const totalClaimBN = BigNumber.from(toFixedString(totalClaim, 'WAD'))
+
+        return gebUtils.wadToFixed(balanaceBN.add(totalClaimBN)).toString()
     }
 
     const handleClaim = async (distribution: Distribution) => {
@@ -46,6 +59,7 @@ const DistributionsModal = () => {
             return
         }
         try {
+            setIsClaiming(true)
             handleClose()
             popupsActions.setIsWaitingModalOpen(true)
             popupsActions.setWaitingPayload({
@@ -57,7 +71,9 @@ const DistributionsModal = () => {
             const signer = library.getSigner(account)
             await claimCallBack(account, signer, distribution)
             checkClaimsCB()
+            setIsClaiming(false)
         } catch (e) {
+            setIsClaiming(false)
             handleTransactionError(e)
         }
     }
@@ -86,69 +102,65 @@ const DistributionsModal = () => {
                     />
 
                     <Balance>
-                        {formatNumber(
-                            (
-                                Number(flxBalance) + Number(claimableAmount)
-                            ).toString(),
-                            4
-                        )}{' '}
+                        {totalBalance(flxBalance, claimableAmount).slice(0, 10)}{' '}
                         FLX
                     </Balance>
 
                     <Blocks>
                         <Block>
                             <Label>{t('your_balance')}:</Label>
-                            <Value>{formatNumber(flxBalance, 2)}</Value>
+                            <Value>{flxBalance.slice(0, 10)}</Value>
                         </Block>
                         <Block>
                             <Label>{t('unclaimed')}:</Label>
-                            <Value>
-                                {formatNumber(claimableAmount.toString(), 2)}
-                            </Value>
+                            <Value>{claimableAmount.slice(0, 10)}</Value>
                         </Block>
                     </Blocks>
-                    {hasClaim && account
-                        ? claimableDistributions.map(
-                              (distribution, index: number) => {
-                                  return (
-                                      <Claims
-                                          key={index + distribution.description}
-                                      >
-                                          <ClaimBlock>
+                    <Claims>
+                        {hasClaim && account
+                            ? claimableDistributions.map(
+                                  (distribution, index: number) => {
+                                      return (
+                                          <ClaimBlock
+                                              key={
+                                                  index +
+                                                  distribution.description
+                                              }
+                                          >
                                               <Info>
                                                   <ClaimTitle>
                                                       {distribution.description}
                                                   </ClaimTitle>
                                                   <ClaimDesc>
-                                                      You have{' '}
+                                                      You can claim{' '}
                                                       <b>
-                                                          {formatNumber(
-                                                              utils.formatEther(
-                                                                  distribution.amount
-                                                              ),
-                                                              2
+                                                          {returnAmount(
+                                                              distribution.amount
                                                           )}
                                                       </b>{' '}
-                                                      FLX unclaimed tokens
+                                                      FLX
                                                   </ClaimDesc>
                                               </Info>
                                               <Action>
                                                   <ClaimBtn
+                                                      disabled={isClaiming}
                                                       onClick={() =>
                                                           handleClaim(
                                                               distribution
                                                           )
                                                       }
                                                   >
-                                                      {t('claim')}
+                                                      {isClaiming
+                                                          ? 'Claiming...'
+                                                          : t('claim')}
                                                   </ClaimBtn>
                                               </Action>
                                           </ClaimBlock>
-                                      </Claims>
-                                  )
-                              }
-                          )
-                        : null}
+                                      )
+                                  }
+                              )
+                            : null}
+                    </Claims>
                 </Body>
             </Container>
         </Modal>
@@ -285,6 +297,10 @@ const Action = styled.div`
 `
 
 const ClaimBtn = styled.button`
+    &:disabled {
+        cursor: not-allowed;
+        background: rgba(255, 255, 255, 0.45) !important;
+    }
     border: 0;
     box-shadow: none;
     padding: 10px 15px;
