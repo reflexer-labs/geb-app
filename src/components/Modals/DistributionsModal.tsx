@@ -20,9 +20,9 @@ import { handleTransactionError } from '../../hooks/TransactionHooks'
 const DistributionsModal = () => {
     const { account, library } = useActiveWeb3React()
     const { t } = useTranslation()
-    const hasClaim = useHasClaimableDistributions(account)
-    const claimableDistributions = useClaimableDistributions(account)
-    const claimableAmount = useClaimableAmount(account)
+    const hasClaim = useHasClaimableDistributions()
+    const claimableDistributions = useClaimableDistributions()
+    const claimableAmount = useClaimableAmount()
     const { claimCallBack } = useClaimDistribution()
     const {
         popupsModel: popupsState,
@@ -87,7 +87,7 @@ const DistributionsModal = () => {
                             (
                                 Number(flxBalance) + Number(claimableAmount)
                             ).toString(),
-                            2
+                            4
                         )}{' '}
                         FLX
                     </Balance>
@@ -121,10 +121,7 @@ const DistributionsModal = () => {
                                                       <b>
                                                           {formatNumber(
                                                               utils.formatEther(
-                                                                  distribution
-                                                                      .recipients[
-                                                                      account
-                                                                  ].amount
+                                                                  distribution.amount
                                                               ),
                                                               2
                                                           )}

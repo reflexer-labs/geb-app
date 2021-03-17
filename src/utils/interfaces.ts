@@ -526,21 +526,12 @@ export interface IManageSafe {
 
 export type Distributions = Distribution[]
 
-export interface DistributionClaim {
-    index: number
-    amount: string
-    proof: string[]
-}
-
 export interface Distribution {
-    isChecked: boolean
     distributionIndex: number
     distributorAddress: string
     isClaimed: boolean
     description: 'Early user rewards'
-    merkleRoot: string
-    tokenTotal: string
-    recipients: {
-        [address: string]: DistributionClaim
-    }
+    index: number
+    amount: string
+    proof: string[]
 }

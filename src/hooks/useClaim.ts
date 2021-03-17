@@ -1,5 +1,4 @@
 import { getAddress } from '@ethersproject/address'
-import { BigNumber } from '@ethersproject/bignumber'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { ChainId } from '@uniswap/sdk'
 import { utils } from 'ethers'
@@ -23,20 +22,6 @@ function isAddress(value: any): string | false {
 
 const CLAIM_PROMISES: { [key: string]: Promise<Distributions | null> } = {}
 
-function distributionsFetcher(network: string) {
-    return fetch(
-        `https://reflexer-labs.github.io/merkle-distributor/${network}.json`
-    )
-        .then((res) => {
-            if (res.status === 200) {
-                return res.json()
-            }
-        })
-        .catch((error) => {
-            console.error('Failed to get distributions data', error)
-        })
-}
-
 // returns the claim for the given address, or null if not valid
 function fetchClaim(
     account: string,
@@ -50,30 +35,21 @@ function fetchClaim(
 
     return (CLAIM_PROMISES[key] =
         CLAIM_PROMISES[key] ??
-        distributionsFetcher(network).then((claimInfo: Distributions) =>
-            claimInfo
-                .map((claim: Distribution, index: number) => {
-                    const { recipients } = claim
-                    const myClaim = recipients[formatted]
-                    if (myClaim) {
-                        return {
-                            ...claim,
-                            distributionIndex: index + 1,
-                            recipients: {
-                                [formatted]: myClaim,
-                            },
-                        }
-                    }
-                    return { ...claim, distributionIndex: index + 1 }
-                })
-                .filter((claim: Distribution) => claim.recipients[formatted])
-        ))
+        fetch(
+            `https://merkle-distributor.reflexer.workers.dev/${network}/${formatted}`
+        )
+            .then((res) => {
+                if (res.status === 200) {
+                    return res.json()
+                }
+            })
+            .catch((error) => {
+                console.error('Failed to get distributions data', error)
+            }))
 }
 
-export function useUserClaimData(
-    account: string | null | undefined
-): Distributions | null | undefined {
-    const { chainId } = useActiveWeb3React()
+export function useUserClaimData(): Distributions | null | undefined {
+    const { chainId, account } = useActiveWeb3React()
     const geb = useGeb()
     const key = `${chainId}:${account}`
     const [claimInfo, setClaimInfo] = useState<{
@@ -84,37 +60,11 @@ export function useUserClaimData(
         async function fetchDistributions() {
             if (!account || !chainId || !geb) return
             const accountClaimInfo = await fetchClaim(account, chainId)
-            const claims = accountClaimInfo
-                ? await Promise.all(
-                      accountClaimInfo.map(async (claim) => {
-                          if (!claim.isChecked) {
-                              const res = await geb.getMerkleDistributorClaimStatues(
-                                  [
-                                      {
-                                          distributionIndex:
-                                              claim.distributionIndex,
-                                          nodeIndex:
-                                              claim.recipients[account].index,
-                                      },
-                                  ]
-                              )
-
-                              return {
-                                  ...claim,
-                                  distributorAddress: res[0].distributorAddress,
-                                  isChecked: true,
-                                  isClaimed: res[0].isClaimed,
-                              }
-                          }
-                          return claim
-                      })
-                  )
-                : null
 
             setClaimInfo((claimInfo) => {
                 return {
                     ...claimInfo,
-                    [key]: claims,
+                    [key]: accountClaimInfo,
                 }
             })
         }
@@ -126,35 +76,58 @@ export function useUserClaimData(
 }
 
 // return claimable distributions
-export function useClaimableDistributions(account: string | null | undefined) {
-    const userClaimData = useUserClaimData(account)
-    if (!userClaimData || !userClaimData.length) return []
-    return userClaimData.filter((claim) => !claim.isClaimed)
+export function useClaimableDistributions() {
+    const { account } = useActiveWeb3React()
+    const geb = useGeb()
+    const [state, setState] = useState<Distributions>([])
+    const userClaimData = useUserClaimData()
+
+    useEffect(() => {
+        async function checClaims() {
+            if (!geb || !account || !userClaimData || !userClaimData.length)
+                return
+            const claims = await Promise.all(
+                userClaimData.map(async (claim) => {
+                    const res = await geb.getMerkleDistributorClaimStatues([
+                        {
+                            distributionIndex: claim.distributionIndex,
+                            nodeIndex: claim.index,
+                        },
+                    ])
+                    return {
+                        ...claim,
+                        distributorAddress: res[0].distributorAddress,
+                        isClaimed: res[0].isClaimed,
+                    }
+                })
+            )
+            setState(claims)
+        }
+
+        checClaims()
+    }, [account, geb, userClaimData])
+
+    return state.filter((claim) => !claim.isClaimed)
 }
 
 // check if user is in blob and has not yet claimed FLX
-export function useHasClaimableDistributions(
-    account: string | null | undefined
-): boolean {
-    const userClaimData = useUserClaimData(account)
-    const claimableDistributions = useClaimableDistributions(account)
-    if (!userClaimData || !userClaimData.length || !account) return false
+export function useHasClaimableDistributions(): boolean {
+    const claimableDistributions = useClaimableDistributions()
+    if (!claimableDistributions || !claimableDistributions.length) return false
     return claimableDistributions.length > 0
 }
 
 // return claimable amount of claimable distributions
-export function useClaimableAmount(account: string | null | undefined) {
-    const claimableDistributions = useClaimableDistributions(account)
-    if (!account || !claimableDistributions.length)
-        return formatNumber(BigNumber.from(0).toString(), 2)
+export function useClaimableAmount() {
+    const { account } = useActiveWeb3React()
+    const claimableDistributions = useClaimableDistributions()
+    if (!account || !claimableDistributions.length) return '0'
 
     const amount = claimableDistributions.reduce(
-        (acc, claim) =>
-            Number(acc) +
-            Number(utils.formatEther(claim.recipients[account].amount)),
+        (acc, claim) => Number(acc) + Number(utils.formatEther(claim.amount)),
         0
     )
-    return formatNumber(amount.toString(), 2)
+    return formatNumber(amount.toString(), 4)
 }
 
 // claim distribution
@@ -179,7 +152,7 @@ export function useClaimDistribution() {
         }
         const geb = new Geb(ETH_NETWORK, signer.provider)
         let distributor = geb.getMerkleDistributor(claim.distributorAddress)
-        const { index, amount, proof } = claim.recipients[formatted]
+        const { index, amount, proof } = claim
         const txData = distributor.claim(index, formatted, amount, proof)
         if (!txData) throw new Error('No transaction request!')
         const tx = await handlePreTxGasEstimate(signer, txData)

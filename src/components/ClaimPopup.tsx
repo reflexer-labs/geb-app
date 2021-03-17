@@ -23,9 +23,9 @@ const ClaimPopup = () => {
         popupsActions.setIsDistributionsModalOpen(true)
     }
 
-    const hasClaim = useHasClaimableDistributions(account)
+    const hasClaim = useHasClaimableDistributions()
 
-    const claimableAmount = useClaimableAmount(account)
+    const claimableAmount = useClaimableAmount()
 
     useEffect(() => {
         async function hideModal() {

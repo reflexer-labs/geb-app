@@ -37,7 +37,7 @@ const Navbar = () => {
 
     const hasPendingTransactions = !!pending.length
 
-    const claimableAmount = useClaimableAmount(account)
+    const claimableAmount = useClaimableAmount()
     return (
         <Container>
             <Left>
