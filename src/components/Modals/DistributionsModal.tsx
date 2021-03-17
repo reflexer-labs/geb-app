@@ -21,7 +21,10 @@ const DistributionsModal = () => {
     const { account, library } = useActiveWeb3React()
     const { t } = useTranslation()
     const hasClaim = useHasClaimableDistributions()
-    const claimableDistributions = useClaimableDistributions()
+    const {
+        checkClaimsCB,
+        claimableDistributions,
+    } = useClaimableDistributions()
     const claimableAmount = useClaimableAmount()
     const { claimCallBack } = useClaimDistribution()
     const {
@@ -42,7 +45,6 @@ const DistributionsModal = () => {
             console.debug('no distribution, account or library')
             return
         }
-
         try {
             handleClose()
             popupsActions.setIsWaitingModalOpen(true)
@@ -54,6 +56,7 @@ const DistributionsModal = () => {
             })
             const signer = library.getSigner(account)
             await claimCallBack(account, signer, distribution)
+            checkClaimsCB()
         } catch (e) {
             handleTransactionError(e)
         }

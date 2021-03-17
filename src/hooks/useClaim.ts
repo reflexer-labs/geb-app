@@ -3,7 +3,7 @@ import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { ChainId } from '@uniswap/sdk'
 import { utils } from 'ethers'
 import { Geb } from 'geb.js'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useActiveWeb3React } from '.'
 import { useStoreActions } from '../store'
 import { ETH_NETWORK } from '../utils/constants'
@@ -81,38 +81,45 @@ export function useClaimableDistributions() {
     const geb = useGeb()
     const [state, setState] = useState<Distributions>([])
     const userClaimData = useUserClaimData()
+    async function checkClaims() {
+        if (!geb || !account || !userClaimData || !userClaimData.length) return
+        const claims = await Promise.all(
+            userClaimData.map(async (claim) => {
+                const res = await geb.getMerkleDistributorClaimStatues([
+                    {
+                        distributionIndex: claim.distributionIndex,
+                        nodeIndex: claim.index,
+                    },
+                ])
+                return {
+                    ...claim,
+                    distributorAddress: res[0].distributorAddress,
+                    isClaimed: res[0].isClaimed,
+                }
+            })
+        )
+        setState(claims)
+    }
+
+    const checkClaimsCB = useCallback(checkClaims, [
+        userClaimData,
+        account,
+        geb,
+    ])
 
     useEffect(() => {
-        async function checClaims() {
-            if (!geb || !account || !userClaimData || !userClaimData.length)
-                return
-            const claims = await Promise.all(
-                userClaimData.map(async (claim) => {
-                    const res = await geb.getMerkleDistributorClaimStatues([
-                        {
-                            distributionIndex: claim.distributionIndex,
-                            nodeIndex: claim.index,
-                        },
-                    ])
-                    return {
-                        ...claim,
-                        distributorAddress: res[0].distributorAddress,
-                        isClaimed: res[0].isClaimed,
-                    }
-                })
-            )
-            setState(claims)
-        }
+        checkClaimsCB()
+    }, [checkClaimsCB])
 
-        checClaims()
-    }, [account, geb, userClaimData])
-
-    return state.filter((claim) => !claim.isClaimed)
+    return {
+        checkClaimsCB,
+        claimableDistributions: state.filter((claim) => !claim.isClaimed),
+    }
 }
 
 // check if user is in blob and has not yet claimed FLX
 export function useHasClaimableDistributions(): boolean {
-    const claimableDistributions = useClaimableDistributions()
+    const { claimableDistributions } = useClaimableDistributions()
     if (!claimableDistributions || !claimableDistributions.length) return false
     return claimableDistributions.length > 0
 }
@@ -120,7 +127,7 @@ export function useHasClaimableDistributions(): boolean {
 // return claimable amount of claimable distributions
 export function useClaimableAmount() {
     const { account } = useActiveWeb3React()
-    const claimableDistributions = useClaimableDistributions()
+    const { claimableDistributions } = useClaimableDistributions()
     if (!account || !claimableDistributions.length) return '0'
 
     const amount = claimableDistributions.reduce(
