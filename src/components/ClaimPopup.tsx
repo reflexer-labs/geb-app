@@ -53,7 +53,7 @@ const ClaimPopup = () => {
 
             <Body>
                 <img
-                    src={require('../assets/flx-logo@2x.png')}
+                    src={require('../assets/flx-logo.svg')}
                     alt="FLX token logo"
                 />
 
