@@ -49,7 +49,7 @@ export const getEtherscanLink = (
         }
     }
 }
-// console.log('test for deployment')
+
 export const amountToFiat = (balance: number, fiatPrice: number) => {
     return (balance * fiatPrice).toFixed(4)
 }
