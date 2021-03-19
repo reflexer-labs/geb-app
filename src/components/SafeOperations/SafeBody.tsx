@@ -181,7 +181,10 @@ const SafeBody = ({ isChecked }: Props) => {
         accumulatedRate
     )
 
-    const liquidationPenaltyPercentage = getRatePercentage(liquidationPenalty)
+    const liquidationPenaltyPercentage = getRatePercentage(
+        liquidationPenalty,
+        0
+    )
     const liquidationPrice = getLiquidationPrice(
         totalCollateral,
         totalDebt,
