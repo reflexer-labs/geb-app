@@ -103,7 +103,7 @@ const OnBoarding = ({ ...props }) => {
                         />
                     </HeaderContainer>
                     {(account && !safeState.safeCreated) || !isOwner ? (
-                        <BtnContainer>
+                        <BtnContainer className="top-up">
                             <Button
                                 disabled={connectWalletState.isWrongNetwork}
                                 onClick={() =>
@@ -161,6 +161,13 @@ const BtnContainer = styled.div`
         min-width: 100px;
         padding: 4px 12px;
     }
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+      position: static;
+      margin-bottom:20px;
+      &.top-up {
+         display:none;
+        }
+    `}
 `
 
 const BtnInner = styled.div`

@@ -49,7 +49,7 @@ export const getEtherscanLink = (
         }
     }
 }
-// console.log('test for deployment')
+
 export const amountToFiat = (balance: number, fiatPrice: number) => {
     return (balance * fiatPrice).toFixed(4)
 }
@@ -59,7 +59,7 @@ export const formatNumber = (value: string, digits = 4, round = false) => {
     if (!value) {
         return '0'
     }
-    const n = Number(value.slice(0, 6))
+    const n = Number(value)
     if (Number.isInteger(n) || value.length < 5) {
         return n
     }
