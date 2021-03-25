@@ -64,6 +64,7 @@ const SafeManager = () => {
         <Body>
             <Label>ETH Address</Label>
             <CustomInput
+                id="topup_input"
                 value={value}
                 placeholder={'Enter a valid ETH address'}
                 onChange={(e) => setValue(e.target.value)}
@@ -74,6 +75,7 @@ const SafeManager = () => {
             <Footer>
                 <Button dimmed text={t('cancel')} onClick={handleCancel} />
                 <Button
+                    data-test-id="topup-manage"
                     withArrow
                     onClick={handleSubmit}
                     text={t('manage_safe')}

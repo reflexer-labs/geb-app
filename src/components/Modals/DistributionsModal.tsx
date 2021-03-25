@@ -87,7 +87,7 @@ const DistributionsModal = () => {
             closeModal={handleClose}
             isModalOpen={popupsState.isDistributionsModalOpen}
         >
-            <Container>
+            <Container data-test-id="distributions-popup">
                 <Header>
                     <Title>{t('flx_breakdown')}</Title>
                     <CloseBtn onClick={handleClose}>
@@ -101,7 +101,7 @@ const DistributionsModal = () => {
                         alt="FLX token logo"
                     />
 
-                    <Balance>
+                    <Balance data-test-id="flx-total-balance">
                         {totalBalance(flxBalance, claimableAmount).slice(0, 10)}{' '}
                         FLX
                     </Balance>
@@ -109,11 +109,15 @@ const DistributionsModal = () => {
                     <Blocks>
                         <Block>
                             <Label>{t('your_balance')}:</Label>
-                            <Value>{flxBalance.slice(0, 10)}</Value>
+                            <Value data-test-id="flx-balance">
+                                {flxBalance.slice(0, 10)}
+                            </Value>
                         </Block>
                         <Block>
                             <Label>{t('unclaimed')}:</Label>
-                            <Value>{claimableAmount.slice(0, 10)}</Value>
+                            <Value data-test-id="claimable-flx">
+                                {claimableAmount.slice(0, 10)}
+                            </Value>
                         </Block>
                     </Blocks>
                     <Claims>

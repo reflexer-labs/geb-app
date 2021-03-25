@@ -14,6 +14,7 @@ interface Props {
     handleClick: () => void
     isDisabled: boolean
     isLoading: boolean
+    id: string
 }
 
 const StepsContent = ({
@@ -24,6 +25,7 @@ const StepsContent = ({
     handleClick,
     isDisabled,
     isLoading,
+    id,
 }: Props) => {
     const { t } = useTranslation()
     const { safeModel: safeState } = useStoreState((state) => state)
@@ -35,7 +37,7 @@ const StepsContent = ({
     const handleOpenState = () => setIsOpen(!isOpen)
 
     return (
-        <Container>
+        <Container id={id}>
             <Title>{t(title)}</Title>
             <Text>
                 {t(text)}{' '}
@@ -51,11 +53,15 @@ const StepsContent = ({
                     <Heading>Important Notes</Heading>
                     <List>
                         <Item>{`You do not need to create a new account if you already have a MakerDAO or Balancer proxy`}</Item>
-                        <Item>{`The minimum amount to mint per safe is ${debtFloorVal} RAI`}</Item>
+                        <Item>
+                            The minimum amount to mint per safe is{' '}
+                            <span>{debtFloorVal}</span> RAI
+                        </Item>
                     </List>
                 </Notes>
             ) : null}
             <Button
+                data-test-id="steps-btn"
                 id={stepNumber === 2 ? 'create-safe' : ''}
                 disabled={isDisabled || isLoading}
                 isLoading={isLoading}

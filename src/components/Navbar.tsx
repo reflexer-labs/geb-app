@@ -47,6 +47,7 @@ const Navbar = () => {
             <RightSide>
                 {active && account ? (
                     <FLXButton
+                        data-test-id="flx-btn"
                         onClick={() =>
                             popupsActions.setIsDistributionsModalOpen(true)
                         }

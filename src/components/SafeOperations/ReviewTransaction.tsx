@@ -207,6 +207,7 @@ const ReviewTransaction = () => {
                     onClick={handleCancel}
                 />
                 <Button
+                    id="confirm_tx"
                     withArrow
                     text={t('confirm_transaction')}
                     onClick={handleConfirm}

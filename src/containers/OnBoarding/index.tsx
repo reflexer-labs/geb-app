@@ -103,8 +103,9 @@ const OnBoarding = ({ ...props }) => {
                         />
                     </HeaderContainer>
                     {(account && !safeState.safeCreated) || !isOwner ? (
-                        <BtnContainer>
+                        <BtnContainer className="top-up">
                             <Button
+                                data-test-id="topup-btn"
                                 disabled={connectWalletState.isWrongNetwork}
                                 onClick={() =>
                                     popupsActions.setIsSafeManagerOpen(true)
@@ -161,12 +162,13 @@ const BtnContainer = styled.div`
         min-width: 100px;
         padding: 4px 12px;
     }
-
-    ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-    position:static;
-    margin:0 0 10px 0
-    
-  `}
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+      position: static;
+      margin-bottom:20px;
+      &.top-up {
+         display:none;
+        }
+    `}
 `
 
 const BtnInner = styled.div`

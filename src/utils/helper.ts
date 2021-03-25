@@ -16,6 +16,8 @@ import {
     ITransaction,
 } from './interfaces'
 import { injected, NETWORK_ID } from '../connectors'
+import Sentry from '@sentry/react'
+import { getAddress } from '@ethersproject/address'
 
 export const returnWalletAddress = (walletAddress: string) =>
     `${walletAddress.slice(0, 4 + 2)}...${walletAddress.slice(-4)}`
@@ -23,6 +25,13 @@ export const returnWalletAddress = (walletAddress: string) =>
 export const capitalizeName = (name: string) =>
     name.charAt(0).toUpperCase() + name.slice(1)
 
+export const isAddress = (value: any): string | false => {
+    try {
+        return getAddress(value)
+    } catch {
+        return false
+    }
+}
 export const getEtherscanLink = (
     chainId: ChainId,
     data: string,
@@ -55,6 +64,9 @@ export const amountToFiat = (balance: number, fiatPrice: number) => {
 
 export const formatNumber = (value: string, digits = 4, round = false) => {
     const nOfDigits = Array.from(Array(digits), (_) => 0).join('')
+    if (!value) {
+        return '0'
+    }
     const n = Number(value)
 
     if (Number.isInteger(n) || value.length < 5) {
@@ -64,6 +76,7 @@ export const formatNumber = (value: string, digits = 4, round = false) => {
     if (round) {
         return numeral(n).format(`0.${nOfDigits}`)
     }
+
     return numeral(n).format(`0.${nOfDigits}`, Math.floor)
 }
 
@@ -77,6 +90,7 @@ export const getRatePercentage = (
         rate < 1
             ? numeral(1).subtract(rate).value() * -1
             : numeral(rate).subtract(1).value()
+
     if (returnRate) return ratePercentage
 
     return formatNumber(String(ratePercentage * 100), digits)
@@ -123,21 +137,6 @@ export const formatUserSafe = (
 
     return safes
         .map((s) => {
-            const collateralRatio = getCollateralRatio(
-                s.collateral,
-                s.debt,
-                currentPrice?.liquidationPrice,
-                liquidationCRatio,
-                accumulatedRate
-            )
-            const liquidationPrice = getLiquidationPrice(
-                s.collateral,
-                s.debt,
-                liquidationCRatio,
-                accumulatedRate,
-                currentRedemptionPrice
-            )
-
             const availableDebt = returnAvaiableDebt(
                 currentPrice?.safetyPrice,
                 '0',
@@ -145,7 +144,26 @@ export const formatUserSafe = (
                 s.debt
             )
 
-            const totalDebt = returnTotalDebt(s.debt, accumulatedRate)
+            const totalDebt = returnTotalValue(
+                returnTotalDebt(s.debt, accumulatedRate) as string,
+                '0'
+            ).toString()
+
+            const liquidationPrice = getLiquidationPrice(
+                s.collateral,
+                totalDebt as string,
+                liquidationCRatio,
+                accumulatedRate,
+                currentRedemptionPrice
+            )
+
+            const collateralRatio = getCollateralRatio(
+                s.collateral,
+                totalDebt as string,
+                currentPrice?.liquidationPrice,
+                liquidationCRatio,
+                accumulatedRate
+            )
 
             return {
                 id: s.safeId,
@@ -505,4 +523,17 @@ export const returnTimeOffset = () => {
     const a = new Date().getTimezoneOffset()
     const res = -Math.round(a / 60)
     return res < 0 ? res : '+' + res
+}
+
+export const handlePickedEvents = (event: Sentry.Event) => {
+    if (!event) return null
+    const { exception } = event
+    if (exception && exception.values) {
+        for (let val of exception.values) {
+            if (val.value && val.value.toLowerCase().includes('bignumber')) {
+                return event
+            }
+        }
+    }
+    return null
 }
