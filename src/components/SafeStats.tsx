@@ -89,7 +89,7 @@ const SafeStats = () => {
             <StatsGrid>
                 <StatItem>
                     <StateInner>
-                        <Value>{`${singleSafe?.collateralRatio}%`}</Value>
+                        <Value data-test-id="details_col_ratio">{`${singleSafe?.collateralRatio}%`}</Value>
                         <Label>{'Collateralization Ratio'}</Label>
                     </StateInner>
                 </StatItem>
@@ -109,7 +109,7 @@ const SafeStats = () => {
                         <InfoIcon data-tip={t('liquidation_price_tip')}>
                             <Info size="16" />
                         </InfoIcon>
-                        <Value>{`$${singleSafe?.liquidationPrice}`}</Value>
+                        <Value data-test-id="details_liq_price">{`$${singleSafe?.liquidationPrice}`}</Value>
                         <Label>{'Liquidation Price'}</Label>
                     </StateInner>
                 </StatItem>
@@ -119,31 +119,36 @@ const SafeStats = () => {
                         <InfoIcon data-tip={t('liquidation_penalty_tip')}>
                             <Info size="16" />
                         </InfoIcon>
-                        <Value>{`${liquidationPenalty}%`}</Value>
+                        <Value data-test-id="details_liq_penalty">{`${liquidationPenalty}%`}</Value>
                         <Label>{'Liquidation Penalty'}</Label>
                     </StateInner>
                 </StatItem>
 
                 <StatItem className="w50">
                     <StateInner>
-                        <Value>${ethPrice}</Value>
+                        <Value data-test-id="details_eth_price">
+                            ${ethPrice}
+                        </Value>
                         <Label>{'ETH Price (OSM)'}</Label>
                     </StateInner>
                 </StatItem>
 
                 <StatItem className="w50">
                     <StateInner>
-                        <Value>${raiPrice}</Value>
+                        <Value data-test-id="details_red_price">
+                            ${raiPrice}
+                        </Value>
                         <Label>{`${COIN_TICKER} Redemption Price`}</Label>
                     </StateInner>
                 </StatItem>
 
                 <StatItem className="w50">
                     <StateInner>
-                        <Value>{`${collateral} ETH`}</Value>
+                        <Value data-test-id="details_collateral">{`${collateral} ETH`}</Value>
                         <Label>{'ETH Collateral'}</Label>
                         <Actions>
                             <Button
+                                id="deposit_borrow"
                                 withArrow
                                 text={t('deposit_borrow')}
                                 onClick={() =>
@@ -160,10 +165,11 @@ const SafeStats = () => {
 
                 <StatItem className="w50">
                     <StateInner>
-                        <Value>{`${totalDebt} ${COIN_TICKER}`}</Value>
+                        <Value data-test-id="details_debt">{`${totalDebt} ${COIN_TICKER}`}</Value>
                         <Label>{`${COIN_TICKER} Debt`}</Label>
                         <Actions>
                             <Button
+                                id="repay_withdraw"
                                 withArrow
                                 text={t('repay_withdraw')}
                                 onClick={() =>
