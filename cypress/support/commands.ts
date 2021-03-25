@@ -3,6 +3,7 @@
 // commands please read more here:
 // https://on.cypress.io/custom-commands
 // ***********************************************
+import 'cypress-wait-until'
 import { Wallet } from '@ethersproject/wallet'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { _Eip1193Bridge } from '@ethersproject/experimental/lib/eip1193-bridge'
@@ -30,11 +31,26 @@ export const TEST_ADDRESS_NEVER_USE =
 
 export const returnWalletAddress = (walletAddress: string) =>
     `${walletAddress.slice(0, 4 + 2)}...${walletAddress.slice(-4)}`
+
+function renameKeys(obj: any, newKeys: any) {
+    const keyValues = Object.keys(obj).map((key) => {
+        const newKey = newKeys[key] || key
+        return { [newKey]: obj[key] }
+    })
+    return Object.assign({}, ...keyValues)
+}
 export class CustomizedBridge extends _Eip1193Bridge {
     address: string
-    constructor(signer: Signer, provider: JsonRpcProvider, address: string) {
+    allowTx: boolean = false
+    constructor(
+        signer: Signer,
+        provider: JsonRpcProvider,
+        address: string,
+        allowTx: boolean
+    ) {
         super(signer, provider)
         this.address = address
+        this.allowTx = allowTx
     }
     //@ts-ignore
     async sendAsync(...args) {
@@ -57,11 +73,22 @@ export class CustomizedBridge extends _Eip1193Bridge {
             method = args[0]
             params = args[1]
         }
+
+        if (method === 'eth_sendTransaction' && this.allowTx) {
+            const txReq = params[0]
+            let custom_tx = renameKeys(txReq, { gas: 'gasLimit' })
+            const { hash } = await this.signer.sendTransaction(custom_tx)
+            if (isCallbackForm) {
+                callback(null, { result: hash })
+            } else {
+                return Promise.resolve(hash)
+            }
+        }
         if (method === 'eth_requestAccounts' || method === 'eth_accounts') {
             if (isCallbackForm) {
-                callback({ result: [ADDRESS_NO_PROXY_NEVER_USER] })
+                callback({ result: [this.address] })
             } else {
-                return Promise.resolve([ADDRESS_NO_PROXY_NEVER_USER])
+                return Promise.resolve([this.address])
             }
         }
         if (method === 'eth_chainId') {
@@ -89,20 +116,33 @@ export class CustomizedBridge extends _Eip1193Bridge {
     }
 }
 
-Cypress.Commands.overwrite('visit', (original, url, options) => {
-    let privateKey = ''
-    let walletAddress = ''
-
-    if (options && options.qs && options.qs.type === 'no_safes') {
-        privateKey = PRIVATE_KEY_NO_SAFES_NEVER_USER
-        walletAddress = ADDRESS_NO_SAFES_NEVER_USER
-    } else if (options && options.qs && options.qs.type === 'no_proxy') {
-        privateKey = PRIVATE_KEY_NO_PROXY_NEVER_USER
-        walletAddress = ADDRESS_NO_PROXY_NEVER_USER
-    } else {
-        privateKey = PRIVATE_KEY_TEST_NEVER_USE
-        walletAddress = TEST_ADDRESS_NEVER_USE
+const returnWallet = (type: string) => {
+    switch (type) {
+        case 'no_safes':
+            return {
+                privateKey: PRIVATE_KEY_NO_SAFES_NEVER_USER,
+                walletAddress: ADDRESS_NO_SAFES_NEVER_USER,
+                allowTx: false,
+            }
+        case 'no_proxy':
+            return {
+                privateKey: PRIVATE_KEY_NO_PROXY_NEVER_USER,
+                walletAddress: ADDRESS_NO_PROXY_NEVER_USER,
+                allowTx: false,
+            }
+        default:
+            return {
+                privateKey: PRIVATE_KEY_TEST_NEVER_USE,
+                walletAddress: TEST_ADDRESS_NEVER_USE,
+                allowTx: true,
+            }
     }
+}
+
+Cypress.Commands.overwrite('visit', (original, url, options) => {
+    const { privateKey, walletAddress, allowTx } = returnWallet(
+        options && options.qs ? options.qs.type : ''
+    )
     return original(url, {
         ...options,
         //@ts-ignore
@@ -114,7 +154,12 @@ Cypress.Commands.overwrite('visit', (original, url, options) => {
                 42
             )
             const signer = new Wallet(privateKey, provider)
-            win.ethereum = new CustomizedBridge(signer, provider, walletAddress)
+            win.ethereum = new CustomizedBridge(
+                signer,
+                provider,
+                walletAddress,
+                allowTx
+            )
         },
     })
 })

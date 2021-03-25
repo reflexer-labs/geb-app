@@ -34,7 +34,11 @@ const SafeList = () => {
                     {safeState.list
                         .slice(page * perPage, (page + 1) * perPage)
                         .map((safe: ISafe) => (
-                            <SafeBlock key={safe.id} {...safe} />
+                            <SafeBlock
+                                className="safeBlock"
+                                key={safe.id}
+                                {...safe}
+                            />
                         ))}
                     <Sep />
                     {safeState.list.length > perPage ? (

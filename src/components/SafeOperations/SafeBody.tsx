@@ -390,6 +390,12 @@ const SafeBody = ({ isChecked }: Props) => {
                 Number(defaultSafe.rightInput) > 0 &&
                 !isPassed
             ) {
+                if (!connectWalletState.proxyAddress) {
+                    setError(
+                        'You do not have a proxy address, Create a Reflexer Account to continue'
+                    )
+                    return
+                }
                 safeActions.setStage(2)
             } else {
                 safeActions.setStage(3)
@@ -484,6 +490,7 @@ const SafeBody = ({ isChecked }: Props) => {
                     className={type === 'repay_withdraw' ? 'reverse' : ''}
                 >
                     <DecimalInput
+                        data_test_id={`${type}_left`}
                         label={returnInputType()}
                         value={defaultSafe.leftInput}
                         onChange={onChangeLeft}
@@ -496,6 +503,7 @@ const SafeBody = ({ isChecked }: Props) => {
                         }
                     />
                     <DecimalInput
+                        data_test_id={`${type}_right`}
                         label={returnInputType(false)}
                         value={defaultSafe.rightInput}
                         onChange={onChangeRight}
@@ -536,17 +544,19 @@ const SafeBody = ({ isChecked }: Props) => {
                     <Block>
                         <Item>
                             <Label>{'Total ETH Collateral'}</Label>
-                            <Value>{`${
+                            <Value data-test-id="modal_collateral">{`${
                                 totalCollateral ? totalCollateral : 0
                             }`}</Value>
                         </Item>
                         <Item>
                             <Label>{`Total ${COIN_TICKER} Debt`}</Label>{' '}
-                            <Value>{`${totalDebt ? totalDebt : 0}`}</Value>
+                            <Value data-test-id="modal_debt">{`${
+                                totalDebt ? totalDebt : 0
+                            }`}</Value>
                         </Item>
                         <Item>
                             <Label>{`ETH Price (OSM)`}</Label>{' '}
-                            <Value>{`$${formatNumber(
+                            <Value data-test-id="modal_eth_price">{`$${formatNumber(
                                 currentPrice.value,
                                 2
                             )}`}</Value>
@@ -558,7 +568,7 @@ const SafeBody = ({ isChecked }: Props) => {
                                     <Info size="16" />
                                 </InfoIcon>
                             </Label>{' '}
-                            <Value>{`$${formatNumber(
+                            <Value data-test-id="modal_red_price">{`$${formatNumber(
                                 currentRedemptionPrice,
                                 3
                             )}`}</Value>
@@ -573,7 +583,7 @@ const SafeBody = ({ isChecked }: Props) => {
                                     <Info size="16" />
                                 </InfoIcon>
                             </Label>{' '}
-                            <Value>{`${
+                            <Value data-test-id="modal_col_ratio">{`${
                                 collateralRatio > 0 ? collateralRatio : '∞'
                             }%`}</Value>
                         </Item>
@@ -586,7 +596,7 @@ const SafeBody = ({ isChecked }: Props) => {
                                     <Info size="16" />
                                 </InfoIcon>
                             </Label>{' '}
-                            <Value>{`$${
+                            <Value data-test-id="modal_liq_price">{`$${
                                 liquidationPrice > 0
                                     ? (liquidationPrice as number) >
                                       Number(currentPrice.value)
@@ -604,13 +614,13 @@ const SafeBody = ({ isChecked }: Props) => {
                                     <Info size="16" />
                                 </InfoIcon>
                             </Label>{' '}
-                            <Value>{`${liquidationPenaltyPercentage}%`}</Value>
+                            <Value data-test-id="modal_liq_penalty">{`${liquidationPenaltyPercentage}%`}</Value>
                         </Item>
                     </Block>
                     <ReactTooltip multiline type="light" data-effect="solid" />
                 </Result>
 
-                <Note>
+                <Note data-test-id="debt_floor_note">
                     {isCreate
                         ? `Note: The minimum amount to mint per safe is ${debtFloor} RAI`
                         : null}

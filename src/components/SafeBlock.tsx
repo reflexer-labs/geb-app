@@ -36,7 +36,7 @@ const SafeBlock = ({ ...props }) => {
         }
     }
     return (
-        <>
+        <Container className={props.className}>
             <BlockContainer>
                 <BlockHeader>
                     <SafeInfo>
@@ -86,11 +86,13 @@ const SafeBlock = ({ ...props }) => {
                     </Link>
                 </BtnContainer>
             </BlockContainer>
-        </>
+        </Container>
     )
 }
 
 export default SafeBlock
+
+const Container = styled.div``
 
 const BlockContainer = styled.div`
     padding: 20px 20px 13px 20px;

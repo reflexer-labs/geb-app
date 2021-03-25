@@ -15,7 +15,7 @@ const env = dotenv.config({
 
 jest.setTimeout(10000)
 
-const provider = new ethers.providers.JsonRpcProvider(
+export const provider = new ethers.providers.JsonRpcProvider(
     env.parsed?.REACT_APP_NETWORK_URL
 )
 const network_name =
