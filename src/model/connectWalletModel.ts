@@ -87,12 +87,13 @@ const connectWalletModel: ConnectWalletModel = {
     }),
     fetchProtBalance: thunk(async (actions, payload) => {
         const res = await fetchFLXBalance(payload.toLowerCase())
-        if (res && res.protBalance.length > 0) {
-            actions.updateFlxBalance({
-                chainId: NETWORK_ID,
-                balance: res.protBalance[0].balance,
-            })
-        }
+        actions.updateFlxBalance({
+            chainId: NETWORK_ID,
+            balance:
+                res && res.protBalance.length > 0
+                    ? res.protBalance[0].balance
+                    : '0',
+        })
     }),
     setFiatPrice: action((state, payload) => {
         state.fiatPrice = payload

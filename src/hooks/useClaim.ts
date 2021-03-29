@@ -91,7 +91,10 @@ export function useClaimableDistributions() {
     const [state, setState] = useState<Distributions>([])
     const userClaimData = useUserClaimData()
     async function checkClaims() {
-        if (!geb || !account || !userClaimData || !userClaimData.length) return
+        if (!geb || !account || !userClaimData) return
+
+        console.log(account)
+
         const claims = await Promise.all(
             userClaimData.map(async (claim) => {
                 const res = await geb.getMerkleDistributorClaimStatues([
@@ -107,6 +110,7 @@ export function useClaimableDistributions() {
                 }
             })
         )
+
         store.dispatch.connectWalletModel.setClaimableFLX(
             returnTotalClaimableAmount(
                 claims.filter((claim) => !claim.isClaimed)
