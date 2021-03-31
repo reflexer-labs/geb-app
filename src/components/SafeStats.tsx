@@ -60,7 +60,7 @@ const SafeStats = () => {
         } else if (Number(currentRedemptionRate) === 0) {
             return '0'
         } else {
-            return currentRedemptionRate
+            return (currentRedemptionRate as number).toFixed(4)
         }
     }
 
