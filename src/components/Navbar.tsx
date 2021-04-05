@@ -16,8 +16,7 @@ const Navbar = () => {
     const { transactions } = transactionsState
 
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
-    const { active, account, connector } = useWeb3React()
-    console.log(account, active, connector)
+    const { active, account } = useWeb3React()
 
     const handleWalletConnect = () => {
         if (active && account) {
