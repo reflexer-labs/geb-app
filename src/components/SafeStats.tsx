@@ -46,7 +46,7 @@ const SafeStats = () => {
 
     const returnRedRate = () => {
         const currentRedemptionRate = singleSafe
-            ? getRatePercentage('0.999941987846746589492957295', 10)
+            ? getRatePercentage(singleSafe.currentRedemptionRate, 10)
             : '0'
         if (
             Number(currentRedemptionRate) > 0 &&
