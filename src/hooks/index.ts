@@ -6,7 +6,10 @@ import { Web3ReactContextInterface } from '@web3-react/core/dist/types'
 import { isMobile } from 'react-device-detect'
 import { injected } from '../connectors'
 import { NetworkContextName } from '../utils/constants'
-
+import { SafeAppConnector } from '../connectors/SafeAppConnector'
+const safeAppConnector = new SafeAppConnector({
+    supportedChainIds: [1, 42],
+})
 export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> & {
     chainId?: ChainId
 } {
@@ -18,21 +21,29 @@ export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> & 
 export function useEagerConnect() {
     const { activate, active } = useWeb3ReactCore() // specifically using useWeb3ReactCore because of what this hook does
     const [tried, setTried] = useState(false)
-
     useEffect(() => {
-        injected.isAuthorized().then((isAuthorized) => {
-            if (isAuthorized) {
-                activate(injected, undefined, true).catch(() => {
+        safeAppConnector.isSafeApp().then((loadedInSafe) => {
+            if (loadedInSafe) {
+                // On success active flag will change and in that case we'll set tried to true, check the hook below
+                activate(safeAppConnector, undefined, true).catch(() => {
                     setTried(true)
                 })
             } else {
-                if (isMobile && window.ethereum) {
-                    activate(injected, undefined, true).catch(() => {
-                        setTried(true)
-                    })
-                } else {
-                    setTried(true)
-                }
+                injected.isAuthorized().then((isAuthorized) => {
+                    if (isAuthorized) {
+                        activate(injected, undefined, true).catch(() => {
+                            setTried(true)
+                        })
+                    } else {
+                        if (isMobile && window.ethereum) {
+                            activate(injected, undefined, true).catch(() => {
+                                setTried(true)
+                            })
+                        } else {
+                            setTried(true)
+                        }
+                    }
+                })
             }
         })
     }, [activate]) // intentionally only running on mount (make sure it's only mounted once :))
