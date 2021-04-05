@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { useStoreActions, useStoreState } from '../store'
 import Button from './Button'
-import numeral from 'numeral'
+import Numeral from 'numeral'
 import { formatNumber, getRatePercentage, timeout } from '../utils/helper'
 import { COIN_TICKER } from '../utils/constants'
 import { useActiveWeb3React } from '../hooks'
@@ -62,7 +62,7 @@ const SafeStats = () => {
         } else if (Number(currentRedemptionRate) === 0) {
             return '0'
         } else {
-            return numeral(currentRedemptionRate).format('0.0000')
+            return Numeral(currentRedemptionRate).format('0.0000')
         }
     }
 
