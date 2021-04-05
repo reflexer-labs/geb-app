@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { useStoreActions, useStoreState } from '../store'
 import Button from './Button'
+import numeral from 'numeral'
 import { formatNumber, getRatePercentage, timeout } from '../utils/helper'
 import { COIN_TICKER } from '../utils/constants'
 import { useActiveWeb3React } from '../hooks'
@@ -45,7 +46,7 @@ const SafeStats = () => {
 
     const returnRedRate = () => {
         const currentRedemptionRate = singleSafe
-            ? getRatePercentage(singleSafe.currentRedemptionRate, 10)
+            ? getRatePercentage('0.999941987846746589492957295', 10)
             : '0'
         if (
             Number(currentRedemptionRate) > 0 &&
@@ -60,7 +61,7 @@ const SafeStats = () => {
         } else if (Number(currentRedemptionRate) === 0) {
             return '0'
         } else {
-            return (currentRedemptionRate as number).toFixed(4)
+            return numeral(currentRedemptionRate).format('0.0000')
         }
     }
 
