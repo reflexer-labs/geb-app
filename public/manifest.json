@@ -21,5 +21,11 @@
     "start_url": ".",
     "display": "standalone",
     "theme_color": "#000000",
-    "background_color": "#ffffff"
+    "background_color": "#ffffff",
+    "iconPath": "logo512.png",
+    "description": "Volatility dampened synthetic instruments",
+    "providedBy": {
+        "name": "Reflexer",
+        "url": "https://reflexer-kovan-pr-144.onrender.com/"
+    }
 }
