@@ -27,7 +27,9 @@ export function useEagerConnect() {
                 console.log(loadedInSafe)
 
                 // On success active flag will change and in that case we'll set tried to true, check the hook below
-                activate(safeAppConnector, undefined, true).catch(() => {
+                activate(safeAppConnector, undefined, true).catch((e) => {
+                    console.log(e)
+
                     setTried(true)
                 })
             } else {
