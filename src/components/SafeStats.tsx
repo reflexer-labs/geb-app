@@ -6,6 +6,7 @@ import Button from './Button'
 import { formatNumber, getRatePercentage, timeout } from '../utils/helper'
 import { COIN_TICKER } from '../utils/constants'
 import { useActiveWeb3React } from '../hooks'
+import numeral from 'numeral'
 import { handleTransactionError } from '../hooks/TransactionHooks'
 import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
@@ -60,7 +61,7 @@ const SafeStats = () => {
         } else if (Number(currentRedemptionRate) === 0) {
             return '0'
         } else {
-            return (currentRedemptionRate as number).toFixed(4)
+            return numeral(currentRedemptionRate).format('0.0000')
         }
     }
 
