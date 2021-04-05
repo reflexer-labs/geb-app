@@ -7,6 +7,7 @@ import { useHasClaimableDistributions } from '../hooks/useClaim'
 import { useStoreActions, useStoreState } from '../store'
 import { timeout } from '../utils/helper'
 import Button from './Button'
+import FLXLogo from './Icons/FLXLogo'
 
 const ClaimPopup = () => {
     const { active, account } = useActiveWeb3React()
@@ -52,11 +53,7 @@ const ClaimPopup = () => {
             </Header>
 
             <Body>
-                <img
-                    src={require('../assets/flx-logo.svg')}
-                    alt="FLX token logo"
-                />
-
+                <FLXLogo />
                 <Balance>
                     {connectWalletState.claimableFLX.slice(0, 10)} FLX
                 </Balance>

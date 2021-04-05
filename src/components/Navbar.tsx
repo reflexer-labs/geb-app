@@ -7,6 +7,7 @@ import { newTransactionsFirst, returnWalletAddress } from '../utils/helper'
 import { useWeb3React } from '@web3-react/core'
 import { isTransactionRecent } from '../hooks/TransactionHooks'
 import NavLinks from './NavLinks'
+import FLXLogoSmall from './Icons/FLXLogoSmall'
 
 const Navbar = () => {
     const {
@@ -56,10 +57,9 @@ const Navbar = () => {
                             {connectWalletState.claimableFLX.slice(0, 10)}
                         </Balance>
                         <FLXInfo>
-                            <img
-                                src={require('../assets/flx-logo.svg')}
-                                alt="FLX token logo"
-                            />
+                            <LogoBox>
+                                <FLXLogoSmall />
+                            </LogoBox>
                             FLX
                         </FLXInfo>
                     </FLXButton>
@@ -217,10 +217,9 @@ const FLXInfo = styled.div`
     color: ${(props) => props.theme.colors.neutral};
     border-radius: 0 4px 4px 0;
     padding: 0 10px;
-    img {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        margin: 0 5px;
-    }
+`
+const LogoBox = styled.div`
+    margin: 0 5px;
+    display: flex;
+    align-items: center;
 `

@@ -16,6 +16,7 @@ import { NETWORK_ID } from '../../connectors'
 import { toFixedString } from '../../utils/helper'
 import { Distribution } from '../../utils/interfaces'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
+import FLXLogo from '../Icons/FLXLogo'
 
 const DistributionsModal = () => {
     const { account, library } = useActiveWeb3React()
@@ -98,10 +99,7 @@ const DistributionsModal = () => {
                 </Header>
 
                 <Body>
-                    <img
-                        src={require('../../assets/flx-logo.svg')}
-                        alt="FLX token logo"
-                    />
+                    <FLXLogo />
 
                     <Balance data-test-id="flx-total-balance">
                         {totalBalance(flxBalance, claimableAmount).slice(0, 10)}{' '}

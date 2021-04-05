@@ -92,9 +92,6 @@ export function useClaimableDistributions() {
     const userClaimData = useUserClaimData()
     async function checkClaims() {
         if (!geb || !account || !userClaimData) return
-
-        console.log(account)
-
         const claims = await Promise.all(
             userClaimData.map(async (claim) => {
                 const res = await geb.getMerkleDistributorClaimStatues([
