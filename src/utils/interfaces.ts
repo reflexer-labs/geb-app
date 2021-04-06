@@ -116,6 +116,7 @@ export interface ISafe {
     collateral: string
     debt: string
     totalDebt: string
+    availableDebt: string
     accumulatedRate: string
     collateralRatio: string
     currentRedemptionPrice: string

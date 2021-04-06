@@ -30,7 +30,12 @@ const PageHeader = ({ text, breadcrumbs, btnText, btnFn }: Props) => {
                     {btnText && btnFn ? (
                         <>
                             or{' '}
-                            <Button withArrow text={btnText} onClick={btnFn} />
+                            <Button
+                                data-test-id="header-btn"
+                                withArrow
+                                text={btnText}
+                                onClick={btnFn}
+                            />
                         </>
                     ) : null}
                 </Text>

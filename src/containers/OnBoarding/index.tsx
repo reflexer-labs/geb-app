@@ -105,6 +105,7 @@ const OnBoarding = ({ ...props }) => {
                     {(account && !safeState.safeCreated) || !isOwner ? (
                         <BtnContainer className="top-up">
                             <Button
+                                data-test-id="topup-btn"
                                 disabled={connectWalletState.isWrongNetwork}
                                 onClick={() =>
                                     popupsActions.setIsSafeManagerOpen(true)

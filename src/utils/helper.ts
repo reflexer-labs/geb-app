@@ -17,6 +17,7 @@ import {
 } from './interfaces'
 import { injected, NETWORK_ID } from '../connectors'
 import Sentry from '@sentry/react'
+import { getAddress } from '@ethersproject/address'
 
 export const returnWalletAddress = (walletAddress: string) =>
     `${walletAddress.slice(0, 4 + 2)}...${walletAddress.slice(-4)}`
@@ -24,6 +25,13 @@ export const returnWalletAddress = (walletAddress: string) =>
 export const capitalizeName = (name: string) =>
     name.charAt(0).toUpperCase() + name.slice(1)
 
+export const isAddress = (value: any): string | false => {
+    try {
+        return getAddress(value)
+    } catch {
+        return false
+    }
+}
 export const getEtherscanLink = (
     chainId: ChainId,
     data: string,

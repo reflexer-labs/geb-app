@@ -65,7 +65,7 @@ export const checkSubgraphBlockDiff = async (latesBlockNumber: number) => {
             }
         }
     } catch (error) {
-        throw Error('Error with subgraph query: ' + error)
+        console.debug('Error with subgraph query: ' + error)
     }
 }
 
