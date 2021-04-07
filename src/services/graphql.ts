@@ -12,7 +12,6 @@ import { formatUserSafe, formatHistoryArray } from '../utils/helper'
 import { incentiveCampaignsQuery } from '../utils/queries/incentives'
 import { IIncentivesCampaignData, IIncentivesConfig } from '../utils/interfaces'
 import {
-    fetchFLXBalanceQuery,
     getSubgraphBlock,
     getUserQuery,
     internalBalanceQuery,
@@ -322,47 +321,14 @@ export const fetchIncentivesCampaigns = async (
 
 export const fetchAuctions = async (address: string) => {
     const res = await request(JSON.stringify({ query: auctionsQuery(address) }))
-    if (!res.data.data) throw new Error('retry')
     const response = res.data.data
     return response
 }
 
 export const fetchInternalBalance = async (proxyAddress: string) => {
-    return retry(
-        async (bail, attempt) => {
-            const res = await axios.post(
-                GRAPH_API_URLS[attempt - 1],
-                JSON.stringify({ query: internalBalanceQuery(proxyAddress) })
-            )
-
-            if (!res.data.data && attempt < GRAPH_API_URLS.length) {
-                throw new Error('retry')
-            }
-
-            return res.data.data
-        },
-        {
-            retries: GRAPH_API_URLS.length - 1,
-        }
+    const res = await request(
+        JSON.stringify({ query: internalBalanceQuery(proxyAddress) })
     )
-}
-
-export const fetchFLXBalance = async (address: string) => {
-    return retry(
-        async (bail, attempt) => {
-            const res = await axios.post(
-                GRAPH_API_URLS[attempt - 1],
-                JSON.stringify({ query: fetchFLXBalanceQuery(address) })
-            )
-
-            if (!res.data.data && attempt < GRAPH_API_URLS.length) {
-                throw new Error('retry')
-            }
-
-            return res.data.data
-        },
-        {
-            retries: GRAPH_API_URLS.length - 1,
-        }
-    )
+    const response = res.data.data
+    return response
 }

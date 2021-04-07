@@ -32,8 +32,6 @@ import AlertLabel from '../components/AlertLabel'
 import useGeb from '../hooks/useGeb'
 import SafeManagerModal from '../components/Modals/SafeManagerModal'
 import { isAddress } from '@ethersproject/address'
-import DistributionsModal from '../components/Modals/DistributionsModal'
-import ClaimPopup from '../components/ClaimPopup'
 
 interface Props {
     children: ReactNode
@@ -101,8 +99,6 @@ const Shared = ({ children, ...rest }: Props) => {
             if (!connectWalletState.ctHash) {
                 connectWalletActions.setStep(2)
                 const { pathname } = history.location
-                await connectWalletActions.fetchProtBalance(account)
-
                 let address = ''
                 if (pathname && pathname !== '/') {
                     const route = pathname.split('/')[1]
@@ -208,9 +204,7 @@ const Shared = ({ children, ...rest }: Props) => {
             <WalletModal />
             <ApplicationUpdater />
             <BalanceUpdater />
-            <ClaimPopup />
             <TransactionUpdater />
-            <DistributionsModal />
             <LoadingModal />
             <IncentivesModal />
             <AuctionsModal />

@@ -13,15 +13,12 @@ export interface PopupsModel {
     isConnectorsWalletOpen: boolean
     showSideMenu: boolean
     isSafeManagerOpen: boolean
-    isClaimPopupOpen: boolean
     returnProxyFunction: (actions: any) => void | null
     blockBackdrop: boolean
-    hasFLXClaim: boolean
     isProxyModalOpen: boolean
     isScreenModalOpen: boolean
     isVotingModalOpen: boolean
     isIncentivesModalOpen: boolean
-    isDistributionsModalOpen: boolean
     auctionOperationPayload: IOperation
     alertPayload: IAlert | null
     ESMOperationPayload: IOperation
@@ -50,9 +47,6 @@ export interface PopupsModel {
     setBlockBackdrop: Action<PopupsModel, boolean>
     setIsProxyModalOpen: Action<PopupsModel, boolean>
     setIsSafeManagerOpen: Action<PopupsModel, boolean>
-    setIsDistributionsModalOpen: Action<PopupsModel, boolean>
-    setIsClaimPopupOpen: Action<PopupsModel, boolean>
-    setHasFLXClaim: Action<PopupsModel, boolean>
     setReturnProxyFunction: Action<
         PopupsModel,
         (storeActions: any) => void | null
@@ -64,14 +58,11 @@ const popupsModel: PopupsModel = {
     isSettingsModalOpen: false,
     isConnectModalOpen: false,
     isProxyModalOpen: false,
-    hasFLXClaim: false,
     isConnectedWalletModalOpen: false,
     isScreenModalOpen: false,
     isIncentivesModalOpen: false,
-    isDistributionsModalOpen: false,
     isWaitingModalOpen: false,
     isSafeManagerOpen: false,
-    isClaimPopupOpen: false,
     returnProxyFunction: () => {},
     waitingPayload: {
         title: '',
@@ -170,15 +161,6 @@ const popupsModel: PopupsModel = {
     }),
     setIsSafeManagerOpen: action((state, payload) => {
         state.isSafeManagerOpen = payload
-    }),
-    setIsDistributionsModalOpen: action((state, payload) => {
-        state.isDistributionsModalOpen = payload
-    }),
-    setIsClaimPopupOpen: action((state, payload) => {
-        state.isClaimPopupOpen = payload
-    }),
-    setHasFLXClaim: action((state, payload) => {
-        state.hasFLXClaim = payload
     }),
 }
 

@@ -18,9 +18,3 @@ export const internalBalanceQuery = (proxyAddress: string) => `{
     balance
   }
 }`
-
-export const fetchFLXBalanceQuery = (address: string) => `{
-  protBalance:erc20Balances(where: {address: "${address}", label: "PROT_TOKEN"}) {
-    balance
-    }
-}`
