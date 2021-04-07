@@ -524,3 +524,15 @@ export interface IManageSafe {
         id: string
     }
 }
+
+export type Distributions = Distribution[]
+
+export interface Distribution {
+    distributionIndex: number
+    distributorAddress: string
+    isClaimed: boolean
+    description: 'Early user rewards'
+    index: number
+    amount: string
+    proof: string[]
+}
