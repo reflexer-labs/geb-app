@@ -4,7 +4,6 @@ import { CSSTransition } from 'react-transition-group'
 import styled from 'styled-components'
 import { useStoreActions } from '../../store'
 import Button from '../Button'
-import Confetti from '../Confetti'
 
 interface Props {
     title?: string
@@ -22,7 +21,6 @@ interface Props {
     hideHeader?: boolean
     hideFooter?: boolean
     backDropColor?: string
-    startConfetti?: boolean
 }
 const Modal = ({
     title,
@@ -38,7 +36,6 @@ const Modal = ({
     borderRadius,
     backDropClose,
     hideHeader,
-    startConfetti = false,
     backDropColor,
 }: Props) => {
     const { t } = useTranslation()
@@ -74,7 +71,6 @@ const Modal = ({
             mountOnEnter
         >
             <Container ref={nodeRef}>
-                <Confetti start={startConfetti} />
                 <InnerContent>
                     <BackDrop bg={backDropColor} onClick={handleBackdrop} />
                     <ChildrenHolder
