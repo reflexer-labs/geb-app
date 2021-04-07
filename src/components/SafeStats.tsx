@@ -103,7 +103,7 @@ const SafeStats = () => {
                             <Info size="16" />
                         </InfoIcon>
                         <Value>{`${returnRedRate()}%`}</Value>
-                        <Label>{`AnnualizedRate Redemption Rate`}</Label>
+                        <Label>{`Annual Redemption Rate`}</Label>
                     </StateInner>
                 </StatItem>
 

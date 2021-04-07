@@ -100,13 +100,13 @@ describe('utils', () => {
 
     describe('#getLiquidationPrice', () => {
         it('returns 0 if no value in params', () => {
-            expect(getLiquidationPrice('', '', '', '', '')).toEqual('0')
+            expect(getLiquidationPrice('', '', '', '')).toEqual('0')
         })
         it('returns 0 if one of the params is empty', () => {
-            expect(getLiquidationPrice('', '2', '1', '1', '2')).toEqual('0')
+            expect(getLiquidationPrice('', '2', '1', '2')).toEqual('0')
         })
         it('succeeds in returning desired value', () => {
-            expect(getLiquidationPrice('2', '2', '1', '1', '2')).toEqual(2)
+            expect(getLiquidationPrice('2', '2', '1', '2')).toEqual(2)
         })
     })
 

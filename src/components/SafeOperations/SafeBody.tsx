@@ -190,7 +190,6 @@ const SafeBody = ({ isChecked }: Props) => {
         totalCollateral,
         totalDebt,
         liquidationCRatio,
-        accumulatedRate,
         currentRedemptionPrice
     )
 

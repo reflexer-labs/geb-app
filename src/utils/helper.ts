@@ -152,7 +152,6 @@ export const formatUserSafe = (
                 s.collateral,
                 totalDebt as string,
                 liquidationCRatio,
-                accumulatedRate,
                 currentRedemptionPrice
             )
 
@@ -171,7 +170,7 @@ export const formatUserSafe = (
                 debt: s.debt,
                 totalDebt,
                 availableDebt,
-                accumulatedRate: accumulatedRate,
+                accumulatedRate,
                 collateralRatio,
                 currentRedemptionPrice,
                 internalCollateralBalance:
@@ -217,7 +216,6 @@ export const getLiquidationPrice = (
     totalCollateral: string,
     totalDebt: string,
     liquidationCRatio: string,
-    accumulatedRate: string,
     currentRedemptionPrice: string
 ) => {
     if (Number(totalCollateral) === 0) {
@@ -227,7 +225,6 @@ export const getLiquidationPrice = (
     }
 
     const numerator = numeral(totalDebt)
-        .multiply(accumulatedRate)
         .multiply(liquidationCRatio)
         .multiply(currentRedemptionPrice)
         .divide(totalCollateral)
