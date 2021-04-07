@@ -100,34 +100,34 @@ describe('utils', () => {
 
     describe('#getLiquidationPrice', () => {
         it('returns 0 if no value in params', () => {
-            expect(getLiquidationPrice('', '', '', '', '')).toEqual('0')
+            expect(getLiquidationPrice('', '', '', '')).toEqual('0')
         })
         it('returns 0 if one of the params is empty', () => {
-            expect(getLiquidationPrice('', '2', '1', '1', '2')).toEqual('0')
+            expect(getLiquidationPrice('', '2', '1', '2')).toEqual('0')
         })
         it('succeeds in returning desired value', () => {
-            expect(getLiquidationPrice('2', '2', '1', '1', '2')).toEqual(2)
+            expect(getLiquidationPrice('2', '2', '1', '2')).toEqual(2)
         })
     })
 
     describe('#getCollateralRatio', () => {
         it('returns 0 if no value in params', () => {
-            expect(getCollateralRatio('', '', '', '', '')).toEqual('0')
+            expect(getCollateralRatio('', '', '', '')).toEqual('0')
         })
         it('returns 0 if one of the params is empty', () => {
-            expect(getCollateralRatio('', '2', '1', '1', '2')).toEqual('0')
+            expect(getCollateralRatio('', '2', '1', '1')).toEqual('0')
         })
         it('succeeds in returning desired value', () => {
-            expect(getCollateralRatio('2', '2', '1', '1', '2')).toEqual(50)
+            expect(getCollateralRatio('2', '2', '1', '1')).toEqual(100)
         })
     })
 
     describe('#safeIsSafe', () => {
         it('returns true', () => {
-            expect(safeIsSafe('2', '2', '1', '1')).toBe(true)
+            expect(safeIsSafe('2', '2', '1')).toBe(true)
         })
         it('returns false if not', () => {
-            expect(safeIsSafe('2', '2', '1', '3')).toBe(false)
+            expect(safeIsSafe('1', '2', '1')).toBe(false)
         })
     })
 
