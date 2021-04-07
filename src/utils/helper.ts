@@ -152,7 +152,6 @@ export const formatUserSafe = (
                 s.collateral,
                 totalDebt as string,
                 liquidationCRatio,
-                accumulatedRate,
                 currentRedemptionPrice
             )
 
@@ -160,8 +159,7 @@ export const formatUserSafe = (
                 s.collateral,
                 totalDebt as string,
                 currentPrice?.liquidationPrice,
-                liquidationCRatio,
-                accumulatedRate
+                liquidationCRatio
             )
 
             return {
@@ -172,7 +170,7 @@ export const formatUserSafe = (
                 debt: s.debt,
                 totalDebt,
                 availableDebt,
-                accumulatedRate: accumulatedRate,
+                accumulatedRate,
                 collateralRatio,
                 currentRedemptionPrice,
                 internalCollateralBalance:
@@ -196,31 +194,28 @@ export const getCollateralRatio = (
     totalCollateral: string,
     totalDebt: string,
     liquidationPrice: string,
-    liquidationCRatio: string,
-    accumulatedRate: string
+    liquidationCRatio: string
 ) => {
     if (Number(totalCollateral) === 0) {
         return '0'
     } else if (Number(totalDebt) === 0) {
         return '∞'
     }
-
-    const denominator = numeral(totalDebt).multiply(accumulatedRate).value()
+    const denominator = numeral(totalDebt).value()
 
     const numerator = numeral(totalCollateral)
         .multiply(liquidationPrice)
         .multiply(liquidationCRatio)
-        .divide(denominator)
-        .multiply(100)
 
-    return formatNumber(numerator.value().toString(), 2, true)
+    const value = numerator.divide(denominator).multiply(100)
+
+    return formatNumber(value.value().toString(), 2, true)
 }
 
 export const getLiquidationPrice = (
     totalCollateral: string,
     totalDebt: string,
     liquidationCRatio: string,
-    accumulatedRate: string,
     currentRedemptionPrice: string
 ) => {
     if (Number(totalCollateral) === 0) {
@@ -230,7 +225,6 @@ export const getLiquidationPrice = (
     }
 
     const numerator = numeral(totalDebt)
-        .multiply(accumulatedRate)
         .multiply(liquidationCRatio)
         .multiply(currentRedemptionPrice)
         .divide(totalCollateral)
@@ -241,20 +235,16 @@ export const getLiquidationPrice = (
 export const safeIsSafe = (
     totalCollateral: string,
     totalDebt: string,
-    safetyPrice: string,
-    accumulatedRate: string
+    safetyPrice: string
 ): Boolean => {
     const totalDebtBN = BigNumber.from(toFixedString(totalDebt, 'WAD'))
     const totalCollateralBN = BigNumber.from(
         toFixedString(totalCollateral, 'WAD')
     )
     const safetyPriceBN = BigNumber.from(toFixedString(safetyPrice, 'RAY'))
-    const accumulatedRateBN = BigNumber.from(
-        toFixedString(accumulatedRate, 'RAY')
+    return totalDebtBN.lte(
+        totalCollateralBN.mul(safetyPriceBN).div(gebUtils.RAY)
     )
-    return totalDebtBN
-        .mul(accumulatedRateBN)
-        .lte(totalCollateralBN.mul(safetyPriceBN))
 }
 
 export const ratioChecker = (liquitdationRatio: number) => {
@@ -300,15 +290,20 @@ export const returnTotalValue = (
 
 export const returnAvaiableDebt = (
     safetyPrice: string,
+    accumulatedRate: string,
     currentCollatral = '0',
     prevCollatral = '0',
     prevDebt = '0'
 ) => {
-    if (!safetyPrice) {
+    if (!safetyPrice || accumulatedRate === '0') {
         return '0'
     }
+
     const safetyPriceRay = BigNumber.from(
         BigNumber.from(toFixedString(safetyPrice, 'RAY'))
+    )
+    const accumulatedRateRay = BigNumber.from(
+        BigNumber.from(toFixedString(accumulatedRate, 'RAY'))
     )
     const totalCollateralBN = returnTotalValue(
         currentCollatral,
@@ -318,7 +313,9 @@ export const returnAvaiableDebt = (
 
     const totalDebtBN = totalCollateralBN.mul(safetyPriceRay).div(gebUtils.RAY)
     const prevDebtBN = BigNumber.from(toFixedString(prevDebt, 'WAD'))
-    const availableDebt = totalDebtBN.sub(prevDebtBN)
+    const totalPrevDebt = prevDebtBN.mul(accumulatedRateRay).div(gebUtils.RAY)
+    const availableDebt = totalDebtBN.sub(totalPrevDebt)
+
     return formatNumber(
         gebUtils.wadToFixed(availableDebt).toString()
     ).toString()

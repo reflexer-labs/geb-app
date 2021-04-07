@@ -400,7 +400,7 @@ export interface ILiquidationResponse {
             value: string
         }
         currentRedemptionRate: {
-            eightHourlyRate: string
+            annualizedRate: string
         }
         globalDebt: string
         globalDebtCeiling: string

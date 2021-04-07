@@ -48,7 +48,7 @@ const DecimalInput = ({
 
     return (
         <Container>
-            <Label>{label}</Label>
+            <Label data-test-id={data_test_id + '_label'}>{label}</Label>
             <Content className={disabled ? 'disabled' : ''}>
                 {icon ? <Icon src={icon} /> : null}
                 <CustomInput
