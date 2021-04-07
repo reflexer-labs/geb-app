@@ -6,6 +6,8 @@ import {
 } from '../support/commands'
 
 describe('App Page - Safe Details', () => {
+    const getValue = (val: string) => val.replace(/[^\d.]*/g, '')
+
     let inititalCollateral: string
     let inititalDebt: string
     beforeEach(() => {
@@ -110,6 +112,29 @@ describe('App Page - Safe Details', () => {
             .then((tx) => {
                 const val = tx.split(' ')[0]
                 expect(cy.get('[data-test-id="modal_debt"]').contains(val))
+            })
+    })
+
+    it('tries max borrow, and checks on CRatio and LiquidationPrice', () => {
+        cy.get('#deposit_borrow').click()
+        cy.get('[data-test-id="deposit_borrow_left"]').type('4')
+        cy.get('[data-test-id="deposit_borrow_right_label"]')
+            .invoke('text')
+            .then((tx) => {
+                cy.get('[data-test-id="deposit_borrow_right"]').type(
+                    getValue(tx)
+                )
+                cy.wait(2000)
+                cy.get('[data-test-id="modal_col_ratio"]').contains('145.00%')
+                cy.get('[data-test-id="details_eth_price"]')
+                    .invoke('text')
+                    .then((tx) => {
+                        expect(
+                            cy
+                                .get('[data-test-id="modal_liq_price"]')
+                                .contains(tx)
+                        )
+                    })
             })
     })
 

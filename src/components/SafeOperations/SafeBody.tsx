@@ -129,12 +129,14 @@ const SafeBody = ({ isChecked }: Props) => {
         if (type === 'deposit_borrow' && isCreate) {
             return returnAvaiableDebt(
                 currentPrice.safetyPrice,
+                accumulatedRate,
                 defaultSafe.leftInput
             )
         } else if (type === 'deposit_borrow' && !isCreate) {
             if (singleSafe) {
                 return returnAvaiableDebt(
                     currentPrice.safetyPrice,
+                    accumulatedRate,
                     defaultSafe.leftInput,
                     singleSafe.collateral,
                     singleSafe.debt
@@ -177,8 +179,7 @@ const SafeBody = ({ isChecked }: Props) => {
         totalCollateral,
         totalDebt,
         currentPrice.liquidationPrice,
-        liquidationCRatio,
-        accumulatedRate
+        liquidationCRatio
     )
 
     const liquidationPenaltyPercentage = getRatePercentage(
@@ -189,7 +190,6 @@ const SafeBody = ({ isChecked }: Props) => {
         totalCollateral,
         totalDebt,
         liquidationCRatio,
-        accumulatedRate,
         currentRedemptionPrice
     )
 
@@ -309,8 +309,7 @@ const SafeBody = ({ isChecked }: Props) => {
         const isSafe = safeIsSafe(
             totalCollateral,
             totalDebt,
-            currentPrice.safetyPrice,
-            accumulatedRate
+            currentPrice.safetyPrice
         )
 
         if (!isSafe && (collateralRatio as number) >= 0) {

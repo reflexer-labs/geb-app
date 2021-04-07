@@ -124,7 +124,7 @@ const verifyKeys = (objA: any, objB: any, matchArrays = true) => {
 describe('actions', () => {
     // Address and safe to run the test against
     // !! This safe needs to exist on the deployment tested against
-    const address = '0xe94D94eDdb2322975D73cA3f2086978e0f2953b1'.toLowerCase()
+    const address = '0x6C5CCF22147A96e27855E26bC6824EB76497D112'.toLowerCase()
     let safeId: string
 
     beforeAll(async () => {
@@ -155,7 +155,7 @@ describe('actions', () => {
 
       expect(rpcResponse.systemState.currentRedemptionPrice.value).almostEqual(gqlResponse.systemState.currentRedemptionPrice.value, 0.0001);      
       // Since we're using JS instead of solidity for the exponentiation, an approximation is enough
-      expect(rpcResponse.systemState.currentRedemptionRate.eightHourlyRate).almostEqual(gqlResponse.systemState.currentRedemptionRate.eightHourlyRate, 0.00001)
+      expect(rpcResponse.systemState.currentRedemptionRate.annualizedRate).almostEqual(gqlResponse.systemState.currentRedemptionRate.annualizedRate, 0.00001)
       expect(rpcResponse.systemState.globalDebt).fixedNumberMatch(gqlResponse.systemState.globalDebt);
       expect(rpcResponse.systemState.globalDebtCeiling).fixedNumberMatch(gqlResponse.systemState.globalDebtCeiling)
       expect(rpcResponse.systemState.perSafeDebtCeiling).fixedNumberMatch(gqlResponse.systemState.perSafeDebtCeiling)

@@ -171,7 +171,7 @@ export const fetchUserSafes = async (
         currentRedemptionPrice:
             safesResponse.systemState.currentRedemptionPrice.value,
         currentRedemptionRate:
-            safesResponse.systemState.currentRedemptionRate.eightHourlyRate,
+            safesResponse.systemState.currentRedemptionRate.annualizedRate,
         globalDebt: safesResponse.systemState.globalDebt,
         globalDebtCeiling: safesResponse.systemState.globalDebtCeiling,
         perSafeDebtCeiling: safesResponse.systemState.perSafeDebtCeiling,
@@ -231,7 +231,7 @@ export const fetchSafeById = async (
         currentRedemptionPrice:
             safeResponse.systemState.currentRedemptionPrice.value,
         currentRedemptionRate:
-            safeResponse.systemState.currentRedemptionRate.eightHourlyRate,
+            safeResponse.systemState.currentRedemptionRate.annualizedRate,
         globalDebt: safeResponse.systemState.globalDebt,
         globalDebtCeiling: safeResponse.systemState.globalDebtCeiling,
         perSafeDebtCeiling: safeResponse.systemState.perSafeDebtCeiling,

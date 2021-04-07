@@ -50,9 +50,9 @@ const getLiquidationDataRpc = async (
             },
             currentRedemptionRate: {
                 // Calculate 8h exponentiation of the redemption rate in JS instead of solidity
-                eightHourlyRate: Math.pow(
+                annualizedRate: Math.pow(
                     Number(parseRay(resp[1])),
-                    3600 * 8
+                    3600 * 24 * 30 * 12
                 ).toString(),
             },
             globalDebt: parseRad(resp[2]),
