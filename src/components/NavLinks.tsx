@@ -64,16 +64,6 @@ const NavLinks = () => {
                 </LinkItem>
                 <MenuBox className="menu-box">
                     <ExtLink
-                        href="https://app.coverprotocol.com/app/marketplace/protocols/RAI"
-                        target="_blank"
-                    >
-                        Cover Protocol
-                        <img
-                            src={require('../assets/dark-arrow.svg')}
-                            alt="arrow"
-                        />
-                    </ExtLink>
-                    <ExtLink
                         href="https://app.nexusmutual.io/cover/buy/get-quote?address=0xCC88a9d330da1133Df3A7bD823B95e52511A6962"
                         target="_blank"
                     >
