@@ -6,7 +6,8 @@ import { Web3ReactContextInterface } from '@web3-react/core/dist/types'
 import { isMobile } from 'react-device-detect'
 import { injected } from '../connectors'
 import { NetworkContextName } from '../utils/constants'
-import { SafeAppConnector } from '../connectors/SafeAppConnector'
+import { SafeAppConnector } from '@gnosis.pm/safe-apps-web3-react'
+
 const safeAppConnector = new SafeAppConnector({
     supportedChainIds: [1, 4],
 })
