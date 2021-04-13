@@ -79,8 +79,6 @@ const DistributionsModal = () => {
         }
     }
 
-    // console.log(claimableDistributions)
-
     return (
         <Modal
             width={'450px'}
