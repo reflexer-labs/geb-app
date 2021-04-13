@@ -7,11 +7,13 @@ import { newTransactionsFirst, returnWalletAddress } from '../utils/helper'
 import { useWeb3React } from '@web3-react/core'
 import { isTransactionRecent } from '../hooks/TransactionHooks'
 import NavLinks from './NavLinks'
+import FLXLogoSmall from './Icons/FLXLogoSmall'
 
 const Navbar = () => {
-    const { transactionsModel: transactionsState } = useStoreState(
-        (state) => state
-    )
+    const {
+        transactionsModel: transactionsState,
+        connectWalletModel: connectWalletState,
+    } = useStoreState((state) => state)
 
     const { transactions } = transactionsState
 
@@ -44,6 +46,24 @@ const Navbar = () => {
                 <NavLinks />
             </HideMobile>
             <RightSide>
+                {active && account ? (
+                    <FLXButton
+                        data-test-id="flx-btn"
+                        onClick={() =>
+                            popupsActions.setIsDistributionsModalOpen(true)
+                        }
+                    >
+                        <Balance>
+                            {connectWalletState.claimableFLX.slice(0, 10)}
+                        </Balance>
+                        <FLXInfo>
+                            <LogoBox>
+                                <FLXLogoSmall />
+                            </LogoBox>
+                            FLX
+                        </FLXInfo>
+                    </FLXButton>
+                ) : null}
                 <BtnContainer>
                     <Button
                         id="web3-status-connected"
@@ -110,6 +130,8 @@ const MenuBtn = styled.div`
 `
 
 const BtnContainer = styled.div`
+    display: flex;
+    align-items: center;
     ${({ theme }) => theme.mediaWidth.upToSmall`
     display: none;
   `}
@@ -149,6 +171,55 @@ const HideMobile = styled.div`
 
 const Left = styled.div`
     min-width: 194px;
+    display: flex;
+    align-items: center;
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+    min-width:auto;
+  `}
+`
+
+const FLXButton = styled.button`
+    box-shadow: none;
+    border: 0;
+    background: transparent;
+    display: flex;
+    padding: 0;
+    outline: none;
+    align-items: center;
+    font-weight: bold;
+    height: 40px;
+    line-height: 24px;
+    position: relative;
+    cursor: pointer;
+    margin-right: 15px;
+`
+const Balance = styled.div`
+    border-radius: 4px;
+    background: ${(props) => props.theme.colors.gradient};
+    color: ${(props) => props.theme.colors.neutral};
+    font-weight: bold;
+    position: relative;
+    font-size: 15px;
+    height: 40px;
+    padding: 0 10px;
+    min-width: 50px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    margin-right: -10px;
+`
+
+const FLXInfo = styled.div`
+    display: flex;
+    align-items: center;
+    background: #34496c;
+    height: 40px;
+    color: ${(props) => props.theme.colors.neutral};
+    border-radius: 0 4px 4px 0;
+    padding: 0 10px;
+`
+const LogoBox = styled.div`
+    margin: 0 5px;
     display: flex;
     align-items: center;
 `
