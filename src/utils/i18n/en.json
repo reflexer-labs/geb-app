@@ -103,7 +103,7 @@
     "liquidation_text": "You have {{balance}} leftover collateral that can be claimed.",
     "collect_surplus": "Collect ETH",
     "my_stake_tip": "This is the percentage of the earned rewards which can be claimed immediately. The remainder is locked until the end of the campaign. Once the campaign ends, the remained will be unlocked linearly until {{date}}",
-    "annual_redemption_tip": "Rate at which RAI is devalued or revalued over 8 hours.",
+    "annual_redemption_tip": "Rate at which RAI is devalued or revalued over 1 year.",
     "liquidation_price_tip": "ETH price under which this Safe can get liquidated. ⚠️ The liquidation price varies with the redemption price.",
     "liquidation_penalty_tip": "This is a fee you pay in case your Safe gets liquidated. The fee is added on top of your Safe's debt during liquidation, resulting in more Safe collateral being sold.",
     "app": "App",
