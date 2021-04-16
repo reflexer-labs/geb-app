@@ -11,7 +11,7 @@ import { timeout } from '../utils/helper'
 import Button from './Button'
 import Loader from './Loader'
 
-export type ApproveMethod = 'coin' | 'uniswapPairCoinEth'
+export type ApproveMethod = 'coin' | 'uniswapPairCoinEth' | 'protocolToken'
 
 interface Props {
     handleBackBtn: () => void
@@ -116,10 +116,19 @@ const ApproveRAI = ({
             })
             const signer = library.getSigner(account)
             const geb = new Geb(ETH_NETWORK, signer.provider)
-            const tx = geb.contracts[methodName].approve(
-                proxyAddress,
-                ethers.constants.MaxUint256
-            )
+            let tx
+            if (methodName === 'protocolToken') {
+                tx = geb.contracts[methodName].approve__AddressUint256(
+                    proxyAddress,
+                    ethers.constants.MaxUint256
+                )
+            } else {
+                tx = geb.contracts[methodName].approve(
+                    proxyAddress,
+                    ethers.constants.MaxUint256
+                )
+            }
+
             const txResponse = await signer.sendTransaction(tx)
             setTextPayload({
                 title: `Unlocking ${coinName}`,

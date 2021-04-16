@@ -13,7 +13,8 @@ const Results = () => {
 
     const { selectedAuction, amount, internalBalance } = auctionsState
     const buyInititalAmount = _.get(selectedAuction, 'buyInitialAmount', '0')
-
+    const sellInitialAmount = _.get(selectedAuction, 'sellInitialAmount', '0')
+    const auctionType = _.get(selectedAuction, 'englishAuctionType', 'DEBT')
     const auctionId = _.get(selectedAuction, 'auctionId', '')
     const buyToken = _.get(selectedAuction, 'buyToken', 'COIN')
     const sellToken = _.get(selectedAuction, 'sellToken', 'PROTOCOL_TOKEN')
@@ -46,13 +47,23 @@ const Results = () => {
                         ) : (
                             <>
                                 <Item>
-                                    <Label>{`${buySymbol} to Bid`}</Label>
+                                    <Label>
+                                        {auctionType === 'DEBT'
+                                            ? `${buySymbol} to Bid`
+                                            : `${sellSymbol} to Receive`}
+                                    </Label>
                                     <Value>{`${formatNumber(
-                                        buyInititalAmount
+                                        auctionType === 'DEBT'
+                                            ? buyInititalAmount
+                                            : sellInitialAmount
                                     )}`}</Value>
                                 </Item>
                                 <Item>
-                                    <Label>{`${sellSymbol} to Receive`}</Label>
+                                    <Label>
+                                        {auctionType === 'DEBT'
+                                            ? `${sellSymbol} to Receive`
+                                            : `${buySymbol} to Bid`}
+                                    </Label>
                                     <Value>{`${formatNumber(amount)}`}</Value>
                                 </Item>
                             </>

@@ -278,8 +278,12 @@ export const handleAuctionBid = async ({
     if (auctionType === 'DEBT') {
         txData = proxy.debtAuctionDecreaseSoldAmount(amountBN, auctionId)
     }
+    if (auctionType === 'SURPLUS') {
+        txData = proxy.surplusIncreaseBidSize(amountBN, auctionId)
+    }
 
     if (!txData) throw new Error('No transaction request!')
+
     let tx = await handlePreTxGasEstimate(signer, txData)
     const txResponse = await signer.sendTransaction(tx)
     return txResponse
@@ -301,6 +305,9 @@ export const handleAuctionClaim = async ({
 
     if (auctionType === 'DEBT') {
         txData = proxy.debtAuctionSettleAuction(auctionId)
+    }
+    if (auctionType === 'SURPLUS') {
+        txData = proxy.surplusSettleAuction(auctionId)
     }
 
     if (!txData) throw new Error('No transaction request!')

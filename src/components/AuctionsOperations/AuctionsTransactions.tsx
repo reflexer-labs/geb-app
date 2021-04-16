@@ -49,6 +49,13 @@ const AuctionsTransactions = () => {
                     : isClaim
                     ? 'Claiming Tokens'
                     : `Bid ${COIN_TICKER} and Receive FLX`
+
+            case 'SURPLUS':
+                return isSettle
+                    ? 'Claiming FLX'
+                    : isClaim
+                    ? 'Claiming Tokens'
+                    : `Bid FLX and Receive ${COIN_TICKER}`
             default:
                 return ''
         }
@@ -69,14 +76,14 @@ const AuctionsTransactions = () => {
                     status: 'loading',
                 })
                 const signer = library.getSigner(account)
-                if (auctionType === 'DEBT' && isSettle) {
+                if (isSettle) {
                     await auctionsActions.auctionClaim({
                         signer,
                         auctionId,
                         title: isClaim ? 'Claiming FLX' : 'Settling Auction',
                         auctionType,
                     })
-                } else if (auctionType === 'DEBT' && (!isClaim || !isSettle)) {
+                } else if (!isClaim || !isSettle) {
                     await auctionsActions.auctionBid({
                         signer,
                         auctionId,
@@ -86,7 +93,7 @@ const AuctionsTransactions = () => {
                     })
                 }
 
-                if (auctionType === 'DEBT' && isClaim) {
+                if (isClaim) {
                     await auctionsActions.auctionClaimInternalBalance({
                         signer,
                         auctionId,

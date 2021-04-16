@@ -116,6 +116,7 @@ export interface ISafe {
     collateral: string
     debt: string
     totalDebt: string
+    availableDebt: string
     accumulatedRate: string
     collateralRatio: string
     currentRedemptionPrice: string
@@ -399,7 +400,7 @@ export interface ILiquidationResponse {
             value: string
         }
         currentRedemptionRate: {
-            eightHourlyRate: string
+            annualizedRate: string
         }
         globalDebt: string
         globalDebtCeiling: string
@@ -503,10 +504,35 @@ export interface IAuctionBid {
     auctionId: string
     title: string
     signer: JsonRpcSigner
-    auctionType: 'DEBT'
+    auctionType: 'DEBT' | 'SURPLUS'
 }
 
 export interface IPaging {
     from: number
     to: number
+}
+
+export interface IIncentivesMigrate {
+    from: string
+    to: string
+    signer: JsonRpcSigner
+}
+
+export interface IManageSafe {
+    safeId: string
+    owner: {
+        id: string
+    }
+}
+
+export type Distributions = Distribution[]
+
+export interface Distribution {
+    distributionIndex: number
+    distributorAddress: string
+    isClaimed: boolean
+    description: 'Early user rewards'
+    index: number
+    amount: string
+    proof: string[]
 }

@@ -5,12 +5,14 @@ import {
     fetchDebtFloorQuery,
     getSafeByIdQuery,
     getUserSafesListQuery,
+    managedSafeQuery,
 } from '../utils/queries/safe'
 import { GRAPH_API_URLS } from '../utils/constants'
 import { formatUserSafe, formatHistoryArray } from '../utils/helper'
 import { incentiveCampaignsQuery } from '../utils/queries/incentives'
 import { IIncentivesCampaignData, IIncentivesConfig } from '../utils/interfaces'
 import {
+    fetchFLXBalanceQuery,
     getSubgraphBlock,
     getUserQuery,
     internalBalanceQuery,
@@ -64,9 +66,10 @@ export const checkSubgraphBlockDiff = async (latesBlockNumber: number) => {
             }
         }
     } catch (error) {
-        throw Error('Error with subgraph query: ' + error)
+        console.debug('Error with subgraph query: ' + error)
     }
 }
+
 export const fetchDebtFloor = () => {
     return retry(
         async (bail, attempt) => {
@@ -81,6 +84,26 @@ export const fetchDebtFloor = () => {
             }
 
             return res.data.data.collateralType.debtFloor
+        },
+        {
+            retries: GRAPH_API_URLS.length - 1,
+        }
+    )
+}
+
+export const fetchManagedSafe = (safeId: string) => {
+    return retry(
+        async (bail, attempt) => {
+            const res = await axios.post(
+                GRAPH_API_URLS[attempt - 1],
+                JSON.stringify({ query: managedSafeQuery(safeId) })
+            )
+
+            if (!res.data.data && attempt < GRAPH_API_URLS.length) {
+                throw new Error('retry')
+            }
+
+            return res.data.data
         },
         {
             retries: GRAPH_API_URLS.length - 1,
@@ -149,7 +172,7 @@ export const fetchUserSafes = async (
         currentRedemptionPrice:
             safesResponse.systemState.currentRedemptionPrice.value,
         currentRedemptionRate:
-            safesResponse.systemState.currentRedemptionRate.eightHourlyRate,
+            safesResponse.systemState.currentRedemptionRate.annualizedRate,
         globalDebt: safesResponse.systemState.globalDebt,
         globalDebtCeiling: safesResponse.systemState.globalDebtCeiling,
         perSafeDebtCeiling: safesResponse.systemState.perSafeDebtCeiling,
@@ -198,7 +221,7 @@ export const fetchSafeById = async (
             : false
     }
 
-    if (!response) return false
+    if (!response || !response.safes.length) return false
 
     if (returnRaw) return response
 
@@ -209,7 +232,7 @@ export const fetchSafeById = async (
         currentRedemptionPrice:
             safeResponse.systemState.currentRedemptionPrice.value,
         currentRedemptionRate:
-            safeResponse.systemState.currentRedemptionRate.eightHourlyRate,
+            safeResponse.systemState.currentRedemptionRate.annualizedRate,
         globalDebt: safeResponse.systemState.globalDebt,
         globalDebtCeiling: safeResponse.systemState.globalDebtCeiling,
         perSafeDebtCeiling: safeResponse.systemState.perSafeDebtCeiling,
@@ -297,16 +320,60 @@ export const fetchIncentivesCampaigns = async (
     return payload
 }
 
-export const fetchAuctions = async (address: string) => {
-    const res = await request(JSON.stringify({ query: auctionsQuery(address) }))
+export const fetchAuctions = async ({
+    address,
+    type,
+}: {
+    address: string
+    type: string
+}) => {
+    const res = await request(
+        JSON.stringify({ query: auctionsQuery(address, type) })
+    )
+    if (!res.data.data) {
+        throw new Error('retry')
+    }
+
     const response = res.data.data
     return response
 }
 
 export const fetchInternalBalance = async (proxyAddress: string) => {
-    const res = await request(
-        JSON.stringify({ query: internalBalanceQuery(proxyAddress) })
+    return retry(
+        async (bail, attempt) => {
+            const res = await axios.post(
+                GRAPH_API_URLS[attempt - 1],
+                JSON.stringify({ query: internalBalanceQuery(proxyAddress) })
+            )
+
+            if (!res.data.data && attempt < GRAPH_API_URLS.length) {
+                throw new Error('retry')
+            }
+
+            return res.data.data
+        },
+        {
+            retries: GRAPH_API_URLS.length - 1,
+        }
     )
-    const response = res.data.data
-    return response
+}
+
+export const fetchFLXBalance = async (address: string) => {
+    return retry(
+        async (bail, attempt) => {
+            const res = await axios.post(
+                GRAPH_API_URLS[attempt - 1],
+                JSON.stringify({ query: fetchFLXBalanceQuery(address) })
+            )
+
+            if (!res.data.data && attempt < GRAPH_API_URLS.length) {
+                throw new Error('retry')
+            }
+
+            return res.data.data
+        },
+        {
+            retries: GRAPH_API_URLS.length - 1,
+        }
+    )
 }

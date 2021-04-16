@@ -13,8 +13,7 @@ export default function useAuctions() {
     const userProxy: string = _.get(connectWalletState, 'proxyAddress', '')
 
     useEffect(() => {
-        const oneMonthOld =
-            Date.now() - new Date().setMonth(new Date().getMonth() - 1)
+        const oneMonthOld = new Date().setMonth(new Date().getMonth() - 1)
         const filteredAuctions = autctionsData
             .filter((auction: IAuction) => {
                 return (
