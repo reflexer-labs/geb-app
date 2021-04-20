@@ -52,7 +52,7 @@ const AuctionsTransactions = () => {
 
             case 'SURPLUS':
                 return isSettle
-                    ? 'Claiming FLX'
+                    ? 'Claiming RAI'
                     : isClaim
                     ? 'Claiming Tokens'
                     : `Bid FLX and Receive ${COIN_TICKER}`
