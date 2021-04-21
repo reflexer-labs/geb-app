@@ -164,9 +164,10 @@ const AuctionsPayment = () => {
 
             if (bids.length > 0 && valueBN.lt(maxBidAmountBN)) {
                 setError(
-                    `You need to bid ${Math.abs(
-                        1 - Number(bidIncrease)
-                    )}% more FLX vs the highest bid`
+                    `You need to bid ${(
+                        (Number(bidIncrease) - 1) *
+                        100
+                    ).toFixed(0)}% more FLX vs the highest bid`
                 )
                 return false
             }
@@ -187,9 +188,10 @@ const AuctionsPayment = () => {
 
             if (bids.length > 0 && valueBN.gt(maxBidAmountBN)) {
                 setError(
-                    `You need to bid ${
-                        1 - Number(bidIncrease)
-                    }% less FLX vs the lowest bid`
+                    `You need to bid ${(
+                        (Number(bidIncrease) - 1) *
+                        100
+                    ).toFixed(0)}% less FLX vs the lowest bid`
                 )
                 return false
             }
@@ -266,6 +268,7 @@ const AuctionsPayment = () => {
                                 ? `${sellSymbol} to Receive`
                                 : `${buySymbol} to Bid`
                         }
+                        maxText={auctionType === 'SURPLUS' ? 'min' : 'max'}
                         handleMaxClick={() => handleAmountChange(maxBid())}
                     />
                 </>

@@ -122,5 +122,6 @@
     "show_faq": "Show FAQ",
     "rai_bid": "{{rai}} Bid",
     "no_auctions": "No debt auctions to bid",
-    "settle": "Settle"
+    "settle": "Settle",
+    "min": "MIN"
 }
