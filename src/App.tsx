@@ -22,10 +22,9 @@ import SafeDetails from './containers/OnBoarding/SafeDetails'
 
 import Privacy from './containers/Privacy'
 import CustomToast from './components/CustomToast'
-import Incentives from './containers/Incentives'
 import Auctions from './containers/Auctions'
-import { NETWORK_ID } from './connectors'
 import GoogleTagManager from './components/Analytics/GoogleTagManager'
+import { SHOW_AUCTIONS } from './utils/constants'
 
 // Toast css
 
@@ -54,18 +53,14 @@ const App = () => {
                                 <Route component={GoogleTagManager} />
                                 <Web3ReactManager>
                                     <Switch>
-                                        <Route
-                                            exact
-                                            component={Auctions}
-                                            path={'/auctions'}
-                                        />
-                                        {NETWORK_ID === 1 ? null : (
+                                        {SHOW_AUCTIONS &&
+                                        SHOW_AUCTIONS === '1' ? (
                                             <Route
                                                 exact
-                                                component={Incentives}
-                                                path={'/incentives'}
+                                                component={Auctions}
+                                                path={'/auctions'}
                                             />
-                                        )}
+                                        ) : null}
                                         <Route
                                             exact
                                             component={Privacy}
