@@ -150,7 +150,9 @@ const ApproveRAI = ({
                 return
             }
             setTextPayload({
-                title: 'Transaction Failed.',
+                title: e.message.includes('proxy')
+                    ? 'No Reflexer Account'
+                    : 'Transaction Failed.',
                 text: '',
                 status: 'error',
             })

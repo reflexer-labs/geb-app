@@ -64,7 +64,9 @@ const Auctions = () => {
                 <Content>
                     <PageHeader
                         breadcrumbs={{ '/': t('auctions') }}
-                        text={t('auctions_header_text')}
+                        text={t('auctions_header_text', {
+                            type: type.toLocaleLowerCase(),
+                        })}
                     />
                     {hide ? (
                         <Button text={t('show_faq')} onClick={handleHideFAQ} />
@@ -86,8 +88,10 @@ const Auctions = () => {
                     </Tab>
                 </Switcher>
 
-                {hide ? null : <AuctionsFAQ hideFAQ={handleHideFAQ} />}
-                <AuctionsList />
+                {hide ? null : (
+                    <AuctionsFAQ hideFAQ={handleHideFAQ} type={type} />
+                )}
+                <AuctionsList type={type} />
             </GridContainer>
         </>
     )

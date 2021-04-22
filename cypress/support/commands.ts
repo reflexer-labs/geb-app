@@ -5,7 +5,7 @@
 // ***********************************************
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { Wallet } from '@ethersproject/wallet'
-import { _Eip1193Bridge } from '@ethersproject/experimental/lib/eip1193-bridge'
+import { Eip1193Bridge } from '@ethersproject/experimental/lib/eip1193-bridge'
 
 // never send real ether to this, obviously
 const PRIVATE_KEY_TEST_NEVER_USE =
@@ -17,11 +17,13 @@ export const TEST_ADDRESS_NEVER_USE =
 
 export const TEST_ADDRESS_NEVER_USE_SHORTENED = '0x6C5C...D112'
 
-class CustomizedBridge extends _Eip1193Bridge {
+class CustomizedBridge extends Eip1193Bridge {
+    //@ts-ignore
     async sendAsync(...args) {
         console.debug('sendAsync called', ...args)
         return this.send(...args)
     }
+    //@ts-ignore
     async send(...args) {
         console.debug('send called', ...args)
         const isCallbackForm =
@@ -73,6 +75,7 @@ class CustomizedBridge extends _Eip1193Bridge {
 Cypress.Commands.overwrite('visit', (original, url, options) => {
     return original(url, {
         ...options,
+        //@ts-ignore
         onBeforeLoad(win) {
             options && options.onBeforeLoad && options.onBeforeLoad(win)
             win.localStorage.clear()

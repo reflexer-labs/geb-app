@@ -37,7 +37,7 @@ const AuctionBlock = (auction: Props) => {
     const [collapse, setCollapse] = useState(isCollapsed)
 
     const id = _.get(auction, 'auctionId', '')
-    const icon = _.get(auction, 'englishAuctionType', 'debt')
+    const eventType = _.get(auction, 'englishAuctionType', 'debt')
     const buyToken = _.get(auction, 'buyToken', 'COIN')
     const sellToken = _.get(auction, 'sellToken', 'PROTOCOL_TOKEN')
     const buyInititalAmount = _.get(auction, 'buyInitialAmount', '0')
@@ -67,7 +67,6 @@ const AuctionBlock = (auction: Props) => {
     }
 
     const userProxy = _.get(connectWalletState, 'proxyAddress', '')
-    const isUserCreated = _.get(connectWalletState, 'isUserCreated', false)
 
     const returnEventType = (bidder: IAuctionBidder, i: number) => {
         if (
@@ -90,17 +89,17 @@ const AuctionBlock = (auction: Props) => {
             return
         }
 
-        if (!isUserCreated) {
-            popupsActions.setIsProxyModalOpen(true)
-            popupsActions.setReturnProxyFunction((storeActions: any) => {
-                storeActions.popupsModel.setAuctionOperationPayload({
-                    isOpen: true,
-                    type,
-                })
-                storeActions.auctionsModel.setSelectedAuction(auction)
-            })
-            return
-        }
+        // if (!userProxy) {
+        //     popupsActions.setIsProxyModalOpen(true)
+        //     popupsActions.setReturnProxyFunction((storeActions: any) => {
+        //         storeActions.popupsModel.setAuctionOperationPayload({
+        //             isOpen: true,
+        //             type,
+        //         })
+        //         storeActions.auctionsModel.setSelectedAuction(auction)
+        //     })
+        //     return
+        // }
 
         popupsActions.setAuctionOperationPayload({
             isOpen: true,
@@ -186,11 +185,12 @@ const AuctionBlock = (auction: Props) => {
     return (
         <Container>
             <Header onClick={() => setCollapse(!collapse)}>
-                <LeftAucInfo>
+                <LeftAucInfo type={eventType.toLowerCase()}>
                     <img
-                        src={require(`../assets/${icon.toLowerCase()}.svg`)}
+                        src={require(`../assets/${eventType.toLowerCase()}.svg`)}
                         alt="debt type auction"
                     />
+
                     {`Auction #${id}`}
                 </LeftAucInfo>
 
@@ -413,11 +413,12 @@ const BtnContainer = styled.div`
     border-top: 1px solid ${(props) => props.theme.colors.border};
 `
 
-const LeftAucInfo = styled.div`
+const LeftAucInfo = styled.div<{ type?: string }>`
     display: flex;
     align-items: center;
     img {
         margin-right: 20px;
+        width: ${({ type }) => (type === 'surplus' ? '40px' : 'auto')};
     }
 `
 
