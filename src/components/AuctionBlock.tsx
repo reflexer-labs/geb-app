@@ -89,17 +89,17 @@ const AuctionBlock = (auction: Props) => {
             return
         }
 
-        // if (!userProxy) {
-        //     popupsActions.setIsProxyModalOpen(true)
-        //     popupsActions.setReturnProxyFunction((storeActions: any) => {
-        //         storeActions.popupsModel.setAuctionOperationPayload({
-        //             isOpen: true,
-        //             type,
-        //         })
-        //         storeActions.auctionsModel.setSelectedAuction(auction)
-        //     })
-        //     return
-        // }
+        if (!userProxy) {
+            popupsActions.setIsProxyModalOpen(true)
+            popupsActions.setReturnProxyFunction((storeActions: any) => {
+                storeActions.popupsModel.setAuctionOperationPayload({
+                    isOpen: true,
+                    type,
+                })
+                storeActions.auctionsModel.setSelectedAuction(auction)
+            })
+            return
+        }
 
         popupsActions.setAuctionOperationPayload({
             isOpen: true,
