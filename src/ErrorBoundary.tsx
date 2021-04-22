@@ -1,12 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import * as Sentry from '@sentry/react'
-import Button from './components/Button'
 
 interface State {
     error: string | null
     errorInfo: any
-    eventId: any
 }
 
 interface Props {
@@ -14,23 +11,13 @@ interface Props {
 }
 
 class ErrorBoundary extends React.Component<Props, State> {
-    state: State = { error: null, errorInfo: null, eventId: null }
+    state: State = { error: null, errorInfo: null }
 
     componentDidCatch(error: any, errorInfo: any) {
         this.setState({
-            error,
-            errorInfo,
+            error: error,
+            errorInfo: errorInfo,
         })
-
-        if (process.env.REACT_APP_SENTRY_KEY) {
-            Sentry.withScope((scope) => {
-                scope.setExtras(errorInfo)
-                const eventId = Sentry.captureException(error)
-                this.setState({
-                    eventId,
-                })
-            })
-        }
     }
 
     render() {
@@ -41,19 +28,6 @@ class ErrorBoundary extends React.Component<Props, State> {
                     <Content>
                         <img src={require('./assets/error.svg')} alt="" />
                         <h2>Something went wrong.</h2>
-                        <br />
-                        {process.env.REACT_APP_SENTRY_KEY ? (
-                            <Button
-                                onClick={() =>
-                                    Sentry.showReportDialog({
-                                        eventId: this.state.eventId,
-                                    })
-                                }
-                            >
-                                Report Feedback
-                            </Button>
-                        ) : null}
-
                         <Details>
                             {this.state.error && this.state.error.toString()}
                             <br />
@@ -68,6 +42,7 @@ class ErrorBoundary extends React.Component<Props, State> {
 }
 
 export default ErrorBoundary
+
 const Container = styled.div`
     width: 100%;
     height: 100%;

@@ -6,7 +6,7 @@
 import 'cypress-wait-until'
 import { Wallet } from '@ethersproject/wallet'
 import { JsonRpcProvider } from '@ethersproject/providers'
-import { _Eip1193Bridge } from '@ethersproject/experimental/lib/eip1193-bridge'
+import { Eip1193Bridge } from '@ethersproject/experimental/lib/eip1193-bridge'
 import { Signer } from '@ethersproject/abstract-signer'
 
 // never send real ether to this, obviously
@@ -39,7 +39,7 @@ function renameKeys(obj: any, newKeys: any) {
     })
     return Object.assign({}, ...keyValues)
 }
-export class CustomizedBridge extends _Eip1193Bridge {
+export class CustomizedBridge extends Eip1193Bridge {
     address: string
     allowTx: boolean = false
     constructor(

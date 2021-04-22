@@ -16,7 +16,6 @@ import {
     ITransaction,
 } from './interfaces'
 import { injected, NETWORK_ID } from '../connectors'
-import Sentry from '@sentry/react'
 import { getAddress } from '@ethersproject/address'
 
 export const returnWalletAddress = (walletAddress: string) =>
@@ -520,17 +519,4 @@ export const returnTimeOffset = () => {
     const a = new Date().getTimezoneOffset()
     const res = -Math.round(a / 60)
     return res < 0 ? res : '+' + res
-}
-
-export const handlePickedEvents = (event: Sentry.Event) => {
-    if (!event) return null
-    const { exception } = event
-    if (exception && exception.values) {
-        for (let val of exception.values) {
-            if (val.value && val.value.toLowerCase().includes('bignumber')) {
-                return event
-            }
-        }
-    }
-    return null
 }
