@@ -5,26 +5,11 @@ import { StoreProvider } from 'easy-peasy'
 import './index.css'
 import App from './App'
 import store from './store'
-import * as Sentry from '@sentry/react'
-import { Integrations } from '@sentry/tracing'
 import { NetworkContextName } from './utils/constants'
 import getLibrary from './utils/getLibrary'
 import { HelmetProvider } from 'react-helmet-async'
-import { handlePickedEvents } from './utils/helper'
 
 const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName)
-
-if (process.env.REACT_APP_SENTRY_KEY) {
-    Sentry.init({
-        dsn: process.env.REACT_APP_SENTRY_KEY,
-        integrations: [new Integrations.BrowserTracing()],
-        tracesSampleRate: 1.0,
-        beforeSend(event) {
-            const val = handlePickedEvents(event)
-            return val
-        },
-    })
-}
 
 if ('ethereum' in window) {
     ;(window.ethereum as any).autoRefreshOnNetworkChange = false
