@@ -11,7 +11,11 @@ const AuctionsModal = () => {
     } = useStoreActions((state) => state)
 
     const handleCancel = () => {
-        popupsActions.setAuctionOperationPayload({ isOpen: false, type: '' })
+        popupsActions.setAuctionOperationPayload({
+            isOpen: false,
+            type: '',
+            auctionType: '',
+        })
         auctionsActions.setOperation(0)
         popupsActions.setReturnProxyFunction(() => {})
         auctionsActions.setAmount('')

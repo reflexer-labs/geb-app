@@ -139,6 +139,9 @@ export interface IOperation {
     type: string
 }
 
+export interface IAuctionOperation extends IOperation {
+    auctionType: string
+}
 export interface IAlert {
     type: string
     text: string
@@ -505,6 +508,7 @@ export interface IAuctionBid {
     title: string
     signer: JsonRpcSigner
     auctionType: 'DEBT' | 'SURPLUS'
+    type?: 'DEBT' | 'SURPLUS'
 }
 
 export interface IPaging {

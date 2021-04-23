@@ -30,8 +30,10 @@ const AuctionsPayment = () => {
         amount,
         coinBalances,
         internalBalance,
+        protInternalBalance,
     } = auctionsState
 
+    const sectionType = popupsState.auctionOperationPayload.auctionType
     const isSettle = popupsState.auctionOperationPayload.type.includes('settle')
     const isBid = popupsState.auctionOperationPayload.type.includes('bid')
     const isClaim = popupsState.auctionOperationPayload.type.includes('claim')
@@ -140,8 +142,12 @@ const AuctionsPayment = () => {
         const internalBalanceBN = internalBalance
             ? BigNumber.from(toFixedString(internalBalance, 'WAD'))
             : BigNumber.from('internalBalance')
+        const flxInternalBalance = protInternalBalance
+            ? BigNumber.from(toFixedString(protInternalBalance, 'WAD'))
+            : BigNumber.from('protInternalBalance')
 
         const totalRaiBalance = raiBalanceBN.add(internalBalanceBN)
+        const totalFlxBalance = flxBalanceBN.add(flxInternalBalance)
 
         const buyAmountBN = buyAmount
             ? BigNumber.from(toFixedString(buyAmount, 'WAD'))
@@ -157,7 +163,7 @@ const AuctionsPayment = () => {
         }
 
         if (auctionType === 'SURPLUS') {
-            if (buyAmountBN.gt(flxBalanceBN)) {
+            if (buyAmountBN.gt(totalFlxBalance)) {
                 setError(`Insufficient FLX balance.`)
                 return false
             }
@@ -227,11 +233,27 @@ const AuctionsPayment = () => {
             }
             return
         }
-        auctionsActions.setOperation(2)
+        if (sectionType === 'DEBT') {
+            auctionsActions.setOperation(2)
+        } else {
+            auctionsActions.setAmount(protInternalBalance)
+            auctionsActions.setOperation(2)
+        }
+    }
+
+    const returnClaimValues = () => {
+        if (sectionType === 'DEBT') {
+            return { amount: internalBalance, symbol: 'RAI' }
+        }
+        return { amount: protInternalBalance, symbol: 'FLX' }
     }
 
     const handleCancel = () => {
-        popupsActions.setAuctionOperationPayload({ isOpen: false, type: '' })
+        popupsActions.setAuctionOperationPayload({
+            isOpen: false,
+            type: '',
+            auctionType: '',
+        })
         auctionsActions.setOperation(0)
         auctionsActions.setSelectedAuction(null)
         auctionsActions.setAmount('')
@@ -276,8 +298,10 @@ const AuctionsPayment = () => {
                 <DecimalInput
                     disabled
                     onChange={() => {}}
-                    value={isClaim ? internalBalance : sellAmount}
-                    label={`Claimable ${isClaim ? 'RAI' : sellSymbol}`}
+                    value={isClaim ? returnClaimValues().amount : sellAmount}
+                    label={`Claimable ${
+                        isClaim ? returnClaimValues().symbol : sellSymbol
+                    }`}
                 />
             )}
             {error && <Error>{error}</Error>}

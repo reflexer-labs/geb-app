@@ -95,6 +95,7 @@ const AuctionBlock = (auction: Props) => {
                 storeActions.popupsModel.setAuctionOperationPayload({
                     isOpen: true,
                     type,
+                    auctionType: eventType,
                 })
                 storeActions.auctionsModel.setSelectedAuction(auction)
             })
@@ -104,6 +105,7 @@ const AuctionBlock = (auction: Props) => {
         popupsActions.setAuctionOperationPayload({
             isOpen: true,
             type,
+            auctionType: eventType,
         })
         auctionsActions.setSelectedAuction(auction)
     }

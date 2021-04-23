@@ -21,7 +21,7 @@ const AuctionsList = ({ type }: Props) => {
         connectWalletModel: connectWalletState,
     } = useStoreState((state) => state)
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
-    const { internalBalance } = auctionsState
+    const { internalBalance, protInternalBalance } = auctionsState
     const { proxyAddress } = connectWalletState
     const auctions = useAuctions()
 
@@ -37,6 +37,7 @@ const AuctionsList = ({ type }: Props) => {
                 storeActions.popupsModel.setAuctionOperationPayload({
                     isOpen: true,
                     type: modalType,
+                    auctionType: type,
                 })
             })
             return
@@ -45,6 +46,7 @@ const AuctionsList = ({ type }: Props) => {
         popupsActions.setAuctionOperationPayload({
             isOpen: true,
             type: modalType,
+            auctionType: type,
         })
     }
 
@@ -55,7 +57,8 @@ const AuctionsList = ({ type }: Props) => {
                 {account &&
                 auctions &&
                 auctions.length &&
-                Number(internalBalance) > 0 ? (
+                (Number(internalBalance) > 0 ||
+                    Number(protInternalBalance) > 0) ? (
                     <Button
                         text={t('claim_tokens')}
                         onClick={() => handleClick('claim_tokens')}

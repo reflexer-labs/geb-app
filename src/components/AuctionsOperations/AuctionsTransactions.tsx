@@ -30,9 +30,8 @@ const AuctionsTransactions = () => {
     const auctionType = _.get(selectedAuction, 'englishAuctionType', 'DEBT')
 
     const isClaim = popupsState.auctionOperationPayload.type.includes('claim')
-
     const isSettle = popupsState.auctionOperationPayload.type.includes('settle')
-
+    const sectionType = popupsState.auctionOperationPayload.auctionType
     const handleBack = () => auctionsActions.setOperation(0)
 
     const reset = () => {
@@ -67,6 +66,7 @@ const AuctionsTransactions = () => {
                 popupsActions.setAuctionOperationPayload({
                     isOpen: false,
                     type: '',
+                    auctionType: '',
                 })
                 popupsActions.setIsWaitingModalOpen(true)
                 popupsActions.setWaitingPayload({
@@ -100,6 +100,7 @@ const AuctionsTransactions = () => {
                         title: handleWaitingTitle(),
                         auctionType,
                         amount,
+                        type: sectionType as 'DEBT' | 'SURPLUS',
                     })
                 }
             }

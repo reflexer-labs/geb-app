@@ -12,6 +12,7 @@ export interface AuctionsModel {
     operation: number
     amount: string
     internalBalance: string
+    protInternalBalance: string
     coinBalances: {
         rai: string
         flx: string
@@ -46,12 +47,14 @@ export interface AuctionsModel {
     >
     setIsSubmitting: Action<AuctionsModel, boolean>
     setInternalBalance: Action<AuctionsModel, string>
+    setProtInternalBalance: Action<AuctionsModel, string>
 }
 
 const auctionsModel: AuctionsModel = {
     operation: 0,
     autctionsData: [],
     internalBalance: '0',
+    protInternalBalance: '0',
     isSubmitting: false,
     coinBalances: {
         rai: '',
@@ -74,6 +77,11 @@ const auctionsModel: AuctionsModel = {
                 if (balanceRes && balanceRes.internalCoinBalances.length > 0) {
                     actions.setInternalBalance(
                         balanceRes.internalCoinBalances[0].balance
+                    )
+                }
+                if (balanceRes && balanceRes.protInternalBalance.length > 0) {
+                    actions.setProtInternalBalance(
+                        balanceRes.protInternalBalance[0].balance
                     )
                 }
                 storeActions.connectWalletModel.setProxyAddress(proxyAddress)
@@ -201,6 +209,9 @@ const auctionsModel: AuctionsModel = {
     }),
     setInternalBalance: action((state, payload) => {
         state.internalBalance = payload
+    }),
+    setProtInternalBalance: action((state, payload) => {
+        state.protInternalBalance = payload
     }),
 }
 
