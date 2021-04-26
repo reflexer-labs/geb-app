@@ -13,13 +13,17 @@ export interface PopupsModel {
     isConnectedWalletModalOpen: boolean
     isConnectorsWalletOpen: boolean
     showSideMenu: boolean
+    isSafeManagerOpen: boolean
+    isClaimPopupOpen: boolean
     returnProxyFunction: (actions: any) => void | null
     blockBackdrop: boolean
+    hasFLXClaim: boolean
     isProxyModalOpen: boolean
     isScreenModalOpen: boolean
     isVotingModalOpen: boolean
     isIncentivesModalOpen: boolean
     auctionOperationPayload: IAuctionOperation
+    isDistributionsModalOpen: boolean
     alertPayload: IAlert | null
     ESMOperationPayload: IOperation
     safeOperationPayload: IOperation & { isCreate: boolean }
@@ -46,6 +50,10 @@ export interface PopupsModel {
     setWaitingPayload: Action<PopupsModel, IWaitingPayload>
     setBlockBackdrop: Action<PopupsModel, boolean>
     setIsProxyModalOpen: Action<PopupsModel, boolean>
+    setIsSafeManagerOpen: Action<PopupsModel, boolean>
+    setIsDistributionsModalOpen: Action<PopupsModel, boolean>
+    setIsClaimPopupOpen: Action<PopupsModel, boolean>
+    setHasFLXClaim: Action<PopupsModel, boolean>
     setReturnProxyFunction: Action<
         PopupsModel,
         (storeActions: any) => void | null
@@ -57,10 +65,14 @@ const popupsModel: PopupsModel = {
     isSettingsModalOpen: false,
     isConnectModalOpen: false,
     isProxyModalOpen: false,
+    hasFLXClaim: false,
     isConnectedWalletModalOpen: false,
     isScreenModalOpen: false,
     isIncentivesModalOpen: false,
+    isDistributionsModalOpen: false,
     isWaitingModalOpen: false,
+    isSafeManagerOpen: false,
+    isClaimPopupOpen: false,
     returnProxyFunction: () => {},
     waitingPayload: {
         title: '',
@@ -157,6 +169,18 @@ const popupsModel: PopupsModel = {
     }),
     setReturnProxyFunction: action((state, payload) => {
         state.returnProxyFunction = payload
+    }),
+    setIsSafeManagerOpen: action((state, payload) => {
+        state.isSafeManagerOpen = payload
+    }),
+    setIsDistributionsModalOpen: action((state, payload) => {
+        state.isDistributionsModalOpen = payload
+    }),
+    setIsClaimPopupOpen: action((state, payload) => {
+        state.isClaimPopupOpen = payload
+    }),
+    setHasFLXClaim: action((state, payload) => {
+        state.hasFLXClaim = payload
     }),
 }
 

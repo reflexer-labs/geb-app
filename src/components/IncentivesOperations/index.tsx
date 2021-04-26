@@ -10,6 +10,7 @@ import IncentivesTransaction from './IncentivesTransaction'
 import RedeemRewards from './RedeemRewards'
 import { COIN_TICKER } from '../../utils/constants'
 import { IApprove } from '../../utils/interfaces'
+import MigrateBox from './MigrateBox'
 
 const IncentivesOperations = () => {
     const { t } = useTranslation()
@@ -51,13 +52,18 @@ const IncentivesOperations = () => {
     const returnBody = () => {
         switch (incentivesState.operation) {
             case 0:
-                return incentivesState.type !== 'claim' ? (
-                    <IncentivesPayment
-                        isChecked={incentivesState.isUniSwapShareChecked}
-                    />
-                ) : (
-                    <RedeemRewards />
-                )
+                if (incentivesState.type === 'migrate') {
+                    return <MigrateBox />
+                } else if (incentivesState.type === 'claim') {
+                    return <RedeemRewards />
+                } else {
+                    return (
+                        <IncentivesPayment
+                            isChecked={incentivesState.isUniSwapShareChecked}
+                        />
+                    )
+                }
+
             case 3:
                 return <IncentivesTransaction />
             default:

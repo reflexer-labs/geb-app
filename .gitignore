@@ -10,6 +10,7 @@
 
 # production
 /build
+/cypress/screenshots
 
 # misc
 .DS_Store
@@ -30,3 +31,4 @@ yarn-error.log*
 # IDE
 .idea
 .vscode
+yarn.lock

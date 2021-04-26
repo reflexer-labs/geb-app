@@ -3,6 +3,7 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import path from 'path'
+import crypto from 'crypto'
 import '@testing-library/jest-dom/extend-expect'
 import { ethers } from 'ethers'
 import { Geb } from 'geb.js'
@@ -13,9 +14,15 @@ const env = dotenv.config({
     path: path.resolve(__dirname, '../.env.development.local'),
 })
 
+Object.defineProperty(global, 'crypto', {
+    value: {
+        getRandomValues: (arr: any) => crypto.randomBytes(arr.length),
+    },
+})
+
 jest.setTimeout(10000)
 
-const provider = new ethers.providers.JsonRpcProvider(
+export const provider = new ethers.providers.JsonRpcProvider(
     env.parsed?.REACT_APP_NETWORK_URL
 )
 const network_name =

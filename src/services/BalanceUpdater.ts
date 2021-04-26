@@ -38,7 +38,7 @@ export default function ApplicationUpdater(): null {
     useEffect(() => {
         if (!library || !chainId || !account) return undefined
         setState({ chainId, balance: 0 })
-
+        store.dispatch.connectWalletModel.fetchProtBalance(account)
         library
             .getBalance(account)
             .then(fetchEthBalanceCallBack)
@@ -53,12 +53,12 @@ export default function ApplicationUpdater(): null {
     const debouncedState = useDebounce(state, 100)
 
     useEffect(() => {
-        if (!debouncedState.chainId) return
-
+        if (!debouncedState.chainId || !debouncedState.balance) return
         store.dispatch.connectWalletModel.updateEthBalance({
             chainId: debouncedState.chainId,
             balance: debouncedState.balance,
         })
+
         store.dispatch.connectWalletModel.fetchFiatPrice()
     }, [debouncedState.balance, debouncedState.chainId])
 

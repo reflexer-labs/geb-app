@@ -42,6 +42,7 @@ class ErrorBoundary extends React.Component<Props, State> {
 }
 
 export default ErrorBoundary
+
 const Container = styled.div`
     width: 100%;
     height: 100%;

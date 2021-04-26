@@ -28,6 +28,7 @@ import {
 } from '../../utils/constants'
 import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
+import { useActiveWeb3React } from '../../hooks'
 
 interface Props {
     isChecked?: boolean
@@ -35,9 +36,11 @@ interface Props {
 
 const SafeBody = ({ isChecked }: Props) => {
     const { t } = useTranslation()
+    const { account } = useActiveWeb3React()
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || false)
     const [error, setError] = useState('')
+    const [isOwner, setIsOwner] = useState(true)
     const [defaultSafe, setDefaultSafe] = useState<ISafeData>(
         DEFAULT_SAFE_STATE
     )
@@ -98,7 +101,7 @@ const SafeBody = ({ isChecked }: Props) => {
                 ).toString()
             }
             return returnTotalValue(
-                singleSafe.debt,
+                returnTotalDebt(singleSafe.debt, accumulatedRate) as string,
                 defaultSafe.rightInput
             ).toString()
         }
@@ -106,6 +109,7 @@ const SafeBody = ({ isChecked }: Props) => {
     }
 
     const totalCollateral = getTotalCollateral() || '0'
+
     const totalDebt = getTotalDebt() || '0'
 
     const getAvailableEth = () => {
@@ -118,19 +122,21 @@ const SafeBody = ({ isChecked }: Props) => {
                 return singleSafe.collateral
             }
         }
-        return ''
+        return '0'
     }
 
     const getAvailableRai = () => {
         if (type === 'deposit_borrow' && isCreate) {
             return returnAvaiableDebt(
                 currentPrice.safetyPrice,
+                accumulatedRate,
                 defaultSafe.leftInput
             )
         } else if (type === 'deposit_borrow' && !isCreate) {
             if (singleSafe) {
                 return returnAvaiableDebt(
                     currentPrice.safetyPrice,
+                    accumulatedRate,
                     defaultSafe.leftInput,
                     singleSafe.collateral,
                     singleSafe.debt
@@ -144,7 +150,7 @@ const SafeBody = ({ isChecked }: Props) => {
                 ) as string
             }
         }
-        return ''
+        return '0'
     }
 
     const returnInputType = (isLeft = true) => {
@@ -173,16 +179,17 @@ const SafeBody = ({ isChecked }: Props) => {
         totalCollateral,
         totalDebt,
         currentPrice.liquidationPrice,
-        liquidationCRatio,
-        accumulatedRate
+        liquidationCRatio
     )
 
-    const liquidationPenaltyPercentage = getRatePercentage(liquidationPenalty)
+    const liquidationPenaltyPercentage = getRatePercentage(
+        liquidationPenalty,
+        0
+    )
     const liquidationPrice = getLiquidationPrice(
         totalCollateral,
         totalDebt,
         liquidationCRatio,
-        accumulatedRate,
         currentRedemptionPrice
     )
 
@@ -208,10 +215,6 @@ const SafeBody = ({ isChecked }: Props) => {
 
         const debtFloorBN = BigNumber.from(toFixedString(debtFloor, 'WAD'))
         const totalDebtBN = BigNumber.from(toFixedString(totalDebt, 'WAD'))
-
-        const accumlatedRateBN = BigNumber.from(
-            toFixedString(accumulatedRate, 'RAY')
-        )
 
         const debtCeilingBN = BigNumber.from(toFixedString(debtCeiling, 'RAD'))
         const globalDebtCeilingBN = globalDebtCeiling
@@ -295,7 +298,7 @@ const SafeBody = ({ isChecked }: Props) => {
             defaultSafe.rightInput &&
             !rightInputBN.isZero() &&
             !totalDebtBN.isZero() &&
-            totalDebtBN.mul(accumlatedRateBN).lt(debtFloorBN.mul(gebUtils.RAY))
+            totalDebtBN.lt(debtFloorBN)
         ) {
             setError(
                 `The resulting debt should be at least ${debtFloor} ${COIN_TICKER} or zero.`
@@ -306,8 +309,7 @@ const SafeBody = ({ isChecked }: Props) => {
         const isSafe = safeIsSafe(
             totalCollateral,
             totalDebt,
-            currentPrice.safetyPrice,
-            accumulatedRate
+            currentPrice.safetyPrice
         )
 
         if (!isSafe && (collateralRatio as number) >= 0) {
@@ -387,6 +389,12 @@ const SafeBody = ({ isChecked }: Props) => {
                 Number(defaultSafe.rightInput) > 0 &&
                 !isPassed
             ) {
+                if (!connectWalletState.proxyAddress) {
+                    setError(
+                        'You do not have a proxy address, Create a Reflexer Account to continue'
+                    )
+                    return
+                }
                 safeActions.setStage(2)
             } else {
                 safeActions.setStage(3)
@@ -464,6 +472,16 @@ const SafeBody = ({ isChecked }: Props) => {
         setUniSwapVal(uniSwapPool)
     }, [safeData, uniSwapPool])
 
+    useEffect(() => {
+        if (!account || !safeState.managedSafe.owner.id) return
+        if (
+            account.toLowerCase() !==
+            safeState.managedSafe.owner.id.toLowerCase()
+        ) {
+            setIsOwner(false)
+        }
+    }, [account, safeState.managedSafe.owner.id])
+
     return (
         <>
             <Body>
@@ -471,20 +489,26 @@ const SafeBody = ({ isChecked }: Props) => {
                     className={type === 'repay_withdraw' ? 'reverse' : ''}
                 >
                     <DecimalInput
+                        data_test_id={`${type}_left`}
                         label={returnInputType()}
                         value={defaultSafe.leftInput}
                         onChange={onChangeLeft}
-                        disabled={isChecked}
+                        disabled={
+                            isChecked || (type === 'repay_withdraw' && !isOwner)
+                        }
                         disableMax={type !== 'repay_withdraw'}
                         handleMaxClick={() =>
                             onChangeLeft(getAvailableEth().toString())
                         }
                     />
                     <DecimalInput
+                        data_test_id={`${type}_right`}
                         label={returnInputType(false)}
                         value={defaultSafe.rightInput}
                         onChange={onChangeRight}
-                        disabled={isChecked}
+                        disabled={
+                            isChecked || (type === 'deposit_borrow' && !isOwner)
+                        }
                         disableMax={type !== 'repay_withdraw'}
                         handleMaxClick={handleMaxRai}
                     />
@@ -519,17 +543,19 @@ const SafeBody = ({ isChecked }: Props) => {
                     <Block>
                         <Item>
                             <Label>{'Total ETH Collateral'}</Label>
-                            <Value>{`${
+                            <Value data-test-id="modal_collateral">{`${
                                 totalCollateral ? totalCollateral : 0
                             }`}</Value>
                         </Item>
                         <Item>
                             <Label>{`Total ${COIN_TICKER} Debt`}</Label>{' '}
-                            <Value>{`${totalDebt ? totalDebt : 0}`}</Value>
+                            <Value data-test-id="modal_debt">{`${
+                                totalDebt ? totalDebt : 0
+                            }`}</Value>
                         </Item>
                         <Item>
                             <Label>{`ETH Price (OSM)`}</Label>{' '}
-                            <Value>{`$${formatNumber(
+                            <Value data-test-id="modal_eth_price">{`$${formatNumber(
                                 currentPrice.value,
                                 2
                             )}`}</Value>
@@ -541,7 +567,7 @@ const SafeBody = ({ isChecked }: Props) => {
                                     <Info size="16" />
                                 </InfoIcon>
                             </Label>{' '}
-                            <Value>{`$${formatNumber(
+                            <Value data-test-id="modal_red_price">{`$${formatNumber(
                                 currentRedemptionPrice,
                                 3
                             )}`}</Value>
@@ -556,7 +582,7 @@ const SafeBody = ({ isChecked }: Props) => {
                                     <Info size="16" />
                                 </InfoIcon>
                             </Label>{' '}
-                            <Value>{`${
+                            <Value data-test-id="modal_col_ratio">{`${
                                 collateralRatio > 0 ? collateralRatio : '∞'
                             }%`}</Value>
                         </Item>
@@ -569,8 +595,13 @@ const SafeBody = ({ isChecked }: Props) => {
                                     <Info size="16" />
                                 </InfoIcon>
                             </Label>{' '}
-                            <Value>{`$${
-                                liquidationPrice > 0 ? liquidationPrice : 0
+                            <Value data-test-id="modal_liq_price">{`$${
+                                liquidationPrice > 0
+                                    ? (liquidationPrice as number) >
+                                      Number(currentPrice.value)
+                                        ? 'Invalid'
+                                        : liquidationPrice
+                                    : 0
                             }`}</Value>
                         </Item>
                         <Item>
@@ -582,13 +613,13 @@ const SafeBody = ({ isChecked }: Props) => {
                                     <Info size="16" />
                                 </InfoIcon>
                             </Label>{' '}
-                            <Value>{`${liquidationPenaltyPercentage}%`}</Value>
+                            <Value data-test-id="modal_liq_penalty">{`${liquidationPenaltyPercentage}%`}</Value>
                         </Item>
                     </Block>
                     <ReactTooltip multiline type="light" data-effect="solid" />
                 </Result>
 
-                <Note>
+                <Note data-test-id="debt_floor_note">
                     {isCreate
                         ? `Note: The minimum amount to mint per safe is ${debtFloor} RAI`
                         : null}

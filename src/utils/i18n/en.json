@@ -103,7 +103,7 @@
     "liquidation_text": "You have {{balance}} leftover collateral that can be claimed.",
     "collect_surplus": "Collect ETH",
     "my_stake_tip": "This is the percentage of the earned rewards which can be claimed immediately. The remainder is locked until the end of the campaign. Once the campaign ends, the remained will be unlocked linearly until {{date}}",
-    "annual_redemption_tip": "Rate at which RAI is devalued or revalued over 8 hours.",
+    "annual_redemption_tip": "Rate at which RAI is devalued or revalued over 1 year.",
     "liquidation_price_tip": "ETH price under which this Safe can get liquidated. ⚠️ The liquidation price varies with the redemption price.",
     "liquidation_penalty_tip": "This is a fee you pay in case your Safe gets liquidated. The fee is added on top of your Safe's debt during liquidation, resulting in more Safe collateral being sold.",
     "app": "App",
@@ -136,5 +136,14 @@
     "surplus_auction_how_to_bid": "How do I bid?",
     "surplus_auction_how_to_bid_desc": "During a surplus auction, you will bid an increasing amount of FLX for a fixed amount of RAI. A practical example: if the current FLX bid is 100 for 20K RAI (resulting in a price of 200 RAI/FLX), the next bidder must bid more FLX for the same amount of RAI. The auction also makes sure that each bid must be at least a certain percentage higher than the previous one (e.g the next bid must be at least 3% higher).",
     "surplus_auction_claim_tokens": "What does the Claim Tokens button do?",
-    "surplus_auction_claim_tokens_desc": "In case someone outbids you in a surplus auction, your FLX bid will be reimbursed to your Reflexer Account. Claim Tokens can be used to get back FLX (and RAI) that is kept in your Account."
+    "surplus_auction_claim_tokens_desc": "In case someone outbids you in a surplus auction, your FLX bid will be reimbursed to your Reflexer Account. Claim Tokens can be used to get back FLX (and RAI) that is kept in your Account.",
+    "migrate": "Migrate",
+    "manage_other_safes": "View / Top-up Other Safes",
+    "managed_safe_warning": "CAUTION: You are not the owner of this Safe. You can only deposit collateral or repay debt. Note that these operations are irreversible.",
+    "flx_breakdown": "Your FLX breakdown",
+    "your_balance": "Your Balance",
+    "unclaimed": "Unclaimed",
+    "flx_is_live": "🎉  FLX is live! 🎉",
+    "flx_thank_you": "Thank you for believing in RAI 🙏",
+    "claim_flx_tokens": "Claim your FLX tokens"
 }

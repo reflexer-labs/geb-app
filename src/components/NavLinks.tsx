@@ -1,10 +1,11 @@
 import React from 'react'
-import { DollarSign, Shield } from 'react-feather'
+import { Shield } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { NETWORK_ID } from '../connectors'
 import { useStoreActions, useStoreState } from '../store'
+import { SHOW_AUCTIONS } from '../utils/constants'
 import AnalyticsIcon from './Icons/AnalyticsIcon'
 import AuctionIcon from './Icons/AuctionIcon'
 import SafeIcon from './Icons/SafeIcon'
@@ -40,16 +41,8 @@ const NavLinks = () => {
             >
                 <SafeIcon className="opacity" /> {t('app')}
             </NavBarLink>
-            {NETWORK_ID === 1 ? null : (
-                <NavBarLink
-                    id="incentives-link"
-                    to="/incentives"
-                    onClick={(e) => handleLinkClick(e, false)}
-                >
-                    <DollarSign size="18" /> {t('incentives')}
-                </NavBarLink>
-            )}
-            {isRPCAdapterOn ? null : (
+            {isRPCAdapterOn ||
+            (SHOW_AUCTIONS && SHOW_AUCTIONS !== '1') ? null : (
                 <NavBarLink
                     to="/auctions"
                     onClick={(e) => handleLinkClick(e, false)}
@@ -57,24 +50,16 @@ const NavLinks = () => {
                     <AuctionIcon className="opacity" /> {t('auctions')}
                 </NavBarLink>
             )}
-
             <Box className="has-menu">
                 <LinkItem>
                     <Shield /> {t('insurance')}
                 </LinkItem>
                 <MenuBox className="menu-box">
-                    {/* <ExtLink href="https://nexusmutual.io/" target="_blank">
-                        Nexus Mutual{' '}
-                        <img
-                            src={require('../assets/dark-arrow.svg')}
-                            alt="arrow"
-                        />
-                    </ExtLink> */}
                     <ExtLink
-                        href="https://app.coverprotocol.com/app/marketplace/protocols/RAI"
+                        href="https://app.nexusmutual.io/cover/buy/get-quote?address=0xCC88a9d330da1133Df3A7bD823B95e52511A6962"
                         target="_blank"
                     >
-                        Cover Protocol
+                        Nexus Mutual{' '}
                         <img
                             src={require('../assets/dark-arrow.svg')}
                             alt="arrow"

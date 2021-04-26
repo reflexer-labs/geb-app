@@ -30,17 +30,23 @@ import ImagePreloader from '../components/ImagePreloader'
 import AuctionsModal from '../components/Modals/AuctionsModal'
 import AlertLabel from '../components/AlertLabel'
 import useGeb from '../hooks/useGeb'
+import SafeManagerModal from '../components/Modals/SafeManagerModal'
+import { isAddress } from '@ethersproject/address'
+import DistributionsModal from '../components/Modals/DistributionsModal'
+import ClaimPopup from '../components/ClaimPopup'
 
 interface Props {
     children: ReactNode
 }
 
-const Shared = ({ children }: Props) => {
+const Shared = ({ children, ...rest }: Props) => {
     const { t } = useTranslation()
     const { chainId, account, library, connector } = useActiveWeb3React()
     const geb = useGeb()
     const history = useHistory()
+
     const previousAccount = usePrevious(account)
+
     const {
         settingsModel: settingsState,
         connectWalletModel: connectWalletState,
@@ -97,9 +103,20 @@ const Shared = ({ children }: Props) => {
             await timeout(200)
             if (!connectWalletState.ctHash) {
                 connectWalletActions.setStep(2)
+                const { pathname } = history.location
+                await connectWalletActions.fetchProtBalance(account)
+
+                let address = ''
+                if (pathname && pathname !== '/') {
+                    const route = pathname.split('/')[1]
+                    if (isAddress(route)) {
+                        address = route.toLowerCase()
+                    }
+                }
                 await safeActions.fetchUserSafes({
-                    address: account as string,
+                    address: address ? address : (account as string),
                     geb,
+                    isRPCAdapterOn: settingsState.isRPCAdapterOn,
                 })
             }
         } catch (error) {
@@ -132,6 +149,7 @@ const Shared = ({ children }: Props) => {
         accountChange()
         const id: ChainId = NETWORK_ID
         connectWalletActions.fetchFiatPrice()
+        popupsActions.setIsSafeManagerOpen(false)
         if (chainId && chainId !== id) {
             const chainName = ETHERSCAN_PREFIXES[id]
             connectWalletActions.setIsWrongNetwork(true)
@@ -193,14 +211,16 @@ const Shared = ({ children }: Props) => {
             <WalletModal />
             <ApplicationUpdater />
             <BalanceUpdater />
+            <ClaimPopup />
             <TransactionUpdater />
+            <DistributionsModal />
             <LoadingModal />
             <IncentivesModal />
             <AuctionsModal />
             <CreateAccountModal />
             <ProxyModal />
             <ConnectedWalletModal />
-
+            <SafeManagerModal />
             <ScreenLoader />
             <WaitingModal />
             <EmptyDiv>

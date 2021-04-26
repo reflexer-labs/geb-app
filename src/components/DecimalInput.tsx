@@ -12,6 +12,7 @@ interface Props {
     handleMaxClick?: () => void
     disabled?: boolean
     maxText?: 'max' | 'min'
+    data_test_id?: string
 }
 
 const DecimalInput = ({
@@ -24,6 +25,7 @@ const DecimalInput = ({
     handleMaxClick,
     disabled,
     maxText = 'max',
+    data_test_id,
 }: Props) => {
     const { t } = useTranslation()
 
@@ -48,7 +50,7 @@ const DecimalInput = ({
 
     return (
         <Container>
-            <Label>{label}</Label>
+            <Label data-test-id={data_test_id + '_label'}>{label}</Label>
             <Content className={disabled ? 'disabled' : ''}>
                 {icon ? <Icon src={icon} /> : null}
                 <CustomInput
@@ -61,6 +63,7 @@ const DecimalInput = ({
                     minLength={1}
                     onChange={handleChange}
                     disabled={disabled}
+                    data-test-id={data_test_id}
                 />
 
                 {disableMax || disabled ? null : (

@@ -4,6 +4,7 @@ import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import {
     IAuctionBid,
     IIncentivesFields,
+    IIncentivesMigrate,
     IIncentiveWithdraw,
     ISafe,
     ISafeData,
@@ -252,6 +253,26 @@ export const handleIncentiveWithdraw = async ({
             campaignAddress
         )
     }
+
+    if (!txData) throw new Error('No transaction request!')
+    const tx = await handlePreTxGasEstimate(signer, txData)
+    const txResponse = await signer.sendTransaction(tx)
+    return txResponse
+}
+
+export const handleIncentiveMigrate = async ({
+    signer,
+    from,
+    to,
+}: IIncentivesMigrate) => {
+    if (!signer || !from || !to) {
+        return false
+    }
+
+    const geb = new Geb(ETH_NETWORK, signer.provider)
+    const proxy = await geb.getProxyAction(signer._address)
+
+    const txData = proxy.migrateCampaign(from, to)
 
     if (!txData) throw new Error('No transaction request!')
     const tx = await handlePreTxGasEstimate(signer, txData)

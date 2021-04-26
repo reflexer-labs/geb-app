@@ -1,5 +1,7 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+import AlertLabel from '../../components/AlertLabel'
 import GridContainer from '../../components/GridContainer'
 import PageHeader from '../../components/PageHeader'
 import SafeHistory from '../../components/SafeHistory'
@@ -11,6 +13,7 @@ import { isNumeric } from '../../utils/validations'
 
 const SafeDetails = ({ ...props }) => {
     const { t } = useTranslation()
+    const [isOwner, setIsOwner] = useState(true)
     const { account, library } = useActiveWeb3React()
     const geb = useGeb()
     const {
@@ -42,6 +45,7 @@ const SafeDetails = ({ ...props }) => {
                 geb,
                 isRPCAdapterOn,
             })
+            await safeActions.fetchManagedSafe(safeId)
             popupsActions.setIsWaitingModalOpen(false)
         }
 
@@ -73,8 +77,25 @@ const SafeDetails = ({ ...props }) => {
         safeId,
     ])
 
+    useEffect(() => {
+        if (account && safeState.managedSafe.owner.id) {
+            setIsOwner(
+                account.toLowerCase() ===
+                    safeState.managedSafe.owner.id.toLowerCase()
+            )
+        }
+    }, [account, safeState.managedSafe.owner.id])
+
     return (
         <>
+            {!isOwner ? (
+                <LabelContainer>
+                    <AlertLabel
+                        text={t('managed_safe_warning')}
+                        type="warning"
+                    />
+                </LabelContainer>
+            ) : null}
             <GridContainer>
                 <PageHeader
                     breadcrumbs={{ '/': t('accounts'), '': `#${safeId}` }}
@@ -96,3 +117,8 @@ const SafeDetails = ({ ...props }) => {
 }
 
 export default SafeDetails
+
+const LabelContainer = styled.div`
+    max-width: ${(props) => props.theme.global.gridMaxWidth};
+    margin: 0 auto;
+`

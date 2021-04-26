@@ -10,6 +10,7 @@ const {
     REACT_APP_COIN_TICKER_KOVAN,
     REACT_APP_SYSTEM_STATUS,
     REACT_APP_MAILCHIMP_URL,
+    REACT_APP_SHOW_AUCTIONS,
 } = process.env
 
 export enum Network {
@@ -30,11 +31,14 @@ export const COIN_TICKER =
 export const COLLATERAL_TYPE_ID = 'ETH-A'
 
 export const SYSTEM_STATUS = REACT_APP_SYSTEM_STATUS || ''
+export const SHOW_AUCTIONS = REACT_APP_SHOW_AUCTIONS || ''
 
 // 'https://api.thegraph.com/subgraphs/name/guifel/kovan_1_3_0'
 export const GRAPH_API_URLS = REACT_APP_GRAPH_API_URLS
     ? REACT_APP_GRAPH_API_URLS.split(',')
-    : ['https://api.thegraph.com/subgraphs/name/guifel/kovan_1_3_0']
+    : [
+          'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai',
+      ]
 
 export const MAILCHIMP_URL = REACT_APP_MAILCHIMP_URL
 
@@ -79,7 +83,7 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
         name: 'Open in Coinbase Wallet',
         iconName: 'coinbaseWalletIcon.svg',
         description: 'Open in Coinbase Wallet app.',
-        href: 'https://go.cb-w.com/mtUDhEZPy1',
+        href: 'https://go.cb-w.com/wJMtuYaNxfb',
         color: '#315CF5',
         mobile: true,
         mobileOnly: true,
