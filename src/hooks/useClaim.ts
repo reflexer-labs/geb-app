@@ -1,6 +1,7 @@
 import { getAddress } from '@ethersproject/address'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { ChainId } from '@uniswap/sdk'
+import dayjs from 'dayjs'
 import { BigNumber, utils } from 'ethers'
 import { Geb } from 'geb.js'
 import { useCallback, useEffect, useState } from 'react'
@@ -94,16 +95,18 @@ export function useClaimableDistributions() {
         if (!geb || !account || !userClaimData) return
         const claims = await Promise.all(
             userClaimData.map(async (claim) => {
-                const res = await geb.getMerkleDistributorClaimStatues([
-                    {
-                        distributionIndex: claim.distributionIndex,
-                        nodeIndex: claim.index,
-                    },
-                ])
+                const distributorAddress = await geb.contracts.merkleDistributorFactory.distributors(
+                    claim.distributionIndex
+                )
+                const distro = geb.getMerkleDistributor(distributorAddress)
+                const isClaimed = await distro.isClaimed(claim.index)
+                const deploymentTime = await distro.deploymentTime()
+
                 return {
                     ...claim,
-                    distributorAddress: res[0].distributorAddress,
-                    isClaimed: res[0].isClaimed,
+                    distributorAddress: distributorAddress,
+                    isClaimed,
+                    createdAt: deploymentTime.toNumber(),
                 }
             })
         )
@@ -137,6 +140,17 @@ export function useHasClaimableDistributions(): boolean {
     const { claimableDistributions } = useClaimableDistributions()
     if (!claimableDistributions || !claimableDistributions.length) return false
     return claimableDistributions.length > 0
+}
+
+// check if distributions are running for less than 7 days
+export function useShowClaimPopup(): boolean {
+    const { claimableDistributions } = useClaimableDistributions()
+    const isClaimable = claimableDistributions.some((distribution) => {
+        const deploymentTime = dayjs(distribution.createdAt * 1000)
+        const dayDiff = dayjs().diff(deploymentTime, 'day')
+        return dayDiff <= 40
+    })
+    return isClaimable
 }
 
 // claim distribution
