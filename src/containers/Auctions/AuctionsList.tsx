@@ -82,7 +82,9 @@ const AuctionsList = ({ type }: Props) => {
                     />
                 </>
             ) : (
-                <NoData>{t('no_auctions')}</NoData>
+                <NoData>
+                    {t('no_auctions', { type: type.toLowerCase() })}
+                </NoData>
             )}
         </Container>
     )
