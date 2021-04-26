@@ -17,6 +17,7 @@ import { toFixedString } from '../../utils/helper'
 import { Distribution } from '../../utils/interfaces'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
 import FLXLogo from '../Icons/FLXLogo'
+import dayjs from 'dayjs'
 
 const DistributionsModal = () => {
     const { account, library } = useActiveWeb3React()
@@ -79,6 +80,15 @@ const DistributionsModal = () => {
         }
     }
 
+    const returnDaysLeftToClaim = (date: number) => {
+        const deploymentTime = dayjs(date * 1000)
+        const dayDiff = dayjs().diff(deploymentTime, 'day')
+        if (dayDiff > 90) {
+            return 0
+        }
+        return 90 - dayjs().diff(deploymentTime, 'day')
+    }
+
     return (
         <Modal
             width={'450px'}
@@ -132,6 +142,17 @@ const DistributionsModal = () => {
                                               <Info>
                                                   <ClaimTitle>
                                                       {distribution.description}
+                                                      {' - '}
+                                                      <span
+                                                          style={{
+                                                              fontSize: '12px',
+                                                          }}
+                                                      >
+                                                          {returnDaysLeftToClaim(
+                                                              distribution.createdAt
+                                                          )}{' '}
+                                                          days left
+                                                      </span>
                                                   </ClaimTitle>
                                                   <ClaimDesc>
                                                       You can claim{' '}

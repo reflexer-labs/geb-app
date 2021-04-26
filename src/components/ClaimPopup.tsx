@@ -3,7 +3,10 @@ import { X } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { useActiveWeb3React } from '../hooks'
-import { useHasClaimableDistributions } from '../hooks/useClaim'
+import {
+    useHasClaimableDistributions,
+    useShowClaimPopup,
+} from '../hooks/useClaim'
 import { useStoreActions, useStoreState } from '../store'
 import { timeout } from '../utils/helper'
 import Button from './Button'
@@ -25,6 +28,7 @@ const ClaimPopup = () => {
     }
 
     const hasClaim = useHasClaimableDistributions()
+    const showPopup = useShowClaimPopup()
 
     useEffect(() => {
         async function hideModal() {
@@ -42,7 +46,11 @@ const ClaimPopup = () => {
         }
     }, [hasClaim, popupsActions])
 
-    return account && active && hasClaim && popupsState.isClaimPopupOpen ? (
+    return account &&
+        active &&
+        hasClaim &&
+        popupsState.isClaimPopupOpen &&
+        showPopup ? (
         <Container>
             <Header>
                 <CloseBtn
