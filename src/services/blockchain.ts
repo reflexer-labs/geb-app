@@ -1,4 +1,4 @@
-import { BigNumberish, utils as ethersUtils } from 'ethers'
+import { BigNumberish, ethers, utils as ethersUtils } from 'ethers'
 import { Geb, TransactionRequest, utils as gebUtils } from 'geb.js'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import {
@@ -11,6 +11,7 @@ import {
 } from '../utils/interfaces'
 import { ETH_NETWORK } from '../utils/constants'
 import { handlePreTxGasEstimate } from '../hooks/TransactionHooks'
+import { callAbi, callBytecode } from './abi'
 
 export const handleDepositAndBorrow = async (
     signer: JsonRpcSigner,
@@ -299,8 +300,12 @@ export const handleAuctionBid = async ({
     if (auctionType === 'DEBT') {
         txData = proxy.debtAuctionDecreaseSoldAmount(amountBN, auctionId)
     }
+    if (auctionType === 'SURPLUS') {
+        txData = proxy.surplusIncreaseBidSize(amountBN, auctionId)
+    }
 
     if (!txData) throw new Error('No transaction request!')
+
     let tx = await handlePreTxGasEstimate(signer, txData)
     const txResponse = await signer.sendTransaction(tx)
     return txResponse
@@ -317,11 +322,13 @@ export const handleAuctionClaim = async ({
 
     const geb = new Geb(ETH_NETWORK, signer.provider)
     const proxy = await geb.getProxyAction(signer._address)
-
     let txData
 
     if (auctionType === 'DEBT') {
         txData = proxy.debtAuctionSettleAuction(auctionId)
+    }
+    if (auctionType === 'SURPLUS') {
+        txData = proxy.surplusSettleAuction(auctionId)
     }
 
     if (!txData) throw new Error('No transaction request!')
@@ -330,18 +337,45 @@ export const handleAuctionClaim = async ({
     return txResponse
 }
 
-export const handleClaimInternalBalance = async ({ signer }: IAuctionBid) => {
+export const handleClaimInternalBalance = async ({
+    signer,
+    type,
+    amount,
+}: IAuctionBid) => {
     if (!signer) {
         return false
     }
 
     const geb = new Geb(ETH_NETWORK, signer.provider)
     const proxy = await geb.getProxyAction(signer._address)
+    let txData
+    if (type && amount) {
+        const amountBN = ethersUtils.parseEther(amount)
+        const call = new ethers.Contract(
+            gebUtils.NULL_ADDRESS,
+            callAbi,
+            signer.provider
+        )
+        const data = (
+            await call.populateTransaction.call(
+                geb.contracts.protocolToken.address,
+                geb.contracts.protocolToken.transfer(signer._address, amountBN)
+                    .data
+            )
+        ).data
 
-    const txData = proxy.exitAllCoin()
+        txData = proxy.proxy.execute__BytesBytes(
+            0,
+            callBytecode,
+            data as ethers.BytesLike
+        )
+    } else {
+        txData = proxy.exitAllCoin()
+    }
 
     if (!txData) throw new Error('No transaction request!')
-    const tx = await handlePreTxGasEstimate(signer, txData)
+    const gasLimit = type && amount ? '150000' : null
+    const tx = await handlePreTxGasEstimate(signer, txData, gasLimit)
     const txResponse = await signer.sendTransaction(tx)
     return txResponse
 }

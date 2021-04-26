@@ -12,6 +12,7 @@ export interface ConnectWalletModel {
     isUserCreated: boolean
     proxyAddress: string
     coinAllowance: string
+    protAllowance: string
     ctHash: string
     ethBalance: ITokenBalance
     raiBalance: ITokenBalance
@@ -44,6 +45,7 @@ export interface ConnectWalletModel {
     setIsUserCreated: Action<ConnectWalletModel, boolean>
     setProxyAddress: Action<ConnectWalletModel, string>
     setCoinAllowance: Action<ConnectWalletModel, string>
+    setProtAllowance: Action<ConnectWalletModel, string>
     setIsStepLoading: Action<ConnectWalletModel, boolean>
     setCtHash: Action<ConnectWalletModel, string>
     setEthPriceChange: Action<ConnectWalletModel, number>
@@ -65,6 +67,7 @@ const connectWalletModel: ConnectWalletModel = {
     step: 0,
     proxyAddress: '',
     coinAllowance: '',
+    protAllowance: '0',
     ctHash: ctHashState || '',
     isStepLoading: false,
     isWrongNetwork: false,
@@ -140,6 +143,9 @@ const connectWalletModel: ConnectWalletModel = {
     }),
     setCoinAllowance: action((state, payload) => {
         state.coinAllowance = payload
+    }),
+    setProtAllowance: action((state, payload) => {
+        state.protAllowance = payload
     }),
     setIsStepLoading: action((state, payload) => {
         state.isStepLoading = payload

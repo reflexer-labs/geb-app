@@ -30,15 +30,20 @@ const AuctionsPayment = () => {
         amount,
         coinBalances,
         internalBalance,
+        protInternalBalance,
     } = auctionsState
 
+    const sectionType = popupsState.auctionOperationPayload.auctionType
     const isSettle = popupsState.auctionOperationPayload.type.includes('settle')
     const isBid = popupsState.auctionOperationPayload.type.includes('bid')
     const isClaim = popupsState.auctionOperationPayload.type.includes('claim')
 
     const auctionType = _.get(selectedAuction, 'englishAuctionType', 'DEBT')
-    const buyInititalAmount = _.get(selectedAuction, 'buyInitialAmount', '0')
+    const buyInitialAmount = _.get(selectedAuction, 'buyInitialAmount', '0')
+    const sellInitialAmount = _.get(selectedAuction, 'sellInitialAmount', '0')
     const bids = _.get(selectedAuction, 'englishAuctionBids', '[]')
+    const biddersList = _.get(selectedAuction, 'biddersList', '[]')
+
     const sellAmount = _.get(selectedAuction, 'sellAmount', '0')
     const buyAmount = _.get(selectedAuction, 'buyAmount', '0')
 
@@ -60,8 +65,9 @@ const AuctionsPayment = () => {
         : false
 
     const raiBalance = _.get(coinBalances, 'rai', '0')
-
+    const flxBalance = _.get(coinBalances, 'flx', '0')
     const raiAllowance = _.get(connectWalletState, 'coinAllowance', '0')
+    const flxAllowance = _.get(connectWalletState, 'protAllowance', '0')
 
     const buySymbol = buyToken === 'COIN' ? COIN_TICKER : 'FLX'
     const sellSymbol = sellToken === 'COIN' ? COIN_TICKER : 'FLX'
@@ -76,33 +82,49 @@ const AuctionsPayment = () => {
         const sellAmountBN = sellAmount
             ? BigNumber.from(toFixedString(sellAmount, 'WAD'))
             : BigNumber.from('0')
+        const buyAmountBN = buyAmount
+            ? BigNumber.from(toFixedString(buyAmount, 'WAD'))
+            : BigNumber.from('0')
         const bidIncreaseBN = BigNumber.from(toFixedString(bidIncrease, 'WAD'))
-        if (bids.length === 0) {
-            if (isOngoingAuction) {
+        if (auctionType === 'DEBT') {
+            if (bids.length === 0) {
+                if (isOngoingAuction) {
+                    // We need to bid 3% less than the current best bid
+                    return gebUtils
+                        .wadToFixed(
+                            sellAmountBN.mul(gebUtils.WAD).div(bidIncreaseBN)
+                        )
+                        .toString()
+                } else {
+                    // Auction restart (no bids and passed the dealine)
+                    // When doing restart we're allowed to accept more FLX, DEBT_amountSoldIncrease=1.2
+                    const numerator = sellAmountBN.mul(
+                        BigNumber.from(
+                            toFixedString(debt_amountSoldIncrease, 'WAD')
+                        )
+                    )
+                    return gebUtils
+                        .wadToFixed(numerator.div(bidIncreaseBN))
+                        .toString()
+                }
+            } else {
                 // We need to bid 3% less than the current best bid
                 return gebUtils
                     .wadToFixed(
                         sellAmountBN.mul(gebUtils.WAD).div(bidIncreaseBN)
                     )
                     .toString()
-            } else {
-                // Auction restart (no bids and passed the dealine)
-                // When doing restart we're allowed to accept more FLX, DEBT_amountSoldIncrease=1.2
-                const numerator = sellAmountBN.mul(
-                    BigNumber.from(
-                        toFixedString(debt_amountSoldIncrease, 'WAD')
-                    )
-                )
-                return gebUtils
-                    .wadToFixed(numerator.div(bidIncreaseBN))
-                    .toString()
             }
-        } else {
-            // We need to bid 3% less than the current best bid
-            return gebUtils
-                .wadToFixed(sellAmountBN.mul(gebUtils.WAD).div(bidIncreaseBN))
-                .toString()
         }
+
+        const amountToBuy =
+            biddersList.length > 0 && buyAmountBN.isZero()
+                ? BigNumber.from(toFixedString(biddersList[0].buyAmount, 'WAD'))
+                : buyAmountBN
+
+        return gebUtils
+            .wadToFixed(amountToBuy.mul(bidIncreaseBN).div(gebUtils.WAD))
+            .toString()
     }
 
     const passedChecks = () => {
@@ -114,27 +136,50 @@ const AuctionsPayment = () => {
         const raiBalanceBN = raiBalance
             ? BigNumber.from(toFixedString(raiBalance, 'WAD'))
             : BigNumber.from('0')
-
+        const flxBalanceBN = flxBalance
+            ? BigNumber.from(toFixedString(flxBalance, 'WAD'))
+            : BigNumber.from('0')
         const internalBalanceBN = internalBalance
             ? BigNumber.from(toFixedString(internalBalance, 'WAD'))
             : BigNumber.from('internalBalance')
+        const flxInternalBalance = protInternalBalance
+            ? BigNumber.from(toFixedString(protInternalBalance, 'WAD'))
+            : BigNumber.from('protInternalBalance')
 
         const totalRaiBalance = raiBalanceBN.add(internalBalanceBN)
+        const totalFlxBalance = flxBalanceBN.add(flxInternalBalance)
 
         const buyAmountBN = buyAmount
             ? BigNumber.from(toFixedString(buyAmount, 'WAD'))
             : BigNumber.from('0')
 
-        if (auctionType.toLowerCase() === 'debt') {
-            if (valueBN.lt(BigNumber.from('0'))) {
-                setError(`You cannot bid a negative number`)
-                return false
-            }
-            if (valueBN.isZero()) {
-                setError(`You cannot submit nothing`)
+        if (valueBN.lt(BigNumber.from('0'))) {
+            setError(`You cannot bid a negative number`)
+            return false
+        }
+        if (valueBN.isZero()) {
+            setError(`You cannot submit nothing`)
+            return false
+        }
+
+        if (auctionType === 'SURPLUS') {
+            if (buyAmountBN.gt(totalFlxBalance)) {
+                setError(`Insufficient FLX balance.`)
                 return false
             }
 
+            if (bids.length > 0 && valueBN.lt(maxBidAmountBN)) {
+                setError(
+                    `You need to bid ${(
+                        (Number(bidIncrease) - 1) *
+                        100
+                    ).toFixed(0)}% more FLX vs the highest bid`
+                )
+                return false
+            }
+        }
+
+        if (auctionType === 'DEBT') {
             if (buyAmountBN.gt(totalRaiBalance)) {
                 setError(`Insufficient ${COIN_TICKER} balance.`)
                 return false
@@ -149,9 +194,10 @@ const AuctionsPayment = () => {
 
             if (bids.length > 0 && valueBN.gt(maxBidAmountBN)) {
                 setError(
-                    `You need to bid ${
-                        1 - Number(bidIncrease)
-                    }% less FLX vs the lowest bid`
+                    `You need to bid ${(
+                        (Number(bidIncrease) - 1) *
+                        100
+                    ).toFixed(0)}% less FLX vs the lowest bid`
                 )
                 return false
             }
@@ -163,10 +209,16 @@ const AuctionsPayment = () => {
         const raiAllowanceBN = raiAllowance
             ? BigNumber.from(toFixedString(raiAllowance, 'WAD'))
             : BigNumber.from('0')
-
+        const flxAllowanceBN = flxAllowance
+            ? BigNumber.from(toFixedString(flxAllowance, 'WAD'))
+            : BigNumber.from('0')
         const valueBN = value
             ? BigNumber.from(toFixedString(value, 'WAD'))
             : BigNumber.from('0')
+        if (auctionType === 'SURPLUS') {
+            return flxAllowanceBN.gte(valueBN)
+        }
+
         return raiAllowanceBN.gte(valueBN)
     }
 
@@ -181,11 +233,27 @@ const AuctionsPayment = () => {
             }
             return
         }
-        auctionsActions.setOperation(2)
+        if (sectionType === 'DEBT') {
+            auctionsActions.setOperation(2)
+        } else {
+            auctionsActions.setAmount(protInternalBalance)
+            auctionsActions.setOperation(2)
+        }
+    }
+
+    const returnClaimValues = () => {
+        if (sectionType === 'DEBT') {
+            return { amount: internalBalance, symbol: 'RAI' }
+        }
+        return { amount: protInternalBalance, symbol: 'FLX' }
     }
 
     const handleCancel = () => {
-        popupsActions.setAuctionOperationPayload({ isOpen: false, type: '' })
+        popupsActions.setAuctionOperationPayload({
+            isOpen: false,
+            type: '',
+            auctionType: '',
+        })
         auctionsActions.setOperation(0)
         auctionsActions.setSelectedAuction(null)
         auctionsActions.setAmount('')
@@ -202,14 +270,27 @@ const AuctionsPayment = () => {
                     <DecimalInput
                         disabled
                         onChange={() => {}}
-                        value={buyInititalAmount}
-                        label={`${buySymbol} to Bid`}
+                        value={
+                            auctionType === 'DEBT'
+                                ? buyInitialAmount
+                                : sellInitialAmount
+                        }
+                        label={
+                            auctionType === 'DEBT'
+                                ? `${buySymbol} to Bid`
+                                : `${sellSymbol} to Receive`
+                        }
                     />
                     <MarginFixer />
                     <DecimalInput
                         onChange={handleAmountChange}
                         value={value}
-                        label={`${sellSymbol} to Receive`}
+                        label={
+                            auctionType === 'DEBT'
+                                ? `${sellSymbol} to Receive`
+                                : `${buySymbol} to Bid`
+                        }
+                        maxText={auctionType === 'SURPLUS' ? 'min' : 'max'}
                         handleMaxClick={() => handleAmountChange(maxBid())}
                     />
                 </>
@@ -217,8 +298,10 @@ const AuctionsPayment = () => {
                 <DecimalInput
                     disabled
                     onChange={() => {}}
-                    value={isClaim ? internalBalance : sellAmount}
-                    label={`Claimable ${isClaim ? 'RAI' : sellSymbol}`}
+                    value={isClaim ? returnClaimValues().amount : sellAmount}
+                    label={`Claimable ${
+                        isClaim ? returnClaimValues().symbol : sellSymbol
+                    }`}
                 />
             )}
             {error && <Error>{error}</Error>}

@@ -89,9 +89,12 @@ const Shared = ({ children, ...rest }: Props) => {
         })
         popupsActions.setIsWaitingModalOpen(true)
         try {
-            const isUserCreated = await geb.getProxyAction(account)
-            if (isUserCreated) {
+            connectWalletActions.setIsUserCreated(false)
+            connectWalletActions.setProxyAddress('')
+            const userProxy = await geb.getProxyAction(account)
+            if (userProxy) {
                 connectWalletActions.setIsUserCreated(true)
+                connectWalletActions.setProxyAddress(userProxy.proxyAddress)
             }
             const txs = localStorage.getItem(`${account}-${chainId}`)
             if (txs) {

@@ -12,6 +12,7 @@ export interface AuctionsModel {
     operation: number
     amount: string
     internalBalance: string
+    protInternalBalance: string
     coinBalances: {
         rai: string
         flx: string
@@ -19,7 +20,12 @@ export interface AuctionsModel {
     isSubmitting: boolean
     autctionsData: Array<IAuction>
     selectedAuction: IAuction | null
-    fetchAuctions: Thunk<AuctionsModel, { address: string }, any, StoreModel>
+    fetchAuctions: Thunk<
+        AuctionsModel,
+        { address: string; type: string },
+        any,
+        StoreModel
+    >
     auctionBid: Thunk<AuctionsModel, IAuctionBid, any, StoreModel>
     auctionClaimInternalBalance: Thunk<
         AuctionsModel,
@@ -41,12 +47,14 @@ export interface AuctionsModel {
     >
     setIsSubmitting: Action<AuctionsModel, boolean>
     setInternalBalance: Action<AuctionsModel, string>
+    setProtInternalBalance: Action<AuctionsModel, string>
 }
 
 const auctionsModel: AuctionsModel = {
     operation: 0,
     autctionsData: [],
     internalBalance: '0',
+    protInternalBalance: '0',
     isSubmitting: false,
     coinBalances: {
         rai: '',
@@ -57,7 +65,10 @@ const auctionsModel: AuctionsModel = {
     fetchAuctions: thunk(
         async (actions, payload, { getState, getStoreActions }) => {
             const storeActions = getStoreActions()
-            const res = await fetchAuctions(payload.address.toLowerCase())
+            const res = await fetchAuctions({
+                address: payload.address.toLowerCase(),
+                type: payload.type,
+            })
             if (!res) return
             if (res.userProxies && res.userProxies.length > 0) {
                 const proxyAddress = res.userProxies[0].address
@@ -68,10 +79,20 @@ const auctionsModel: AuctionsModel = {
                         balanceRes.internalCoinBalances[0].balance
                     )
                 }
+                if (balanceRes && balanceRes.protInternalBalance.length > 0) {
+                    actions.setProtInternalBalance(
+                        balanceRes.protInternalBalance[0].balance
+                    )
+                }
                 storeActions.connectWalletModel.setProxyAddress(proxyAddress)
                 if (res.userProxies[0].coinAllowance) {
                     storeActions.connectWalletModel.setCoinAllowance(
                         res.userProxies[0].coinAllowance.amount
+                    )
+                }
+                if (res.userProxies[0].protAllowance) {
+                    storeActions.connectWalletModel.setProtAllowance(
+                        res.userProxies[0].protAllowance.amount
                     )
                 }
             }
@@ -83,6 +104,12 @@ const auctionsModel: AuctionsModel = {
                 actions.setCoinBalances({
                     ...getState().coinBalances,
                     rai: res.raiBalance[0].balance,
+                })
+            }
+            if (res.protBalance && res.protBalance.length > 0) {
+                actions.setCoinBalances({
+                    ...getState().coinBalances,
+                    flx: res.protBalance[0].balance,
                 })
             }
 
@@ -182,6 +209,9 @@ const auctionsModel: AuctionsModel = {
     }),
     setInternalBalance: action((state, payload) => {
         state.internalBalance = payload
+    }),
+    setProtInternalBalance: action((state, payload) => {
+        state.protInternalBalance = payload
     }),
 }
 
