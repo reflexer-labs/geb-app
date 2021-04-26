@@ -11,9 +11,15 @@ const Results = () => {
         popupsModel: popupsState,
     } = useStoreState((state) => state)
 
-    const { selectedAuction, amount, internalBalance } = auctionsState
+    const {
+        selectedAuction,
+        amount,
+        internalBalance,
+        protInternalBalance,
+    } = auctionsState
     const buyInititalAmount = _.get(selectedAuction, 'buyInitialAmount', '0')
-
+    const sellInitialAmount = _.get(selectedAuction, 'sellInitialAmount', '0')
+    const auctionType = _.get(selectedAuction, 'englishAuctionType', 'DEBT')
     const auctionId = _.get(selectedAuction, 'auctionId', '')
     const buyToken = _.get(selectedAuction, 'buyToken', 'COIN')
     const sellToken = _.get(selectedAuction, 'sellToken', 'PROTOCOL_TOKEN')
@@ -22,6 +28,7 @@ const Results = () => {
     const buySymbol = buyToken === 'COIN' ? COIN_TICKER : 'FLX'
     const sellSymbol = sellToken === 'COIN' ? COIN_TICKER : 'FLX'
 
+    const sectionType = popupsState.auctionOperationPayload.auctionType
     const isClaim = popupsState.auctionOperationPayload.type.includes('claim')
     const isSettle = popupsState.auctionOperationPayload.type.includes('settle')
     return (
@@ -29,8 +36,14 @@ const Results = () => {
             <Block>
                 {isClaim ? (
                     <Item>
-                        <Label>{`RAI Amount`}</Label>
-                        <Value>{`${formatNumber(internalBalance)}`}</Value>
+                        <Label>{`${
+                            sectionType === 'DEBT' ? 'RAI' : 'FLX'
+                        } Amount`}</Label>
+                        <Value>{`${formatNumber(
+                            sectionType === 'DEBT'
+                                ? internalBalance
+                                : protInternalBalance
+                        )}`}</Value>
                     </Item>
                 ) : (
                     <>
@@ -46,13 +59,23 @@ const Results = () => {
                         ) : (
                             <>
                                 <Item>
-                                    <Label>{`${buySymbol} to Bid`}</Label>
+                                    <Label>
+                                        {auctionType === 'DEBT'
+                                            ? `${buySymbol} to Bid`
+                                            : `${sellSymbol} to Receive`}
+                                    </Label>
                                     <Value>{`${formatNumber(
-                                        buyInititalAmount
+                                        auctionType === 'DEBT'
+                                            ? buyInititalAmount
+                                            : sellInitialAmount
                                     )}`}</Value>
                                 </Item>
                                 <Item>
-                                    <Label>{`${sellSymbol} to Receive`}</Label>
+                                    <Label>
+                                        {auctionType === 'DEBT'
+                                            ? `${sellSymbol} to Receive`
+                                            : `${buySymbol} to Bid`}
+                                    </Label>
                                     <Value>{`${formatNumber(amount)}`}</Value>
                                 </Item>
                             </>

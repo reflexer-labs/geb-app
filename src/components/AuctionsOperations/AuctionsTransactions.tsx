@@ -30,9 +30,8 @@ const AuctionsTransactions = () => {
     const auctionType = _.get(selectedAuction, 'englishAuctionType', 'DEBT')
 
     const isClaim = popupsState.auctionOperationPayload.type.includes('claim')
-
     const isSettle = popupsState.auctionOperationPayload.type.includes('settle')
-
+    const sectionType = popupsState.auctionOperationPayload.auctionType
     const handleBack = () => auctionsActions.setOperation(0)
 
     const reset = () => {
@@ -49,6 +48,13 @@ const AuctionsTransactions = () => {
                     : isClaim
                     ? 'Claiming Tokens'
                     : `Bid ${COIN_TICKER} and Receive FLX`
+
+            case 'SURPLUS':
+                return isSettle
+                    ? 'Claiming RAI'
+                    : isClaim
+                    ? 'Claiming Tokens'
+                    : `Bid FLX and Receive ${COIN_TICKER}`
             default:
                 return ''
         }
@@ -60,6 +66,7 @@ const AuctionsTransactions = () => {
                 popupsActions.setAuctionOperationPayload({
                     isOpen: false,
                     type: '',
+                    auctionType: '',
                 })
                 popupsActions.setIsWaitingModalOpen(true)
                 popupsActions.setWaitingPayload({
@@ -69,14 +76,14 @@ const AuctionsTransactions = () => {
                     status: 'loading',
                 })
                 const signer = library.getSigner(account)
-                if (auctionType === 'DEBT' && isSettle) {
+                if (isSettle) {
                     await auctionsActions.auctionClaim({
                         signer,
                         auctionId,
                         title: isClaim ? 'Claiming FLX' : 'Settling Auction',
                         auctionType,
                     })
-                } else if (auctionType === 'DEBT' && (!isClaim || !isSettle)) {
+                } else if (!isClaim || !isSettle) {
                     await auctionsActions.auctionBid({
                         signer,
                         auctionId,
@@ -86,13 +93,14 @@ const AuctionsTransactions = () => {
                     })
                 }
 
-                if (auctionType === 'DEBT' && isClaim) {
+                if (isClaim) {
                     await auctionsActions.auctionClaimInternalBalance({
                         signer,
                         auctionId,
                         title: handleWaitingTitle(),
                         auctionType,
                         amount,
+                        type: sectionType as 'DEBT' | 'SURPLUS',
                     })
                 }
             }

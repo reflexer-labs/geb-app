@@ -11,6 +11,7 @@ interface Props {
     disableMax?: boolean
     handleMaxClick?: () => void
     disabled?: boolean
+    maxText?: 'max' | 'min'
     data_test_id?: string
 }
 
@@ -23,6 +24,7 @@ const DecimalInput = ({
     disableMax,
     handleMaxClick,
     disabled,
+    maxText = 'max',
     data_test_id,
 }: Props) => {
     const { t } = useTranslation()
@@ -65,7 +67,7 @@ const DecimalInput = ({
                 />
 
                 {disableMax || disabled ? null : (
-                    <MaxBtn onClick={handleMaxClick}>{t('max')}</MaxBtn>
+                    <MaxBtn onClick={handleMaxClick}>{t(maxText)}</MaxBtn>
                 )}
             </Content>
         </Container>

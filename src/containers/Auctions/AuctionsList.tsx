@@ -9,7 +9,10 @@ import { IPaging } from '../../utils/interfaces'
 import { useStoreActions, useStoreState } from '../../store'
 import { useActiveWeb3React } from '../../hooks'
 
-const AuctionsList = () => {
+interface Props {
+    type: 'DEBT' | 'SURPLUS'
+}
+const AuctionsList = ({ type }: Props) => {
     const { t } = useTranslation()
     const { account } = useActiveWeb3React()
     const [paging, setPaging] = useState<IPaging>({ from: 0, to: 5 })
@@ -18,22 +21,23 @@ const AuctionsList = () => {
         connectWalletModel: connectWalletState,
     } = useStoreState((state) => state)
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
-    const { internalBalance } = auctionsState
-    const { isUserCreated } = connectWalletState
+    const { internalBalance, protInternalBalance } = auctionsState
+    const { proxyAddress } = connectWalletState
     const auctions = useAuctions()
 
-    const handleClick = (type: string) => {
+    const handleClick = (modalType: string) => {
         if (!account) {
             popupsActions.setIsConnectorsWalletOpen(true)
             return
         }
 
-        if (!isUserCreated) {
+        if (!proxyAddress) {
             popupsActions.setIsProxyModalOpen(true)
             popupsActions.setReturnProxyFunction((storeActions: any) => {
                 storeActions.popupsModel.setAuctionOperationPayload({
                     isOpen: true,
-                    type,
+                    type: modalType,
+                    auctionType: type,
                 })
             })
             return
@@ -41,18 +45,20 @@ const AuctionsList = () => {
 
         popupsActions.setAuctionOperationPayload({
             isOpen: true,
-            type,
+            type: modalType,
+            auctionType: type,
         })
     }
 
     return (
         <Container>
             <InfoBox>
-                <Title>Debt Auctions</Title>
+                <Title>{type.toLowerCase()} Auctions</Title>
                 {account &&
                 auctions &&
                 auctions.length &&
-                Number(internalBalance) > 0 ? (
+                (Number(internalBalance) > 0 ||
+                    Number(protInternalBalance) > 0) ? (
                     <Button
                         text={t('claim_tokens')}
                         onClick={() => handleClick('claim_tokens')}
@@ -91,6 +97,7 @@ const Container = styled.div`
 const Title = styled.div`
     font-size: ${(props) => props.theme.font.large};
     font-weight: bold;
+    text-transform: capitalize !important;
 `
 
 const InfoBox = styled.div`

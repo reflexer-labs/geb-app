@@ -320,9 +320,20 @@ export const fetchIncentivesCampaigns = async (
     return payload
 }
 
-export const fetchAuctions = async (address: string) => {
-    const res = await request(JSON.stringify({ query: auctionsQuery(address) }))
-    if (!res.data.data) throw new Error('retry')
+export const fetchAuctions = async ({
+    address,
+    type,
+}: {
+    address: string
+    type: string
+}) => {
+    const res = await request(
+        JSON.stringify({ query: auctionsQuery(address, type) })
+    )
+    if (!res.data.data) {
+        throw new Error('retry')
+    }
+
     const response = res.data.data
     return response
 }

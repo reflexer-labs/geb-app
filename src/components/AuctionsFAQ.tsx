@@ -5,66 +5,77 @@ import Button from './Button'
 
 interface Props {
     hideFAQ: () => void
+    type: 'DEBT' | 'SURPLUS'
 }
 
-const AuctionsFAQ = ({ hideFAQ }: Props) => {
+interface FAQ {
+    title: string
+    desc: string
+    image: string
+}
+interface FAQS {
+    debt: Array<FAQ>
+    surplus: Array<FAQ>
+}
+
+const AuctionsFAQ = ({ hideFAQ, type }: Props) => {
     const { t } = useTranslation()
+
+    const faqs: FAQS = {
+        debt: [
+            {
+                title: t('debt_auction_minting_flx_header'),
+                desc: t('debt_auction_minting_flx_desc'),
+                image: require('../assets/mine.svg'),
+            },
+            {
+                title: t('debt_auction_how_to_bid'),
+                desc: t('debt_auction_how_to_bid_desc'),
+                image: require('../assets/bid.svg'),
+            },
+            {
+                title: t('debt_auction_claim_tokens'),
+                desc: t('debt_auction_claim_tokens_desc'),
+                image: require('../assets/claim.svg'),
+            },
+        ],
+        surplus: [
+            {
+                title: t('surplus_auction_minting_flx_header'),
+                desc: t('surplus_auction_minting_flx_desc'),
+                image: require('../assets/sell-rai.svg'),
+            },
+            {
+                title: t('surplus_auction_how_to_bid'),
+                desc: t('surplus_auction_how_to_bid_desc'),
+                image: require('../assets/bid.svg'),
+            },
+            {
+                title: t('surplus_auction_claim_tokens'),
+                desc: t('surplus_auction_claim_tokens_desc'),
+                image: require('../assets/claim.svg'),
+            },
+        ],
+    }
 
     return (
         <HeroSection>
             <Header>
-                How do RAI debt auctions work?{' '}
+                How do RAI {type.toLowerCase()} auctions work?{' '}
                 <Button text={t('hide_faq')} onClick={hideFAQ} />
             </Header>
             <Content>
-                <Col>
-                    <InnerCol>
-                        <img
-                            src={require('../assets/mine.svg')}
-                            alt="mining flx"
-                        />
-                        <SectionHeading>Minting FLX</SectionHeading>
-                        <SectionContent>
-                            Debt auctions are meant to mint and auction new FLX
-                            in exchange for RAI. The RAI that is received by an
-                            auction will be used to eliminate bad (or otherwise
-                            called uncovered) debt from the system.
-                        </SectionContent>
-                    </InnerCol>
-                </Col>
-                <Col>
-                    <InnerCol>
-                        <img src={require('../assets/bid.svg')} alt="bid" />
-                        <SectionHeading>How do I bid?</SectionHeading>
-                        <SectionContent>
-                            During a debt auction, you will bid a fixed amount
-                            of RAI for a decreasing amount of FLX. A practical
-                            example: if the current FLX bid is 100 for 20K RAI
-                            (resulting in a price of 200 RAI/FLX), the next bid
-                            must accept less FLX for the same amount of RAI. The
-                            auction also makes sure that each bid must be at
-                            least a certain percentage smaller than the previous
-                            one (e.g the next bid must be at least 3% smaller).
-                        </SectionContent>
-                    </InnerCol>
-                </Col>
-                <Col>
-                    <InnerCol>
-                        <img
-                            src={require('../assets/claim.svg')}
-                            alt="claiming tokens"
-                        />
-                        <SectionHeading>
-                            What does the Claim Tokens button do?
-                        </SectionHeading>
-                        <SectionContent>
-                            In case someone outbids you in a debt auction, your
-                            RAI bid will be reimbursed to your Reflexer Account.
-                            Claim Tokens can be used to get back RAI (and FLX)
-                            that is kept in your Account.
-                        </SectionContent>
-                    </InnerCol>
-                </Col>
+                {faqs[type.toLowerCase() as 'debt' | 'surplus'].map(
+                    (faq: FAQ) => (
+                        <Col key={faq.title}>
+                            <InnerCol>
+                                <img src={faq.image} alt={faq.title} />
+                                <SectionHeading>{faq.title}</SectionHeading>
+                                <SectionContent>{faq.desc}</SectionContent>
+                            </InnerCol>
+                        </Col>
+                    )
+                )}
             </Content>
         </HeroSection>
     )

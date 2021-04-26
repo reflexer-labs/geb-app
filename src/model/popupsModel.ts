@@ -4,6 +4,7 @@ import {
     IOperation,
     LoadingPayload,
     IWaitingPayload,
+    IAuctionOperation,
 } from '../utils/interfaces'
 
 export interface PopupsModel {
@@ -21,8 +22,8 @@ export interface PopupsModel {
     isScreenModalOpen: boolean
     isVotingModalOpen: boolean
     isIncentivesModalOpen: boolean
+    auctionOperationPayload: IAuctionOperation
     isDistributionsModalOpen: boolean
-    auctionOperationPayload: IOperation
     alertPayload: IAlert | null
     ESMOperationPayload: IOperation
     safeOperationPayload: IOperation & { isCreate: boolean }
@@ -44,7 +45,7 @@ export interface PopupsModel {
     setESMOperationPayload: Action<PopupsModel, IOperation>
     setIsVotingModalOpen: Action<PopupsModel, boolean>
     setIsIncentivesModalOpen: Action<PopupsModel, boolean>
-    setAuctionOperationPayload: Action<PopupsModel, IOperation>
+    setAuctionOperationPayload: Action<PopupsModel, IAuctionOperation>
     setIsWaitingModalOpen: Action<PopupsModel, boolean>
     setWaitingPayload: Action<PopupsModel, IWaitingPayload>
     setBlockBackdrop: Action<PopupsModel, boolean>
@@ -103,6 +104,7 @@ const popupsModel: PopupsModel = {
     auctionOperationPayload: {
         isOpen: false,
         type: '',
+        auctionType: '',
     },
 
     setIsSettingModalOpen: action((state, payload) => {

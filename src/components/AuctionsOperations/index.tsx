@@ -21,6 +21,13 @@ const IncentivesOperations = () => {
     } = useStoreState((state) => state)
 
     const raiCoinAllowance = _.get(connectWalletState, 'coinAllowance', '0')
+    const flxAllowance = _.get(connectWalletState, 'protAllowance', '0')
+
+    const auctionType = _.get(
+        auctionsState,
+        'selectedAuction.englishAuctionType',
+        'DEBT'
+    )
 
     const amount = _.get(auctionsState, 'amount', '0')
 
@@ -59,9 +66,21 @@ const IncentivesOperations = () => {
                                 auctionsActions.setOperation(2)
                             }
                             amount={amount}
-                            allowance={raiCoinAllowance}
-                            coinName={COIN_TICKER as string}
-                            methodName={'coin'}
+                            allowance={
+                                auctionType === 'DEBT'
+                                    ? raiCoinAllowance
+                                    : flxAllowance
+                            }
+                            coinName={
+                                auctionType === 'DEBT'
+                                    ? (COIN_TICKER as string)
+                                    : 'FLX'
+                            }
+                            methodName={
+                                auctionType === 'DEBT'
+                                    ? 'coin'
+                                    : 'protocolToken'
+                            }
                         />
                     ) : (
                         <ModalContent

@@ -155,7 +155,7 @@ describe('actions', () => {
 
       expect(rpcResponse.systemState.currentRedemptionPrice.value).almostEqual(gqlResponse.systemState.currentRedemptionPrice.value, 0.0001);      
       // Since we're using JS instead of solidity for the exponentiation, an approximation is enough
-      expect(rpcResponse.systemState.currentRedemptionRate.annualizedRate).almostEqual(gqlResponse.systemState.currentRedemptionRate.annualizedRate, 0.00001)
+      expect(rpcResponse.systemState.currentRedemptionRate.annualizedRate).almostEqual(gqlResponse.systemState.currentRedemptionRate.annualizedRate, 0.0001)
       expect(rpcResponse.systemState.globalDebt).fixedNumberMatch(gqlResponse.systemState.globalDebt);
       expect(rpcResponse.systemState.globalDebtCeiling).fixedNumberMatch(gqlResponse.systemState.globalDebtCeiling)
       expect(rpcResponse.systemState.perSafeDebtCeiling).fixedNumberMatch(gqlResponse.systemState.perSafeDebtCeiling)
