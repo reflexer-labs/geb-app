@@ -33,7 +33,6 @@ import useGeb from '../hooks/useGeb'
 import SafeManagerModal from '../components/Modals/SafeManagerModal'
 import { isAddress } from '@ethersproject/address'
 import DistributionsModal from '../components/Modals/DistributionsModal'
-import ClaimPopup from '../components/ClaimPopup'
 
 interface Props {
     children: ReactNode
@@ -211,7 +210,6 @@ const Shared = ({ children, ...rest }: Props) => {
             <WalletModal />
             <ApplicationUpdater />
             <BalanceUpdater />
-            <ClaimPopup />
             <TransactionUpdater />
             <DistributionsModal />
             <LoadingModal />
