@@ -27,6 +27,7 @@ const OnBoarding = ({ ...props }) => {
     const {
         popupsModel: popupsActions,
         safeModel: safeActions,
+        settingsModel: settingsActions,
     } = useStoreActions((state) => state)
 
     const { isRPCAdapterOn } = settingsState
@@ -40,7 +41,7 @@ const OnBoarding = ({ ...props }) => {
             !library
         )
             return
-
+        settingsActions.setIsRPCAdapterOn(true)
         async function fetchSafes() {
             await safeActions.fetchUserSafes({
                 address: address || (account as string),
@@ -55,7 +56,15 @@ const OnBoarding = ({ ...props }) => {
         }, ms)
 
         return () => clearInterval(interval)
-    }, [account, library, safeActions, isRPCAdapterOn, geb, address])
+    }, [
+        account,
+        library,
+        safeActions,
+        isRPCAdapterOn,
+        geb,
+        address,
+        settingsActions,
+    ])
 
     useEffect(() => {
         async function getDebtFloor() {

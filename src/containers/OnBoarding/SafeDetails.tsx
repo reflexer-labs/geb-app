@@ -19,6 +19,7 @@ const SafeDetails = ({ ...props }) => {
     const {
         safeModel: safeActions,
         popupsModel: popupsActions,
+        settingsModel: settingsActions,
     } = useStoreActions((state) => state)
     const {
         safeModel: safeState,
@@ -32,6 +33,7 @@ const SafeDetails = ({ ...props }) => {
         if (!isNumeric(safeId)) {
             props.history.push('/')
         }
+        settingsActions.setIsRPCAdapterOn(true)
 
         async function fetchSafe() {
             popupsActions.setIsWaitingModalOpen(true)
@@ -46,6 +48,7 @@ const SafeDetails = ({ ...props }) => {
                 isRPCAdapterOn,
             })
             await safeActions.fetchManagedSafe(safeId)
+            await safeActions.fetchSafeHistory(safeId)
             popupsActions.setIsWaitingModalOpen(false)
         }
 
@@ -75,6 +78,7 @@ const SafeDetails = ({ ...props }) => {
         props.history,
         safeActions,
         safeId,
+        settingsActions,
     ])
 
     useEffect(() => {
@@ -104,7 +108,7 @@ const SafeDetails = ({ ...props }) => {
                 {safeState.singleSafe ? (
                     <>
                         <SafeStats />
-                        {safeState.historyList.length && !isRPCAdapterOn ? (
+                        {safeState.historyList.length ? (
                             <SafeHistory
                                 hideHistory={!safeState.historyList.length}
                             />

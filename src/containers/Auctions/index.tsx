@@ -7,7 +7,7 @@ import Button from '../../components/Button'
 import GridContainer from '../../components/GridContainer'
 import PageHeader from '../../components/PageHeader'
 import { useActiveWeb3React } from '../../hooks'
-import { useStoreActions, useStoreState } from '../../store'
+import { useStoreActions } from '../../store'
 import AuctionsList from './AuctionsList'
 
 export type AuctionEventType = 'DEBT' | 'SURPLUS'
@@ -19,10 +19,8 @@ const Auctions = () => {
     const {
         auctionsModel: auctionsActions,
         popupsModel: popupsActions,
+        settingsModel: settingsActions,
     } = useStoreActions((state) => state)
-    const { settingsModel: settingsState } = useStoreState((state) => state)
-
-    const { isRPCAdapterOn } = settingsState
 
     const [hide, setHide] = useState(false)
     const [type, setType] = useState<AuctionEventType>('DEBT')
@@ -30,9 +28,7 @@ const Auctions = () => {
     const handleHideFAQ = () => setHide(!hide)
 
     useEffect(() => {
-        if (isRPCAdapterOn) {
-            history.push('/')
-        }
+        settingsActions.setIsRPCAdapterOn(false)
         async function init() {
             popupsActions.setIsWaitingModalOpen(true)
             popupsActions.setWaitingPayload({
@@ -56,7 +52,14 @@ const Auctions = () => {
         }, 2000)
 
         return () => clearInterval(interval)
-    }, [account, auctionsActions, history, isRPCAdapterOn, popupsActions, type])
+    }, [
+        account,
+        auctionsActions,
+        history,
+        popupsActions,
+        settingsActions,
+        type,
+    ])
 
     return (
         <>
