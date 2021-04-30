@@ -19,13 +19,8 @@ const SafeDetails = ({ ...props }) => {
     const {
         safeModel: safeActions,
         popupsModel: popupsActions,
-        settingsModel: settingsActions,
     } = useStoreActions((state) => state)
-    const {
-        safeModel: safeState,
-        settingsModel: settingsState,
-    } = useStoreState((state) => state)
-    const { isRPCAdapterOn } = settingsState
+    const { safeModel: safeState } = useStoreState((state) => state)
     const safeId = props.match.params.id as string
 
     useEffect(() => {
@@ -33,8 +28,6 @@ const SafeDetails = ({ ...props }) => {
         if (!isNumeric(safeId)) {
             props.history.push('/')
         }
-        settingsActions.setIsRPCAdapterOn(true)
-
         async function fetchSafe() {
             popupsActions.setIsWaitingModalOpen(true)
             popupsActions.setWaitingPayload({
@@ -45,7 +38,7 @@ const SafeDetails = ({ ...props }) => {
                 safeId,
                 address: account as string,
                 geb,
-                isRPCAdapterOn,
+                isRPCAdapterOn: true,
             })
             await safeActions.fetchManagedSafe(safeId)
             await safeActions.fetchSafeHistory(safeId)
@@ -54,14 +47,14 @@ const SafeDetails = ({ ...props }) => {
 
         fetchSafe()
 
-        const ms = isRPCAdapterOn ? 5000 : 2000
+        const ms = 3000
 
         const interval = setInterval(() => {
             safeActions.fetchSafeById({
                 safeId,
                 address: account as string,
                 geb,
-                isRPCAdapterOn,
+                isRPCAdapterOn: true,
             })
         }, ms)
 
@@ -72,13 +65,11 @@ const SafeDetails = ({ ...props }) => {
     }, [
         account,
         geb,
-        isRPCAdapterOn,
         library,
         popupsActions,
         props.history,
         safeActions,
         safeId,
-        settingsActions,
     ])
 
     useEffect(() => {

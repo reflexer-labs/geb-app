@@ -269,7 +269,7 @@ const safeModel: SafeModel = {
             })
             if (res.proxyData) {
                 const { address, coinAllowance } = res.proxyData
-                if (address) {
+                if (address && !address.startsWith('0x000')) {
                     storeActions.connectWalletModel.setProxyAddress(address)
                 }
                 if (coinAllowance) {

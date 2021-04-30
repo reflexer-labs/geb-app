@@ -8,7 +8,7 @@ import {
 describe('App Page - Has Safes', () => {
     beforeEach(() => {
         cy.visit('/')
-        cy.wait(5000)
+        cy.wait(10000)
     })
     it('loads App page', () => {
         cy.get('#app-page')
@@ -34,7 +34,6 @@ describe('App Page - Has Safes', () => {
     it('is a safeBlock', () => {
         cy.get('.safeBlock').each(($el: any) => {
             cy.get($el).contains('Safe #')
-            cy.get($el).contains('Created')
             cy.get($el).contains('ETH Deposited')
             cy.get($el).contains('RAI Borrowed')
             cy.get($el).contains('Collateralization Ratio')

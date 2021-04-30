@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { useActiveWeb3React } from '../../hooks'
 import useGeb from '../../hooks/useGeb'
 import { fetchUserSafes } from '../../services/graphql'
-import { useStoreActions, useStoreState } from '../../store'
+import { useStoreActions } from '../../store'
 import { timeout } from '../../utils/helper'
 import Button from '../Button'
 
@@ -17,13 +17,11 @@ const SafeManager = () => {
     const [error, setError] = useState('')
     const [value, setValue] = useState('')
 
+    const [isSubmitting, setIsSubmitting] = useState(false)
+
     const history = useHistory()
 
-    const { settingsModel: settingsState } = useStoreState((state) => state)
-
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
-
-    const { isRPCAdapterOn } = settingsState
 
     const handleCancel = () => {
         popupsActions.setIsSafeManagerOpen(false)
@@ -41,8 +39,9 @@ const SafeManager = () => {
         }
 
         try {
+            setIsSubmitting(true)
             const userSafes = await fetchUserSafes(
-                { address: value, geb, isRPCAdapterOn },
+                { address: value, geb, isRPCAdapterOn: true },
                 true
             )
 
@@ -53,10 +52,12 @@ const SafeManager = () => {
             popupsActions.setIsWaitingModalOpen(true)
             history.push(`/${value}`)
             handleCancel()
-            await timeout(3000)
+            await timeout(1000)
             popupsActions.setIsWaitingModalOpen(false)
         } catch (error) {
             console.log(error)
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -68,6 +69,7 @@ const SafeManager = () => {
                 value={value}
                 placeholder={'Enter a valid ETH address'}
                 onChange={(e) => setValue(e.target.value)}
+                disabled={isSubmitting}
             />
 
             {error && <Error>{error}</Error>}
@@ -78,7 +80,8 @@ const SafeManager = () => {
                     data-test-id="topup-manage"
                     withArrow
                     onClick={handleSubmit}
-                    text={t('manage_safe')}
+                    text={isSubmitting ? t('fetching...') : t('manage_safe')}
+                    disabled={isSubmitting}
                 />
             </Footer>
         </Body>
