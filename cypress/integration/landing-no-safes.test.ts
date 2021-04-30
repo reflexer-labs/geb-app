@@ -11,7 +11,7 @@ describe('App Page - No Safes', () => {
         cy.visit('/', {
             qs: { type: 'no_safes' },
         })
-        cy.wait(10000)
+        cy.wait(5000)
     })
     it('loads App page', () => {
         cy.get('#app-page')
@@ -44,20 +44,17 @@ describe('App Page - No Safes', () => {
         cy.contains('Review Transaction').click()
         cy.contains('Confirm Transaction Details')
         cy.get('#confirm_tx').click()
-        cy.wait(5000)
         cy.contains('Transaction Failed')
     })
 
-    it('should show RAI Allowance unlock if I have a proxy', () => {
+    it('should shows RAI Allowance unlock if I have a proxy', () => {
         cy.contains('✓ Accept').click()
         cy.get('[data-test-id="topup-btn"]').click()
         cy.get('#topup_input').type(TEST_ADDRESS_NEVER_USE)
         cy.get('[data-test-id="topup-manage"]').click()
-        cy.wait(5000)
         cy.url().should('include', TEST_ADDRESS_NEVER_USE)
         cy.contains('accounts')
         cy.get('.safeBlock').first().contains('Manage Safe').click()
-        cy.wait(2000)
         cy.url().should('include', 'safes/')
         cy.contains('CAUTION')
         cy.get('#repay_withdraw').click()

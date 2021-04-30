@@ -4,7 +4,6 @@ import store from '../store'
 import {
     fetchDebtFloorQuery,
     getSafeByIdQuery,
-    getSafeHistoryQuery,
     getUserSafesListQuery,
     managedSafeQuery,
 } from '../utils/queries/safe'
@@ -372,35 +371,6 @@ export const fetchFLXBalance = async (address: string) => {
             }
 
             return res.data.data
-        },
-        {
-            retries: GRAPH_API_URLS.length - 1,
-        }
-    )
-}
-
-export const fetchSafeHistory = async (safeId: string) => {
-    return retry(
-        async (bail, attempt) => {
-            const res = await axios.post(
-                GRAPH_API_URLS[attempt - 1],
-                JSON.stringify({ query: getSafeHistoryQuery(safeId) })
-            )
-
-            if (!res.data.data && attempt < GRAPH_API_URLS.length) {
-                throw new Error('retry')
-            }
-            const response = res.data.data
-
-            const modifySAFECollateralization =
-                response.safes[0].modifySAFECollateralization ?? []
-            const liquidationFixedDiscount =
-                response.safes[0].liquidationFixedDiscount ?? []
-            const safeHistory = formatHistoryArray(
-                modifySAFECollateralization,
-                liquidationFixedDiscount
-            )
-            return safeHistory
         },
         {
             retries: GRAPH_API_URLS.length - 1,

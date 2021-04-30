@@ -46,24 +46,6 @@ export const getUserSafesListQuery = (address: string) => `{
   ${liquidationQuery}
 }`
 
-export const getSafeHistoryQuery = (safeId: string) => `{
-  safes(where: { safeId: "${safeId}" , proxy_contains: "0x", safeId_not: null}) {
-    modifySAFECollateralization {
-      deltaDebt
-      deltaCollateral
-      createdAt
-      createdAtTransaction
-      accumulatedRate
-    }
-    liquidationFixedDiscount {
-      sellInitialAmount
-      sellAmount
-      createdAt
-      createdAtTransaction
-    }
-  }
-}`
-
 export const getSafeByIdQuery = (safeId: string, address: string) => `{
   safes(where: { safeId: "${safeId}" , proxy_contains: "0x", safeId_not: null}) {
     safeId
