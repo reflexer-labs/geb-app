@@ -12,7 +12,7 @@ describe('App Page - No Proxy', () => {
         cy.visit('/', {
             qs: { type: 'no_proxy' },
         })
-        cy.wait(5000)
+        cy.wait(10000)
     })
     it('loads App page', () => {
         cy.get('#app-page')
@@ -77,19 +77,21 @@ describe('App Page - No Proxy', () => {
         cy.contains('Address has no Safes')
     })
 
-    it('should navigates to safe list of the address if user has safes', () => {
+    it('should navigate to safe list of the address if user has safes', () => {
         cy.contains('✓ Accept').click()
         cy.get('[data-test-id="topup-btn"]').click()
         cy.get('#topup_input').type(TEST_ADDRESS_NEVER_USE)
         cy.get('[data-test-id="topup-manage"]').click()
+        cy.wait(5000)
         cy.url().should('include', TEST_ADDRESS_NEVER_USE)
     })
 
-    it('should navigates to first safe page details', () => {
+    it('should navigate to first safe page details', () => {
         cy.contains('✓ Accept').click()
         cy.get('[data-test-id="topup-btn"]').click()
         cy.get('#topup_input').type(TEST_ADDRESS_NEVER_USE)
         cy.get('[data-test-id="topup-manage"]').click()
+        cy.wait(5000)
         cy.url().should('include', TEST_ADDRESS_NEVER_USE)
         cy.contains('accounts')
         cy.get('.safeBlock').first().contains('Manage Safe').click()
@@ -101,6 +103,7 @@ describe('App Page - No Proxy', () => {
         cy.get('[data-test-id="topup-btn"]').click()
         cy.get('#topup_input').type(TEST_ADDRESS_NEVER_USE)
         cy.get('[data-test-id="topup-manage"]').click()
+        cy.wait(5000)
         cy.url().should('include', TEST_ADDRESS_NEVER_USE)
         cy.contains('accounts')
         cy.get('.safeBlock').first().contains('Manage Safe').click()
@@ -108,11 +111,12 @@ describe('App Page - No Proxy', () => {
         cy.contains('CAUTION')
     })
 
-    it('should checks if withdraw and borrow inputs are disabled', () => {
+    it('should check if withdraw and borrow inputs are disabled', () => {
         cy.contains('✓ Accept').click()
         cy.get('[data-test-id="topup-btn"]').click()
         cy.get('#topup_input').type(TEST_ADDRESS_NEVER_USE)
         cy.get('[data-test-id="topup-manage"]').click()
+        cy.wait(5000)
         cy.url().should('include', TEST_ADDRESS_NEVER_USE)
         cy.contains('accounts')
         cy.get('.safeBlock').first().contains('Manage Safe').click()
@@ -129,11 +133,12 @@ describe('App Page - No Proxy', () => {
         cy.get('[data-test-id="repay_withdraw_right"]').type('0.001')
     })
 
-    it('should shows error if I do not have a proxy address', () => {
+    it('should show error if I do not have a proxy address', () => {
         cy.contains('✓ Accept').click()
         cy.get('[data-test-id="topup-btn"]').click()
         cy.get('#topup_input').type(TEST_ADDRESS_NEVER_USE)
         cy.get('[data-test-id="topup-manage"]').click()
+        cy.wait(5000)
         cy.url().should('include', TEST_ADDRESS_NEVER_USE)
         cy.contains('accounts')
         cy.get('.safeBlock').first().contains('Manage Safe').click()
