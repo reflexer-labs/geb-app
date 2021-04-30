@@ -19,7 +19,6 @@ import {
     fetchDebtFloor,
     fetchManagedSafe,
     fetchSafeById,
-    fetchSafeHistory,
     fetchUserSafes,
 } from '../services/graphql'
 import { DEFAULT_SAFE_STATE } from '../utils/constants'
@@ -60,7 +59,6 @@ export interface SafeModel {
     fetchUserSafes: Thunk<SafeModel, IFetchSafesPayload, any, StoreModel>
     fetchDebtFloor: Thunk<SafeModel>
     fetchManagedSafe: Thunk<SafeModel, string>
-    fetchSafeHistory: Thunk<SafeModel, string>
     collectETH: Thunk<
         SafeModel,
         { signer: JsonRpcSigner; safe: ISafe },
@@ -269,7 +267,7 @@ const safeModel: SafeModel = {
             })
             if (res.proxyData) {
                 const { address, coinAllowance } = res.proxyData
-                if (address && !address.startsWith('0x000')) {
+                if (address) {
                     storeActions.connectWalletModel.setProxyAddress(address)
                 }
                 if (coinAllowance) {
@@ -296,13 +294,6 @@ const safeModel: SafeModel = {
             if (res.safes.length > 0) {
                 actions.setManagedSafe(res.safes[0])
             }
-            return res
-        }
-    }),
-    fetchSafeHistory: thunk(async (actions, payload) => {
-        const res = await fetchSafeHistory(payload)
-        if (res && res.length > 0) {
-            actions.setSafeHistoryList(res)
             return res
         }
     }),

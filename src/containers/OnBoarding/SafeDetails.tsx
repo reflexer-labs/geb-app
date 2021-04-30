@@ -20,7 +20,11 @@ const SafeDetails = ({ ...props }) => {
         safeModel: safeActions,
         popupsModel: popupsActions,
     } = useStoreActions((state) => state)
-    const { safeModel: safeState } = useStoreState((state) => state)
+    const {
+        safeModel: safeState,
+        settingsModel: settingsState,
+    } = useStoreState((state) => state)
+    const { isRPCAdapterOn } = settingsState
     const safeId = props.match.params.id as string
 
     useEffect(() => {
@@ -28,6 +32,7 @@ const SafeDetails = ({ ...props }) => {
         if (!isNumeric(safeId)) {
             props.history.push('/')
         }
+
         async function fetchSafe() {
             popupsActions.setIsWaitingModalOpen(true)
             popupsActions.setWaitingPayload({
@@ -38,23 +43,22 @@ const SafeDetails = ({ ...props }) => {
                 safeId,
                 address: account as string,
                 geb,
-                isRPCAdapterOn: true,
+                isRPCAdapterOn,
             })
             await safeActions.fetchManagedSafe(safeId)
-            await safeActions.fetchSafeHistory(safeId)
             popupsActions.setIsWaitingModalOpen(false)
         }
 
         fetchSafe()
 
-        const ms = 3000
+        const ms = isRPCAdapterOn ? 5000 : 2000
 
         const interval = setInterval(() => {
             safeActions.fetchSafeById({
                 safeId,
                 address: account as string,
                 geb,
-                isRPCAdapterOn: true,
+                isRPCAdapterOn,
             })
         }, ms)
 
@@ -65,6 +69,7 @@ const SafeDetails = ({ ...props }) => {
     }, [
         account,
         geb,
+        isRPCAdapterOn,
         library,
         popupsActions,
         props.history,
@@ -99,7 +104,7 @@ const SafeDetails = ({ ...props }) => {
                 {safeState.singleSafe ? (
                     <>
                         <SafeStats />
-                        {safeState.historyList.length ? (
+                        {safeState.historyList.length && !isRPCAdapterOn ? (
                             <SafeHistory
                                 hideHistory={!safeState.historyList.length}
                             />

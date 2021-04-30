@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import CopyToClipboard from 'react-copy-to-clipboard'
@@ -14,24 +14,32 @@ import ConnectedWalletIcon from './ConnectedWalletIcon'
 import { SUPPORTED_WALLETS } from '../utils/constants'
 import Transaction from './Transaction'
 import { isTransactionRecent } from '../hooks/TransactionHooks'
+import Dropdown from './Dropdown'
 
 const ConnectedWalletInfo = () => {
     const { t } = useTranslation()
     const { ethereum } = window
+
+    const connections = ['Subgraph Endpoint', 'RPC Endpoint']
 
     const { active, account, connector, chainId } = useWeb3React()
 
     const [copied, setCopied] = useState(false)
     const isMetaMask = !!(ethereum && ethereum.isMetaMask)
 
-    const { transactionsModel: transactionsState } = useStoreState(
-        (state) => state
-    )
+    const {
+        transactionsModel: transactionsState,
+        settingsModel: settingsState,
+    } = useStoreState((state) => state)
+    const { isRPCAdapterOn } = settingsState
     const {
         popupsModel: popupsActions,
         connectWalletModel: connectWalletActions,
         transactionsModel: transactionsActions,
+        settingsModel: settingsActions,
     } = useStoreActions((state) => state)
+
+    const [selectedConnection, setSelectedConnection] = useState('')
 
     const handleChange = () => {
         popupsActions.setIsConnectedWalletModalOpen(false)
@@ -61,6 +69,10 @@ const ConnectedWalletInfo = () => {
         return txs.filter(isTransactionRecent).sort(newTransactionsFirst)
     }, [transactionsState.transactions])
 
+    useEffect(() => {
+        setSelectedConnection(isRPCAdapterOn ? connections[1] : connections[0])
+    }, [connections, isRPCAdapterOn])
+
     const pendingTransactions = sortedRecentTransactions
         .filter((tx) => !tx.receipt)
         .map((tx) => tx.hash)
@@ -81,6 +93,13 @@ const ConnectedWalletInfo = () => {
     const handleClearTransactions = () => {
         transactionsActions.clearTransactions()
         localStorage.removeItem(`${account}-${chainId}`)
+    }
+
+    const handleSelectedConnection = (selected: string) => {
+        if (connector === injected) {
+            settingsActions.setIsRPCAdapterOn(selected === connections[1])
+            localStorage.setItem('blockchain_connection', selected)
+        }
     }
 
     return (
@@ -137,7 +156,7 @@ const ConnectedWalletInfo = () => {
                     </WalletData>
                 ) : null}
             </DataContainer>
-            {/* <ConnectionBlock>
+            <ConnectionBlock>
                 {t('block_connection')}
                 <Dropdown
                     padding={'10px'}
@@ -147,7 +166,7 @@ const ConnectedWalletInfo = () => {
                     itemSelected={selectedConnection}
                     getSelectedItem={handleSelectedConnection}
                 />
-            </ConnectionBlock> */}
+            </ConnectionBlock>
             <TransactionsContainer>
                 {!!pendingTransactions.length ||
                 !!confirmedTransactions.length ? (
@@ -286,13 +305,13 @@ const Heading = styled.div`
     }
 `
 
-// const ConnectionBlock = styled.div`
-//     display: flex;
-//     align-items: center;
-//     justify-content: space-between;
-//     margin-top: 30px;
-//     font-size: ${(props) => props.theme.font.small};
-//     div {
-//         font-size: 14px;
-//     }
-// `
+const ConnectionBlock = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 30px;
+    font-size: ${(props) => props.theme.font.small};
+    div {
+        font-size: 14px;
+    }
+`

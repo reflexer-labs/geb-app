@@ -20,6 +20,7 @@ const OnBoarding = ({ ...props }) => {
 
     const {
         connectWalletModel: connectWalletState,
+        settingsModel: settingsState,
         safeModel: safeState,
         popupsModel: popupsState,
     } = useStoreState((state) => state)
@@ -27,6 +28,8 @@ const OnBoarding = ({ ...props }) => {
         popupsModel: popupsActions,
         safeModel: safeActions,
     } = useStoreActions((state) => state)
+
+    const { isRPCAdapterOn } = settingsState
 
     const address: string = props.match.params.address ?? ''
 
@@ -42,17 +45,17 @@ const OnBoarding = ({ ...props }) => {
             await safeActions.fetchUserSafes({
                 address: address || (account as string),
                 geb,
-                isRPCAdapterOn: true,
+                isRPCAdapterOn,
             })
         }
         fetchSafes()
-        const ms = 3000
+        const ms = isRPCAdapterOn ? 5000 : 2000
         const interval = setInterval(() => {
             fetchSafes()
         }, ms)
 
         return () => clearInterval(interval)
-    }, [account, library, safeActions, geb, address])
+    }, [account, library, safeActions, isRPCAdapterOn, geb, address])
 
     useEffect(() => {
         async function getDebtFloor() {
@@ -62,9 +65,6 @@ const OnBoarding = ({ ...props }) => {
     }, [safeActions])
 
     useEffect(() => {
-        if (!address) {
-            setIsOwner(true)
-        }
         if (account && address) {
             setIsOwner(account.toLowerCase() === address.toLowerCase())
         }

@@ -12,10 +12,10 @@ describe('App Page - Safe Details', () => {
     let inititalDebt: string
     beforeEach(() => {
         cy.visit('/')
-        cy.wait(10000)
+        cy.wait(5000)
         cy.contains('✓ Accept').click()
         cy.get('.safeBlock').first().contains('Manage Safe').click()
-        cy.wait(5000)
+        cy.wait(3000)
     })
 
     it('is connected', () => {
@@ -115,7 +115,7 @@ describe('App Page - Safe Details', () => {
             })
     })
 
-    it.only('tries max borrow, and checks on CRatio and LiquidationPrice', () => {
+    it('tries max borrow, and checks on CRatio and LiquidationPrice', () => {
         cy.get('#deposit_borrow').click()
         cy.get('[data-test-id="deposit_borrow_left"]').type('4')
         cy.get('[data-test-id="deposit_borrow_right_label"]')
@@ -186,13 +186,7 @@ describe('App Page - Safe Details', () => {
 
     it('should show error if too much debt', () => {
         cy.get('#repay_withdraw').click()
-        cy.get('[data-test-id="repay_withdraw_left_label"]')
-            .invoke('text')
-            .then((tx) => {
-                cy.get('[data-test-id="repay_withdraw_left"]').type(
-                    getValue(tx)
-                )
-            })
+        cy.get('[data-test-id="repay_withdraw_left"]').type('1')
         cy.contains('Review Transaction').click()
         cy.contains('Too much debt')
     })
