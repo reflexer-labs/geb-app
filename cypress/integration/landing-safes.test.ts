@@ -8,7 +8,7 @@ import {
 describe('App Page - Has Safes', () => {
     beforeEach(() => {
         cy.visit('/')
-        cy.wait(5000)
+        cy.wait(10000)
     })
     it('loads App page', () => {
         cy.get('#app-page')

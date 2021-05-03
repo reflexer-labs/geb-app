@@ -12,10 +12,10 @@ describe('App Page - Safe Details', () => {
     let inititalDebt: string
     beforeEach(() => {
         cy.visit('/')
-        cy.wait(5000)
+        cy.wait(10000)
         cy.contains('✓ Accept').click()
         cy.get('.safeBlock').first().contains('Manage Safe').click()
-        cy.wait(3000)
+        cy.wait(10000)
     })
 
     it('is connected', () => {
