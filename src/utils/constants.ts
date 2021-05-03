@@ -76,19 +76,19 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
         name: 'Coinbase Wallet',
         iconName: 'coinbaseWalletIcon.svg',
         description: 'Use Coinbase Wallet app on mobile device',
+        href: null,
+        color: '#315CF5',
+    },
+    COINBASE_LINK: {
+        connector: walletlink,
+        name: 'Open in Coinbase Wallet',
+        iconName: 'coinbaseWalletIcon.svg',
+        description: 'Open in Coinbase Wallet app.',
         href: 'https://go.cb-w.com/wJMtuYaNxfb',
         color: '#315CF5',
         mobile: true,
+        mobileOnly: true,
     },
-    // COINBASE_LINK: {
-    //     name: 'Open in Coinbase Wallet',
-    //     iconName: 'coinbaseWalletIcon.svg',
-    //     description: 'Open in Coinbase Wallet app.',
-    //     href: 'https://go.cb-w.com/wJMtuYaNxfb',
-    //     color: '#315CF5',
-    //     mobile: true,
-    //     mobileOnly: true,
-    // },
 }
 
 export const ETHERSCAN_PREFIXES: { [chainId in ChainId]: string } = {
