@@ -80,6 +80,7 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
         color: '#315CF5',
     },
     COINBASE_LINK: {
+        connector: walletlink,
         name: 'Open in Coinbase Wallet',
         iconName: 'coinbaseWalletIcon.svg',
         description: 'Open in Coinbase Wallet app.',

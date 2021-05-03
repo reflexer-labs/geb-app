@@ -11,7 +11,7 @@ describe('App Page - No Safes', () => {
         cy.visit('/', {
             qs: { type: 'no_safes' },
         })
-        cy.wait(5000)
+        cy.wait(10000)
     })
     it('loads App page', () => {
         cy.get('#app-page')
