@@ -14,6 +14,7 @@ const INITIAL_STATE = [
     require('../assets/uniswap-icon.svg'),
     require('../assets/logo192.png'),
     require('../assets/connectors/metamask.png'),
+    require('../assets/saviour.svg'),
 ]
 
 const ImagePreloader = () => {

@@ -1,7 +1,11 @@
 import { action, Action, Thunk, thunk } from 'easy-peasy'
 import { NETWORK_ID } from '../connectors'
 import api from '../services/api'
-import { fetchFLXBalance, fetchUser } from '../services/graphql'
+import {
+    fetchFLXBalance,
+    fetchUniswapPoolBalance,
+    fetchUser,
+} from '../services/graphql'
 import { IBlockNumber, ITokenBalance } from '../utils/interfaces'
 
 export interface ConnectWalletModel {
@@ -17,6 +21,7 @@ export interface ConnectWalletModel {
     ethBalance: ITokenBalance
     raiBalance: ITokenBalance
     flxBalance: ITokenBalance
+    uniswapPoolBalance: ITokenBalance
     claimableFLX: string
     isWrongNetwork: boolean
     isStepLoading: boolean
@@ -39,8 +44,13 @@ export interface ConnectWalletModel {
         ConnectWalletModel,
         { chainId: number; balance: string }
     >
+    updateUniswapPoolBalance: Action<
+        ConnectWalletModel,
+        { chainId: number; balance: string }
+    >
     fetchUser: Thunk<ConnectWalletModel, string>
     fetchProtBalance: Thunk<ConnectWalletModel, string>
+    fetchUniswapPoolBalance: Thunk<ConnectWalletModel, string>
     setStep: Action<ConnectWalletModel, number>
     setIsUserCreated: Action<ConnectWalletModel, boolean>
     setProxyAddress: Action<ConnectWalletModel, string>
@@ -61,6 +71,7 @@ const connectWalletModel: ConnectWalletModel = {
     ethBalance: { 1: 0, 42: 0 },
     raiBalance: { 1: '0', 42: '0' },
     flxBalance: { 1: '0', 42: '0' },
+    uniswapPoolBalance: { 1: '0', 42: '0' },
     claimableFLX: '0',
     fiatPrice: 0,
     ethPriceChange: 0,
@@ -98,6 +109,16 @@ const connectWalletModel: ConnectWalletModel = {
                     : '0',
         })
     }),
+    fetchUniswapPoolBalance: thunk(async (actions, payload) => {
+        const res = await fetchUniswapPoolBalance(payload.toLowerCase())
+        actions.updateUniswapPoolBalance({
+            chainId: NETWORK_ID,
+            balance:
+                res && res.uniswapCoinPool.length > 0
+                    ? res.uniswapCoinPool[0].balance
+                    : '0',
+        })
+    }),
     setFiatPrice: action((state, payload) => {
         state.fiatPrice = payload
     }),
@@ -130,6 +151,10 @@ const connectWalletModel: ConnectWalletModel = {
     updateFlxBalance: action((state, payload) => {
         const { chainId, balance } = payload
         state.flxBalance[chainId] = balance
+    }),
+    updateUniswapPoolBalance: action((state, payload) => {
+        const { chainId, balance } = payload
+        state.uniswapPoolBalance[chainId] = balance
     }),
     setStep: action((state, payload) => {
         state.step = payload

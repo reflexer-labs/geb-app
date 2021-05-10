@@ -112,6 +112,7 @@ export interface WalletInfo {
 export interface ISafe {
     id: string
     date: string
+    safeHandler: string
     riskState: number
     collateral: string
     debt: string
@@ -433,6 +434,7 @@ export interface ILiquidationFixedDiscount {
 
 export interface ISingleSafe {
     safeId: string
+    safeHandler: string
     collateral: string
     createdAt: string | null // Will be null in RPC mode
     debt: string
@@ -540,4 +542,11 @@ export interface Distribution {
     amount: string
     proof: string[]
     createdAt: number
+}
+
+export interface SaviourPayload {
+    safeId: number
+    safeHandler: string
+    amount: string
+    targetedCRatio: number
 }

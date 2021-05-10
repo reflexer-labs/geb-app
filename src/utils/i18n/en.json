@@ -145,5 +145,13 @@
     "unclaimed": "Unclaimed",
     "flx_is_live": "🎉  FLX is live! 🎉",
     "flx_thank_you": "Thank you for believing in RAI 🙏",
-    "claim_flx_tokens": "Claim your FLX tokens"
+    "claim_flx_tokens": "Claim your FLX tokens",
+    "add_savoiur": "Add a Saviour",
+    "saviour_tip": "✨ Now you can attach a saviour to your safe and protect it from liquidation, click here for more info",
+    "safe_saviour_title": "Safe Saviour",
+    "configure": "Configure",
+    "saviour_configuration": "Saviour Configuration",
+    "saviour_balance_tip": "Minimum amount of LP token needed for the savior to work. The amount depends on your targeted rescue cRatio and the current RAI and collateral prices.",
+    "liquidation_point_tip": "While the minimum cRatio is 145%, a safe can get liquidated below this ratio when markets are highly volatile. This is the lowest ratio at which the saviour will be able to rescue your safe.",
+    "rescue_fee_tip": "Flat fee subtracted from your saviour balance to pay the rescuing keeper."
 }

@@ -14,6 +14,7 @@ interface Props {
     extraWord?: string
     label?: string
     itemPadding?: string
+    imgSize?: string
 }
 const Dropdown = (props: Props) => {
     const wrapperRef = useRef(null)
@@ -28,6 +29,7 @@ const Dropdown = (props: Props) => {
         getSelectedItem,
         label,
         itemPadding,
+        imgSize,
     } = props
     const [isOpen, setIsOpen] = useState(false)
     const [selectedItem, setSelectedItem] = useState<Item>(itemSelected)
@@ -82,7 +84,13 @@ const Dropdown = (props: Props) => {
                             selectedItem
                         ) : (
                             <ItemImg>
-                                <img src={selectedItem.img} alt="" />{' '}
+                                <img
+                                    src={selectedItem.img}
+                                    alt=""
+                                    style={{
+                                        width: imgSize || '20px',
+                                    }}
+                                />{' '}
                                 {selectedItem.item}
                             </ItemImg>
                         )}
@@ -117,7 +125,13 @@ const Dropdown = (props: Props) => {
                                         item
                                     ) : (
                                         <ItemImg>
-                                            <img src={item.img} alt="" />{' '}
+                                            <img
+                                                src={item.img}
+                                                alt=""
+                                                style={{
+                                                    width: imgSize || '20px',
+                                                }}
+                                            />{' '}
                                             {item.item}
                                         </ItemImg>
                                     )}

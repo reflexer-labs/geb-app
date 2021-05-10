@@ -31,13 +31,16 @@ export interface SafeModel {
     safeCreated: boolean
     singleSafe: ISafe | null
     operation: number
+    targetedCRatio: number
     totalEth: string
     managedSafe: IManageSafe
     totalRAI: string
+    amount: string
     isES: boolean
     isUniSwapPoolChecked: boolean
     stage: number
     debtFloor: string
+    isSaviourDeposit: boolean
     isSuccessfulTx: boolean
     safeData: ISafeData
     liquidationData: ILiquidationData
@@ -81,12 +84,17 @@ export interface SafeModel {
     setIsSuccessfulTx: Action<SafeModel, boolean>
     setDebtFloor: Action<SafeModel, string>
     setManagedSafe: Action<SafeModel, IManageSafe>
+    setIsSaviourDeposit: Action<SafeModel, boolean>
+    setAmount: Action<SafeModel, string>
+    setTargetedCRatio: Action<SafeModel, number>
 }
 
 const safeModel: SafeModel = {
     list: [],
     safeCreated: false,
     operation: 0,
+    amount: '',
+    targetedCRatio: 0,
     managedSafe: {
         safeId: '',
         owner: {
@@ -101,6 +109,7 @@ const safeModel: SafeModel = {
     isUniSwapPoolChecked: true,
     stage: 0,
     debtFloor: '',
+    isSaviourDeposit: true,
     safeData: DEFAULT_SAFE_STATE,
     liquidationData: {
         accumulatedRate: '0',
@@ -278,6 +287,7 @@ const safeModel: SafeModel = {
                     storeActions.connectWalletModel.setCoinAllowance('')
                 }
             }
+            return res.safe[0]
         }
     }),
 
@@ -346,6 +356,15 @@ const safeModel: SafeModel = {
     }),
     setManagedSafe: action((state, payload) => {
         state.managedSafe = payload
+    }),
+    setIsSaviourDeposit: action((state, payload) => {
+        state.isSaviourDeposit = payload
+    }),
+    setAmount: action((state, payload) => {
+        state.amount = payload
+    }),
+    setTargetedCRatio: action((state, payload) => {
+        state.targetedCRatio = payload
     }),
 }
 

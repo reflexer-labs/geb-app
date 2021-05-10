@@ -16,6 +16,7 @@ import {
     getSubgraphBlock,
     getUserQuery,
     internalBalanceQuery,
+    uniswapPoolBalanceQuery,
 } from '../utils/queries/user'
 import {
     IFetchSafeById,
@@ -364,6 +365,26 @@ export const fetchFLXBalance = async (address: string) => {
             const res = await axios.post(
                 GRAPH_API_URLS[attempt - 1],
                 JSON.stringify({ query: fetchFLXBalanceQuery(address) })
+            )
+
+            if (!res.data.data && attempt < GRAPH_API_URLS.length) {
+                throw new Error('retry')
+            }
+
+            return res.data.data
+        },
+        {
+            retries: GRAPH_API_URLS.length - 1,
+        }
+    )
+}
+
+export const fetchUniswapPoolBalance = async (address: string) => {
+    return retry(
+        async (bail, attempt) => {
+            const res = await axios.post(
+                GRAPH_API_URLS[attempt - 1],
+                JSON.stringify({ query: uniswapPoolBalanceQuery(address) })
             )
 
             if (!res.data.data && attempt < GRAPH_API_URLS.length) {
