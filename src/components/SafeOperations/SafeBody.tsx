@@ -166,7 +166,7 @@ const SafeBody = ({ isChecked }: Props) => {
         if (type === 'repay_withdraw' && singleSafe && !isLeft) {
             return `Repay ${COIN_TICKER} (Owe: ${formatNumber(
                 getAvailableRai()
-            )}, Avail: ${
+            )}, Available: ${
                 Number(raiBalance.toString()) > 0.0001
                     ? formatNumber(raiBalance.toString())
                     : '< 0.0001'
@@ -277,7 +277,7 @@ const SafeBody = ({ isChecked }: Props) => {
             }
 
             if (!rightInputBN.isZero() && rightInputBN.gt(raiBalanceBN)) {
-                setError(`ballance_issue`)
+                setError(`balance_issue`)
                 return false
             }
         }
@@ -348,14 +348,16 @@ const SafeBody = ({ isChecked }: Props) => {
     }
 
     const returnMaxRepayValue = () => {
-        const availableRaiBN = BigNumber.from(
-            toFixedString(getAvailableRai().toString(), 'WAD')
-        )
+        const rightInputBN = defaultSafe.rightInput
+            ? BigNumber.from(toFixedString(defaultSafe.rightInput, 'WAD'))
+            : BigNumber.from('0')
+
         const raiBalanceBN = BigNumber.from(
             toFixedString(raiBalance.toString(), 'WAD')
         )
+
         const diff = gebUtils
-            .wadToFixed(availableRaiBN.sub(raiBalanceBN))
+            .wadToFixed(rightInputBN.sub(raiBalanceBN))
             .toString()
 
         return `Insufficient balance. You are ${diff} short`
@@ -516,7 +518,7 @@ const SafeBody = ({ isChecked }: Props) => {
 
                 {error && (
                     <Error>
-                        {error === 'ballance_issue'
+                        {error === 'balance_issue'
                             ? returnMaxRepayValue()
                             : error}
                     </Error>
@@ -667,7 +669,9 @@ export default SafeBody
 const DoubleInput = styled.div`
     display: flex;
     margin-bottom: 16px;
-
+    @media (min-width: 767px) {
+        align-items: flex-end;
+    }
     > div {
         &:last-child {
             flex: 0 0 calc(50% + 5px);
