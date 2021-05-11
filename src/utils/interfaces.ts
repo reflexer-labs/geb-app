@@ -544,9 +544,11 @@ export interface Distribution {
     createdAt: number
 }
 
-export interface SaviourPayload {
+export interface SaviourWithdrawPayload {
     safeId: number
-    safeHandler: string
     amount: string
+}
+export interface SaviourDepositPayload extends SaviourWithdrawPayload {
+    safeHandler: string
     targetedCRatio: number
 }

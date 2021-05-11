@@ -3,9 +3,11 @@ import { Info } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
+import { useSaviourData } from '../../hooks/useSaviour'
 
 const Results = () => {
     const { t } = useTranslation()
+    const saviourData = useSaviourData()
     return (
         <Result>
             <Block>
@@ -34,7 +36,7 @@ const Results = () => {
                             <Info size="16" />
                         </InfoIcon>
                     </Label>
-                    <Value>{`$0.00`}</Value>
+                    <Value>{`$${saviourData?.rescueFee}`}</Value>
                 </Item>
             </Block>
             <ReactTooltip multiline type="light" data-effect="solid" />

@@ -21,7 +21,9 @@ const INITITAL_STATE = [
 const SaviourOperatrions = () => {
     const { t } = useTranslation()
     const [error, setError] = useState('')
-    const [sliderVal, setSliderVal] = useState(250)
+    const saviourData = useSaviourData()
+    const [sliderVal, setSliderVal] = useState<number>(200)
+
     const [amount, setAmount] = useState('')
     const {
         popupsModel: popupsActions,
@@ -43,12 +45,10 @@ const SaviourOperatrions = () => {
         NETWORK_ID
     ].toString()
 
-    const saviourData = useSaviourData()
-
     const availableBalance = isSaviourDeposit
         ? uniswapPoolBalance
         : saviourData
-        ? saviourData.saviourBalance.toString()
+        ? saviourData.saviourBalance
         : '0'
 
     const safeId = _.get(singleSafe, 'id', '')
@@ -59,6 +59,10 @@ const SaviourOperatrions = () => {
     }
 
     const passedValidation = () => {
+        if (!sliderVal) {
+            setError('No minCollateralRatio')
+            return false
+        }
         if (!amount) {
             setError('You cannot submit nothing')
             return false
@@ -70,7 +74,7 @@ const SaviourOperatrions = () => {
         if (passedValidation()) {
             safeActions.setOperation(1)
         }
-        safeActions.setTargetedCRatio(sliderVal)
+        safeActions.setTargetedCRatio(sliderVal as number)
     }
 
     const handleChange = (val: string) => {
@@ -92,8 +96,10 @@ const SaviourOperatrions = () => {
     useEffect(() => {
         if (targetedCRatio) {
             setSliderVal(targetedCRatio)
+        } else {
+            setSliderVal(saviourData?.minCollateralRatio as number)
         }
-    }, [targetedCRatio])
+    }, [saviourData, targetedCRatio])
 
     return (
         <Body>
@@ -149,9 +155,9 @@ const SaviourOperatrions = () => {
 
                 <SliderContainer>
                     <StyledSlider
-                        defaultValue={sliderVal}
+                        value={sliderVal}
                         onChange={(value) => setSliderVal(value as number)}
-                        max={1500}
+                        max={350}
                         renderTrack={Track}
                         renderThumb={Thumb}
                     />

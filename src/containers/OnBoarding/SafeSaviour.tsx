@@ -112,11 +112,9 @@ const SafeSaviour = ({ ...props }) => {
                                     {'Saviour Balance'}
                                 </Label>
                                 <Value>
-                                    {saviourData.saviourBalance.toString()}{' '}
+                                    {saviourData.saviourBalance}{' '}
                                     {`(${formatNumber(
-                                        numeral(
-                                            saviourData.saviourBalance.toString()
-                                        )
+                                        numeral(saviourData.saviourBalance)
                                             .multiply(saviourData.uniPoolPrice)
                                             .value()
                                             .toString()
@@ -132,9 +130,7 @@ const SafeSaviour = ({ ...props }) => {
                                 <Label className="top">
                                     {'Target Rescue CRatio'}
                                 </Label>
-                                <Value>
-                                    {saviourData.saviourRescueRatio.toString()}%
-                                </Value>
+                                <Value>{saviourData.saviourRescueRatio}%</Value>
                                 <Label className="small"></Label>
                             </StateInner>
                         </StatItem>
