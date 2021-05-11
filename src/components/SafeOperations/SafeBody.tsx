@@ -21,11 +21,7 @@ import {
     toFixedString,
 } from '../../utils/helper'
 import { NETWORK_ID } from '../../connectors'
-import {
-    DEFAULT_SAFE_STATE,
-    COIN_TICKER,
-    COLLATERAL_TYPE_ID,
-} from '../../utils/constants'
+import { DEFAULT_SAFE_STATE, COIN_TICKER } from '../../utils/constants'
 import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
 import { useActiveWeb3React } from '../../hooks'
@@ -321,12 +317,13 @@ const SafeBody = ({ isChecked }: Props) => {
             return false
         }
 
-        if (totalDebtBN.gt(globalDebtCeilingBN)) {
+        if (totalDebtBN.mul(gebUtils.RAY).gt(globalDebtCeilingBN)) {
             setError('Cannot exceed global debt ceiling.')
             return
         }
-        if (totalDebtBN.gt(debtCeilingBN)) {
-            setError(`Cannot exceed ${COLLATERAL_TYPE_ID} debt ceiling.`)
+
+        if (totalDebtBN.mul(gebUtils.RAY).gt(debtCeilingBN)) {
+            setError(`Cannot exceed ${COIN_TICKER} debt ceiling.`)
             return
         }
 
