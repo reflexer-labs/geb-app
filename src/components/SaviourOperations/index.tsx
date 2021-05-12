@@ -97,7 +97,7 @@ const SaviourOperatrions = () => {
                 setError(
                     `Recommended minimal savior balance is:  ${getMinSaviourBalance(
                         sliderVal
-                    )} UNI-V2 and your total deposit is ${ethers.utils.formatEther(
+                    )} UNI-V2 and your result balance is ${ethers.utils.formatEther(
                         amountBN.add(saviourBalanceBN)
                     )} UNI-V2`
                 )
