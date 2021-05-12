@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import _ from '../../utils/lodash'
 import ReactSlider from 'react-slider'
+import numeral from 'numeral'
 import { useStoreActions, useStoreState } from '../../store'
 import Button from '../Button'
 import DecimalInput from '../DecimalInput'
@@ -10,7 +11,8 @@ import Dropdown from '../Dropdown'
 import Results from './Results'
 import { NETWORK_ID } from '../../connectors'
 import { formatNumber } from '../../utils/helper'
-import { useSaviourData } from '../../hooks/useSaviour'
+import { useMinSaviourBalance, useSaviourData } from '../../hooks/useSaviour'
+import { BigNumber, ethers } from 'ethers'
 
 const INITITAL_STATE = [
     {
@@ -22,6 +24,8 @@ const SaviourOperatrions = () => {
     const { t } = useTranslation()
     const [error, setError] = useState('')
     const saviourData = useSaviourData()
+
+    const { getMinSaviourBalance } = useMinSaviourBalance()
     const [sliderVal, setSliderVal] = useState<number>(200)
 
     const [amount, setAmount] = useState('')
@@ -56,22 +60,72 @@ const SaviourOperatrions = () => {
     const handleCancel = () => {
         popupsActions.setIsSaviourModalOpen(false)
         safeActions.setOperation(0)
+        safeActions.setIsMaxWithdraw(false)
+        safeActions.setIsSaviourDeposit(true)
+    }
+
+    const returnFiatValue = (value: string, price: number) => {
+        if (!value || !price) return '0.00'
+        return formatNumber(
+            numeral(value).multiply(price).value().toString(),
+            2
+        )
     }
 
     const passedValidation = () => {
+        const amountBN = amount
+            ? ethers.utils.parseEther(amount)
+            : BigNumber.from('0')
+
+        const saviourBalanceBN = saviourData
+            ? ethers.utils.parseEther(saviourData.saviourBalance)
+            : BigNumber.from('0')
+        const minBalance = getMinSaviourBalance(sliderVal)
+        const minBalanceBN = ethers.utils.parseEther(minBalance as string)
+
         if (!sliderVal) {
             setError('No minCollateralRatio')
             return false
         }
-        if (!amount) {
+        if (amountBN.isZero()) {
             setError('You cannot submit nothing')
             return false
+        }
+
+        if (isSaviourDeposit) {
+            if (amountBN.add(saviourBalanceBN).lt(minBalanceBN)) {
+                setError(
+                    `Recommended minimal savior balance is:  ${getMinSaviourBalance(
+                        sliderVal
+                    )} UNI-V2 and your total deposit is ${ethers.utils.formatEther(
+                        amountBN.add(saviourBalanceBN)
+                    )} UNI-V2`
+                )
+                return false
+            }
+        }
+
+        if (!isSaviourDeposit) {
+            if (
+                saviourBalanceBN.sub(amountBN).lt(minBalanceBN) &&
+                !saviourBalanceBN.eq(amountBN)
+            ) {
+                setError(
+                    `Recommended minimal savior balance is:  ${getMinSaviourBalance(
+                        sliderVal
+                    )} UNI-V2 and your result balance is ${ethers.utils.formatEther(
+                        saviourBalanceBN.sub(amountBN)
+                    )} UNI-V2`
+                )
+                return false
+            }
         }
         return true
     }
 
     const handleSubmit = () => {
         if (passedValidation()) {
+            setError('')
             safeActions.setOperation(1)
         }
         safeActions.setTargetedCRatio(sliderVal as number)
@@ -80,6 +134,13 @@ const SaviourOperatrions = () => {
     const handleChange = (val: string) => {
         setAmount(val)
         safeActions.setAmount(val)
+    }
+
+    const handleMaxChange = () => {
+        handleChange(availableBalance)
+        if (!isSaviourDeposit) {
+            safeActions.setIsMaxWithdraw(true)
+        }
     }
 
     const Thumb = (props: any) => <StyledThumb {...props} />
@@ -127,7 +188,7 @@ const SaviourOperatrions = () => {
                         label={`${
                             isSaviourDeposit ? 'Deposit' : 'Withdraw'
                         } (Available: ${formatNumber(availableBalance, 4)})`}
-                        handleMaxClick={() => handleChange(availableBalance)}
+                        handleMaxClick={handleMaxChange}
                     />
                 </Input>
                 <Tabs>
@@ -147,7 +208,13 @@ const SaviourOperatrions = () => {
             </Operation>
 
             <MaxBalance>
-                Recommended minimal savior balance: 412 UNI-V2 ($3205)
+                Recommended minimal savior balance:{' '}
+                {getMinSaviourBalance(sliderVal)} UNI-V2 ($
+                {returnFiatValue(
+                    getMinSaviourBalance(sliderVal) as string,
+                    saviourData?.uniPoolPrice as number
+                )}
+                )
             </MaxBalance>
 
             <RescueRatio>
@@ -157,6 +224,9 @@ const SaviourOperatrions = () => {
                     <StyledSlider
                         value={sliderVal}
                         onChange={(value) => setSliderVal(value as number)}
+                        onAfterChange={(value) =>
+                            safeActions.setTargetedCRatio(value as number)
+                        }
                         max={350}
                         renderTrack={Track}
                         renderThumb={Thumb}

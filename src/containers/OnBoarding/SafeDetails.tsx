@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link2 } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router'
-import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import AlertLabel from '../../components/AlertLabel'
 import Button from '../../components/Button'
@@ -18,9 +17,7 @@ import { isNumeric } from '../../utils/validations'
 
 const SafeDetails = ({ ...props }) => {
     const { t } = useTranslation()
-    const [isLoading, setIsLoading] = useState(true)
     const [isOwner, setIsOwner] = useState(true)
-    const [hideTip, setHideTip] = useState(false)
     const { account, library } = useActiveWeb3React()
     const geb = useGeb()
     const {
@@ -36,8 +33,6 @@ const SafeDetails = ({ ...props }) => {
 
     const saviourData = useSaviourData()
 
-    const tipRef: any = useRef(null)
-
     const history = useHistory()
 
     useEffect(() => {
@@ -47,7 +42,6 @@ const SafeDetails = ({ ...props }) => {
         }
 
         async function fetchSafe() {
-            setIsLoading(true)
             popupsActions.setIsWaitingModalOpen(true)
             popupsActions.setWaitingPayload({
                 title: 'Fetching Safe Data',
@@ -61,7 +55,6 @@ const SafeDetails = ({ ...props }) => {
             })
             await safeActions.fetchManagedSafe(safeId)
             popupsActions.setIsWaitingModalOpen(false)
-            setIsLoading(false)
         }
 
         fetchSafe()
@@ -100,20 +93,6 @@ const SafeDetails = ({ ...props }) => {
         }
     }, [account, safeState.managedSafe.owner.id])
 
-    useEffect(() => {
-        let timeout: NodeJS.Timeout
-        if (tipRef) {
-            if (!isLoading) {
-                ReactTooltip.show(tipRef.current)
-                timeout = setTimeout(() => {
-                    ReactTooltip.hide(tipRef.current)
-                    setHideTip(true)
-                }, 4000)
-            }
-        }
-        return () => clearTimeout(timeout)
-    }, [isLoading])
-
     return (
         <>
             {!isOwner ? (
@@ -138,11 +117,7 @@ const SafeDetails = ({ ...props }) => {
                                     history.push(`/safes/${safeId}/saviour`)
                                 }
                             >
-                                <BtnInner
-                                    data-tip={t('saviour_tip')}
-                                    ref={tipRef}
-                                    data-tip-disable={hideTip}
-                                >
+                                <BtnInner>
                                     <Link2 size={18} />
                                     {t(
                                         saviourData.hasSaviour
@@ -163,8 +138,6 @@ const SafeDetails = ({ ...props }) => {
                         />
                     ) : null}
                 </>
-
-                <ReactTooltip multiline type="light" data-effect="solid" />
             </GridContainer>
         </>
     )

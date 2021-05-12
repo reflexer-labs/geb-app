@@ -33,6 +33,7 @@ export interface SafeModel {
     operation: number
     targetedCRatio: number
     totalEth: string
+    isMaxWithdraw: boolean
     managedSafe: IManageSafe
     totalRAI: string
     amount: string
@@ -87,14 +88,16 @@ export interface SafeModel {
     setIsSaviourDeposit: Action<SafeModel, boolean>
     setAmount: Action<SafeModel, string>
     setTargetedCRatio: Action<SafeModel, number>
+    setIsMaxWithdraw: Action<SafeModel, boolean>
 }
 
 const safeModel: SafeModel = {
     list: [],
     safeCreated: false,
+    isMaxWithdraw: false,
     operation: 0,
     amount: '',
-    targetedCRatio: 0,
+    targetedCRatio: 200,
     managedSafe: {
         safeId: '',
         owner: {
@@ -365,6 +368,9 @@ const safeModel: SafeModel = {
     }),
     setTargetedCRatio: action((state, payload) => {
         state.targetedCRatio = payload
+    }),
+    setIsMaxWithdraw: action((state, payload) => {
+        state.isMaxWithdraw = payload
     }),
 }
 

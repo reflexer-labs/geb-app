@@ -3,14 +3,42 @@ import { Info } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
-import { useSaviourData } from '../../hooks/useSaviour'
+import numeral from 'numeral'
+import { useMinSaviourBalance, useSaviourData } from '../../hooks/useSaviour'
+import { useStoreState } from '../../store'
+import { formatNumber } from '../../utils/helper'
 
 const Results = () => {
     const { t } = useTranslation()
+
     const saviourData = useSaviourData()
+    const { getMinSaviourBalance } = useMinSaviourBalance()
+
+    const { safeModel: safeState } = useStoreState((state) => state)
+
+    const { targetedCRatio, isSaviourDeposit, amount } = safeState
+
+    const returnFiatValue = (value: string, price: number) => {
+        if (!value || !price) return '0.00'
+        return formatNumber(
+            numeral(value).multiply(price).value().toString(),
+            2
+        )
+    }
     return (
         <Result>
             <Block>
+                <Item>
+                    <Label>
+                        {isSaviourDeposit
+                            ? `Deposited Amount`
+                            : `Withdrawn Amount`}{' '}
+                    </Label>
+                    <Value>{`${formatNumber(amount)} UNI-V2 ($${returnFiatValue(
+                        amount,
+                        saviourData?.uniPoolPrice as number
+                    )})`}</Value>
+                </Item>
                 <Item>
                     <Label>
                         {`Minimum saviour balance`}{' '}
@@ -18,7 +46,12 @@ const Results = () => {
                             <Info size="16" />
                         </InfoIcon>
                     </Label>
-                    <Value>{`450 UNI-V2 ($3205)`}</Value>
+                    <Value>{`${getMinSaviourBalance(
+                        targetedCRatio
+                    )} UNI-V2 ($${returnFiatValue(
+                        getMinSaviourBalance(targetedCRatio) as string,
+                        saviourData?.uniPoolPrice as number
+                    )})`}</Value>
                 </Item>
                 <Item>
                     <Label>
@@ -27,7 +60,7 @@ const Results = () => {
                             <Info size="16" />
                         </InfoIcon>
                     </Label>
-                    <Value>{`0.00%`}</Value>
+                    <Value>{`130%`}</Value>
                 </Item>
                 <Item>
                     <Label>

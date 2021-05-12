@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import _ from '../../utils/lodash'
 import { useActiveWeb3React } from '../../hooks'
-import { useSaviourDeposit } from '../../hooks/useSaviour'
+import { useSaviourDeposit, useSaviourWithdraw } from '../../hooks/useSaviour'
 import { useStoreActions, useStoreState } from '../../store'
 import { returnConnectorName } from '../../utils/helper'
 import Button from '../Button'
@@ -20,12 +20,19 @@ const SaviourTransactions = () => {
     } = useStoreActions((state) => state)
 
     const { safeModel: safeState } = useStoreState((state) => state)
-    const { singleSafe, amount, targetedCRatio } = safeState
+    const {
+        singleSafe,
+        amount,
+        targetedCRatio,
+        isSaviourDeposit,
+        isMaxWithdraw,
+    } = safeState
 
     const safeId = _.get(singleSafe, 'id', '0')
     const safeHandler = _.get(singleSafe, 'safeHandler', '')
 
     const { depositCallback } = useSaviourDeposit()
+    const { withdrawCallback } = useSaviourWithdraw()
 
     const handleBack = () => safeActions.setOperation(0)
 
@@ -34,6 +41,8 @@ const SaviourTransactions = () => {
         safeActions.setOperation(0)
         safeActions.setTargetedCRatio(0)
         popupsActions.setIsSaviourModalOpen(false)
+        safeActions.setIsMaxWithdraw(false)
+        safeActions.setIsSaviourDeposit(true)
     }
 
     const handleConfirm = async () => {
@@ -46,7 +55,9 @@ const SaviourTransactions = () => {
             popupsActions.setIsWaitingModalOpen(true)
             popupsActions.setWaitingPayload({
                 title: 'Waiting For Confirmation',
-                text: 'Safe Saviour Deposit',
+                text: `Safe Saviour ${
+                    isSaviourDeposit ? 'Deposit' : 'Withdraw'
+                }`,
                 hint: 'Confirm this transaction in your wallet',
                 status: 'loading',
             })
@@ -57,7 +68,15 @@ const SaviourTransactions = () => {
                 amount,
                 targetedCRatio,
             }
-            await depositCallback(signer, saviourPayload)
+            if (isSaviourDeposit) {
+                await depositCallback(signer, saviourPayload)
+            } else {
+                await withdrawCallback(signer, {
+                    safeId: Number(safeId),
+                    amount,
+                    isMaxWithdraw,
+                })
+            }
         } catch (e) {
             handleTransactionError(e)
         }

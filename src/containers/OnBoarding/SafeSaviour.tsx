@@ -8,10 +8,11 @@ import GridContainer from '../../components/GridContainer'
 import PageHeader from '../../components/PageHeader'
 import { useActiveWeb3React } from '../../hooks'
 import useGeb from '../../hooks/useGeb'
-import { useSaviourData } from '../../hooks/useSaviour'
+import { useMinSaviourBalance, useSaviourData } from '../../hooks/useSaviour'
 import { useStoreActions } from '../../store'
 import { formatNumber } from '../../utils/helper'
 import { isNumeric } from '../../utils/validations'
+import AlertLabel from '../../components/AlertLabel'
 
 const SafeSaviour = ({ ...props }) => {
     const { t } = useTranslation()
@@ -20,6 +21,7 @@ const SafeSaviour = ({ ...props }) => {
     const history = useHistory()
     const geb = useGeb()
     const saviourData = useSaviourData()
+    const { getMinSaviourBalance } = useMinSaviourBalance()
 
     const {
         popupsModel: popupsActions,
@@ -43,12 +45,31 @@ const SafeSaviour = ({ ...props }) => {
 
     useEffect(() => {
         popupsActions.setIsWaitingModalOpen(true)
-        if (saviourData) {
+        if (saviourData && saviourData.redemptionPrice) {
             popupsActions.setIsWaitingModalOpen(false)
         }
     }, [popupsActions, saviourData])
 
     const handleOpenModal = () => popupsActions.setIsSaviourModalOpen(true)
+
+    const returnStatus = () => {
+        if (!saviourData) return 'none'
+        const minimumBalance = getMinSaviourBalance(
+            saviourData.saviourRescueRatio
+        ) as number
+        if (Number(saviourData.saviourBalance) >= minimumBalance) {
+            return 'Protected'
+        }
+        return 'Not Protected'
+    }
+
+    const returnFiatValue = (value: string, price: number) => {
+        if (!value || !price) return '0.00'
+        return formatNumber(
+            numeral(value).multiply(price).value().toString(),
+            2
+        )
+    }
 
     return (
         <GridContainer>
@@ -69,7 +90,21 @@ const SafeSaviour = ({ ...props }) => {
                     </ImageContainer>
                 )}
 
-                <Title>{t('safe_saviour_title')}</Title>
+                <SaviourHeading>
+                    <Title>{t('safe_saviour_title')}</Title>
+                    {saviourData && saviourData.hasSaviour ? (
+                        <AlertLabel
+                            text={`Status: ${returnStatus()}`}
+                            type={
+                                returnStatus() === 'Protected'
+                                    ? 'success'
+                                    : returnStatus() === 'none'
+                                    ? 'dimmed'
+                                    : 'danger'
+                            }
+                        />
+                    ) : null}
+                </SaviourHeading>
                 <Description>
                     Lorem ipsum dolor sit amet consectetur, adipisicing elit.
                     Eligendi commodi iusto doloribus excepturi, praesentium
@@ -112,16 +147,30 @@ const SafeSaviour = ({ ...props }) => {
                                     {'Saviour Balance'}
                                 </Label>
                                 <Value>
-                                    {saviourData.saviourBalance}{' '}
-                                    {`(${formatNumber(
-                                        numeral(saviourData.saviourBalance)
-                                            .multiply(saviourData.uniPoolPrice)
-                                            .value()
-                                            .toString()
-                                    )})`}
-                                    RAI/ETH LP
+                                    {formatNumber(saviourData.saviourBalance)}{' '}
+                                    {`($${returnFiatValue(
+                                        saviourData.saviourBalance,
+                                        saviourData.uniPoolPrice
+                                    )}) `}
+                                    UNI-V2 RAI/ETH LP
                                 </Value>
-                                <Label className="small"></Label>
+                                <Label className="small">
+                                    {' '}
+                                    Minimum saviour balance:{' '}
+                                    <b>
+                                        {getMinSaviourBalance(
+                                            saviourData.saviourRescueRatio
+                                        )}
+                                    </b>{' '}
+                                    UNI-V2 ($
+                                    {returnFiatValue(
+                                        getMinSaviourBalance(
+                                            saviourData.saviourRescueRatio
+                                        ) as string,
+                                        saviourData.uniPoolPrice
+                                    )}
+                                    )
+                                </Label>
                             </StateInner>
                         </StatItem>
 
@@ -131,7 +180,6 @@ const SafeSaviour = ({ ...props }) => {
                                     {'Target Rescue CRatio'}
                                 </Label>
                                 <Value>{saviourData.saviourRescueRatio}%</Value>
-                                <Label className="small"></Label>
                             </StateInner>
                         </StatItem>
                     </StatsGrid>
@@ -261,6 +309,9 @@ const Label = styled.div`
         font-size: ${(props) => props.theme.font.extraSmall};
         color: ${(props) => props.theme.colors.secondary};
         margin-top: 10px;
+        b {
+            color: ${(props) => props.theme.colors.primary};
+        }
         a {
             color: inherit;
             filter: grayscale(100%);
@@ -278,4 +329,10 @@ const Label = styled.div`
     ${({ theme }) => theme.mediaWidth.upToSmall`
     font-size: ${(props) => props.theme.font.extraSmall};
   `}
+`
+
+const SaviourHeading = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 `

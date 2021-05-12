@@ -14,24 +14,28 @@ import {
     SaviourWithdrawPayload,
 } from '../utils/interfaces'
 import { BigNumber } from '@ethersproject/bignumber'
+import { formatNumber } from '../utils/helper'
 
 export type SaviourData = {
     hasSaviour: boolean
     saviourAddress: string
     saviourBalance: string
     saviourRescueRatio: number
-    token0: string
-    token1: string
-    reserve0: string
-    reserve1: string
-    coinTotalSupply: string
-    reserveRAI: string
-    reserveETH: string
+    reserve0: BigNumber
+    reserve1: BigNumber
+    coinTotalSupply: BigNumber
+    reserveRAI: BigNumber
+    reserveETH: BigNumber
     ethPrice: number
     uniPoolPrice: number
     minCollateralRatio: number
     rescueFee: string
+    redemptionPrice: BigNumber
+    accumulatedRate: BigNumber
+    generatedDebt: BigNumber
+    lockedCollateral: BigNumber
 }
+
 export function useSaviourData() {
     const geb = useGeb()
     const [safe, setSafe] = useState<ISafe | null>(null)
@@ -68,8 +72,6 @@ export function useSaviourData() {
                     safeHandler.toLowerCase(),
                     true
                 ),
-                geb.contracts.uniswapPairCoinEth.token0(true),
-                geb.contracts.uniswapPairCoinEth.token1(true),
                 geb.contracts.uniswapPairCoinEth.getReserves(true),
                 geb.contracts.uniswapPairCoinEth.totalSupply(true),
             ])
@@ -80,6 +82,13 @@ export function useSaviourData() {
                     true
                 ),
                 geb.contracts.coinNativeUniswapSaviour.minKeeperPayoutValue(
+                    true
+                ),
+                geb.contracts.oracleRelayer.redemptionPrice_readOnly(true),
+                geb.contracts.safeEngine.collateralTypes(gebUtils.ETH_A, true),
+                geb.contracts.safeEngine.safes(
+                    gebUtils.ETH_A,
+                    safeHandler.toLowerCase(),
                     true
                 ),
             ])
@@ -93,18 +102,22 @@ export function useSaviourData() {
                 saviourAddress,
                 saviourBalance,
                 saviourRescueRatio,
-                token0,
-                token1,
                 reserves,
                 coinTotalSupply,
             ] = muliCallResponse1
 
-            const [minCollateralRatio, rescueFee] = multiCallResponse2
+            const [
+                minCollateralRatio,
+                rescueFee,
+                redemptionPrice,
+                { accumulatedRate },
+                { generatedDebt, lockedCollateral },
+            ] = multiCallResponse2
 
-            const wethAddress = token0
-            const coinAddress = token1
-            const reserve0 = ethersUtils.formatEther(reserves._reserve0)
-            const reserve1 = ethersUtils.formatEther(reserves._reserve1)
+            const wethAddress = geb.contracts.weth.address
+            const coinAddress = geb.contracts.coin.address
+            const reserve0 = reserves._reserve0
+            const reserve1 = reserves._reserve1
 
             const isCoinLessThanWeth = () => {
                 if (!coinAddress || !wethAddress) return false
@@ -113,8 +126,8 @@ export function useSaviourData() {
                 )
             }
 
-            let reserveRAI = '0'
-            let reserveETH = '0'
+            let reserveRAI = BigNumber.from('0')
+            let reserveETH = BigNumber.from('0')
 
             if (isCoinLessThanWeth()) {
                 reserveRAI = reserve0
@@ -124,6 +137,11 @@ export function useSaviourData() {
                 reserveETH = reserve0
             }
 
+            //
+            //                      2 * ethPrice * reserveETH
+            // uniPoolPrice = --------------------------------------
+            //                            lptotalSupply
+
             const formattedSaviourBalance = ethersUtils.formatEther(
                 saviourBalance
             )
@@ -132,9 +150,12 @@ export function useSaviourData() {
                 coinTotalSupply
             )
 
-            const denometer = numeral(ethPrice).multiply(reserveETH).value()
+            const numerator = numeral(2)
+                .multiply(ethPrice)
+                .multiply(ethersUtils.formatEther(reserveETH))
+                .value()
 
-            const uniPoolPrice = numeral(Math.sqrt(denometer))
+            const uniPoolPrice = numeral(numerator)
                 .divide(formattedCoinTotalSupply)
                 .value()
 
@@ -143,23 +164,106 @@ export function useSaviourData() {
                 saviourAddress,
                 saviourBalance: formattedSaviourBalance,
                 saviourRescueRatio: saviourRescueRatio.toNumber(),
-                coinTotalSupply: formattedCoinTotalSupply,
+                coinTotalSupply,
                 minCollateralRatio: minCollateralRatio.toNumber(),
                 rescueFee: ethersUtils.formatEther(rescueFee),
-                token0,
-                token1,
                 reserve0,
                 reserve1,
                 reserveRAI,
                 reserveETH,
                 ethPrice,
-                uniPoolPrice,
+                uniPoolPrice: formatNumber(
+                    uniPoolPrice.toString(),
+                    2
+                ) as number,
+                redemptionPrice,
+                accumulatedRate,
+                generatedDebt,
+                lockedCollateral,
             })
         }
         fetchSaviourData()
     }, [safe, geb, ethPrice])
 
     return state
+}
+
+// minSaviourBalance
+
+export function useMinSaviourBalance() {
+    const WAD_COMPLEMENT = BigNumber.from(10 ** 9)
+    const HUNDRED = 100
+    const LIQUIDATION_POINT = 130 // percent
+
+    const saviourData = useSaviourData()
+
+    const getMinSaviourBalance = function (targetCRatio: number) {
+        if (!saviourData || !targetCRatio) return '0'
+        const { RAY } = gebUtils
+        const {
+            redemptionPrice,
+            generatedDebt,
+            accumulatedRate,
+            lockedCollateral,
+            reserveETH: ethReserve,
+            reserveRAI: raiReserve,
+            coinTotalSupply: lpTotalSupply,
+        } = saviourData
+
+        // Liquidation price formula
+        //
+        //                      debt * accumulatedRate * targetCRatio * RP
+        // liquidationPrice = -----------------------------------------------
+        //                                     collateral
+
+        const liquidationPrice = redemptionPrice
+            .mul(generatedDebt.mul(WAD_COMPLEMENT))
+            .mul(accumulatedRate)
+            .div(lockedCollateral.mul(WAD_COMPLEMENT))
+            .div(RAY)
+            .mul(LIQUIDATION_POINT)
+            .div(HUNDRED)
+
+        // Formula for min savior balance
+        //
+        //                                           targetCRatio * RP * accumulatedRate * debt  -  collateralPrice * collateral
+        // Min savior balance = ----------------------------------------------------------------------------------------------------------------------
+        //                        collateralPrice * (reserveETH / totalLPsupply) + RP * accumulatedRate * (reserveRAI / totalLPsupply) * targetCRatio
+
+        // (All calculation are made in RAY)
+        const numerator = redemptionPrice
+            .mul(accumulatedRate)
+            .div(RAY)
+            .mul(generatedDebt.mul(WAD_COMPLEMENT))
+            .div(RAY)
+            .mul(targetCRatio)
+            .div(100)
+            .sub(
+                liquidationPrice
+                    .mul(lockedCollateral)
+                    .mul(WAD_COMPLEMENT)
+                    .div(RAY)
+            )
+
+        const denominator = liquidationPrice
+            .mul(ethReserve.mul(WAD_COMPLEMENT))
+            .div(lpTotalSupply.mul(WAD_COMPLEMENT))
+            .add(
+                redemptionPrice
+                    .mul(accumulatedRate)
+                    .div(RAY)
+                    .mul(raiReserve.mul(WAD_COMPLEMENT))
+                    .div(lpTotalSupply.mul(WAD_COMPLEMENT))
+                    .mul(targetCRatio)
+                    .div(100)
+            )
+
+        const value = numerator.mul(RAY).div(denominator)
+        const minSaviorBalance = parseInt(value.toString()) / 1e27
+        return formatNumber(minSaviorBalance.toString())
+    }
+
+    return { getMinSaviourBalance }
 }
 
 // deposit LP balance to saviour
@@ -237,16 +341,29 @@ export function useSaviourWithdraw() {
 
         const geb = new Geb(ETH_NETWORK, signer.provider)
         const proxy = await geb.getProxyAction(signer._address)
-        const { safeId, amount } = saviourPayload
+        const { safeId, amount, isMaxWithdraw } = saviourPayload
         const tokenAmount = ethersUtils.parseEther(amount)
 
-        const txData = proxy.withdraw(
-            false,
-            geb.contracts.coinNativeUniswapSaviour.address,
-            safeId,
-            tokenAmount,
-            signer._address
-        )
+        let txData
+
+        if (isMaxWithdraw) {
+            txData = proxy.withdrawUncoverSAFE(
+                false,
+                geb.contracts.coinNativeUniswapSaviour.address,
+                geb.contracts.uniswapPairCoinEth.address,
+                safeId,
+                tokenAmount,
+                signer._address
+            )
+        } else {
+            txData = proxy.withdraw(
+                false,
+                geb.contracts.coinNativeUniswapSaviour.address,
+                safeId,
+                tokenAmount,
+                signer._address
+            )
+        }
         if (!txData) throw new Error('No transaction request!')
         const tx = await handlePreTxGasEstimate(signer, txData)
         const txResponse = await signer.sendTransaction(tx)
