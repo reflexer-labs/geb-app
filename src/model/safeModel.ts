@@ -97,7 +97,7 @@ const safeModel: SafeModel = {
     isMaxWithdraw: false,
     operation: 0,
     amount: '',
-    targetedCRatio: 200,
+    targetedCRatio: 0,
     managedSafe: {
         safeId: '',
         owner: {

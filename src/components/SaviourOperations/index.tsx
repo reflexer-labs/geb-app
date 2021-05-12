@@ -158,9 +158,16 @@ const SaviourOperatrions = () => {
         if (targetedCRatio) {
             setSliderVal(targetedCRatio)
         } else {
-            setSliderVal(saviourData?.minCollateralRatio as number)
+            if (saviourData) {
+                const CRatio = saviourData.hasSaviour
+                    ? saviourData.saviourRescueRatio
+                    : saviourData.minCollateralRatio
+
+                setSliderVal(CRatio)
+                safeActions.setTargetedCRatio(CRatio)
+            }
         }
-    }, [saviourData, targetedCRatio])
+    }, [safeActions, saviourData, targetedCRatio])
 
     return (
         <Body>
