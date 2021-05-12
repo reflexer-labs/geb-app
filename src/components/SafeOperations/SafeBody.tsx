@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { useStoreActions, useStoreState } from '../../store'
 import { ISafeData } from '../../utils/interfaces'
 import Button from '../Button'
+import numeral from 'numeral'
 // import CheckBox from '../CheckBox';
 import DecimalInput from '../DecimalInput'
 import {
@@ -212,7 +213,7 @@ const SafeBody = ({ isChecked }: Props) => {
         const debtFloorBN = BigNumber.from(toFixedString(debtFloor, 'WAD'))
         const totalDebtBN = BigNumber.from(toFixedString(totalDebt, 'WAD'))
 
-        const debtCeilingBN = BigNumber.from(toFixedString(debtCeiling, 'RAD'))
+        // const debtCeilingBN = BigNumber.from(toFixedString(debtCeiling, 'RAD'))
         const globalDebtCeilingBN = globalDebtCeiling
             ? BigNumber.from(toFixedString(globalDebtCeiling, 'RAD'))
             : BigNumber.from('0')
@@ -317,14 +318,14 @@ const SafeBody = ({ isChecked }: Props) => {
             return false
         }
 
-        if (totalDebtBN.mul(gebUtils.RAY).gt(globalDebtCeilingBN)) {
+        if (totalDebtBN.gt(globalDebtCeilingBN)) {
             setError('Cannot exceed global debt ceiling.')
-            return
+            return false
         }
 
-        if (totalDebtBN.mul(gebUtils.RAY).gt(debtCeilingBN)) {
+        if (numeral(totalDebt).value() > numeral(debtCeiling).value()) {
             setError(`Cannot exceed ${COIN_TICKER} debt ceiling.`)
-            return
+            return false
         }
 
         return true
