@@ -17,6 +17,7 @@ const SaviourTransactions = () => {
     const {
         safeModel: safeActions,
         popupsModel: popupsActions,
+        connectWalletModel: connectWalletActions,
     } = useStoreActions((state) => state)
 
     const { safeModel: safeState } = useStoreState((state) => state)
@@ -51,7 +52,7 @@ const SaviourTransactions = () => {
             return
         }
         try {
-            handleClose()
+            popupsActions.setIsSaviourModalOpen(false)
             popupsActions.setIsWaitingModalOpen(true)
             popupsActions.setWaitingPayload({
                 title: 'Waiting For Confirmation',
@@ -77,8 +78,13 @@ const SaviourTransactions = () => {
                     isMaxWithdraw,
                 })
             }
+            await connectWalletActions.fetchUniswapPoolBalance(
+                account.toLowerCase()
+            )
         } catch (e) {
             handleTransactionError(e)
+        } finally {
+            handleClose()
         }
     }
     return (

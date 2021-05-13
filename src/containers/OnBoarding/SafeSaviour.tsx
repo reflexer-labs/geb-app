@@ -13,6 +13,9 @@ import { useStoreActions } from '../../store'
 import { formatNumber } from '../../utils/helper'
 import { isNumeric } from '../../utils/validations'
 import AlertLabel from '../../components/AlertLabel'
+import { Info } from 'react-feather'
+import ReactTooltip from 'react-tooltip'
+import usePrevious from '../../hooks/usePrevious'
 
 const SafeSaviour = ({ ...props }) => {
     const { t } = useTranslation()
@@ -22,7 +25,7 @@ const SafeSaviour = ({ ...props }) => {
     const geb = useGeb()
     const saviourData = useSaviourData()
     const { getMinSaviourBalance } = useMinSaviourBalance()
-
+    const previousSaviourData = usePrevious(saviourData)
     const {
         popupsModel: popupsActions,
         safeModel: safeActions,
@@ -40,15 +43,29 @@ const SafeSaviour = ({ ...props }) => {
             geb,
             isRPCAdapterOn: true,
         })
-        connectWalletActions.fetchUniswapPoolBalance(account)
+        connectWalletActions.fetchUniswapPoolBalance(account.toLowerCase())
+        const interval = setInterval(
+            () =>
+                connectWalletActions.fetchUniswapPoolBalance(
+                    account.toLowerCase()
+                ),
+            2000
+        )
+        return () => clearInterval(interval)
     }, [account, connectWalletActions, geb, history, safeActions, safeId])
 
     useEffect(() => {
-        popupsActions.setIsWaitingModalOpen(true)
-        if (saviourData && saviourData.redemptionPrice) {
+        if (!previousSaviourData) {
+            popupsActions.setIsWaitingModalOpen(true)
+        }
+        if (
+            !previousSaviourData &&
+            saviourData &&
+            saviourData.redemptionPrice
+        ) {
             popupsActions.setIsWaitingModalOpen(false)
         }
-    }, [popupsActions, saviourData])
+    }, [popupsActions, previousSaviourData, saviourData])
 
     const handleOpenModal = () => popupsActions.setIsSaviourModalOpen(true)
 
@@ -116,13 +133,6 @@ const SafeSaviour = ({ ...props }) => {
                     doloremque?
                 </Description>
 
-                <BtnContainer>
-                    <Button
-                        withArrow
-                        text={'configure'}
-                        onClick={handleOpenModal}
-                    />
-                </BtnContainer>
                 {saviourData && saviourData.hasSaviour ? (
                     <StatsGrid>
                         <StatItem>
@@ -161,29 +171,43 @@ const SafeSaviour = ({ ...props }) => {
                                         {getMinSaviourBalance(
                                             saviourData.saviourRescueRatio
                                         )}
+                                        {`($${returnFiatValue(
+                                            getMinSaviourBalance(
+                                                saviourData.saviourRescueRatio
+                                            ) as string,
+                                            saviourData.uniPoolPrice
+                                        )}) `}
                                     </b>{' '}
-                                    UNI-V2 ($
-                                    {returnFiatValue(
-                                        getMinSaviourBalance(
-                                            saviourData.saviourRescueRatio
-                                        ) as string,
-                                        saviourData.uniPoolPrice
-                                    )}
-                                    )
+                                    UNI-V2 RAI/ETH LP
                                 </Label>
                             </StateInner>
                         </StatItem>
 
                         <StatItem>
                             <StateInner>
+                                <InfoIcon data-tip={t('saviour_target_cratio')}>
+                                    <Info size="16" />
+                                </InfoIcon>
                                 <Label className="top">
                                     {'Target Rescue CRatio'}
                                 </Label>
                                 <Value>{saviourData.saviourRescueRatio}%</Value>
                             </StateInner>
                         </StatItem>
+                        <ReactTooltip
+                            multiline
+                            type="light"
+                            data-effect="solid"
+                        />
                     </StatsGrid>
                 ) : null}
+                <BtnContainer>
+                    <Button
+                        withArrow
+                        text={'configure'}
+                        onClick={handleOpenModal}
+                    />
+                </BtnContainer>
             </Container>
         </GridContainer>
     )
@@ -265,6 +289,7 @@ const StateInner = styled.div`
     padding: 20px;
     text-align: left;
     height: 100%;
+    position: relative;
 `
 
 const Value = styled.div`
@@ -335,4 +360,15 @@ const SaviourHeading = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+`
+
+const InfoIcon = styled.div`
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    svg {
+        fill: ${(props) => props.theme.colors.secondary};
+        color: ${(props) => props.theme.colors.neutral};
+    }
 `

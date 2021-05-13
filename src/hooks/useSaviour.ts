@@ -34,6 +34,7 @@ export type SaviourData = {
     accumulatedRate: BigNumber
     generatedDebt: BigNumber
     lockedCollateral: BigNumber
+    keeperPayOut: BigNumber
 }
 
 export function useSaviourData() {
@@ -91,6 +92,9 @@ export function useSaviourData() {
                     safeHandler.toLowerCase(),
                     true
                 ),
+                geb.contracts.coinNativeUniswapSaviour.minKeeperPayoutValue(
+                    true
+                ),
             ])
 
             const [muliCallResponse1, multiCallResponse2] = await Promise.all([
@@ -112,6 +116,7 @@ export function useSaviourData() {
                 redemptionPrice,
                 { accumulatedRate },
                 { generatedDebt, lockedCollateral },
+                keeperPayOut,
             ] = multiCallResponse2
 
             const wethAddress = geb.contracts.weth.address
@@ -180,9 +185,13 @@ export function useSaviourData() {
                 accumulatedRate,
                 generatedDebt,
                 lockedCollateral,
+                keeperPayOut,
             })
         }
         fetchSaviourData()
+
+        const interval = setInterval(fetchSaviourData, 8000)
+        return () => clearInterval(interval)
     }, [safe, geb, ethPrice])
 
     return state
@@ -208,6 +217,7 @@ export function useMinSaviourBalance() {
             reserveETH: ethReserve,
             reserveRAI: raiReserve,
             coinTotalSupply: lpTotalSupply,
+            keeperPayOut,
         } = saviourData
 
         // Liquidation price formula
@@ -216,13 +226,15 @@ export function useMinSaviourBalance() {
         // liquidationPrice = -----------------------------------------------
         //                                     collateral
 
-        const liquidationPrice = redemptionPrice
-            .mul(generatedDebt.mul(WAD_COMPLEMENT))
-            .mul(accumulatedRate)
-            .div(lockedCollateral.mul(WAD_COMPLEMENT))
-            .div(RAY)
-            .mul(LIQUIDATION_POINT)
-            .div(HUNDRED)
+        const liquidationPrice = !lockedCollateral.isZero()
+            ? redemptionPrice
+                  .mul(generatedDebt.mul(WAD_COMPLEMENT))
+                  .mul(accumulatedRate)
+                  .div(lockedCollateral.mul(WAD_COMPLEMENT))
+                  .div(RAY)
+                  .mul(LIQUIDATION_POINT)
+                  .div(HUNDRED)
+            : BigNumber.from('0')
 
         // Formula for min savior balance
         //
@@ -258,8 +270,31 @@ export function useMinSaviourBalance() {
                     .div(100)
             )
 
-        const value = numerator.mul(RAY).div(denominator)
-        const minSaviorBalance = parseInt(value.toString()) / 1e27
+        let balanceBN = !lockedCollateral.isZero()
+            ? numerator.mul(RAY).div(denominator)
+            : BigNumber.from('0')
+
+        // Price USD RAY price of a LP share
+        // lpUsdPrice = (reserveETH * priceEth + reserveRAI * priceRAI) / lpTotalSupply
+        const lpTokenUsdPrice = ethReserve
+            .mul(WAD_COMPLEMENT)
+            .mul(liquidationPrice)
+            .div(RAY)
+            .add(raiReserve.mul(WAD_COMPLEMENT).mul(redemptionPrice).div(RAY))
+            .mul(RAY)
+            .div(lpTotalSupply.mul(WAD_COMPLEMENT))
+
+        // Calculate keeper fee and add it to the min balance
+        const keeperPayoutInLP = keeperPayOut
+            .mul(WAD_COMPLEMENT)
+            .mul(RAY)
+            .div(lpTokenUsdPrice)
+
+        balanceBN = !lockedCollateral.isZero()
+            ? balanceBN.add(keeperPayoutInLP)
+            : BigNumber.from('0')
+
+        const minSaviorBalance = parseInt(balanceBN.toString()) / 1e27
         return formatNumber(minSaviorBalance.toString())
     }
 
@@ -282,7 +317,6 @@ export function useSaviourDeposit() {
         if (!account || !signer || !saviourPayload) {
             return false
         }
-
         const geb = new Geb(ETH_NETWORK, signer.provider)
         const proxy = await geb.getProxyAction(signer._address)
         const { safeId, amount, targetedCRatio } = saviourPayload
@@ -338,7 +372,6 @@ export function useSaviourWithdraw() {
         if (!account || !signer || !saviourPayload) {
             return false
         }
-
         const geb = new Geb(ETH_NETWORK, signer.provider)
         const proxy = await geb.getProxyAction(signer._address)
         const { safeId, amount, isMaxWithdraw } = saviourPayload

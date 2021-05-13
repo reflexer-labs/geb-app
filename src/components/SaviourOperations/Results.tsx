@@ -16,7 +16,7 @@ const Results = () => {
 
     const { safeModel: safeState } = useStoreState((state) => state)
 
-    const { targetedCRatio, isSaviourDeposit, amount } = safeState
+    const { targetedCRatio, amount } = safeState
 
     const returnFiatValue = (value: string, price: number) => {
         if (!value || !price) return '0.00'
@@ -29,11 +29,7 @@ const Results = () => {
         <Result>
             <Block>
                 <Item>
-                    <Label>
-                        {isSaviourDeposit
-                            ? `Deposited Amount`
-                            : `Withdrawn Amount`}{' '}
-                    </Label>
+                    <Label>{'New Saviour Balance'}</Label>
                     <Value>{`${formatNumber(amount)} UNI-V2 ($${returnFiatValue(
                         amount,
                         saviourData?.uniPoolPrice as number

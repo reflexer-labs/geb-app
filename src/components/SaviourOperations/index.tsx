@@ -26,7 +26,7 @@ const SaviourOperatrions = () => {
     const saviourData = useSaviourData()
 
     const { getMinSaviourBalance } = useMinSaviourBalance()
-    const [sliderVal, setSliderVal] = useState<number>(200)
+    const [sliderVal, setSliderVal] = useState<number>(0)
 
     const [amount, setAmount] = useState('')
     const {
@@ -81,7 +81,9 @@ const SaviourOperatrions = () => {
             ? ethers.utils.parseEther(saviourData.saviourBalance)
             : BigNumber.from('0')
         const minBalance = getMinSaviourBalance(sliderVal)
-        const minBalanceBN = ethers.utils.parseEther(minBalance as string)
+        const minBalanceBN = minBalance
+            ? ethers.utils.parseEther(minBalance as string)
+            : BigNumber.from('0')
 
         if (!sliderVal) {
             setError('No minCollateralRatio')
@@ -89,6 +91,11 @@ const SaviourOperatrions = () => {
         }
         if (amountBN.isZero()) {
             setError('You cannot submit nothing')
+            return false
+        }
+
+        if (!minBalance) {
+            setError('No Collateral')
             return false
         }
 
@@ -165,6 +172,8 @@ const SaviourOperatrions = () => {
 
                 setSliderVal(CRatio)
                 safeActions.setTargetedCRatio(CRatio)
+            } else {
+                setSliderVal(200)
             }
         }
     }, [safeActions, saviourData, targetedCRatio])
@@ -233,6 +242,11 @@ const SaviourOperatrions = () => {
                         onChange={(value) => setSliderVal(value as number)}
                         onAfterChange={(value) =>
                             safeActions.setTargetedCRatio(value as number)
+                        }
+                        min={
+                            saviourData
+                                ? (saviourData.minCollateralRatio as number)
+                                : 200
                         }
                         max={350}
                         renderTrack={Track}
