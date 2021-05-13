@@ -214,9 +214,9 @@ const SafeBody = ({ isChecked }: Props) => {
         const totalDebtBN = BigNumber.from(toFixedString(totalDebt, 'WAD'))
 
         // const debtCeilingBN = BigNumber.from(toFixedString(debtCeiling, 'RAD'))
-        const globalDebtCeilingBN = globalDebtCeiling
-            ? BigNumber.from(toFixedString(globalDebtCeiling, 'RAD'))
-            : BigNumber.from('0')
+        // const globalDebtCeilingBN = globalDebtCeiling
+        //     ? BigNumber.from(toFixedString(globalDebtCeiling, 'RAD'))
+        //     : BigNumber.from('0')
 
         if (type === 'deposit_borrow') {
             if (leftInputBN.gt(availableEthBN)) {
@@ -318,7 +318,7 @@ const SafeBody = ({ isChecked }: Props) => {
             return false
         }
 
-        if (totalDebtBN.gt(globalDebtCeilingBN)) {
+        if (numeral(totalDebt).value() > numeral(globalDebtCeiling).value()) {
             setError('Cannot exceed global debt ceiling.')
             return false
         }
