@@ -13,6 +13,7 @@ import { NETWORK_ID } from '../../connectors'
 import { formatNumber } from '../../utils/helper'
 import { useMinSaviourBalance, useSaviourData } from '../../hooks/useSaviour'
 import { BigNumber, ethers } from 'ethers'
+import { Info } from 'react-feather'
 
 const INITITAL_STATE = [
     {
@@ -94,12 +95,11 @@ const SaviourOperatrions = () => {
             return false
         }
 
-        if (!minBalance) {
-            setError('No Collateral')
-            return false
-        }
-
         if (isSaviourDeposit) {
+            if (!minBalance) {
+                setError('No Collateral')
+                return false
+            }
             if (amountBN.add(saviourBalanceBN).lt(minBalanceBN)) {
                 setError(
                     `Recommended minimal savior balance is:  ${getMinSaviourBalance(
@@ -234,24 +234,31 @@ const SaviourOperatrions = () => {
             </MaxBalance>
 
             <RescueRatio>
-                <Label>Target rescue CRatio</Label>
+                <Label>
+                    Target rescue CRatio{' '}
+                    <InfoIcon data-tip={t('saviour_target_cratio')}>
+                        <Info size="16" />
+                    </InfoIcon>
+                </Label>
 
                 <SliderContainer>
-                    <StyledSlider
-                        value={sliderVal}
-                        onChange={(value) => setSliderVal(value as number)}
-                        onAfterChange={(value) =>
-                            safeActions.setTargetedCRatio(value as number)
-                        }
-                        min={
-                            saviourData
-                                ? (saviourData.minCollateralRatio as number)
-                                : 200
-                        }
-                        max={350}
-                        renderTrack={Track}
-                        renderThumb={Thumb}
-                    />
+                    {isSaviourDeposit ? (
+                        <StyledSlider
+                            value={sliderVal}
+                            onChange={(value) => setSliderVal(value as number)}
+                            onAfterChange={(value) =>
+                                safeActions.setTargetedCRatio(value as number)
+                            }
+                            min={
+                                saviourData
+                                    ? (saviourData.minCollateralRatio as number)
+                                    : 200
+                            }
+                            max={350}
+                            renderTrack={Track}
+                            renderThumb={Thumb}
+                        />
+                    ) : null}
                     <SliderValue>{sliderVal}%</SliderValue>
                 </SliderContainer>
             </RescueRatio>
@@ -377,6 +384,7 @@ const Label = styled.div`
     flex: 1;
     color: ${(props) => props.theme.colors.secondary};
     font-size: 14px;
+    position: relative;
     ${({ theme }) => theme.mediaWidth.upToSmall`
        min-width:100%;
        margin-bottom:10px;
@@ -387,6 +395,7 @@ const SliderContainer = styled.div`
     display: flex;
     align-items: center;
     flex: 1;
+    justify-content: flex-end;
     ${({ theme }) => theme.mediaWidth.upToSmall`
        min-width:100%;
        margin-bottom:10px;
@@ -403,4 +412,15 @@ const Error = styled.p`
     font-size: ${(props) => props.theme.font.extraSmall};
     width: 100%;
     margin: 16px 0;
+`
+
+const InfoIcon = styled.div`
+    position: absolute;
+    top: 2px;
+    left: 142px;
+    cursor: pointer;
+    svg {
+        fill: ${(props) => props.theme.colors.secondary};
+        color: ${(props) => props.theme.colors.neutral};
+    }
 `
