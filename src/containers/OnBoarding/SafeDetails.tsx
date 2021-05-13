@@ -10,8 +10,13 @@ import PageHeader from '../../components/PageHeader'
 import SafeHistory from '../../components/SafeHistory'
 import SafeStats from '../../components/SafeStats'
 import { useActiveWeb3React } from '../../hooks'
+import { handleTransactionError } from '../../hooks/TransactionHooks'
 import useGeb from '../../hooks/useGeb'
-import { useSaviourData } from '../../hooks/useSaviour'
+import {
+    SaviourData,
+    useSaviourData,
+    useSaviourGetReserves,
+} from '../../hooks/useSaviour'
 import { useStoreActions, useStoreState } from '../../store'
 import { isNumeric } from '../../utils/validations'
 
@@ -19,6 +24,7 @@ const SafeDetails = ({ ...props }) => {
     const { t } = useTranslation()
     const [isOwner, setIsOwner] = useState(true)
     const { account, library } = useActiveWeb3React()
+    const [loading, setIsLoading] = useState(false)
     const geb = useGeb()
     const {
         safeModel: safeActions,
@@ -32,6 +38,7 @@ const SafeDetails = ({ ...props }) => {
     const safeId = props.match.params.id as string
 
     const saviourData = useSaviourData()
+    const { getReservesCallback } = useSaviourGetReserves()
 
     const history = useHistory()
 
@@ -93,6 +100,33 @@ const SafeDetails = ({ ...props }) => {
         }
     }, [account, safeState.managedSafe.owner.id])
 
+    const handleSaviourBtnClick = async (data: SaviourData) => {
+        const { hasLeftOver, saviourAddress } = data
+        if (hasLeftOver) {
+            if (!library || !account) throw new Error('No library or account')
+            setIsLoading(true)
+            try {
+                popupsActions.setIsWaitingModalOpen(true)
+                popupsActions.setWaitingPayload({
+                    title: 'Waiting For Confirmation',
+                    hint: 'Confirm this transaction in your wallet',
+                    status: 'loading',
+                })
+                const signer = library.getSigner(account)
+                await getReservesCallback(signer, {
+                    safeId: Number(safeId),
+                    saviourAddress,
+                })
+            } catch (e) {
+                handleTransactionError(e)
+            } finally {
+                setIsLoading(false)
+            }
+        } else {
+            history.push(`/safes/${safeId}/saviour`)
+        }
+    }
+
     return (
         <>
             {!isOwner ? (
@@ -114,15 +148,22 @@ const SafeDetails = ({ ...props }) => {
                             <Button
                                 id="create-safe"
                                 onClick={() =>
-                                    history.push(`/safes/${safeId}/saviour`)
+                                    handleSaviourBtnClick(saviourData)
                                 }
+                                isLoading={loading}
                             >
                                 <BtnInner>
-                                    <Link2 size={18} />
-                                    {t(
-                                        saviourData.hasSaviour
-                                            ? 'Saviour Configuration'
-                                            : 'add_savoiur'
+                                    {saviourData.hasLeftOver ? (
+                                        t('Collect Saviour Balance')
+                                    ) : (
+                                        <>
+                                            <Link2 size={18} />
+                                            {t(
+                                                saviourData.hasSaviour
+                                                    ? 'Saviour Configuration'
+                                                    : 'add_savoiur'
+                                            )}
+                                        </>
                                     )}
                                 </BtnInner>
                             </Button>

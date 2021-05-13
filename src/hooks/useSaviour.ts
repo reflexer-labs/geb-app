@@ -9,6 +9,7 @@ import useGeb from './useGeb'
 import { useActiveWeb3React } from '.'
 import { handlePreTxGasEstimate } from './TransactionHooks'
 import {
+    GetReservesFromSaviour,
     ISafe,
     SaviourDepositPayload,
     SaviourWithdrawPayload,
@@ -35,6 +36,9 @@ export type SaviourData = {
     generatedDebt: BigNumber
     lockedCollateral: BigNumber
     keeperPayOut: BigNumber
+    systemCoins: BigNumber
+    collateralCoins: BigNumber
+    hasLeftOver: boolean
 }
 
 export function useSaviourData() {
@@ -95,6 +99,10 @@ export function useSaviourData() {
                 geb.contracts.coinNativeUniswapSaviour.minKeeperPayoutValue(
                     true
                 ),
+                geb.contracts.coinNativeUniswapSaviour.underlyingReserves(
+                    safeHandler.toLowerCase(),
+                    true
+                ),
             ])
 
             const [muliCallResponse1, multiCallResponse2] = await Promise.all([
@@ -117,6 +125,7 @@ export function useSaviourData() {
                 { accumulatedRate },
                 { generatedDebt, lockedCollateral },
                 keeperPayOut,
+                { systemCoins, collateralCoins },
             ] = multiCallResponse2
 
             const wethAddress = geb.contracts.weth.address
@@ -164,6 +173,7 @@ export function useSaviourData() {
                 .divide(formattedCoinTotalSupply)
                 .value()
 
+            const hasLeftOver = systemCoins.gt(0) || collateralCoins.gt(0)
             setState({
                 hasSaviour: saviourAddress !== EMPTY_ADDRESS,
                 saviourAddress,
@@ -186,6 +196,9 @@ export function useSaviourData() {
                 generatedDebt,
                 lockedCollateral,
                 keeperPayOut,
+                systemCoins,
+                collateralCoins,
+                hasLeftOver,
             })
         }
         fetchSaviourData()
@@ -356,7 +369,7 @@ export function useSaviourDeposit() {
     return { depositCallback }
 }
 
-// withdraws balance/left-over from saviour
+// withdraws balance from saviour
 export function useSaviourWithdraw() {
     const {
         transactionsModel: transactionsActions,
@@ -421,4 +434,56 @@ export function useSaviourWithdraw() {
     }
 
     return { withdrawCallback }
+}
+
+// withdraws balance from saviour
+export function useSaviourGetReserves() {
+    const {
+        transactionsModel: transactionsActions,
+        popupsModel: popupsActions,
+    } = useStoreActions((store) => store)
+
+    const { account } = useActiveWeb3React()
+
+    const getReservesCallback = async function (
+        signer: JsonRpcSigner,
+        payload: GetReservesFromSaviour
+    ) {
+        if (!account || !signer || !payload) {
+            return false
+        }
+        const geb = new Geb(ETH_NETWORK, signer.provider)
+        const proxy = await geb.getProxyAction(signer._address)
+        const { safeId, saviourAddress } = payload
+
+        const txData = proxy.getReserves(
+            saviourAddress,
+            safeId,
+            signer._address
+        )
+
+        if (!txData) throw new Error('No transaction request!')
+        const tx = await handlePreTxGasEstimate(signer, txData)
+        const txResponse = await signer.sendTransaction(tx)
+        if (txResponse) {
+            const { hash, chainId } = txResponse
+            transactionsActions.addTransaction({
+                chainId,
+                hash,
+                from: txResponse.from,
+                summary: 'Safe Saviour Get Reserves',
+                addedTime: new Date().getTime(),
+                originalTx: txResponse,
+            })
+            popupsActions.setIsWaitingModalOpen(true)
+            popupsActions.setWaitingPayload({
+                title: 'Transaction Submitted',
+                hash: txResponse.hash,
+                status: 'success',
+            })
+            await txResponse.wait()
+        }
+    }
+
+    return { getReservesCallback }
 }

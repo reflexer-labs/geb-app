@@ -555,3 +555,7 @@ export interface SaviourWithdrawPayload {
     amount: string
     isMaxWithdraw: boolean
 }
+export interface GetReservesFromSaviour {
+    saviourAddress: string
+    safeId: number
+}
