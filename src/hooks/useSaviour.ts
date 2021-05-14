@@ -71,6 +71,20 @@ export function useHasLeftOver(safeHandler: string) {
     return { status: state, saviourAddress }
 }
 
+export function useSaviourRescueRatio(safeHandler: string) {
+    const [state, setState] = useState(170)
+    const geb = useGeb()
+    if (!geb || !safeHandler) return state
+    geb.contracts.saviourCRatioSetter
+        .desiredCollateralizationRatios(
+            gebUtils.ETH_A,
+            safeHandler.toLowerCase()
+        )
+        .then((cRatio) => setState(cRatio.toNumber()))
+
+    return state
+}
+
 export function useSaviourData() {
     const { account } = useActiveWeb3React()
     const geb = useGeb()
@@ -429,7 +443,13 @@ export function useSaviourWithdraw() {
         }
         const geb = new Geb(ETH_NETWORK, signer.provider)
         const proxy = await geb.getProxyAction(signer._address)
-        const { safeId, amount, isMaxWithdraw } = saviourPayload
+        const {
+            safeId,
+            amount,
+            isMaxWithdraw,
+            targetedCRatio,
+            isTargetedCRatioChanged,
+        } = saviourPayload
         const tokenAmount = ethersUtils.parseEther(amount)
 
         let txData
@@ -441,6 +461,15 @@ export function useSaviourWithdraw() {
                 geb.contracts.uniswapPairCoinEth.address,
                 safeId,
                 tokenAmount,
+                signer._address
+            )
+        } else if (isTargetedCRatioChanged) {
+            txData = proxy.setDesiredCRatioWithdraw(
+                false,
+                geb.contracts.coinNativeUniswapSaviour.address,
+                safeId,
+                tokenAmount,
+                targetedCRatio,
                 signer._address
             )
         } else {

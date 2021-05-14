@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import _ from '../../utils/lodash'
 import { useActiveWeb3React } from '../../hooks'
-import { useSaviourDeposit, useSaviourWithdraw } from '../../hooks/useSaviour'
+import {
+    useSaviourDeposit,
+    useSaviourRescueRatio,
+    useSaviourWithdraw,
+} from '../../hooks/useSaviour'
 import { useStoreActions, useStoreState } from '../../store'
 import { returnConnectorName } from '../../utils/helper'
 import Button from '../Button'
@@ -28,6 +32,10 @@ const SaviourTransactions = () => {
         isSaviourDeposit,
         isMaxWithdraw,
     } = safeState
+
+    const saviourRescueRatio = useSaviourRescueRatio(
+        singleSafe?.safeHandler as string
+    )
 
     const safeId = _.get(singleSafe, 'id', '0')
     const safeHandler = _.get(singleSafe, 'safeHandler', '')
@@ -72,10 +80,16 @@ const SaviourTransactions = () => {
             if (isSaviourDeposit) {
                 await depositCallback(signer, saviourPayload)
             } else {
+                console.log('here', targetedCRatio !== saviourRescueRatio)
+
                 await withdrawCallback(signer, {
                     safeId: Number(safeId),
+                    safeHandler: safeHandler as string,
                     amount,
+                    targetedCRatio,
                     isMaxWithdraw,
+                    isTargetedCRatioChanged:
+                        targetedCRatio !== saviourRescueRatio,
                 })
             }
             await connectWalletActions.fetchUniswapPoolBalance(

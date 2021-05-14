@@ -66,11 +66,6 @@ const SaviourOperatrions = () => {
         safeActions.setIsSaviourDeposit(!isSaviourDeposit)
         safeActions.setIsMaxWithdraw(false)
         setAmount('')
-        setSliderVal(
-            saviourData
-                ? (saviourData.minCollateralRatio as number)
-                : MIN_SAVIOUR_CRATIO
-        )
     }
 
     const returnFiatValue = (value: string, price: number) => {
@@ -163,7 +158,21 @@ const SaviourOperatrions = () => {
         return uniswapV2CoinEthAllowanceBN.gt(amountBN)
     }
 
+    const isSetToMax = () => {
+        const amountBN = amount
+            ? ethers.utils.parseEther(amount)
+            : BigNumber.from('0')
+        const availableBalanceBN = availableBalance
+            ? ethers.utils.parseEther(availableBalance)
+            : BigNumber.from('0')
+        return amountBN.eq(availableBalanceBN)
+    }
+
     const handleSubmit = () => {
+        safeActions.setTargetedCRatio(sliderVal as number)
+        if (!isSaviourDeposit) {
+            safeActions.setIsMaxWithdraw(isSetToMax())
+        }
         if (passedValidation()) {
             setError('')
             if (isSaviourDeposit && !passedAllowance()) {
@@ -172,7 +181,6 @@ const SaviourOperatrions = () => {
                 safeActions.setOperation(2)
             }
         }
-        safeActions.setTargetedCRatio(sliderVal as number)
     }
 
     const handleChange = (val: string) => {
@@ -236,7 +244,7 @@ const SaviourOperatrions = () => {
             <Operation>
                 <Input>
                     <DecimalInput
-                        value={amount ? (formatNumber(amount) as string) : ''}
+                        value={amount}
                         onChange={handleChange}
                         label={`${
                             isSaviourDeposit ? 'Deposit' : 'Withdraw'
@@ -279,23 +287,21 @@ const SaviourOperatrions = () => {
                 </Label>
 
                 <SliderContainer>
-                    {isSaviourDeposit ? (
-                        <StyledSlider
-                            value={sliderVal}
-                            onChange={(value) => setSliderVal(value as number)}
-                            onAfterChange={(value) =>
-                                safeActions.setTargetedCRatio(value as number)
-                            }
-                            min={
-                                saviourData
-                                    ? (saviourData.minCollateralRatio as number)
-                                    : MIN_SAVIOUR_CRATIO
-                            }
-                            max={300}
-                            renderTrack={Track}
-                            renderThumb={Thumb}
-                        />
-                    ) : null}
+                    <StyledSlider
+                        value={sliderVal}
+                        onChange={(value) => setSliderVal(value as number)}
+                        onAfterChange={(value) =>
+                            safeActions.setTargetedCRatio(value as number)
+                        }
+                        min={
+                            saviourData
+                                ? (saviourData.minCollateralRatio as number)
+                                : MIN_SAVIOUR_CRATIO
+                        }
+                        max={300}
+                        renderTrack={Track}
+                        renderThumb={Thumb}
+                    />
                     <SliderValue>{sliderVal}%</SliderValue>
                 </SliderContainer>
             </RescueRatio>
