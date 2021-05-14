@@ -151,21 +151,20 @@ const SafeDetails = ({ ...props }) => {
                                     handleSaviourBtnClick(saviourData)
                                 }
                                 isLoading={loading}
+                                disabled={loading}
                             >
-                                <BtnInner>
-                                    {saviourData.hasLeftOver ? (
-                                        t('Collect Saviour Balance')
-                                    ) : (
-                                        <>
-                                            <Link2 size={18} />
-                                            {t(
-                                                saviourData.hasSaviour
-                                                    ? 'Saviour Configuration'
-                                                    : 'add_savoiur'
-                                            )}
-                                        </>
-                                    )}
-                                </BtnInner>
+                                {saviourData.hasLeftOver ? (
+                                    t('Collect Saviour Balance')
+                                ) : (
+                                    <BtnInner>
+                                        <Link2 size={18} />
+                                        {t(
+                                            saviourData.hasSaviour
+                                                ? 'Saviour Configuration'
+                                                : 'add_savoiur'
+                                        )}
+                                    </BtnInner>
+                                )}
                             </Button>
                         </BtnContainer>
                     ) : null}

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
@@ -20,6 +20,7 @@ import usePrevious from '../../hooks/usePrevious'
 const SafeSaviour = ({ ...props }) => {
     const { t } = useTranslation()
     const { account } = useActiveWeb3React()
+    const [loaded, setLoaded] = useState(false)
     const safeId = props.match.params.id as string
     const history = useHistory()
     const geb = useGeb()
@@ -29,7 +30,6 @@ const SafeSaviour = ({ ...props }) => {
     const {
         popupsModel: popupsActions,
         safeModel: safeActions,
-        connectWalletModel: connectWalletActions,
     } = useStoreActions((state) => state)
 
     useEffect(() => {
@@ -43,16 +43,7 @@ const SafeSaviour = ({ ...props }) => {
             geb,
             isRPCAdapterOn: true,
         })
-        connectWalletActions.fetchUniswapPoolBalance(account.toLowerCase())
-        const interval = setInterval(
-            () =>
-                connectWalletActions.fetchUniswapPoolBalance(
-                    account.toLowerCase()
-                ),
-            2000
-        )
-        return () => clearInterval(interval)
-    }, [account, connectWalletActions, geb, history, safeActions, safeId])
+    }, [account, geb, history, safeActions, safeId])
 
     useEffect(() => {
         if (!previousSaviourData) {
@@ -64,6 +55,7 @@ const SafeSaviour = ({ ...props }) => {
             saviourData.redemptionPrice
         ) {
             popupsActions.setIsWaitingModalOpen(false)
+            setLoaded(true)
         }
     }, [popupsActions, previousSaviourData, saviourData])
 
@@ -77,7 +69,7 @@ const SafeSaviour = ({ ...props }) => {
         if (Number(saviourData.saviourBalance) >= minimumBalance) {
             return 'Protected'
         }
-        return 'Not Protected'
+        return 'Unprotected'
     }
 
     const returnFiatValue = (value: string, price: number) => {
@@ -98,14 +90,16 @@ const SafeSaviour = ({ ...props }) => {
             </HeaderContainer>
 
             <Container>
-                {saviourData && saviourData.hasSaviour ? null : (
-                    <ImageContainer>
-                        <img
-                            src={require('../../assets/saviour.svg')}
-                            alt="saviour"
-                        />
-                    </ImageContainer>
-                )}
+                {loaded ? (
+                    saviourData && saviourData.hasSaviour ? null : (
+                        <ImageContainer>
+                            <img
+                                src={require('../../assets/saviour.svg')}
+                                alt="saviour"
+                            />
+                        </ImageContainer>
+                    )
+                ) : null}
 
                 <SaviourHeading>
                     <Title>{t('safe_saviour_title')}</Title>
@@ -123,14 +117,9 @@ const SafeSaviour = ({ ...props }) => {
                     ) : null}
                 </SaviourHeading>
                 <Description>
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                    Eligendi commodi iusto doloribus excepturi, praesentium
-                    officiis, in ea, vel optio neque ad! Repellat voluptate
-                    laboriosam adipisci ipsa? Obcaecati dignissimos corporis
-                    distinctio recusandae pariatur natus cumque quas ipsa
-                    ducimus expedita! Voluptatum veritatis quis ratione debitis
-                    ducimus ipsa molestias iste repudiandae consequatur
-                    doloremque?
+                    {saviourData && saviourData.hasSaviour
+                        ? t('current_saviour_desc')
+                        : t('saviour_desc')}
                 </Description>
 
                 {saviourData && saviourData.hasSaviour ? (
@@ -145,7 +134,7 @@ const SafeSaviour = ({ ...props }) => {
                                         src={require('../../assets/uniswap-icon.svg')}
                                         alt=""
                                     />{' '}
-                                    Uniswap V2
+                                    Uniswap V2 RAI/ETH
                                 </Value>
                                 <Label className="small"></Label>
                             </StateInner>
@@ -166,7 +155,7 @@ const SafeSaviour = ({ ...props }) => {
                                 </Value>
                                 <Label className="small">
                                     {' '}
-                                    Minimum saviour balance:{' '}
+                                    Minimum Saviour Balance:{' '}
                                     <b>
                                         {getMinSaviourBalance(
                                             saviourData.saviourRescueRatio
@@ -222,6 +211,9 @@ const HeaderContainer = styled.div`
 const ImageContainer = styled.div`
     text-align: center;
     margin: 3rem 0;
+    img {
+        max-width: 300px;
+    }
     ${({ theme }) => theme.mediaWidth.upToSmall`
        img {
         width:100%;

@@ -9,7 +9,6 @@ import Button from '../Button'
 import DecimalInput from '../DecimalInput'
 import Dropdown from '../Dropdown'
 import Results from './Results'
-import { NETWORK_ID } from '../../connectors'
 import { formatNumber } from '../../utils/helper'
 import { useMinSaviourBalance, useSaviourData } from '../../hooks/useSaviour'
 import { BigNumber, ethers } from 'ethers'
@@ -21,6 +20,9 @@ const INITITAL_STATE = [
         img: require('../../assets/uniswap-icon.svg'),
     },
 ]
+
+const MIN_SAVIOUR_CRATIO = 175
+
 const SaviourOperatrions = () => {
     const { t } = useTranslation()
     const [error, setError] = useState('')
@@ -35,10 +37,7 @@ const SaviourOperatrions = () => {
         safeModel: safeActions,
     } = useStoreActions((state) => state)
 
-    const {
-        safeModel: safeState,
-        connectWalletModel: connectWalletState,
-    } = useStoreState((state) => state)
+    const { safeModel: safeState } = useStoreState((state) => state)
     const {
         singleSafe,
         isSaviourDeposit,
@@ -46,23 +45,32 @@ const SaviourOperatrions = () => {
         targetedCRatio,
     } = safeState
 
-    const uniswapPoolBalance = connectWalletState.uniswapPoolBalance[
-        NETWORK_ID
-    ].toString()
-
-    const availableBalance = isSaviourDeposit
-        ? uniswapPoolBalance
-        : saviourData
-        ? saviourData.saviourBalance
+    const availableBalance = saviourData
+        ? isSaviourDeposit
+            ? saviourData.uniswapV2CoinEthBalance
+            : saviourData.saviourBalance
         : '0'
 
     const safeId = _.get(singleSafe, 'id', '')
 
     const handleCancel = () => {
         popupsActions.setIsSaviourModalOpen(false)
+        safeActions.setAmount('')
         safeActions.setOperation(0)
+        safeActions.setTargetedCRatio(0)
         safeActions.setIsMaxWithdraw(false)
         safeActions.setIsSaviourDeposit(true)
+    }
+
+    const handleSwitching = () => {
+        safeActions.setIsSaviourDeposit(!isSaviourDeposit)
+        safeActions.setIsMaxWithdraw(false)
+        setAmount('')
+        setSliderVal(
+            saviourData
+                ? (saviourData.minCollateralRatio as number)
+                : MIN_SAVIOUR_CRATIO
+        )
     }
 
     const returnFiatValue = (value: string, price: number) => {
@@ -86,23 +94,36 @@ const SaviourOperatrions = () => {
             ? ethers.utils.parseEther(minBalance as string)
             : BigNumber.from('0')
 
+        const availableBalanceBN = availableBalance
+            ? ethers.utils.parseEther(availableBalance)
+            : BigNumber.from('0')
+
         if (!sliderVal) {
             setError('No minCollateralRatio')
             return false
         }
         if (amountBN.isZero()) {
-            setError('You cannot submit nothing')
+            setError(
+                `You cannot ${
+                    isSaviourDeposit ? 'deposit' : 'withdraw'
+                } nothing`
+            )
+            return false
+        }
+
+        if (amountBN.gt(availableBalanceBN)) {
+            setError('Cannot deposit more than you have in your wallet')
             return false
         }
 
         if (isSaviourDeposit) {
             if (!minBalance) {
-                setError('No Collateral')
+                setError('Cannot deposit if your Safe does not have debt')
                 return false
             }
             if (amountBN.add(saviourBalanceBN).lt(minBalanceBN)) {
                 setError(
-                    `Recommended minimal savior balance is:  ${getMinSaviourBalance(
+                    `Recommended minimal balance is:  ${getMinSaviourBalance(
                         sliderVal
                     )} UNI-V2 and your result balance is ${ethers.utils.formatEther(
                         amountBN.add(saviourBalanceBN)
@@ -118,7 +139,7 @@ const SaviourOperatrions = () => {
                 !saviourBalanceBN.eq(amountBN)
             ) {
                 setError(
-                    `Recommended minimal savior balance is:  ${getMinSaviourBalance(
+                    `Recommended minimal balance is:  ${getMinSaviourBalance(
                         sliderVal
                     )} UNI-V2 and your result balance is ${ethers.utils.formatEther(
                         saviourBalanceBN.sub(amountBN)
@@ -130,10 +151,26 @@ const SaviourOperatrions = () => {
         return true
     }
 
+    const passedAllowance = () => {
+        const amountBN = amount
+            ? ethers.utils.parseEther(amount)
+            : BigNumber.from('0')
+
+        const uniswapV2CoinEthAllowanceBN = saviourData
+            ? ethers.utils.parseEther(saviourData.uniswapV2CoinEthAllowance)
+            : BigNumber.from('0')
+
+        return uniswapV2CoinEthAllowanceBN.gt(amountBN)
+    }
+
     const handleSubmit = () => {
         if (passedValidation()) {
             setError('')
-            safeActions.setOperation(1)
+            if (isSaviourDeposit && !passedAllowance()) {
+                safeActions.setOperation(1)
+            } else {
+                safeActions.setOperation(2)
+            }
         }
         safeActions.setTargetedCRatio(sliderVal as number)
     }
@@ -173,7 +210,7 @@ const SaviourOperatrions = () => {
                 setSliderVal(CRatio)
                 safeActions.setTargetedCRatio(CRatio)
             } else {
-                setSliderVal(200)
+                setSliderVal(MIN_SAVIOUR_CRATIO)
             }
         }
     }, [safeActions, saviourData, targetedCRatio])
@@ -199,7 +236,7 @@ const SaviourOperatrions = () => {
             <Operation>
                 <Input>
                     <DecimalInput
-                        value={amount}
+                        value={formatNumber(amount) as string}
                         onChange={handleChange}
                         label={`${
                             isSaviourDeposit ? 'Deposit' : 'Withdraw'
@@ -210,13 +247,13 @@ const SaviourOperatrions = () => {
                 <Tabs>
                     <Btn
                         className={isSaviourDeposit ? 'active' : ''}
-                        onClick={() => safeActions.setIsSaviourDeposit(true)}
+                        onClick={handleSwitching}
                     >
                         Deposit
                     </Btn>
                     <Btn
                         className={!isSaviourDeposit ? 'active' : ''}
-                        onClick={() => safeActions.setIsSaviourDeposit(false)}
+                        onClick={handleSwitching}
                     >
                         Withdraw
                     </Btn>
@@ -224,7 +261,7 @@ const SaviourOperatrions = () => {
             </Operation>
 
             <MaxBalance>
-                Recommended minimal savior balance:{' '}
+                Recommended minimal balance is:{' '}
                 {getMinSaviourBalance(sliderVal)} UNI-V2 ($
                 {returnFiatValue(
                     getMinSaviourBalance(sliderVal) as string,
@@ -235,7 +272,7 @@ const SaviourOperatrions = () => {
 
             <RescueRatio>
                 <Label>
-                    Target rescue CRatio{' '}
+                    Target Rescue CRatio{' '}
                     <InfoIcon data-tip={t('saviour_target_cratio')}>
                         <Info size="16" />
                     </InfoIcon>
@@ -252,9 +289,9 @@ const SaviourOperatrions = () => {
                             min={
                                 saviourData
                                     ? (saviourData.minCollateralRatio as number)
-                                    : 200
+                                    : MIN_SAVIOUR_CRATIO
                             }
-                            max={350}
+                            max={300}
                             renderTrack={Track}
                             renderThumb={Thumb}
                         />

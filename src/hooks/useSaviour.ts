@@ -39,9 +39,12 @@ export type SaviourData = {
     systemCoins: BigNumber
     collateralCoins: BigNumber
     hasLeftOver: boolean
+    uniswapV2CoinEthAllowance: string
+    uniswapV2CoinEthBalance: string
 }
 
 export function useSaviourData() {
+    const { account } = useActiveWeb3React()
     const geb = useGeb()
     const [safe, setSafe] = useState<ISafe | null>(null)
     const {
@@ -49,7 +52,7 @@ export function useSaviourData() {
         connectWalletModel: connectWalletState,
     } = useStoreState((state) => state)
     const { singleSafe } = safeState
-    const ethPrice = connectWalletState.fiatPrice
+    const { fiatPrice: ethPrice, proxyAddress } = connectWalletState
 
     useEffect(() => {
         if (singleSafe && !safe) {
@@ -62,6 +65,7 @@ export function useSaviourData() {
         if (!geb || !safe) return
         const { safeHandler } = safe
         async function fetchSaviourData() {
+            if (!account || !proxyAddress) return
             const multiCallRequest = geb.multiCall([
                 geb.contracts.liquidationEngine.chosenSAFESaviour(
                     gebUtils.ETH_A,
@@ -79,8 +83,16 @@ export function useSaviourData() {
                 ),
                 geb.contracts.uniswapPairCoinEth.getReserves(true),
                 geb.contracts.uniswapPairCoinEth.totalSupply(true),
+                geb.contracts.uniswapPairCoinEth.allowance(
+                    account.toLowerCase(),
+                    proxyAddress.toLowerCase(),
+                    true
+                ),
+                geb.contracts.uniswapPairCoinEth.balanceOf(
+                    account.toLowerCase(),
+                    true
+                ),
             ])
-
             const multiCallRequest2 = geb.multiCall([
                 geb.contracts.saviourCRatioSetter.minDesiredCollateralizationRatios(
                     gebUtils.ETH_A,
@@ -116,6 +128,8 @@ export function useSaviourData() {
                 saviourRescueRatio,
                 reserves,
                 coinTotalSupply,
+                uniswapV2CoinEthAllowance,
+                uniswapV2CoinEthBalance,
             ] = muliCallResponse1
 
             const [
@@ -164,6 +178,13 @@ export function useSaviourData() {
                 coinTotalSupply
             )
 
+            const formattedUniswapV2CoinEthAllowance = ethersUtils.formatEther(
+                uniswapV2CoinEthAllowance
+            )
+            const formattedUniswapV2CoinEthBalance = ethersUtils.formatEther(
+                uniswapV2CoinEthBalance
+            )
+
             const numerator = numeral(2)
                 .multiply(ethPrice)
                 .multiply(ethersUtils.formatEther(reserveETH))
@@ -199,13 +220,15 @@ export function useSaviourData() {
                 systemCoins,
                 collateralCoins,
                 hasLeftOver,
+                uniswapV2CoinEthAllowance: formattedUniswapV2CoinEthAllowance,
+                uniswapV2CoinEthBalance: formattedUniswapV2CoinEthBalance,
             })
         }
         fetchSaviourData()
 
         const interval = setInterval(fetchSaviourData, 8000)
         return () => clearInterval(interval)
-    }, [safe, geb, ethPrice])
+    }, [safe, geb, ethPrice, account, proxyAddress])
 
     return state
 }
@@ -239,7 +262,7 @@ export function useMinSaviourBalance() {
         // liquidationPrice = -----------------------------------------------
         //                                     collateral
 
-        const liquidationPrice = !lockedCollateral.isZero()
+        const liquidationPrice = !generatedDebt.isZero()
             ? redemptionPrice
                   .mul(generatedDebt.mul(WAD_COMPLEMENT))
                   .mul(accumulatedRate)
@@ -283,7 +306,7 @@ export function useMinSaviourBalance() {
                     .div(100)
             )
 
-        let balanceBN = !lockedCollateral.isZero()
+        let balanceBN = !generatedDebt.isZero()
             ? numerator.mul(RAY).div(denominator)
             : BigNumber.from('0')
 
@@ -303,7 +326,7 @@ export function useMinSaviourBalance() {
             .mul(RAY)
             .div(lpTokenUsdPrice)
 
-        balanceBN = !lockedCollateral.isZero()
+        balanceBN = !generatedDebt.isZero()
             ? balanceBN.add(keeperPayoutInLP)
             : BigNumber.from('0')
 
