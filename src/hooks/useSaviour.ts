@@ -36,11 +36,39 @@ export type SaviourData = {
     generatedDebt: BigNumber
     lockedCollateral: BigNumber
     keeperPayOut: BigNumber
-    systemCoins: BigNumber
-    collateralCoins: BigNumber
-    hasLeftOver: boolean
     uniswapV2CoinEthAllowance: string
     uniswapV2CoinEthBalance: string
+}
+
+export function useSaviourAddress(safeHandler: string) {
+    const [state, setState] = useState(EMPTY_ADDRESS)
+    const geb = useGeb()
+    if (!geb || !safeHandler) return EMPTY_ADDRESS
+    geb.contracts.liquidationEngine
+        .chosenSAFESaviour(gebUtils.ETH_A, safeHandler.toLowerCase())
+        .then((saviourAddress) => setState(saviourAddress))
+
+    return state
+}
+
+export function useHasSaviour(safeHandler: string) {
+    const saviourAddress = useSaviourAddress(safeHandler)
+    return saviourAddress !== EMPTY_ADDRESS
+}
+
+export function useHasLeftOver(safeHandler: string) {
+    const [state, setState] = useState(false)
+    const geb = useGeb()
+    const saviourAddress = useSaviourAddress(safeHandler)
+    if (!geb || !safeHandler) return { status: state, saviourAddress }
+    geb.contracts.coinNativeUniswapSaviour
+        .underlyingReserves(safeHandler.toLowerCase())
+        .then(({ systemCoins, collateralCoins }) => {
+            const hasLeftOver = systemCoins.gt(0) || collateralCoins.gt(0)
+            setState(hasLeftOver)
+        })
+
+    return { status: state, saviourAddress }
 }
 
 export function useSaviourData() {
@@ -111,10 +139,6 @@ export function useSaviourData() {
                 geb.contracts.coinNativeUniswapSaviour.minKeeperPayoutValue(
                     true
                 ),
-                geb.contracts.coinNativeUniswapSaviour.underlyingReserves(
-                    safeHandler.toLowerCase(),
-                    true
-                ),
             ])
 
             const [muliCallResponse1, multiCallResponse2] = await Promise.all([
@@ -139,7 +163,6 @@ export function useSaviourData() {
                 { accumulatedRate },
                 { generatedDebt, lockedCollateral },
                 keeperPayOut,
-                { systemCoins, collateralCoins },
             ] = multiCallResponse2
 
             const wethAddress = geb.contracts.weth.address
@@ -194,7 +217,6 @@ export function useSaviourData() {
                 .divide(formattedCoinTotalSupply)
                 .value()
 
-            const hasLeftOver = systemCoins.gt(0) || collateralCoins.gt(0)
             setState({
                 hasSaviour: saviourAddress !== EMPTY_ADDRESS,
                 saviourAddress,
@@ -217,9 +239,6 @@ export function useSaviourData() {
                 generatedDebt,
                 lockedCollateral,
                 keeperPayOut,
-                systemCoins,
-                collateralCoins,
-                hasLeftOver,
                 uniswapV2CoinEthAllowance: formattedUniswapV2CoinEthAllowance,
                 uniswapV2CoinEthBalance: formattedUniswapV2CoinEthBalance,
             })

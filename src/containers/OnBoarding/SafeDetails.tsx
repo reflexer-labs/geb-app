@@ -13,8 +13,8 @@ import { useActiveWeb3React } from '../../hooks'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
 import useGeb from '../../hooks/useGeb'
 import {
-    SaviourData,
-    useSaviourData,
+    useHasLeftOver,
+    useHasSaviour,
     useSaviourGetReserves,
 } from '../../hooks/useSaviour'
 import { useStoreActions, useStoreState } from '../../store'
@@ -37,7 +37,11 @@ const SafeDetails = ({ ...props }) => {
     const { isRPCAdapterOn } = settingsState
     const safeId = props.match.params.id as string
 
-    const saviourData = useSaviourData()
+    const hasSaviour = useHasSaviour(
+        safeState.singleSafe?.safeHandler as string
+    )
+    const leftOver = useHasLeftOver(safeState.singleSafe?.safeHandler as string)
+
     const { getReservesCallback } = useSaviourGetReserves()
 
     const history = useHistory()
@@ -100,9 +104,12 @@ const SafeDetails = ({ ...props }) => {
         }
     }, [account, safeState.managedSafe.owner.id])
 
-    const handleSaviourBtnClick = async (data: SaviourData) => {
-        const { hasLeftOver, saviourAddress } = data
-        if (hasLeftOver) {
+    const handleSaviourBtnClick = async (data: {
+        status: boolean
+        saviourAddress: string
+    }) => {
+        const { status, saviourAddress } = data
+        if (status) {
             if (!library || !account) throw new Error('No library or account')
             setIsLoading(true)
             try {
@@ -143,31 +150,28 @@ const SafeDetails = ({ ...props }) => {
                         breadcrumbs={{ '/': t('accounts'), '': `#${safeId}` }}
                         text={t('accounts_header_text')}
                     />
-                    {saviourData ? (
-                        <BtnContainer>
-                            <Button
-                                id="create-safe"
-                                onClick={() =>
-                                    handleSaviourBtnClick(saviourData)
-                                }
-                                isLoading={loading}
-                                disabled={loading}
-                            >
-                                {saviourData.hasLeftOver ? (
-                                    t('Collect Saviour Balance')
-                                ) : (
-                                    <BtnInner>
-                                        <Link2 size={18} />
-                                        {t(
-                                            saviourData.hasSaviour
-                                                ? 'Saviour Configuration'
-                                                : 'add_savoiur'
-                                        )}
-                                    </BtnInner>
-                                )}
-                            </Button>
-                        </BtnContainer>
-                    ) : null}
+
+                    <BtnContainer>
+                        <Button
+                            id="create-safe"
+                            onClick={() => handleSaviourBtnClick(leftOver)}
+                            isLoading={loading}
+                            disabled={loading}
+                        >
+                            {leftOver.status ? (
+                                t('Collect Saviour Balance')
+                            ) : (
+                                <BtnInner>
+                                    <Link2 size={18} />
+                                    {t(
+                                        hasSaviour
+                                            ? 'Saviour Configuration'
+                                            : 'add_savoiur'
+                                    )}
+                                </BtnInner>
+                            )}
+                        </Button>
+                    </BtnContainer>
                 </HeaderContainer>
 
                 <>

@@ -236,7 +236,7 @@ const SaviourOperatrions = () => {
             <Operation>
                 <Input>
                     <DecimalInput
-                        value={formatNumber(amount) as string}
+                        value={amount ? (formatNumber(amount) as string) : ''}
                         onChange={handleChange}
                         label={`${
                             isSaviourDeposit ? 'Deposit' : 'Withdraw'
