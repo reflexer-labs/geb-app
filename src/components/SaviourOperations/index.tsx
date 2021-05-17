@@ -127,7 +127,7 @@ const SaviourOperatrions = () => {
                 setError(
                     `Recommended minimal balance is:  ${getMinSaviourBalance(
                         sliderVal
-                    )} UNI-V2 and your result balance is ${ethers.utils.formatEther(
+                    )} UNI-V2 and your resulting balance is ${ethers.utils.formatEther(
                         amountBN.add(saviourBalanceBN)
                     )} UNI-V2`
                 )
@@ -144,7 +144,7 @@ const SaviourOperatrions = () => {
                 setError(
                     `Recommended minimal balance is:  ${getMinSaviourBalance(
                         sliderVal
-                    )} UNI-V2 and your result balance is ${ethers.utils.formatEther(
+                    )} UNI-V2 and your resulting balance is ${ethers.utils.formatEther(
                         saviourBalanceBN.sub(amountBN)
                     )} UNI-V2`
                 )
