@@ -133,11 +133,14 @@ const SafeSaviour = ({ ...props }) => {
                         />
                     ) : null}
                 </SaviourHeading>
-                <Description>
-                    {saviourData && saviourData.hasSaviour
-                        ? t('current_saviour_desc')
-                        : t('saviour_desc')}
-                </Description>
+                <Description
+                    dangerouslySetInnerHTML={{
+                        __html:
+                            saviourData && saviourData.hasSaviour
+                                ? t('current_saviour_desc')
+                                : t('saviour_desc'),
+                    }}
+                />
 
                 {saviourData && saviourData.hasSaviour ? (
                     <StatsGrid>
