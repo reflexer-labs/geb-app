@@ -4,6 +4,8 @@ import styled from 'styled-components'
 import _ from '../../utils/lodash'
 import { useActiveWeb3React } from '../../hooks'
 import {
+    useChangeTargetedCRatio,
+    useHasSaviour,
     useSaviourDeposit,
     useSaviourRescueRatio,
     useSaviourWithdraw,
@@ -33,6 +35,7 @@ const SaviourTransactions = () => {
         isMaxWithdraw,
     } = safeState
 
+    const hasSaviour = useHasSaviour(singleSafe?.safeHandler as string)
     const saviourRescueRatio = useSaviourRescueRatio(
         singleSafe?.safeHandler as string
     )
@@ -42,6 +45,7 @@ const SaviourTransactions = () => {
 
     const { depositCallback } = useSaviourDeposit()
     const { withdrawCallback } = useSaviourWithdraw()
+    const { changeTargetedCRatio } = useChangeTargetedCRatio()
 
     const handleBack = () => safeActions.setOperation(0)
 
@@ -76,20 +80,20 @@ const SaviourTransactions = () => {
                 safeHandler: safeHandler as string,
                 amount,
                 targetedCRatio,
+                isTargetedCRatioChanged: targetedCRatio !== saviourRescueRatio,
             }
-            if (isSaviourDeposit) {
+            if (
+                hasSaviour &&
+                !amount &&
+                targetedCRatio !== saviourRescueRatio
+            ) {
+                await changeTargetedCRatio(signer, saviourPayload)
+            } else if (isSaviourDeposit) {
                 await depositCallback(signer, saviourPayload)
             } else {
-                console.log('here', targetedCRatio !== saviourRescueRatio)
-
                 await withdrawCallback(signer, {
-                    safeId: Number(safeId),
-                    safeHandler: safeHandler as string,
-                    amount,
-                    targetedCRatio,
+                    ...saviourPayload,
                     isMaxWithdraw,
-                    isTargetedCRatioChanged:
-                        targetedCRatio !== saviourRescueRatio,
                 })
             }
             await connectWalletActions.fetchUniswapPoolBalance(

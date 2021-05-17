@@ -10,7 +10,11 @@ import DecimalInput from '../DecimalInput'
 import Dropdown from '../Dropdown'
 import Results from './Results'
 import { formatNumber } from '../../utils/helper'
-import { useMinSaviourBalance, useSaviourData } from '../../hooks/useSaviour'
+import {
+    useHasSaviour,
+    useMinSaviourBalance,
+    useSaviourData,
+} from '../../hooks/useSaviour'
 import { BigNumber, ethers } from 'ethers'
 import { Info } from 'react-feather'
 
@@ -21,7 +25,7 @@ const INITITAL_STATE = [
     },
 ]
 
-const MIN_SAVIOUR_CRATIO = 175
+const MIN_SAVIOUR_CRATIO = 200
 
 const SaviourOperatrions = () => {
     const { t } = useTranslation()
@@ -45,6 +49,8 @@ const SaviourOperatrions = () => {
         targetedCRatio,
     } = safeState
 
+    const hasSaviour = useHasSaviour(singleSafe?.safeHandler as string)
+
     const availableBalance = saviourData
         ? isSaviourDeposit
             ? saviourData.uniswapV2CoinEthBalance
@@ -63,6 +69,7 @@ const SaviourOperatrions = () => {
     }
 
     const handleSwitching = () => {
+        setError('')
         safeActions.setIsSaviourDeposit(!isSaviourDeposit)
         safeActions.setIsMaxWithdraw(false)
         setAmount('')
@@ -94,10 +101,10 @@ const SaviourOperatrions = () => {
             : BigNumber.from('0')
 
         if (!sliderVal) {
-            setError('No minCollateralRatio')
+            setError('No min CollateralRatio')
             return false
         }
-        if (amountBN.isZero()) {
+        if (!hasSaviour && amountBN.isZero()) {
             setError(
                 `You cannot ${
                     isSaviourDeposit ? 'deposit' : 'withdraw'
@@ -106,8 +113,12 @@ const SaviourOperatrions = () => {
             return false
         }
 
-        if (amountBN.gt(availableBalanceBN)) {
-            setError('Cannot deposit more than you have in your wallet')
+        if (!amountBN.isZero() && amountBN.gt(availableBalanceBN)) {
+            setError(
+                isSaviourDeposit
+                    ? `Cannot deposit more than you have in your wallet`
+                    : `Cannot withdraw less than minimum saviour balance`
+            )
             return false
         }
 
@@ -130,6 +141,7 @@ const SaviourOperatrions = () => {
 
         if (!isSaviourDeposit) {
             if (
+                !amountBN.isZero() &&
                 saviourBalanceBN.sub(amountBN).lt(minBalanceBN) &&
                 !saviourBalanceBN.eq(amountBN)
             ) {
@@ -184,6 +196,7 @@ const SaviourOperatrions = () => {
     }
 
     const handleChange = (val: string) => {
+        setError('')
         setAmount(val)
         safeActions.setAmount(val)
     }
@@ -293,11 +306,7 @@ const SaviourOperatrions = () => {
                         onAfterChange={(value) =>
                             safeActions.setTargetedCRatio(value as number)
                         }
-                        min={
-                            saviourData
-                                ? (saviourData.minCollateralRatio as number)
-                                : MIN_SAVIOUR_CRATIO
-                        }
+                        min={MIN_SAVIOUR_CRATIO}
                         max={300}
                         renderTrack={Track}
                         renderThumb={Thumb}

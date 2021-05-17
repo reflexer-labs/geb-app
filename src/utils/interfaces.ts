@@ -549,10 +549,10 @@ export interface SaviourDepositPayload {
     targetedCRatio: number
     safeId: number
     amount: string
+    isTargetedCRatioChanged: boolean
 }
 export interface SaviourWithdrawPayload extends SaviourDepositPayload {
     isMaxWithdraw: boolean
-    isTargetedCRatioChanged: boolean
 }
 export interface GetReservesFromSaviour {
     saviourAddress: string

@@ -10,7 +10,6 @@ import { useActiveWeb3React } from '.'
 import { handlePreTxGasEstimate } from './TransactionHooks'
 import {
     GetReservesFromSaviour,
-    ISafe,
     SaviourDepositPayload,
     SaviourWithdrawPayload,
 } from '../utils/interfaces'
@@ -86,23 +85,18 @@ export function useSaviourRescueRatio(safeHandler: string) {
 }
 
 export function useSaviourData() {
+    const [state, setState] = useState<SaviourData>()
     const { account } = useActiveWeb3React()
     const geb = useGeb()
-    const [safe, setSafe] = useState<ISafe | null>(null)
+
     const {
         safeModel: safeState,
         connectWalletModel: connectWalletState,
     } = useStoreState((state) => state)
-    const { singleSafe } = safeState
+
+    const { singleSafe: safe } = safeState
     const { fiatPrice: ethPrice, proxyAddress } = connectWalletState
 
-    useEffect(() => {
-        if (singleSafe && !safe) {
-            setSafe(singleSafe)
-        }
-    }, [safe, singleSafe])
-
-    const [state, setState] = useState<SaviourData>()
     useEffect(() => {
         if (!geb || !safe) return
         const { safeHandler } = safe
@@ -259,8 +253,10 @@ export function useSaviourData() {
         }
         fetchSaviourData()
 
-        const interval = setInterval(fetchSaviourData, 8000)
-        return () => clearInterval(interval)
+        const interval = setInterval(fetchSaviourData, 5000)
+        return () => {
+            clearInterval(interval)
+        }
     }, [safe, geb, ethPrice, account, proxyAddress])
 
     return state
@@ -399,6 +395,7 @@ export function useSaviourDeposit() {
             tokenAmount,
             targetedCRatio
         )
+
         if (!txData) throw new Error('No transaction request!')
         const tx = await handlePreTxGasEstimate(signer, txData)
         const txResponse = await signer.sendTransaction(tx)
@@ -527,7 +524,7 @@ export function useSaviourGetReserves() {
         const proxy = await geb.getProxyAction(signer._address)
         const { safeId, saviourAddress } = payload
 
-        const txData = proxy.getReserves(
+        const txData = proxy.getReservesAndUncover(
             saviourAddress,
             safeId,
             signer._address
@@ -557,4 +554,56 @@ export function useSaviourGetReserves() {
     }
 
     return { getReservesCallback }
+}
+
+// withdraws balance from saviour
+export function useChangeTargetedCRatio() {
+    const {
+        transactionsModel: transactionsActions,
+        popupsModel: popupsActions,
+    } = useStoreActions((store) => store)
+
+    const { account } = useActiveWeb3React()
+
+    const changeTargetedCRatio = async function (
+        signer: JsonRpcSigner,
+        payload: SaviourDepositPayload
+    ) {
+        if (!account || !signer || !payload) {
+            return false
+        }
+        const geb = new Geb(ETH_NETWORK, signer.provider)
+        const proxy = await geb.getProxyAction(signer._address)
+        const { safeId, targetedCRatio } = payload
+
+        const txData = proxy.setDesiredCollateralizationRatio(
+            gebUtils.ETH_A,
+            safeId,
+            targetedCRatio
+        )
+
+        if (!txData) throw new Error('No transaction request!')
+        const tx = await handlePreTxGasEstimate(signer, txData)
+        const txResponse = await signer.sendTransaction(tx)
+        if (txResponse) {
+            const { hash, chainId } = txResponse
+            transactionsActions.addTransaction({
+                chainId,
+                hash,
+                from: txResponse.from,
+                summary: 'Change Collateralization Ratio',
+                addedTime: new Date().getTime(),
+                originalTx: txResponse,
+            })
+            popupsActions.setIsWaitingModalOpen(true)
+            popupsActions.setWaitingPayload({
+                title: 'Transaction Submitted',
+                hash: txResponse.hash,
+                status: 'success',
+            })
+            await txResponse.wait()
+        }
+    }
+
+    return { changeTargetedCRatio }
 }
