@@ -12,9 +12,8 @@ import { BigNumber, ethers } from 'ethers'
 const Results = () => {
     const { t } = useTranslation()
 
-    const saviourData = useSaviourData()
     const { getMinSaviourBalance } = useMinSaviourBalance()
-
+    const saviourData = useSaviourData()
     const { safeModel: safeState } = useStoreState((state) => state)
 
     const { targetedCRatio, amount, isSaviourDeposit } = safeState
@@ -40,6 +39,7 @@ const Results = () => {
         }
         return ethers.utils.formatEther(saviourBalanceBN.sub(amountBN))
     }
+
     return (
         <Result>
             <Block>

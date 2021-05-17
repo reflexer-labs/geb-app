@@ -10,11 +10,7 @@ import DecimalInput from '../DecimalInput'
 import Dropdown from '../Dropdown'
 import Results from './Results'
 import { formatNumber } from '../../utils/helper'
-import {
-    useHasSaviour,
-    useMinSaviourBalance,
-    useSaviourData,
-} from '../../hooks/useSaviour'
+import { useMinSaviourBalance, useSaviourData } from '../../hooks/useSaviour'
 import { BigNumber, ethers } from 'ethers'
 import { Info } from 'react-feather'
 
@@ -49,7 +45,7 @@ const SaviourOperatrions = () => {
         targetedCRatio,
     } = safeState
 
-    const hasSaviour = useHasSaviour(singleSafe?.safeHandler as string)
+    const hasSaviour = saviourData && saviourData.hasSaviour
 
     const availableBalance = saviourData
         ? isSaviourDeposit

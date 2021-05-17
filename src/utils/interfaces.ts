@@ -558,3 +558,11 @@ export interface GetReservesFromSaviour {
     saviourAddress: string
     safeId: number
 }
+
+export interface FetchSaviourPayload {
+    account: string
+    proxyAddress: string
+    ethPrice: number
+    geb: Geb
+    safe: ISafe
+}

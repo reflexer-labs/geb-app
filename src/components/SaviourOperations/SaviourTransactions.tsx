@@ -5,9 +5,8 @@ import _ from '../../utils/lodash'
 import { useActiveWeb3React } from '../../hooks'
 import {
     useChangeTargetedCRatio,
-    useHasSaviour,
+    useSaviourData,
     useSaviourDeposit,
-    useSaviourRescueRatio,
     useSaviourWithdraw,
 } from '../../hooks/useSaviour'
 import { useStoreActions, useStoreState } from '../../store'
@@ -35,10 +34,7 @@ const SaviourTransactions = () => {
         isMaxWithdraw,
     } = safeState
 
-    const hasSaviour = useHasSaviour(singleSafe?.safeHandler as string)
-    const saviourRescueRatio = useSaviourRescueRatio(
-        singleSafe?.safeHandler as string
-    )
+    const saviourData = useSaviourData()
 
     const safeId = _.get(singleSafe, 'id', '0')
     const safeHandler = _.get(singleSafe, 'safeHandler', '')
@@ -80,12 +76,13 @@ const SaviourTransactions = () => {
                 safeHandler: safeHandler as string,
                 amount,
                 targetedCRatio,
-                isTargetedCRatioChanged: targetedCRatio !== saviourRescueRatio,
+                isTargetedCRatioChanged:
+                    targetedCRatio !== saviourData?.saviourRescueRatio,
             }
             if (
-                hasSaviour &&
+                saviourData?.hasSaviour &&
                 !amount &&
-                targetedCRatio !== saviourRescueRatio
+                targetedCRatio !== saviourData?.saviourRescueRatio
             ) {
                 await changeTargetedCRatio(signer, saviourPayload)
             } else if (isSaviourDeposit) {

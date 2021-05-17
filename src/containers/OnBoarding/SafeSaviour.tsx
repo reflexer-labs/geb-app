@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
@@ -9,13 +9,13 @@ import PageHeader from '../../components/PageHeader'
 import { useActiveWeb3React } from '../../hooks'
 import useGeb from '../../hooks/useGeb'
 import { useMinSaviourBalance, useSaviourData } from '../../hooks/useSaviour'
-import { useStoreActions } from '../../store'
+import { useStoreActions, useStoreState } from '../../store'
 import { formatNumber } from '../../utils/helper'
 import { isNumeric } from '../../utils/validations'
 import AlertLabel from '../../components/AlertLabel'
 import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
-import usePrevious from '../../hooks/usePrevious'
+import useInterval from '../../hooks/useInterval'
 
 const SafeSaviour = ({ ...props }) => {
     const { t } = useTranslation()
@@ -26,7 +26,13 @@ const SafeSaviour = ({ ...props }) => {
     const geb = useGeb()
     const saviourData = useSaviourData()
     const { getMinSaviourBalance } = useMinSaviourBalance()
-    const previousSaviourData = usePrevious(saviourData)
+
+    const {
+        safeModel: safeState,
+        connectWalletModel: connectWalletState,
+    } = useStoreState((state) => state)
+    const { singleSafe } = safeState
+    const { proxyAddress, fiatPrice: ethPrice } = connectWalletState
     const {
         popupsModel: popupsActions,
         safeModel: safeActions,
@@ -45,19 +51,30 @@ const SafeSaviour = ({ ...props }) => {
         })
     }, [account, geb, history, safeActions, safeId])
 
+    const fetchSaviourDataCallback = useCallback(() => {
+        if (!account || !geb || !singleSafe) return
+        safeActions.fetchSaviourData({
+            account,
+            geb,
+            proxyAddress,
+            safe: singleSafe,
+            ethPrice,
+        })
+    }, [account, ethPrice, geb, proxyAddress, safeActions, singleSafe])
+
     useEffect(() => {
-        if (!previousSaviourData) {
-            popupsActions.setIsWaitingModalOpen(true)
-        }
-        if (
-            !previousSaviourData &&
-            saviourData &&
-            saviourData.redemptionPrice
-        ) {
-            popupsActions.setIsWaitingModalOpen(false)
+        fetchSaviourDataCallback()
+    }, [fetchSaviourDataCallback])
+
+    useInterval(fetchSaviourDataCallback, 5000)
+
+    useEffect(() => {
+        if (saviourData) {
             setLoaded(true)
+        } else {
+            setLoaded(false)
         }
-    }, [popupsActions, previousSaviourData, saviourData])
+    }, [saviourData])
 
     const handleOpenModal = () => popupsActions.setIsSaviourModalOpen(true)
 

@@ -9,6 +9,7 @@ import {
     IFetchSafesPayload,
     IFetchSafeById,
     IManageSafe,
+    FetchSaviourPayload,
 } from '../utils/interfaces'
 import {
     handleCollectETH,
@@ -25,9 +26,11 @@ import { DEFAULT_SAFE_STATE } from '../utils/constants'
 import { timeout } from '../utils/helper'
 import { StoreModel } from '.'
 import { NETWORK_ID } from '../connectors'
+import { fetchSaviourData, SaviourData } from '../hooks/useSaviour'
 
 export interface SafeModel {
     list: Array<ISafe>
+    saviourData: SaviourData | undefined
     safeCreated: boolean
     singleSafe: ISafe | null
     operation: number
@@ -69,6 +72,7 @@ export interface SafeModel {
         any,
         StoreModel
     >
+    fetchSaviourData: Thunk<SafeModel, FetchSaviourPayload, any, StoreModel>
     setIsSafeCreated: Action<SafeModel, boolean>
     setList: Action<SafeModel, Array<ISafe>>
     setSingleSafe: Action<SafeModel, ISafe | null>
@@ -89,6 +93,7 @@ export interface SafeModel {
     setAmount: Action<SafeModel, string>
     setTargetedCRatio: Action<SafeModel, number>
     setIsMaxWithdraw: Action<SafeModel, boolean>
+    setSaviourData: Action<SafeModel, SaviourData | undefined>
 }
 
 const safeModel: SafeModel = {
@@ -98,6 +103,7 @@ const safeModel: SafeModel = {
     operation: 0,
     amount: '',
     targetedCRatio: 0,
+    saviourData: undefined,
     managedSafe: {
         safeId: '',
         owner: {
@@ -310,6 +316,11 @@ const safeModel: SafeModel = {
             return res
         }
     }),
+    fetchSaviourData: thunk(async (actions, payload) => {
+        const res = await fetchSaviourData(payload)
+        actions.setSaviourData(res)
+        return res
+    }),
     setIsSafeCreated: action((state, payload) => {
         state.safeCreated = payload
     }),
@@ -371,6 +382,9 @@ const safeModel: SafeModel = {
     }),
     setIsMaxWithdraw: action((state, payload) => {
         state.isMaxWithdraw = payload
+    }),
+    setSaviourData: action((state, payload) => {
+        state.saviourData = payload
     }),
 }
 

@@ -1,6 +1,6 @@
 import { Geb, utils as gebUtils } from 'geb.js'
 import { utils as ethersUtils } from 'ethers'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import numeral from 'numeral'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { useStoreActions, useStoreState } from '../store'
@@ -10,6 +10,7 @@ import { useActiveWeb3React } from '.'
 import { handlePreTxGasEstimate } from './TransactionHooks'
 import {
     GetReservesFromSaviour,
+    ISafe,
     SaviourDepositPayload,
     SaviourWithdrawPayload,
 } from '../utils/interfaces'
@@ -52,6 +53,7 @@ export function useSaviourAddress(safeHandler: string) {
 
 export function useHasSaviour(safeHandler: string) {
     const saviourAddress = useSaviourAddress(safeHandler)
+    if (!safeHandler) return false
     return saviourAddress !== EMPTY_ADDRESS
 }
 
@@ -70,196 +72,161 @@ export function useHasLeftOver(safeHandler: string) {
     return { status: state, saviourAddress }
 }
 
-export function useSaviourRescueRatio(safeHandler: string) {
-    const [state, setState] = useState(170)
-    const geb = useGeb()
-    if (!geb || !safeHandler) return state
-    geb.contracts.saviourCRatioSetter
-        .desiredCollateralizationRatios(
+export type Config = {
+    account: string
+    proxyAddress: string
+    ethPrice: number
+    geb: Geb
+    safe: ISafe
+}
+export async function fetchSaviourData({
+    account,
+    proxyAddress,
+    ethPrice,
+    geb,
+    safe,
+}: Config) {
+    if (!account || !proxyAddress || !geb || !safe) return
+    const { safeHandler } = safe
+    const multiCallRequest = geb.multiCall([
+        geb.contracts.liquidationEngine.chosenSAFESaviour(
             gebUtils.ETH_A,
-            safeHandler.toLowerCase()
-        )
-        .then((cRatio) => setState(cRatio.toNumber()))
+            safeHandler.toLowerCase(),
+            true
+        ),
+        geb.contracts.coinNativeUniswapSaviour.lpTokenCover(
+            safeHandler.toLowerCase(),
+            true
+        ),
+        geb.contracts.saviourCRatioSetter.desiredCollateralizationRatios(
+            gebUtils.ETH_A,
+            safeHandler.toLowerCase(),
+            true
+        ),
+        geb.contracts.uniswapPairCoinEth.getReserves(true),
+        geb.contracts.uniswapPairCoinEth.totalSupply(true),
+        geb.contracts.uniswapPairCoinEth.allowance(
+            account.toLowerCase(),
+            proxyAddress.toLowerCase(),
+            true
+        ),
+        geb.contracts.uniswapPairCoinEth.balanceOf(account.toLowerCase(), true),
+    ])
+    const multiCallRequest2 = geb.multiCall([
+        geb.contracts.saviourCRatioSetter.minDesiredCollateralizationRatios(
+            gebUtils.ETH_A,
+            true
+        ),
+        geb.contracts.coinNativeUniswapSaviour.minKeeperPayoutValue(true),
+        geb.contracts.oracleRelayer.redemptionPrice_readOnly(true),
+        geb.contracts.safeEngine.collateralTypes(gebUtils.ETH_A, true),
+        geb.contracts.safeEngine.safes(
+            gebUtils.ETH_A,
+            safeHandler.toLowerCase(),
+            true
+        ),
+        geb.contracts.coinNativeUniswapSaviour.minKeeperPayoutValue(true),
+    ])
 
-    return state
+    const [muliCallResponse1, multiCallResponse2] = await Promise.all([
+        multiCallRequest,
+        multiCallRequest2,
+    ])
+
+    const [
+        saviourAddress,
+        saviourBalance,
+        saviourRescueRatio,
+        reserves,
+        coinTotalSupply,
+        uniswapV2CoinEthAllowance,
+        uniswapV2CoinEthBalance,
+    ] = muliCallResponse1
+
+    const [
+        minCollateralRatio,
+        rescueFee,
+        redemptionPrice,
+        { accumulatedRate },
+        { generatedDebt, lockedCollateral },
+        keeperPayOut,
+    ] = multiCallResponse2
+
+    const wethAddress = geb.contracts.weth.address
+    const coinAddress = geb.contracts.coin.address
+    const reserve0 = reserves._reserve0
+    const reserve1 = reserves._reserve1
+
+    const isCoinLessThanWeth = () => {
+        if (!coinAddress || !wethAddress) return false
+        return BigNumber.from(coinAddress).lt(BigNumber.from(wethAddress))
+    }
+
+    let reserveRAI = BigNumber.from('0')
+    let reserveETH = BigNumber.from('0')
+
+    if (isCoinLessThanWeth()) {
+        reserveRAI = reserve0
+        reserveETH = reserve1
+    } else {
+        reserveRAI = reserve1
+        reserveETH = reserve0
+    }
+
+    //
+    //                      2 * ethPrice * reserveETH
+    // uniPoolPrice = --------------------------------------
+    //                            lptotalSupply
+
+    const formattedSaviourBalance = ethersUtils.formatEther(saviourBalance)
+
+    const formattedCoinTotalSupply = ethersUtils.formatEther(coinTotalSupply)
+
+    const formattedUniswapV2CoinEthAllowance = ethersUtils.formatEther(
+        uniswapV2CoinEthAllowance
+    )
+    const formattedUniswapV2CoinEthBalance = ethersUtils.formatEther(
+        uniswapV2CoinEthBalance
+    )
+
+    const numerator = numeral(2)
+        .multiply(ethPrice)
+        .multiply(ethersUtils.formatEther(reserveETH))
+        .value()
+
+    const uniPoolPrice = numeral(numerator)
+        .divide(formattedCoinTotalSupply)
+        .value()
+
+    return {
+        hasSaviour: saviourAddress !== EMPTY_ADDRESS,
+        saviourAddress,
+        saviourBalance: formattedSaviourBalance,
+        saviourRescueRatio: saviourRescueRatio.toNumber(),
+        coinTotalSupply,
+        minCollateralRatio: minCollateralRatio.toNumber(),
+        rescueFee: ethersUtils.formatEther(rescueFee),
+        reserve0,
+        reserve1,
+        reserveRAI,
+        reserveETH,
+        ethPrice,
+        uniPoolPrice: formatNumber(uniPoolPrice.toString(), 2) as number,
+        redemptionPrice,
+        accumulatedRate,
+        generatedDebt,
+        lockedCollateral,
+        keeperPayOut,
+        uniswapV2CoinEthAllowance: formattedUniswapV2CoinEthAllowance,
+        uniswapV2CoinEthBalance: formattedUniswapV2CoinEthBalance,
+    }
 }
 
-export function useSaviourData() {
-    const [state, setState] = useState<SaviourData>()
-    const { account } = useActiveWeb3React()
-    const geb = useGeb()
-
-    const {
-        safeModel: safeState,
-        connectWalletModel: connectWalletState,
-    } = useStoreState((state) => state)
-
-    const { singleSafe: safe } = safeState
-    const { fiatPrice: ethPrice, proxyAddress } = connectWalletState
-
-    useEffect(() => {
-        if (!geb || !safe) return
-        const { safeHandler } = safe
-        async function fetchSaviourData() {
-            if (!account || !proxyAddress) return
-            const multiCallRequest = geb.multiCall([
-                geb.contracts.liquidationEngine.chosenSAFESaviour(
-                    gebUtils.ETH_A,
-                    safeHandler.toLowerCase(),
-                    true
-                ),
-                geb.contracts.coinNativeUniswapSaviour.lpTokenCover(
-                    safeHandler.toLowerCase(),
-                    true
-                ),
-                geb.contracts.saviourCRatioSetter.desiredCollateralizationRatios(
-                    gebUtils.ETH_A,
-                    safeHandler.toLowerCase(),
-                    true
-                ),
-                geb.contracts.uniswapPairCoinEth.getReserves(true),
-                geb.contracts.uniswapPairCoinEth.totalSupply(true),
-                geb.contracts.uniswapPairCoinEth.allowance(
-                    account.toLowerCase(),
-                    proxyAddress.toLowerCase(),
-                    true
-                ),
-                geb.contracts.uniswapPairCoinEth.balanceOf(
-                    account.toLowerCase(),
-                    true
-                ),
-            ])
-            const multiCallRequest2 = geb.multiCall([
-                geb.contracts.saviourCRatioSetter.minDesiredCollateralizationRatios(
-                    gebUtils.ETH_A,
-                    true
-                ),
-                geb.contracts.coinNativeUniswapSaviour.minKeeperPayoutValue(
-                    true
-                ),
-                geb.contracts.oracleRelayer.redemptionPrice_readOnly(true),
-                geb.contracts.safeEngine.collateralTypes(gebUtils.ETH_A, true),
-                geb.contracts.safeEngine.safes(
-                    gebUtils.ETH_A,
-                    safeHandler.toLowerCase(),
-                    true
-                ),
-                geb.contracts.coinNativeUniswapSaviour.minKeeperPayoutValue(
-                    true
-                ),
-            ])
-
-            const [muliCallResponse1, multiCallResponse2] = await Promise.all([
-                multiCallRequest,
-                multiCallRequest2,
-            ])
-
-            const [
-                saviourAddress,
-                saviourBalance,
-                saviourRescueRatio,
-                reserves,
-                coinTotalSupply,
-                uniswapV2CoinEthAllowance,
-                uniswapV2CoinEthBalance,
-            ] = muliCallResponse1
-
-            const [
-                minCollateralRatio,
-                rescueFee,
-                redemptionPrice,
-                { accumulatedRate },
-                { generatedDebt, lockedCollateral },
-                keeperPayOut,
-            ] = multiCallResponse2
-
-            const wethAddress = geb.contracts.weth.address
-            const coinAddress = geb.contracts.coin.address
-            const reserve0 = reserves._reserve0
-            const reserve1 = reserves._reserve1
-
-            const isCoinLessThanWeth = () => {
-                if (!coinAddress || !wethAddress) return false
-                return BigNumber.from(coinAddress).lt(
-                    BigNumber.from(wethAddress)
-                )
-            }
-
-            let reserveRAI = BigNumber.from('0')
-            let reserveETH = BigNumber.from('0')
-
-            if (isCoinLessThanWeth()) {
-                reserveRAI = reserve0
-                reserveETH = reserve1
-            } else {
-                reserveRAI = reserve1
-                reserveETH = reserve0
-            }
-
-            //
-            //                      2 * ethPrice * reserveETH
-            // uniPoolPrice = --------------------------------------
-            //                            lptotalSupply
-
-            const formattedSaviourBalance = ethersUtils.formatEther(
-                saviourBalance
-            )
-
-            const formattedCoinTotalSupply = ethersUtils.formatEther(
-                coinTotalSupply
-            )
-
-            const formattedUniswapV2CoinEthAllowance = ethersUtils.formatEther(
-                uniswapV2CoinEthAllowance
-            )
-            const formattedUniswapV2CoinEthBalance = ethersUtils.formatEther(
-                uniswapV2CoinEthBalance
-            )
-
-            const numerator = numeral(2)
-                .multiply(ethPrice)
-                .multiply(ethersUtils.formatEther(reserveETH))
-                .value()
-
-            const uniPoolPrice = numeral(numerator)
-                .divide(formattedCoinTotalSupply)
-                .value()
-
-            setState({
-                hasSaviour: saviourAddress !== EMPTY_ADDRESS,
-                saviourAddress,
-                saviourBalance: formattedSaviourBalance,
-                saviourRescueRatio: saviourRescueRatio.toNumber(),
-                coinTotalSupply,
-                minCollateralRatio: minCollateralRatio.toNumber(),
-                rescueFee: ethersUtils.formatEther(rescueFee),
-                reserve0,
-                reserve1,
-                reserveRAI,
-                reserveETH,
-                ethPrice,
-                uniPoolPrice: formatNumber(
-                    uniPoolPrice.toString(),
-                    2
-                ) as number,
-                redemptionPrice,
-                accumulatedRate,
-                generatedDebt,
-                lockedCollateral,
-                keeperPayOut,
-                uniswapV2CoinEthAllowance: formattedUniswapV2CoinEthAllowance,
-                uniswapV2CoinEthBalance: formattedUniswapV2CoinEthBalance,
-            })
-        }
-        fetchSaviourData()
-
-        const interval = setInterval(fetchSaviourData, 5000)
-        return () => {
-            clearInterval(interval)
-        }
-    }, [safe, geb, ethPrice, account, proxyAddress])
-
-    return state
+export function useSaviourData(): SaviourData | undefined {
+    const { safeModel: safeState } = useStoreState((state) => state)
+    const { saviourData } = safeState
+    if (!saviourData) return
+    return saviourData
 }
 
 // minSaviourBalance
