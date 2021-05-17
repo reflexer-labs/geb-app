@@ -174,6 +174,7 @@ const getSafeByIdRpc = async (
         safes: [
             {
                 collateral: parseWad(multiCall2[0].lockedCollateral),
+                safeHandler,
                 // We can't get this over RPC
                 createdAt: null,
                 debt: parseWad(multiCall2[0].generatedDebt),

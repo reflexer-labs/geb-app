@@ -25,6 +25,7 @@ import CustomToast from './components/CustomToast'
 import Auctions from './containers/Auctions'
 import GoogleTagManager from './components/Analytics/GoogleTagManager'
 import { SHOW_AUCTIONS } from './utils/constants'
+import SafeSaviour from './containers/OnBoarding/SafeSaviour'
 
 // Toast css
 
@@ -65,6 +66,11 @@ const App = () => {
                                             exact
                                             component={Privacy}
                                             path={'/privacy'}
+                                        />
+                                        <Route
+                                            exact
+                                            component={SafeSaviour}
+                                            path={'/safes/:id/saviour'}
                                         />
                                         <Route
                                             exact

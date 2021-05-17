@@ -164,6 +164,7 @@ export const formatUserSafe = (
 
             return {
                 id: s.safeId,
+                safeHandler: s.safeHandler,
                 date: s.createdAt,
                 riskState: ratioChecker(Number(collateralRatio)),
                 collateral: s.collateral,
