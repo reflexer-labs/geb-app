@@ -55,8 +55,8 @@ const SaviourTransactions = () => {
     }
 
     const handleConfirm = async () => {
-        if (!account || !library) {
-            console.debug('no account or library')
+        if (!account || !library || !saviourData) {
+            console.debug('no account , library or saviourData')
             return
         }
         try {
@@ -77,12 +77,12 @@ const SaviourTransactions = () => {
                 amount,
                 targetedCRatio,
                 isTargetedCRatioChanged:
-                    targetedCRatio !== saviourData?.saviourRescueRatio,
+                    targetedCRatio !== saviourData.saviourRescueRatio,
             }
             if (
-                saviourData?.hasSaviour &&
+                saviourData.hasSaviour &&
                 !amount &&
-                targetedCRatio !== saviourData?.saviourRescueRatio
+                targetedCRatio !== saviourData.saviourRescueRatio
             ) {
                 await changeTargetedCRatio(signer, saviourPayload)
             } else if (isSaviourDeposit) {

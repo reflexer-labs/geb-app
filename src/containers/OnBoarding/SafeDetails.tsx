@@ -13,6 +13,7 @@ import { useActiveWeb3React } from '../../hooks'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
 import useGeb from '../../hooks/useGeb'
 import {
+    useDisconnectSaviour,
     useHasLeftOver,
     useHasSaviour,
     useSaviourGetReserves,
@@ -43,6 +44,7 @@ const SafeDetails = ({ ...props }) => {
     const leftOver = useHasLeftOver(safeState.singleSafe?.safeHandler as string)
 
     const { getReservesCallback } = useSaviourGetReserves()
+    const { disconnectSaviour } = useDisconnectSaviour()
 
     const history = useHistory()
 
@@ -109,7 +111,7 @@ const SafeDetails = ({ ...props }) => {
         saviourAddress: string
     }) => {
         const { status, saviourAddress } = data
-        if (status) {
+        if (status || Number(safeState.saviourData?.saviourBalance) === 0) {
             if (!library || !account) throw new Error('No library or account')
             setIsLoading(true)
             try {
@@ -120,10 +122,17 @@ const SafeDetails = ({ ...props }) => {
                     status: 'loading',
                 })
                 const signer = library.getSigner(account)
-                await getReservesCallback(signer, {
-                    safeId: Number(safeId),
-                    saviourAddress,
-                })
+                if (status) {
+                    await getReservesCallback(signer, {
+                        safeId: Number(safeId),
+                        saviourAddress,
+                    })
+                } else {
+                    await disconnectSaviour(signer, {
+                        safeId: Number(safeId),
+                        saviourAddress,
+                    })
+                }
             } catch (e) {
                 handleTransactionError(e)
             } finally {
@@ -131,6 +140,21 @@ const SafeDetails = ({ ...props }) => {
             }
         } else {
             history.push(`/safes/${safeId}/saviour`)
+        }
+    }
+
+    const returnSaviourBtnText = () => {
+        if (leftOver && leftOver.status) {
+            return t('Collect Saviour Balance')
+        } else if (Number(safeState.saviourData?.saviourBalance) === 0) {
+            return t('Disconnect Saviour')
+        } else {
+            return (
+                <BtnInner>
+                    <Link2 size={18} />
+                    {t(hasSaviour ? 'Saviour Configuration' : 'add_savoiur')}
+                </BtnInner>
+            )
         }
     }
 
@@ -158,18 +182,7 @@ const SafeDetails = ({ ...props }) => {
                             isLoading={loading}
                             disabled={loading}
                         >
-                            {leftOver.status ? (
-                                t('Collect Saviour Balance')
-                            ) : (
-                                <BtnInner>
-                                    <Link2 size={18} />
-                                    {t(
-                                        hasSaviour
-                                            ? 'Saviour Configuration'
-                                            : 'add_savoiur'
-                                    )}
-                                </BtnInner>
-                            )}
+                            {returnSaviourBtnText()}
                         </Button>
                     </BtnContainer>
                 </HeaderContainer>

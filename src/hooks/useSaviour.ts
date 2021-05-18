@@ -523,7 +523,7 @@ export function useSaviourGetReserves() {
     return { getReservesCallback }
 }
 
-// withdraws balance from saviour
+// Change saviour target CRatio
 export function useChangeTargetedCRatio() {
     const {
         transactionsModel: transactionsActions,
@@ -573,4 +573,52 @@ export function useChangeTargetedCRatio() {
     }
 
     return { changeTargetedCRatio }
+}
+
+// Disconnect Saviour from Safe
+export function useDisconnectSaviour() {
+    const {
+        transactionsModel: transactionsActions,
+        popupsModel: popupsActions,
+    } = useStoreActions((store) => store)
+
+    const { account } = useActiveWeb3React()
+
+    const disconnectSaviour = async function (
+        signer: JsonRpcSigner,
+        payload: GetReservesFromSaviour
+    ) {
+        if (!account || !signer || !payload) {
+            return false
+        }
+        const geb = new Geb(ETH_NETWORK, signer.provider)
+        const proxy = await geb.getProxyAction(signer._address)
+        const { safeId, saviourAddress } = payload
+
+        const txData = proxy.protectSAFE(saviourAddress, safeId)
+
+        if (!txData) throw new Error('No transaction request!')
+        const tx = await handlePreTxGasEstimate(signer, txData)
+        const txResponse = await signer.sendTransaction(tx)
+        if (txResponse) {
+            const { hash, chainId } = txResponse
+            transactionsActions.addTransaction({
+                chainId,
+                hash,
+                from: txResponse.from,
+                summary: 'Disconnect Saviour form Safe',
+                addedTime: new Date().getTime(),
+                originalTx: txResponse,
+            })
+            popupsActions.setIsWaitingModalOpen(true)
+            popupsActions.setWaitingPayload({
+                title: 'Transaction Submitted',
+                hash: txResponse.hash,
+                status: 'success',
+            })
+            await txResponse.wait()
+        }
+    }
+
+    return { disconnectSaviour }
 }
