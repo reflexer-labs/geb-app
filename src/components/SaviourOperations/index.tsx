@@ -21,7 +21,7 @@ const INITITAL_STATE = [
     },
 ]
 
-const MIN_SAVIOUR_CRATIO = 200
+const MIN_SAVIOUR_CRATIO = 175
 
 const SaviourOperatrions = () => {
     const { t } = useTranslation()
@@ -100,7 +100,12 @@ const SaviourOperatrions = () => {
             setError('No min CollateralRatio')
             return false
         }
-        if (!hasSaviour && amountBN.isZero()) {
+        if (
+            (!hasSaviour && amountBN.isZero()) ||
+            (hasSaviour &&
+                amountBN.isZero() &&
+                targetedCRatio === saviourData?.saviourRescueRatio)
+        ) {
             setError(
                 `You cannot ${
                     isSaviourDeposit ? 'deposit' : 'withdraw'
@@ -302,7 +307,10 @@ const SaviourOperatrions = () => {
                         onAfterChange={(value) =>
                             safeActions.setTargetedCRatio(value as number)
                         }
-                        min={MIN_SAVIOUR_CRATIO}
+                        min={
+                            saviourData?.minCollateralRatio ||
+                            MIN_SAVIOUR_CRATIO
+                        }
                         max={300}
                         renderTrack={Track}
                         renderThumb={Thumb}
