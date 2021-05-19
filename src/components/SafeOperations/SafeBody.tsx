@@ -429,6 +429,19 @@ const SafeBody = ({ isChecked }: Props) => {
     }
 
     const onChangeRight = (val: string) => {
+        if (type === 'deposit_borrow') {
+            if (
+                val &&
+                val.startsWith('0') &&
+                val.length >= 5 &&
+                Number(val) < 0.005
+            ) {
+                val = '0'
+            }
+        } else if (val && Number(val) < 0) {
+            val = '0'
+        }
+
         setDefaultSafe({
             ...defaultSafe,
             totalCollateral,

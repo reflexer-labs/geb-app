@@ -186,7 +186,7 @@ describe('App Page - Safe Details', () => {
 
     it('should show error if too much debt', () => {
         cy.get('#repay_withdraw').click()
-        cy.get('[data-test-id="repay_withdraw_left"]').type('1')
+        cy.get('[data-test-id="repay_withdraw_left"]').type('2')
         cy.contains('Review Transaction').click()
         cy.contains('Too much debt')
     })
@@ -217,7 +217,7 @@ describe('App Page - Safe Details', () => {
         cy.contains('Review Transaction').click()
         cy.contains('Confirm Transaction Details')
         cy.get('#confirm_tx').click()
-        cy.wait(25000)
+        cy.wait(65000)
         cy.contains('Transaction Submitted')
         cy.contains('Close').click()
         cy.wait(10000)
@@ -258,7 +258,7 @@ describe('App Page - Safe Details', () => {
         cy.contains('Review Transaction').click()
         cy.contains('Confirm Transaction Details')
         cy.get('#confirm_tx').click()
-        cy.wait(25000)
+        cy.wait(65000)
         cy.contains('Transaction Submitted')
         cy.contains('Close').click()
         cy.wait(10000)

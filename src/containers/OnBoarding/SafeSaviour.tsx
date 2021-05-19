@@ -8,7 +8,12 @@ import GridContainer from '../../components/GridContainer'
 import PageHeader from '../../components/PageHeader'
 import { useActiveWeb3React } from '../../hooks'
 import useGeb from '../../hooks/useGeb'
-import { useMinSaviourBalance, useSaviourData } from '../../hooks/useSaviour'
+import {
+    useDisconnectSaviour,
+    useMinSaviourBalance,
+    useSaviourData,
+    useSaviourWithdraw,
+} from '../../hooks/useSaviour'
 import { useStoreActions, useStoreState } from '../../store'
 import { formatNumber } from '../../utils/helper'
 import { isNumeric } from '../../utils/validations'
@@ -16,16 +21,20 @@ import AlertLabel from '../../components/AlertLabel'
 import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
 import useInterval from '../../hooks/useInterval'
+import { handleTransactionError } from '../../hooks/TransactionHooks'
 
 const SafeSaviour = ({ ...props }) => {
     const { t } = useTranslation()
-    const { account } = useActiveWeb3React()
+    const { account, library } = useActiveWeb3React()
+    const [isLoading, setIsLoading] = useState(false)
     const [loaded, setLoaded] = useState(false)
     const safeId = props.match.params.id as string
     const history = useHistory()
     const geb = useGeb()
     const saviourData = useSaviourData()
     const { getMinSaviourBalance } = useMinSaviourBalance()
+    const { disconnectSaviour } = useDisconnectSaviour()
+    const { withdrawCallback } = useSaviourWithdraw()
 
     const {
         safeModel: safeState,
@@ -95,6 +104,40 @@ const SafeSaviour = ({ ...props }) => {
             numeral(value).multiply(price).value().toString(),
             2
         )
+    }
+
+    const handleDisconnectSaviour = async () => {
+        if (!library || !account || !saviourData || !saviourData?.hasSaviour)
+            throw new Error('No library, account or saviour')
+        setIsLoading(true)
+        try {
+            popupsActions.setIsWaitingModalOpen(true)
+            popupsActions.setWaitingPayload({
+                title: 'Waiting For Confirmation',
+                hint: 'Confirm this transaction in your wallet',
+                status: 'loading',
+            })
+            const signer = library.getSigner(account)
+            if (Number(saviourData.saviourBalance) === 0) {
+                await disconnectSaviour(signer, {
+                    safeId: Number(safeId),
+                    saviourAddress: saviourData.saviourAddress,
+                })
+            } else {
+                await withdrawCallback(signer, {
+                    safeId: Number(safeId),
+                    safeHandler: singleSafe?.safeHandler as string,
+                    amount: saviourData.saviourBalance,
+                    isMaxWithdraw: true,
+                    targetedCRatio: saviourData.saviourRescueRatio,
+                    isTargetedCRatioChanged: false,
+                })
+            }
+        } catch (e) {
+            handleTransactionError(e)
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (
@@ -212,7 +255,15 @@ const SafeSaviour = ({ ...props }) => {
                 ) : null}
                 <BtnContainer>
                     <Button
+                        dimmed
+                        text={'disconnect_saviour'}
+                        isLoading={isLoading}
+                        disabled={isLoading}
+                        onClick={handleDisconnectSaviour}
+                    />
+                    <Button
                         withArrow
+                        disabled={isLoading}
                         text={'configure'}
                         onClick={handleOpenModal}
                     />
@@ -263,7 +314,9 @@ const Description = styled.div`
 `
 
 const BtnContainer = styled.div`
-    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-top: 10px;
 `
 
