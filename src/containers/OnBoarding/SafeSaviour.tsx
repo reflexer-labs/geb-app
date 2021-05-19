@@ -253,14 +253,22 @@ const SafeSaviour = ({ ...props }) => {
                         />
                     </StatsGrid>
                 ) : null}
-                <BtnContainer>
-                    <Button
-                        dimmed
-                        text={'disconnect_saviour'}
-                        isLoading={isLoading}
-                        disabled={isLoading}
-                        onClick={handleDisconnectSaviour}
-                    />
+                <BtnContainer
+                    style={{
+                        justifyContent: saviourData?.hasSaviour
+                            ? 'space-between'
+                            : 'flex-end',
+                    }}
+                >
+                    {saviourData?.hasSaviour ? (
+                        <Button
+                            dimmed
+                            text={'disconnect_saviour'}
+                            isLoading={isLoading}
+                            disabled={isLoading}
+                            onClick={handleDisconnectSaviour}
+                        />
+                    ) : null}
                     <Button
                         withArrow
                         disabled={isLoading}
@@ -316,7 +324,6 @@ const Description = styled.div`
 const BtnContainer = styled.div`
     display: flex;
     align-items: center;
-    justify-content: space-between;
     margin-top: 10px;
 `
 
