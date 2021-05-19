@@ -50,6 +50,10 @@ const NavLinks = () => {
                     <AuctionIcon className="opacity" /> {t('auctions')}
                 </NavBarLink>
             )}
+
+            <NavBarLink to="/earn" onClick={(e) => handleLinkClick(e, false)}>
+                <AuctionIcon className="opacity" /> {t('earn')}
+            </NavBarLink>
             <Box className="has-menu">
                 <LinkItem>
                     <Shield /> {t('insurance')}

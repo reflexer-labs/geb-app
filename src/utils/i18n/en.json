@@ -157,5 +157,9 @@
     "saviour_target_cratio": "Collateralization ratio toward which the safe will be rebalanced upon liquidation",
     "saviour_desc": "Safe saviours can save your Safes from liquidation. You can attach a saviour to one of your Safes and top it up with RAI/ETH Uniswap V2 LP tokens. When someone starts a liquidation for one of your protected Safes, the saviour will try to withdraw your Uniswap liquidity and bring the collateralization ratio of the liquidated Safe to a target level that you chose beforehand.",
     "current_saviour_desc": "The current saviour for this Safe will try to withdraw your Uniswap V2 RAI/ETH liquidity and repay part of your debt or top up your Safe with ETH. Any leftover RAI or ETH that weren't used to save the Safe will be available for you to withdraw. <b>NOTE: if the saviour doesn't have enough LP tokens to save your Safe, the Safe will get liquidated.</b>",
-    "disconnect_saviour": "Disconnect Saviour"
+    "disconnect_saviour": "Disconnect Saviour",
+    "earn": "Earn",
+    "earn_title": "Liquidity Pool",
+    "earn_header_desc": "Add liquidity and earn reward",
+    "earn_description": "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Molestiae mollitia distinctio veritatis consequatur, cupiditate sapiente ad eos dolor natus sunt vero expedita exercitationem voluptatem similique praesentium facilis quis, esse, consequuntur deleniti reprehenderit officiis rerum."
 }
