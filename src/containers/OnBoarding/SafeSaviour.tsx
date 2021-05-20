@@ -10,8 +10,10 @@ import { useActiveWeb3React } from '../../hooks'
 import useGeb from '../../hooks/useGeb'
 import {
     useDisconnectSaviour,
+    useHasLeftOver,
     useMinSaviourBalance,
     useSaviourData,
+    useSaviourGetReserves,
     useSaviourWithdraw,
 } from '../../hooks/useSaviour'
 import { useStoreActions, useStoreState } from '../../store'
@@ -35,6 +37,7 @@ const SafeSaviour = ({ ...props }) => {
     const { getMinSaviourBalance } = useMinSaviourBalance()
     const { disconnectSaviour } = useDisconnectSaviour()
     const { withdrawCallback } = useSaviourWithdraw()
+    const { getReservesCallback } = useSaviourGetReserves()
 
     const {
         safeModel: safeState,
@@ -46,6 +49,8 @@ const SafeSaviour = ({ ...props }) => {
         popupsModel: popupsActions,
         safeModel: safeActions,
     } = useStoreActions((state) => state)
+
+    const leftOver = useHasLeftOver(safeState.singleSafe?.safeHandler as string)
 
     useEffect(() => {
         if (!account) return
@@ -118,7 +123,12 @@ const SafeSaviour = ({ ...props }) => {
                 status: 'loading',
             })
             const signer = library.getSigner(account)
-            if (Number(saviourData.saviourBalance) === 0) {
+            if (leftOver.status) {
+                await getReservesCallback(signer, {
+                    safeId: Number(safeId),
+                    saviourAddress: saviourData.saviourAddress,
+                })
+            } else if (Number(saviourData.saviourBalance) === 0) {
                 await disconnectSaviour(signer, {
                     safeId: Number(safeId),
                     saviourAddress: saviourData.saviourAddress,

@@ -58,14 +58,16 @@ const SafeDetails = ({ ...props }) => {
                 title: 'Fetching Safe Data',
                 status: 'loading',
             })
-            await safeActions.fetchSafeById({
+            const safe = await safeActions.fetchSafeById({
                 safeId,
                 address: account as string,
                 geb,
                 isRPCAdapterOn,
             })
             await safeActions.fetchManagedSafe(safeId)
-            popupsActions.setIsWaitingModalOpen(false)
+            if (safe) {
+                popupsActions.setIsWaitingModalOpen(false)
+            }
         }
 
         fetchSafe()
