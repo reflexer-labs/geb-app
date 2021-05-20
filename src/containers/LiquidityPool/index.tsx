@@ -11,7 +11,7 @@ const LiquidityPool = () => {
     return (
         <GridContainer>
             <PageHeader
-                breadcrumbs={{ '/': t('earn') }}
+                breadcrumbs={{ '/': t('earn_header_title') }}
                 text={t('earn_header_desc')}
             />
             <Container>

@@ -159,7 +159,8 @@
     "current_saviour_desc": "The current saviour for this Safe will try to withdraw your Uniswap V2 RAI/ETH liquidity and repay part of your debt or top up your Safe with ETH. Any leftover RAI or ETH that weren't used to save the Safe will be available for you to withdraw. <b>NOTE: if the saviour doesn't have enough LP tokens to save your Safe, the Safe will get liquidated.</b>",
     "disconnect_saviour": "Disconnect Saviour",
     "earn": "Earn",
-    "earn_title": "Liquidity Pool",
-    "earn_header_desc": "Add liquidity and earn reward",
-    "earn_description": "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Molestiae mollitia distinctio veritatis consequatur, cupiditate sapiente ad eos dolor natus sunt vero expedita exercitationem voluptatem similique praesentium facilis quis, esse, consequuntur deleniti reprehenderit officiis rerum."
+    "earn_title": "RAI Uniswap V3 Liquidity Pools",
+    "earn_header_desc": "Add liquidity for RAI on Uniswap V3 and earn more fees",
+    "earn_description": "This dashboard helps you add liquidity to RAI pools in Uniswap V3. Under the hood, your liquidity is concentrated around RAI's redemption price so you get to collect more fees.",
+    "earn_header_title": "Uniswap V3 Liquidity Manager"
 }
