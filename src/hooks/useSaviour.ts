@@ -61,7 +61,8 @@ export function useHasLeftOver(safeHandler: string) {
     const [state, setState] = useState(false)
     const geb = useGeb()
     const saviourAddress = useSaviourAddress(safeHandler)
-    if (!geb || !safeHandler) return { status: state, saviourAddress }
+    if (!geb || !safeHandler || saviourAddress === EMPTY_ADDRESS)
+        return { status: state, saviourAddress }
     geb.contracts.coinNativeUniswapSaviour
         .underlyingReserves(safeHandler.toLowerCase())
         .then(({ systemCoins, collateralCoins }) => {
