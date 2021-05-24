@@ -85,6 +85,7 @@ const SafeDetails = ({ ...props }) => {
 
         return () => {
             clearInterval(interval)
+            safeActions.setSingleSafe(null)
         }
     }, [
         account,
