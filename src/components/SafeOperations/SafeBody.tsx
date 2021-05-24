@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { useStoreActions, useStoreState } from '../../store'
 import { ISafeData } from '../../utils/interfaces'
 import Button from '../Button'
+import numeral from 'numeral'
 // import CheckBox from '../CheckBox';
 import DecimalInput from '../DecimalInput'
 import {
@@ -21,11 +22,7 @@ import {
     toFixedString,
 } from '../../utils/helper'
 import { NETWORK_ID } from '../../connectors'
-import {
-    DEFAULT_SAFE_STATE,
-    COIN_TICKER,
-    COLLATERAL_TYPE_ID,
-} from '../../utils/constants'
+import { DEFAULT_SAFE_STATE, COIN_TICKER } from '../../utils/constants'
 import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
 import { useActiveWeb3React } from '../../hooks'
@@ -166,7 +163,7 @@ const SafeBody = ({ isChecked }: Props) => {
         if (type === 'repay_withdraw' && singleSafe && !isLeft) {
             return `Repay ${COIN_TICKER} (Owe: ${formatNumber(
                 getAvailableRai()
-            )}, Avail: ${
+            )}, Available: ${
                 Number(raiBalance.toString()) > 0.0001
                     ? formatNumber(raiBalance.toString())
                     : '< 0.0001'
@@ -216,10 +213,10 @@ const SafeBody = ({ isChecked }: Props) => {
         const debtFloorBN = BigNumber.from(toFixedString(debtFloor, 'WAD'))
         const totalDebtBN = BigNumber.from(toFixedString(totalDebt, 'WAD'))
 
-        const debtCeilingBN = BigNumber.from(toFixedString(debtCeiling, 'RAD'))
-        const globalDebtCeilingBN = globalDebtCeiling
-            ? BigNumber.from(toFixedString(globalDebtCeiling, 'RAD'))
-            : BigNumber.from('0')
+        // const debtCeilingBN = BigNumber.from(toFixedString(debtCeiling, 'RAD'))
+        // const globalDebtCeilingBN = globalDebtCeiling
+        //     ? BigNumber.from(toFixedString(globalDebtCeiling, 'RAD'))
+        //     : BigNumber.from('0')
 
         if (type === 'deposit_borrow') {
             if (leftInputBN.gt(availableEthBN)) {
@@ -277,7 +274,7 @@ const SafeBody = ({ isChecked }: Props) => {
             }
 
             if (!rightInputBN.isZero() && rightInputBN.gt(raiBalanceBN)) {
-                setError(`ballance_issue`)
+                setError(`balance_issue`)
                 return false
             }
         }
@@ -321,13 +318,14 @@ const SafeBody = ({ isChecked }: Props) => {
             return false
         }
 
-        if (totalDebtBN.gt(globalDebtCeilingBN)) {
+        if (numeral(totalDebt).value() > numeral(globalDebtCeiling).value()) {
             setError('Cannot exceed global debt ceiling.')
-            return
+            return false
         }
-        if (totalDebtBN.gt(debtCeilingBN)) {
-            setError(`Cannot exceed ${COLLATERAL_TYPE_ID} debt ceiling.`)
-            return
+
+        if (numeral(totalDebt).value() > numeral(debtCeiling).value()) {
+            setError(`Cannot exceed ${COIN_TICKER} debt ceiling.`)
+            return false
         }
 
         return true
@@ -348,14 +346,16 @@ const SafeBody = ({ isChecked }: Props) => {
     }
 
     const returnMaxRepayValue = () => {
-        const availableRaiBN = BigNumber.from(
-            toFixedString(getAvailableRai().toString(), 'WAD')
-        )
+        const rightInputBN = defaultSafe.rightInput
+            ? BigNumber.from(toFixedString(defaultSafe.rightInput, 'WAD'))
+            : BigNumber.from('0')
+
         const raiBalanceBN = BigNumber.from(
             toFixedString(raiBalance.toString(), 'WAD')
         )
+
         const diff = gebUtils
-            .wadToFixed(availableRaiBN.sub(raiBalanceBN))
+            .wadToFixed(rightInputBN.sub(raiBalanceBN))
             .toString()
 
         return `Insufficient balance. You are ${diff} short`
@@ -429,6 +429,19 @@ const SafeBody = ({ isChecked }: Props) => {
     }
 
     const onChangeRight = (val: string) => {
+        if (type === 'deposit_borrow') {
+            if (
+                val &&
+                val.startsWith('0') &&
+                val.length >= 5 &&
+                Number(val) < 0.005
+            ) {
+                val = '0'
+            }
+        } else if (val && Number(val) < 0) {
+            val = '0'
+        }
+
         setDefaultSafe({
             ...defaultSafe,
             totalCollateral,
@@ -516,7 +529,7 @@ const SafeBody = ({ isChecked }: Props) => {
 
                 {error && (
                     <Error>
-                        {error === 'ballance_issue'
+                        {error === 'balance_issue'
                             ? returnMaxRepayValue()
                             : error}
                     </Error>
@@ -667,7 +680,9 @@ export default SafeBody
 const DoubleInput = styled.div`
     display: flex;
     margin-bottom: 16px;
-
+    @media (min-width: 767px) {
+        align-items: flex-end;
+    }
     > div {
         &:last-child {
             flex: 0 0 calc(50% + 5px);

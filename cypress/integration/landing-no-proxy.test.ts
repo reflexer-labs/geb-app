@@ -12,7 +12,7 @@ describe('App Page - No Proxy', () => {
         cy.visit('/', {
             qs: { type: 'no_proxy' },
         })
-        cy.wait(5000)
+        cy.wait(10000)
     })
     it('loads App page', () => {
         cy.get('#app-page')

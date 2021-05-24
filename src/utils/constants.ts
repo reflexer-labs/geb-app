@@ -29,7 +29,7 @@ export const COIN_TICKER =
         : 'RAI'
 
 export const COLLATERAL_TYPE_ID = 'ETH-A'
-
+export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000'
 export const SYSTEM_STATUS = REACT_APP_SYSTEM_STATUS || ''
 export const SHOW_AUCTIONS = REACT_APP_SHOW_AUCTIONS || ''
 
@@ -80,6 +80,7 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
         color: '#315CF5',
     },
     COINBASE_LINK: {
+        connector: walletlink,
         name: 'Open in Coinbase Wallet',
         iconName: 'coinbaseWalletIcon.svg',
         description: 'Open in Coinbase Wallet app.',

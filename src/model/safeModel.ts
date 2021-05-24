@@ -9,6 +9,7 @@ import {
     IFetchSafesPayload,
     IFetchSafeById,
     IManageSafe,
+    FetchSaviourPayload,
 } from '../utils/interfaces'
 import {
     handleCollectETH,
@@ -25,19 +26,25 @@ import { DEFAULT_SAFE_STATE } from '../utils/constants'
 import { timeout } from '../utils/helper'
 import { StoreModel } from '.'
 import { NETWORK_ID } from '../connectors'
+import { fetchSaviourData, SaviourData } from '../hooks/useSaviour'
 
 export interface SafeModel {
     list: Array<ISafe>
+    saviourData: SaviourData | undefined
     safeCreated: boolean
     singleSafe: ISafe | null
     operation: number
+    targetedCRatio: number
     totalEth: string
+    isMaxWithdraw: boolean
     managedSafe: IManageSafe
     totalRAI: string
+    amount: string
     isES: boolean
     isUniSwapPoolChecked: boolean
     stage: number
     debtFloor: string
+    isSaviourDeposit: boolean
     isSuccessfulTx: boolean
     safeData: ISafeData
     liquidationData: ILiquidationData
@@ -65,6 +72,7 @@ export interface SafeModel {
         any,
         StoreModel
     >
+    fetchSaviourData: Thunk<SafeModel, FetchSaviourPayload, any, StoreModel>
     setIsSafeCreated: Action<SafeModel, boolean>
     setList: Action<SafeModel, Array<ISafe>>
     setSingleSafe: Action<SafeModel, ISafe | null>
@@ -81,12 +89,21 @@ export interface SafeModel {
     setIsSuccessfulTx: Action<SafeModel, boolean>
     setDebtFloor: Action<SafeModel, string>
     setManagedSafe: Action<SafeModel, IManageSafe>
+    setIsSaviourDeposit: Action<SafeModel, boolean>
+    setAmount: Action<SafeModel, string>
+    setTargetedCRatio: Action<SafeModel, number>
+    setIsMaxWithdraw: Action<SafeModel, boolean>
+    setSaviourData: Action<SafeModel, SaviourData | undefined>
 }
 
 const safeModel: SafeModel = {
     list: [],
     safeCreated: false,
+    isMaxWithdraw: false,
     operation: 0,
+    amount: '',
+    targetedCRatio: 0,
+    saviourData: undefined,
     managedSafe: {
         safeId: '',
         owner: {
@@ -101,6 +118,7 @@ const safeModel: SafeModel = {
     isUniSwapPoolChecked: true,
     stage: 0,
     debtFloor: '',
+    isSaviourDeposit: true,
     safeData: DEFAULT_SAFE_STATE,
     liquidationData: {
         accumulatedRate: '0',
@@ -278,6 +296,7 @@ const safeModel: SafeModel = {
                     storeActions.connectWalletModel.setCoinAllowance('')
                 }
             }
+            return res.safe[0]
         }
     }),
 
@@ -296,6 +315,11 @@ const safeModel: SafeModel = {
             }
             return res
         }
+    }),
+    fetchSaviourData: thunk(async (actions, payload) => {
+        const res = await fetchSaviourData(payload)
+        actions.setSaviourData(res)
+        return res
     }),
     setIsSafeCreated: action((state, payload) => {
         state.safeCreated = payload
@@ -346,6 +370,21 @@ const safeModel: SafeModel = {
     }),
     setManagedSafe: action((state, payload) => {
         state.managedSafe = payload
+    }),
+    setIsSaviourDeposit: action((state, payload) => {
+        state.isSaviourDeposit = payload
+    }),
+    setAmount: action((state, payload) => {
+        state.amount = payload
+    }),
+    setTargetedCRatio: action((state, payload) => {
+        state.targetedCRatio = payload
+    }),
+    setIsMaxWithdraw: action((state, payload) => {
+        state.isMaxWithdraw = payload
+    }),
+    setSaviourData: action((state, payload) => {
+        state.saviourData = payload
     }),
 }
 
