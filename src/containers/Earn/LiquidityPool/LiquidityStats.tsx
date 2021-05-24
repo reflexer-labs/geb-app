@@ -10,11 +10,11 @@ const LiquidityStats = () => {
                         <Position>
                             <Images>
                                 <img
-                                    src={require('../../assets/rai-logo.svg')}
+                                    src={require('../../../assets/rai-logo.svg')}
                                     alt=""
                                 />
                                 <img
-                                    src={require('../../assets/eth-logo.png')}
+                                    src={require('../../../assets/eth-logo.png')}
                                     alt=""
                                 />
                             </Images>

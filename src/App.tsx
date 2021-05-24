@@ -26,7 +26,7 @@ import Auctions from './containers/Auctions'
 import GoogleTagManager from './components/Analytics/GoogleTagManager'
 import { SHOW_AUCTIONS } from './utils/constants'
 import SafeSaviour from './containers/OnBoarding/SafeSaviour'
-import LiquidityPool from './containers/LiquidityPool'
+import Earn from './containers/Earn'
 
 // Toast css
 
@@ -65,7 +65,7 @@ const App = () => {
                                         ) : null}
                                         <Route
                                             exact
-                                            component={LiquidityPool}
+                                            component={Earn}
                                             path={'/earn'}
                                         />
                                         <Route

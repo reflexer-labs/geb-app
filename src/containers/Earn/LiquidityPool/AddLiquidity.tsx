@@ -1,8 +1,8 @@
 import React from 'react'
 import { PlusCircle } from 'react-feather'
 import styled from 'styled-components'
-import Button from '../../components/Button'
-import DecimalInput from '../../components/DecimalInput'
+import Button from '../../../components/Button'
+import DecimalInput from '../../../components/DecimalInput'
 
 const AddLiquidity = () => {
     return (
@@ -10,7 +10,7 @@ const AddLiquidity = () => {
             <Title>Add Liquidity</Title>
             <InputContainer>
                 <InputLabel>
-                    <img src={require('../../assets/rai-logo.svg')} alt="" />
+                    <img src={require('../../../assets/rai-logo.svg')} alt="" />
                     {`RAI (Available: 20.342)`}
                 </InputLabel>
                 <DecimalInput value={''} onChange={() => {}} label={''} />
@@ -20,7 +20,7 @@ const AddLiquidity = () => {
             </SeparatorIcon>
             <InputContainer>
                 <InputLabel>
-                    <img src={require('../../assets/eth-logo.png')} alt="" />
+                    <img src={require('../../../assets/eth-logo.png')} alt="" />
                     {`ETH (Available: 20.342)`}
                 </InputLabel>
                 <DecimalInput value={''} onChange={() => {}} label={''} />

@@ -5,6 +5,7 @@ import styled from 'styled-components'
 interface Props {
     label: string
     icon?: string
+    iconSize?: string
     placeholder?: string
     value: string
     onChange: (val: string) => void
@@ -19,6 +20,7 @@ const DecimalInput = ({
     label,
     placeholder,
     icon,
+    iconSize,
     value,
     onChange,
     disableMax,
@@ -52,7 +54,13 @@ const DecimalInput = ({
         <Container>
             <Label data-test-id={data_test_id + '_label'}>{label}</Label>
             <Content className={disabled ? 'disabled' : ''}>
-                {icon ? <Icon src={icon} /> : null}
+                {icon ? (
+                    <Icon
+                        src={icon}
+                        width={iconSize || '24px'}
+                        height={iconSize || '24px'}
+                    />
+                ) : null}
                 <CustomInput
                     placeholder={placeholder || '0.00'}
                     type={'text'}
@@ -100,8 +108,6 @@ const Content = styled.div`
 `
 
 const Icon = styled.img`
-    width: 24px;
-    height: 24px;
     margin-left: 20px;
 `
 
