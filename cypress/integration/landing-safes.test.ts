@@ -8,7 +8,14 @@ import {
 describe('App Page - Has Safes', () => {
     beforeEach(() => {
         cy.visit('/')
-        cy.wait(10000)
+        cy.wait(2000)
+        cy.get('[data-test-id="waiting-modal"]').then((e) => {
+            if (e.is(':visible')) {
+                cy.waitUntil(() => Cypress.$(e).is(':hidden'), {
+                    timeout: 20000,
+                })
+            }
+        })
     })
     it('loads App page', () => {
         cy.get('#app-page')

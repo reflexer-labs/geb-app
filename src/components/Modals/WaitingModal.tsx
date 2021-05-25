@@ -52,10 +52,13 @@ const WaitingModal = () => {
             isModalOpen={popupsState.isWaitingModalOpen}
             handleModalContent
         >
-            <InnerContainer>
+            <InnerContainer data-test-id="waiting-modal">
                 {returnStatusIcon(status)}
                 {
-                    <Title className={status}>
+                    <Title
+                        data-test-id="waiting-modal-title"
+                        className={status}
+                    >
                         {title ? title : t('initializing')}
                     </Title>
                 }
