@@ -57,19 +57,19 @@ const StakingOps = () => {
                     </AlertBox>
                 ) : null}
                 <Footer>
-                    <Button
-                        onClick={() => {}}
-                        text={type === 'stake' ? 'Stake' : 'Unstake'}
-                    />
+                    {type === 'stake' ? (
+                        <Button onClick={() => {}} text={'Stake'} />
+                    ) : (
+                        <Button onClick={() => {}} text={'Request Stake'} />
+                    )}
                 </Footer>
             </StakingPayment>
 
             <Statistics>
-                <StatsHeader>My Statistics</StatsHeader>
                 <Content>
                     <Blocks>
                         <Block>
-                            <Label>My Balance</Label>
+                            <Label>My LP Balance</Label>
                             <Value>0 {returnImg('lp')}</Value>
                         </Block>
                         <Block>
@@ -78,7 +78,7 @@ const StakingOps = () => {
                         </Block>
 
                         <Block>
-                            <Label>My Daily Reward</Label>
+                            <Label>My Weekly Reward</Label>
                             <Value>0 {returnImg('flx')}</Value>
                         </Block>
 
@@ -125,8 +125,8 @@ const StakingPayment = styled.div`
     background: ${(props) => props.theme.colors.neutral};
     border-radius: ${(props) => props.theme.global.borderRadius};
     border: 1px solid ${(props) => props.theme.colors.border};
-    flex: 3;
-    margin-right: 30px;
+    flex: 4;
+    margin-right: 15px;
     ${({ theme }) => theme.mediaWidth.upToSmall`
    margin-right:0
  `}
@@ -167,36 +167,33 @@ const Footer = styled.div`
 `
 
 const Statistics = styled.div`
-    flex: 2;
-    background: ${(props) => props.theme.colors.neutral};
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    border: 1px solid ${(props) => props.theme.colors.border};
+    flex: 3;
     ${({ theme }) => theme.mediaWidth.upToSmall`
    margin-bottom:20px;
  `}
 `
 
-const StatsHeader = styled.div`
-    border-bottom: 1px solid ${(props) => props.theme.colors.border};
-    padding: 20px;
-`
-
 const Blocks = styled.div`
     flex-grow: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
 `
 
 const Block = styled.div`
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 15px;
-    padding: 0 20px;
+    margin-bottom: 7px;
+    flex: 0 0 49%;
+    border: 1px solid ${(props) => props.theme.colors.border};
+    border-radius: ${(props) => props.theme.global.borderRadius};
+    padding: 20px;
+    ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+         flex: 0 0 100%;  
+    `}
 `
 
 const Label = styled.div`
     color: ${(props) => props.theme.colors.secondary};
-    font-size: 14px;
+    font-size: 12px;
 `
 
 const Value = styled.div`
@@ -204,6 +201,7 @@ const Value = styled.div`
     font-size: 14px;
     display: flex;
     align-items: center;
+    margin-top: 10px;
     img {
         margin-left: 5px;
     }
@@ -215,10 +213,11 @@ const StatsFooter = styled.div`
     padding: 20px;
     justify-content: space-between;
     flex-wrap: wrap;
-    margin-top: 10px;
-    background: #f8f8f8;
+    border: 1px solid ${(props) => props.theme.colors.border};
+    button {
+        width: 100%;
+    }
     ${({ theme }) => theme.mediaWidth.upToSmall`
-        background:transparent;
         button {
             width:100%;
         }
@@ -232,22 +231,19 @@ const Content = styled.div`
 `
 
 const RewardBox = styled.div`
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-        flex:0 0 100%;
-        display:flex;
-        align-items:center;
-        flex-direction:row-reverse;
-        justify-content: space-between;
-        margin-bottom:20px;
-    `}
+    flex: 0 0 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    margin-bottom: 20px;
 `
 
 const RewardValue = styled.div``
 const RewardLabel = styled.div`
     color: ${(props) => props.theme.colors.secondary};
     font-weight: bold;
-    margin-top: 10px;
-    font-size: 12px;
+    font-size: 14px;
     ${({ theme }) => theme.mediaWidth.upToSmall`
         font-size: 14px;
         margin-top:0;

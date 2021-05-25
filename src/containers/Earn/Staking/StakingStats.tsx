@@ -18,7 +18,7 @@ const StakingStats = () => {
                 <StatLabel>Weekly Rewards</StatLabel>
                 <StatValue>
                     <img
-                        src={require('../../../assets/flx_uni_dai.svg')}
+                        src={require('../../../assets/flx-logo.svg')}
                         width={'23px'}
                         height="23px"
                         alt=""
@@ -39,7 +39,8 @@ const Container = styled.div`
     align-items: center;
     width: 100%;
     padding: 20px 30px 0;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.09);
+    border-radius: ${(props) => props.theme.global.borderRadius};
+    border: 1px solid ${(props) => props.theme.colors.border};
 `
 
 const Stat = styled.div`
