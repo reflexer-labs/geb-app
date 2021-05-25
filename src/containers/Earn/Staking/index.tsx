@@ -1,28 +1,36 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+import GridContainer from '../../../components/GridContainer'
+import PageHeader from '../../../components/PageHeader'
 import StakingOps from './StakingOps'
 import StakingStats from './StakingStats'
 
 const Staking = () => {
     const { t } = useTranslation()
     return (
-        <Container>
-            <Title>{t('staking_title')}</Title>
-            <Description>{t('staking_description')}</Description>
+        <GridContainer>
+            <PageHeader
+                breadcrumbs={{ '/': t('staking_header_title') }}
+                text={t('staking_header_desc')}
+            />
+            <Container>
+                <Title>{t('staking_title')}</Title>
+                <Description>{t('staking_description')}</Description>
 
-            <Content>
-                <Header>
-                    <img
-                        src={require('../../../assets/flx_uni_dai.svg')}
-                        alt="flx_uni_dai"
-                    />
-                    DAI_FLX_UNI_V2_LP
-                </Header>
-                <StakingStats />
-                <StakingOps />
-            </Content>
-        </Container>
+                <Content>
+                    <Header>
+                        <img
+                            src={require('../../../assets/flx_uni_dai.svg')}
+                            alt="flx_uni_dai"
+                        />
+                        DAI_FLX_UNI_V2_LP
+                    </Header>
+                    <StakingStats />
+                    <StakingOps />
+                </Content>
+            </Container>
+        </GridContainer>
     )
 }
 

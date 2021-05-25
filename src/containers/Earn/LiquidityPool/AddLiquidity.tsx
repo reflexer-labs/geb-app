@@ -54,10 +54,9 @@ export default AddLiquidity
 
 const Container = styled.div`
     background: ${(props) => props.theme.colors.neutral};
-    border-radius: 25px;
+    border-radius: ${(props) => props.theme.global.borderRadius};
     border: 1px solid ${(props) => props.theme.colors.border};
     padding: 30px 25px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.09);
     width: 100%;
     max-width: 430px;
 `

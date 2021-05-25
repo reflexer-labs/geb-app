@@ -185,6 +185,7 @@ const Block = styled.div`
     flex: 0 0 49%;
     border: 1px solid ${(props) => props.theme.colors.border};
     border-radius: ${(props) => props.theme.global.borderRadius};
+    background: #fafafa;
     padding: 20px;
     ${({ theme }) => theme.mediaWidth.upToExtraSmall`
          flex: 0 0 100%;  

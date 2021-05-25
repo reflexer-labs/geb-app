@@ -66,8 +66,8 @@ const StatItem = styled.div`
     }
 `
 const StateInner = styled.div`
+    border-radius: ${(props) => props.theme.global.borderRadius};
     border: 1px solid ${(props) => props.theme.colors.border};
-    border-radius: 25px;
     background: #fafafa;
     text-align: center;
     padding: 30px 20px;

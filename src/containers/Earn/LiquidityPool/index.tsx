@@ -1,21 +1,29 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+import GridContainer from '../../../components/GridContainer'
+import PageHeader from '../../../components/PageHeader'
 import AddLiquidity from './AddLiquidity'
 import LiquidityStats from './LiquidityStats'
 
 const LiquidityPool = () => {
     const { t } = useTranslation()
     return (
-        <Container>
-            <Title>{t('lp_title')}</Title>
-            <Description>{t('lp_description')}</Description>
+        <GridContainer>
+            <PageHeader
+                breadcrumbs={{ '/': t('lp_header_title') }}
+                text={t('lp_header_desc')}
+            />
+            <Container>
+                <Title>{t('lp_title')}</Title>
+                <Description>{t('lp_description')}</Description>
 
-            <Content>
-                <AddLiquidity />
-                <LiquidityStats />
-            </Content>
-        </Container>
+                <Content>
+                    <AddLiquidity />
+                    <LiquidityStats />
+                </Content>
+            </Container>
+        </GridContainer>
     )
 }
 
