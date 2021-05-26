@@ -14,7 +14,7 @@ describe('App Page - Safe Details', () => {
         cy.get('[data-test-id="waiting-modal"]').then((e) => {
             if (e.is(':visible')) {
                 cy.waitUntil(() => Cypress.$(e).is(':hidden'), {
-                    timeout: 20000,
+                    timeout: 50000,
                 })
             }
         })
@@ -23,7 +23,7 @@ describe('App Page - Safe Details', () => {
         cy.get('[data-test-id="waiting-modal"]').then((e) => {
             if (e.is(':visible')) {
                 cy.waitUntil(() => Cypress.$(e).is(':hidden'), {
-                    timeout: 20000,
+                    timeout: 50000,
                 })
             }
         })
