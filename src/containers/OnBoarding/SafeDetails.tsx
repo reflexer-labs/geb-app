@@ -85,6 +85,7 @@ const SafeDetails = ({ ...props }) => {
 
         return () => {
             clearInterval(interval)
+            safeActions.setSingleSafe(null)
         }
     }, [
         account,
@@ -167,16 +168,17 @@ const SafeDetails = ({ ...props }) => {
                         text={t('accounts_header_text')}
                     />
 
-                    <BtnContainer>
-                        <Button
-                            id="create-safe"
-                            onClick={() => handleSaviourBtnClick(leftOver)}
-                            isLoading={loading}
-                            disabled={loading}
-                        >
-                            {returnSaviourBtnText()}
-                        </Button>
-                    </BtnContainer>
+                    {isOwner ? (
+                        <BtnContainer>
+                            <Button
+                                onClick={() => handleSaviourBtnClick(leftOver)}
+                                isLoading={loading}
+                                disabled={loading}
+                            >
+                                {returnSaviourBtnText()}
+                            </Button>
+                        </BtnContainer>
+                    ) : null}
                 </HeaderContainer>
 
                 <>

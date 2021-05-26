@@ -40,6 +40,8 @@ const DecimalInput = ({
                 onChange(returnedVal)
             } else if (val.startsWith('.')) {
                 onChange('0' + val)
+            } else if (val.replace(/[^.]/g, '').length > 1) {
+                onChange(value)
             } else if (val.length === 6 && Number(val) === 0) {
                 onChange('')
             } else {
