@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import _ from '../utils/lodash'
 import { useStoreState } from '../store'
 import Button from './Button'
+import { formatNumber } from '../utils/helper'
 
 interface Props {
     title: string
@@ -55,7 +56,7 @@ const StepsContent = ({
                         <Item>{`You do not need to create a new account if you already have a MakerDAO or Balancer proxy`}</Item>
                         <Item>
                             The minimum amount to mint per safe is{' '}
-                            <span>{debtFloorVal}</span> RAI
+                            <span>{formatNumber(debtFloorVal, 0)}</span> RAI
                         </Item>
                     </List>
                 </Notes>
