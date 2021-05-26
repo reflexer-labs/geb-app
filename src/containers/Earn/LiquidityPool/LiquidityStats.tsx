@@ -68,7 +68,7 @@ const StatItem = styled.div`
 const StateInner = styled.div`
     border-radius: ${(props) => props.theme.global.borderRadius};
     border: 1px solid ${(props) => props.theme.colors.border};
-    background: #fafafa;
+    background: ${(props) => props.theme.colors.background};
     text-align: center;
     padding: 30px 20px;
     text-align: left;
@@ -83,7 +83,6 @@ const Value = styled.div`
     font-size: ${(props) => props.theme.font.medium};
     line-height: 27px;
     letter-spacing: -0.69px;
-    font-weight: 600;
     margin: 20px 0 0px;
     display: flex;
     align-items: center;

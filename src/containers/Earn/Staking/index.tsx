@@ -15,16 +15,17 @@ const Staking = () => {
                 text={t('staking_header_desc')}
             />
             <Container>
-                <Title>{t('staking_title')}</Title>
-                <Description>{t('staking_description')}</Description>
-
+                <Details>
+                    <Title>{t('staking_title')}</Title>
+                    <Description>{t('staking_description')}</Description>
+                </Details>
                 <Content>
                     <Header>
                         <img
-                            src={require('../../../assets/flx_uni_dai.svg')}
-                            alt="flx_uni_dai"
+                            src={require('../../../assets/flx_uni_rai.svg')}
+                            alt="flx_uni_rai"
                         />
-                        DAI_FLX_UNI_V2_LP
+                        RAI_FLX_UNI_V2_LP
                     </Header>
                     <StakingStats />
                     <StakingOps />
@@ -36,10 +37,12 @@ const Staking = () => {
 
 export default Staking
 
-const Container = styled.div`
-    background: ${(props) => props.theme.colors.neutral};
-    border-radius: ${(props) => props.theme.global.borderRadius};
+const Container = styled.div``
+
+const Details = styled.div`
+    background: ${(props) => props.theme.colors.background};
     border: 1px solid ${(props) => props.theme.colors.border};
+    border-radius: ${(props) => props.theme.global.borderRadius};
     padding: 30px;
 `
 
@@ -58,8 +61,8 @@ const Description = styled.div`
 `
 
 const Content = styled.div`
-    max-width: 800px;
-    margin: 60px auto;
+    max-width: 980px;
+    margin: 40px auto 20px auto;
 `
 
 const Header = styled.div`

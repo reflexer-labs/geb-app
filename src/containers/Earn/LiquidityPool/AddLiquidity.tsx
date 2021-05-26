@@ -53,7 +53,7 @@ const AddLiquidity = () => {
 export default AddLiquidity
 
 const Container = styled.div`
-    background: ${(props) => props.theme.colors.neutral};
+    background: ${(props) => props.theme.colors.background};
     border-radius: ${(props) => props.theme.global.borderRadius};
     border: 1px solid ${(props) => props.theme.colors.border};
     padding: 30px 25px;

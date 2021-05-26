@@ -15,7 +15,7 @@ const INITIAL_STATE = [
     require('../assets/logo192.png'),
     require('../assets/connectors/metamask.png'),
     require('../assets/saviour.svg'),
-    require('../assets/flx_uni_dai.svg'),
+    require('../assets/flx_uni_rai.svg'),
 ]
 
 const ImagePreloader = () => {

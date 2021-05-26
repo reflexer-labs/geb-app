@@ -41,6 +41,7 @@ const Container = styled.div`
     padding: 20px 30px 0;
     border-radius: ${(props) => props.theme.global.borderRadius};
     border: 1px solid ${(props) => props.theme.colors.border};
+    background: ${(props) => props.theme.colors.background};
 `
 
 const Stat = styled.div`

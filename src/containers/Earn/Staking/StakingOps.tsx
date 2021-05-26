@@ -11,7 +11,7 @@ const StakingOps = () => {
         return (
             <img
                 src={require(`../../../assets/${
-                    type === 'flx' ? 'flx-logo' : 'flx_uni_dai'
+                    type === 'flx' ? 'flx-logo' : 'flx_uni_rai'
                 }.svg`)}
                 width={width}
                 height={height}
@@ -39,11 +39,11 @@ const StakingOps = () => {
                 </Header>
                 <Body>
                     <DecimalInput
-                        icon={require('../../../assets/flx_uni_dai.svg')}
+                        icon={require('../../../assets/flx_uni_rai.svg')}
                         iconSize={'30px'}
                         onChange={() => {}}
                         value={''}
-                        label={'DAI_FLX_UNI_V2_LP (Available: 23.23)'}
+                        label={'RAI_FLX_UNI_V2_LP (Available: 23.23)'}
                     />
                 </Body>
                 {type === 'unstake' ? (
@@ -89,15 +89,11 @@ const StakingOps = () => {
                     </Blocks>
                     <StatsFooter>
                         <RewardBox>
-                            <RewardValue>0</RewardValue>
                             <RewardLabel>My Current Reward</RewardLabel>
+                            <RewardValue>0 {returnImg('flx')}</RewardValue>
                         </RewardBox>
 
-                        <Button
-                            disabled
-                            onClick={() => {}}
-                            text={'Claim Reward'}
-                        />
+                        <Button onClick={() => {}} text={'Claim Reward'} />
                     </StatsFooter>
                 </Content>
             </Statistics>
@@ -110,7 +106,7 @@ export default StakingOps
 const Container = styled.div`
     display: flex;
     align-items: stretch;
-    margin-top: 30px;
+    margin-top: 20px;
 
     ${({ theme }) => theme.mediaWidth.upToSmall`
         flex-direction:column-reverse;
@@ -122,11 +118,11 @@ const AlertBox = styled.div`
 `
 
 const StakingPayment = styled.div`
-    background: ${(props) => props.theme.colors.neutral};
+    background: ${(props) => props.theme.colors.background};
     border-radius: ${(props) => props.theme.global.borderRadius};
     border: 1px solid ${(props) => props.theme.colors.border};
-    flex: 4;
-    margin-right: 15px;
+    flex: 5;
+    margin-right: 20px;
     ${({ theme }) => theme.mediaWidth.upToSmall`
    margin-right:0
  `}
@@ -167,7 +163,7 @@ const Footer = styled.div`
 `
 
 const Statistics = styled.div`
-    flex: 3;
+    flex: 5;
     ${({ theme }) => theme.mediaWidth.upToSmall`
    margin-bottom:20px;
  `}
@@ -181,11 +177,11 @@ const Blocks = styled.div`
 `
 
 const Block = styled.div`
-    margin-bottom: 7px;
-    flex: 0 0 49%;
+    margin-bottom: 20px;
+    flex: 0 0 48%;
     border: 1px solid ${(props) => props.theme.colors.border};
     border-radius: ${(props) => props.theme.global.borderRadius};
-    background: #fafafa;
+    background: ${(props) => props.theme.colors.background};
     padding: 20px;
     ${({ theme }) => theme.mediaWidth.upToExtraSmall`
          flex: 0 0 100%;  
@@ -194,12 +190,12 @@ const Block = styled.div`
 
 const Label = styled.div`
     color: ${(props) => props.theme.colors.secondary};
-    font-size: 12px;
+    font-size: 14px;
 `
 
 const Value = styled.div`
     color: ${(props) => props.theme.colors.primary};
-    font-size: 14px;
+    font-size: 15px;
     display: flex;
     align-items: center;
     margin-top: 10px;
@@ -210,19 +206,12 @@ const Value = styled.div`
 
 const StatsFooter = styled.div`
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     padding: 20px;
     justify-content: space-between;
     flex-wrap: wrap;
     border: 1px solid ${(props) => props.theme.colors.border};
-    button {
-        width: 100%;
-    }
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-        button {
-            width:100%;
-        }
-    `}
+    background: ${(props) => props.theme.colors.background};
 `
 const Content = styled.div`
     display: flex;
@@ -232,18 +221,22 @@ const Content = styled.div`
 `
 
 const RewardBox = styled.div`
-    flex: 0 0 100%;
-    display: flex;
+    /* display: flex;
     align-items: center;
     flex-direction: row-reverse;
-    justify-content: space-between;
-    margin-bottom: 20px;
+    justify-content: space-between; */
 `
 
-const RewardValue = styled.div``
+const RewardValue = styled.div`
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    img {
+        margin-left: 5px;
+    }
+`
 const RewardLabel = styled.div`
     color: ${(props) => props.theme.colors.secondary};
-    font-weight: bold;
     font-size: 14px;
     ${({ theme }) => theme.mediaWidth.upToSmall`
         font-size: 14px;
