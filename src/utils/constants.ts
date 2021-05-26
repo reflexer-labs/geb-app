@@ -1,4 +1,6 @@
 import { ChainId } from '@uniswap/sdk'
+import { ethers } from 'ethers'
+import { Geb } from 'geb.js'
 import { css } from 'styled-components'
 import { injected, walletconnect, walletlink } from '../connectors'
 import { WalletInfo } from './interfaces'
@@ -11,6 +13,7 @@ const {
     REACT_APP_SYSTEM_STATUS,
     REACT_APP_MAILCHIMP_URL,
     REACT_APP_SHOW_AUCTIONS,
+    REACT_APP_NETWORK_URL,
 } = process.env
 
 export enum Network {
@@ -36,7 +39,9 @@ export const SHOW_AUCTIONS = REACT_APP_SHOW_AUCTIONS || ''
 // 'https://api.thegraph.com/subgraphs/name/guifel/kovan_1_3_0'
 export const GRAPH_API_URLS = REACT_APP_GRAPH_API_URLS
     ? REACT_APP_GRAPH_API_URLS.split(',')
-    : ['https://subgraph.reflexer.finance/subgraphs/name/reflexer-labs/rai']
+    : [
+          'https://subgraph-kovan.reflexer.finance/subgraphs/name/reflexer-labs/rai',
+      ]
 
 export const MAILCHIMP_URL = REACT_APP_MAILCHIMP_URL
 
@@ -192,3 +197,6 @@ export const INITIAL_INCENTIVE_ASSETS_STATE = {
 }
 export const network_name =
     process.env.REACT_APP_NETWORK_ID === '1' ? 'mainnet' : 'kovan'
+
+const provider = new ethers.providers.JsonRpcProvider(REACT_APP_NETWORK_URL)
+export const geb = new Geb(network_name, provider)

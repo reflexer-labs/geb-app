@@ -368,9 +368,9 @@ export default {
 }
 
 // Helper functions
-const parseWad = (val: BigNumber) => utils.wadToFixed(val).toString()
-const parseRay = (val: BigNumber) => utils.rayToFixed(val).toString()
-const parseRad = (val: BigNumber) => utils.radToFixed(val).toString()
+export const parseWad = (val: BigNumber) => utils.wadToFixed(val).toString()
+export const parseRay = (val: BigNumber) => utils.rayToFixed(val).toString()
+export const parseRad = (val: BigNumber) => utils.radToFixed(val).toString()
 
 // Split an array into groups of arrays [..] => [[..], [..], ..]
 function chunkArrayInGroups<T>(arr: T[], size: number) {
