@@ -64,7 +64,10 @@ const SafeDetails = ({ ...props }) => {
                 geb,
                 isRPCAdapterOn,
             })
-            await safeActions.fetchManagedSafe(safeId)
+            if (!isRPCAdapterOn) {
+                await safeActions.fetchManagedSafe(safeId)
+            }
+
             if (safe) {
                 popupsActions.setIsWaitingModalOpen(false)
             }
