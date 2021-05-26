@@ -58,13 +58,6 @@ const OnBoarding = ({ ...props }) => {
     }, [account, library, safeActions, isRPCAdapterOn, geb, address])
 
     useEffect(() => {
-        async function getDebtFloor() {
-            await safeActions.fetchDebtFloor()
-        }
-        getDebtFloor()
-    }, [safeActions])
-
-    useEffect(() => {
         if (account && address) {
             setIsOwner(account.toLowerCase() === address.toLowerCase())
         }

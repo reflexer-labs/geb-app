@@ -32,7 +32,7 @@ const StepsContent = ({
 
     const [isOpen, setIsOpen] = useState(true)
 
-    const debtFloorVal = _.get(safeState, 'debtFloor', '0')
+    const debtFloorVal = _.get(safeState, 'liquidationData.debtFloor', '0')
 
     const handleOpenState = () => setIsOpen(!isOpen)
 
