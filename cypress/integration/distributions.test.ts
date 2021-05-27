@@ -5,14 +5,18 @@ import {
     TEST_ADDRESS_NEVER_USE,
 } from '../support/commands'
 
-describe('App Page - No Safes', () => {
+describe('Distributions', () => {
     beforeEach(() => {
         cy.visit('/')
         cy.wait(2000)
-        cy.get('[data-test-id="waiting-modal"]').then((e) => {
-            if (e.is(':visible')) {
-                cy.waitUntil(() => Cypress.$(e).is(':hidden'), {
-                    timeout: 50000,
+        cy.get('body').then((body) => {
+            if (body.find('[data-test-id="waiting-modal"]').length > 0) {
+                cy.get('[data-test-id="waiting-modal"]').then((e) => {
+                    if (e.is(':visible')) {
+                        cy.waitUntil(() => Cypress.$(e).is(':hidden'), {
+                            timeout: 100000,
+                        })
+                    }
                 })
             }
         })

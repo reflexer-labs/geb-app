@@ -4,11 +4,11 @@ import { CSSTransition, SwitchTransition } from 'react-transition-group'
 import styled from 'styled-components'
 import _ from '../../utils/lodash'
 import { useStoreState, useStoreActions } from '../../store'
-import ApproveRAI from '../ApproveRAI'
 import SaviourOperatrions from '../SaviourOperations'
 import SaviourTransactions from '../SaviourOperations/SaviourTransactions'
 import Modal from './Modal'
 import { useSaviourData } from '../../hooks/useSaviour'
+import ApproveToken from '../ApproveToken'
 
 const SaviourModal = () => {
     const nodeRef = React.useRef(null)
@@ -74,7 +74,7 @@ const SaviourModal = () => {
                         }}
                     >
                         {operation === 1 ? (
-                            <ApproveRAI
+                            <ApproveToken
                                 handleBackBtn={() =>
                                     safeActions.setOperation(0)
                                 }

@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import { useStoreActions, useStoreState } from '../../store'
 import { COIN_TICKER } from '../../utils/constants'
 import _ from '../../utils/lodash'
-import ApproveRAI from '../ApproveRAI'
+import ApproveToken from '../ApproveToken'
 import AuctionsPayment from './AuctionsPayment'
 import AuctionsTransactions from './AuctionsTransactions'
 
@@ -58,7 +58,7 @@ const IncentivesOperations = () => {
                     }}
                 >
                     {auctionsState.operation === 1 ? (
-                        <ApproveRAI
+                        <ApproveToken
                             handleBackBtn={() =>
                                 auctionsActions.setOperation(0)
                             }

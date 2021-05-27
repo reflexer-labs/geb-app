@@ -1,6 +1,6 @@
 import { Geb, utils as gebUtils } from 'geb.js'
 import { utils as ethersUtils } from 'ethers'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import numeral from 'numeral'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { useStoreActions, useStoreState } from '../store'
@@ -43,7 +43,9 @@ export type SaviourData = {
 export function useSaviourAddress(safeHandler: string) {
     const [state, setState] = useState(EMPTY_ADDRESS)
     const geb = useGeb()
+
     if (!geb || !safeHandler) return EMPTY_ADDRESS
+
     geb.contracts.liquidationEngine
         .chosenSAFESaviour(gebUtils.ETH_A, safeHandler.toLowerCase())
         .then((saviourAddress) => setState(saviourAddress))
@@ -53,8 +55,9 @@ export function useSaviourAddress(safeHandler: string) {
 
 export function useHasSaviour(safeHandler: string) {
     const saviourAddress = useSaviourAddress(safeHandler)
-    if (!safeHandler) return false
-    return saviourAddress !== EMPTY_ADDRESS
+    return useMemo(() => {
+        return safeHandler ? saviourAddress !== EMPTY_ADDRESS : false
+    }, [safeHandler, saviourAddress])
 }
 
 export function useHasLeftOver(safeHandler: string) {
@@ -233,103 +236,108 @@ export function useSaviourData(): SaviourData | undefined {
 // minSaviourBalance
 
 export function useMinSaviourBalance() {
-    const WAD_COMPLEMENT = BigNumber.from(10 ** 9)
     const HUNDRED = 100
     const LIQUIDATION_POINT = 130 // percent
 
     const saviourData = useSaviourData()
 
-    const getMinSaviourBalance = function (targetCRatio: number) {
-        if (!saviourData || !targetCRatio) return '0'
-        const { RAY } = gebUtils
-        const {
-            redemptionPrice,
-            generatedDebt,
-            accumulatedRate,
-            lockedCollateral,
-            reserveETH: ethReserve,
-            reserveRAI: raiReserve,
-            coinTotalSupply: lpTotalSupply,
-            keeperPayOut,
-        } = saviourData
+    const getMinSaviourBalance = useCallback(
+        (targetCRatio: number) => {
+            const WAD_COMPLEMENT = BigNumber.from(10 ** 9)
+            if (!saviourData || !targetCRatio) return '0'
+            const { RAY } = gebUtils
+            const {
+                redemptionPrice,
+                generatedDebt,
+                accumulatedRate,
+                lockedCollateral,
+                reserveETH: ethReserve,
+                reserveRAI: raiReserve,
+                coinTotalSupply: lpTotalSupply,
+                keeperPayOut,
+            } = saviourData
 
-        // Liquidation price formula
-        //
-        //                      debt * accumulatedRate * targetCRatio * RP
-        // liquidationPrice = -----------------------------------------------
-        //                                     collateral
+            // Liquidation price formula
+            //
+            //                      debt * accumulatedRate * targetCRatio * RP
+            // liquidationPrice = -----------------------------------------------
+            //                                     collateral
 
-        const liquidationPrice = !generatedDebt.isZero()
-            ? redemptionPrice
-                  .mul(generatedDebt.mul(WAD_COMPLEMENT))
-                  .mul(accumulatedRate)
-                  .div(lockedCollateral.mul(WAD_COMPLEMENT))
-                  .div(RAY)
-                  .mul(LIQUIDATION_POINT)
-                  .div(HUNDRED)
-            : BigNumber.from('0')
+            const liquidationPrice = !generatedDebt.isZero()
+                ? redemptionPrice
+                      .mul(generatedDebt.mul(WAD_COMPLEMENT))
+                      .mul(accumulatedRate)
+                      .div(lockedCollateral.mul(WAD_COMPLEMENT))
+                      .div(RAY)
+                      .mul(LIQUIDATION_POINT)
+                      .div(HUNDRED)
+                : BigNumber.from('0')
 
-        // Formula for min savior balance
-        //
-        //                                           targetCRatio * RP * accumulatedRate * debt  -  collateralPrice * collateral
-        // Min savior balance = ----------------------------------------------------------------------------------------------------------------------
-        //                        collateralPrice * (reserveETH / totalLPsupply) + RP * accumulatedRate * (reserveRAI / totalLPsupply) * targetCRatio
+            // Formula for min savior balance
+            //
+            //                                           targetCRatio * RP * accumulatedRate * debt  -  collateralPrice * collateral
+            // Min savior balance = ----------------------------------------------------------------------------------------------------------------------
+            //                        collateralPrice * (reserveETH / totalLPsupply) + RP * accumulatedRate * (reserveRAI / totalLPsupply) * targetCRatio
 
-        // (All calculation are made in RAY)
-        const numerator = redemptionPrice
-            .mul(accumulatedRate)
-            .div(RAY)
-            .mul(generatedDebt.mul(WAD_COMPLEMENT))
-            .div(RAY)
-            .mul(targetCRatio)
-            .div(100)
-            .sub(
-                liquidationPrice
-                    .mul(lockedCollateral)
-                    .mul(WAD_COMPLEMENT)
-                    .div(RAY)
-            )
+            // (All calculation are made in RAY)
+            const numerator = redemptionPrice
+                .mul(accumulatedRate)
+                .div(RAY)
+                .mul(generatedDebt.mul(WAD_COMPLEMENT))
+                .div(RAY)
+                .mul(targetCRatio)
+                .div(100)
+                .sub(
+                    liquidationPrice
+                        .mul(lockedCollateral)
+                        .mul(WAD_COMPLEMENT)
+                        .div(RAY)
+                )
 
-        const denominator = liquidationPrice
-            .mul(ethReserve.mul(WAD_COMPLEMENT))
-            .div(lpTotalSupply.mul(WAD_COMPLEMENT))
-            .add(
-                redemptionPrice
-                    .mul(accumulatedRate)
-                    .div(RAY)
-                    .mul(raiReserve.mul(WAD_COMPLEMENT))
-                    .div(lpTotalSupply.mul(WAD_COMPLEMENT))
-                    .mul(targetCRatio)
-                    .div(100)
-            )
+            const denominator = liquidationPrice
+                .mul(ethReserve.mul(WAD_COMPLEMENT))
+                .div(lpTotalSupply.mul(WAD_COMPLEMENT))
+                .add(
+                    redemptionPrice
+                        .mul(accumulatedRate)
+                        .div(RAY)
+                        .mul(raiReserve.mul(WAD_COMPLEMENT))
+                        .div(lpTotalSupply.mul(WAD_COMPLEMENT))
+                        .mul(targetCRatio)
+                        .div(100)
+                )
 
-        let balanceBN = !generatedDebt.isZero()
-            ? numerator.mul(RAY).div(denominator)
-            : BigNumber.from('0')
+            let balanceBN = !generatedDebt.isZero()
+                ? numerator.mul(RAY).div(denominator)
+                : BigNumber.from('0')
 
-        // Price USD RAY price of a LP share
-        // lpUsdPrice = (reserveETH * priceEth + reserveRAI * priceRAI) / lpTotalSupply
-        const lpTokenUsdPrice = ethReserve
-            .mul(WAD_COMPLEMENT)
-            .mul(liquidationPrice)
-            .div(RAY)
-            .add(raiReserve.mul(WAD_COMPLEMENT).mul(redemptionPrice).div(RAY))
-            .mul(RAY)
-            .div(lpTotalSupply.mul(WAD_COMPLEMENT))
+            // Price USD RAY price of a LP share
+            // lpUsdPrice = (reserveETH * priceEth + reserveRAI * priceRAI) / lpTotalSupply
+            const lpTokenUsdPrice = ethReserve
+                .mul(WAD_COMPLEMENT)
+                .mul(liquidationPrice)
+                .div(RAY)
+                .add(
+                    raiReserve.mul(WAD_COMPLEMENT).mul(redemptionPrice).div(RAY)
+                )
+                .mul(RAY)
+                .div(lpTotalSupply.mul(WAD_COMPLEMENT))
 
-        // Calculate keeper fee and add it to the min balance
-        const keeperPayoutInLP = keeperPayOut
-            .mul(WAD_COMPLEMENT)
-            .mul(RAY)
-            .div(lpTokenUsdPrice)
+            // Calculate keeper fee and add it to the min balance
+            const keeperPayoutInLP = keeperPayOut
+                .mul(WAD_COMPLEMENT)
+                .mul(RAY)
+                .div(lpTokenUsdPrice)
 
-        balanceBN = !generatedDebt.isZero()
-            ? balanceBN.add(keeperPayoutInLP)
-            : BigNumber.from('0')
+            balanceBN = !generatedDebt.isZero()
+                ? balanceBN.add(keeperPayoutInLP)
+                : BigNumber.from('0')
 
-        const minSaviorBalance = parseInt(balanceBN.toString()) / 1e27
-        return formatNumber(minSaviorBalance.toString())
-    }
+            const minSaviorBalance = parseInt(balanceBN.toString()) / 1e27
+            return formatNumber(minSaviorBalance.toString(), 4, true)
+        },
+        [saviourData]
+    )
 
     return { getMinSaviourBalance }
 }

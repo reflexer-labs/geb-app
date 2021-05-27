@@ -6,8 +6,8 @@ import Safe from './Safe'
 import _ from '../../utils/lodash'
 import ReviewTransaction from './ReviewTransaction'
 import UniSwapPool from './UniSwapPool'
-import ApproveRAI from '../ApproveRAI'
 import { COIN_TICKER } from '../../utils/constants'
+import ApproveToken from '../ApproveToken'
 
 interface Props {
     width?: string
@@ -37,7 +37,7 @@ const SafeContainer = ({ width, maxWidth }: Props) => {
                 return <UniSwapPool isChecked={isUniSwapPoolChecked} />
             case 2:
                 return (
-                    <ApproveRAI
+                    <ApproveToken
                         handleBackBtn={() => safeActions.setStage(0)}
                         handleSuccess={() => safeActions.setStage(3)}
                         amount={safeState.safeData.rightInput}

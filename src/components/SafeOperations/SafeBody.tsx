@@ -25,7 +25,7 @@ import { NETWORK_ID } from '../../connectors'
 import { DEFAULT_SAFE_STATE, COIN_TICKER } from '../../utils/constants'
 import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
-import { useActiveWeb3React } from '../../hooks'
+import { useIsOwner } from '../../hooks/useGeb'
 
 interface Props {
     isChecked?: boolean
@@ -33,11 +33,9 @@ interface Props {
 
 const SafeBody = ({ isChecked }: Props) => {
     const { t } = useTranslation()
-    const { account } = useActiveWeb3React()
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || false)
     const [error, setError] = useState('')
-    const [isOwner, setIsOwner] = useState(true)
     const [defaultSafe, setDefaultSafe] = useState<ISafeData>(
         DEFAULT_SAFE_STATE
     )
@@ -67,6 +65,7 @@ const SafeBody = ({ isChecked }: Props) => {
         globalDebtCeiling,
     } = safeState.liquidationData
 
+    const isOwner = useIsOwner(singleSafe?.id as string)
     const raiBalance = connectWalletState.raiBalance[NETWORK_ID].toString()
 
     const getTotalCollateral = () => {
@@ -484,16 +483,6 @@ const SafeBody = ({ isChecked }: Props) => {
         setDefaultSafe(safeData)
         setUniSwapVal(uniSwapPool)
     }, [safeData, uniSwapPool])
-
-    useEffect(() => {
-        if (!account || !safeState.managedSafe.owner.id) return
-        if (
-            account.toLowerCase() !==
-            safeState.managedSafe.owner.id.toLowerCase()
-        ) {
-            setIsOwner(false)
-        }
-    }, [account, safeState.managedSafe.owner.id])
 
     return (
         <>

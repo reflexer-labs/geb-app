@@ -196,6 +196,11 @@ const SaviourOperatrions = () => {
         }
     }
 
+    const handleSliderChange = (value: number | readonly number[]) => {
+        setSliderVal(value as number)
+        safeActions.setTargetedCRatio(value as number)
+    }
+
     const handleChange = (val: string) => {
         setError('')
         setAmount(val)
@@ -303,10 +308,7 @@ const SaviourOperatrions = () => {
                 <SliderContainer>
                     <StyledSlider
                         value={sliderVal}
-                        onChange={(value) => setSliderVal(value as number)}
-                        onAfterChange={(value) =>
-                            safeActions.setTargetedCRatio(value as number)
-                        }
+                        onChange={handleSliderChange}
                         min={
                             saviourData?.minCollateralRatio ||
                             MIN_SAVIOUR_CRATIO

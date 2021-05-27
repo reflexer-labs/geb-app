@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers'
 import { Geb, utils, contracts } from 'geb.js'
+import { EMPTY_ADDRESS } from '../constants'
 import {
     IIncentivesCampaignData,
     ILiquidationResponse,
@@ -289,7 +290,7 @@ const getIncentives = async (
         })
 
         incentiveBalances.push({
-            address: proxyAddress,
+            address: proxyAddress === EMPTY_ADDRESS ? '' : proxyAddress,
             id: `${campaignInfo[
                 i
             ].stakingRewards.toLowerCase()}-${proxyAddress}`,
@@ -349,7 +350,8 @@ const getIncentives = async (
             multiCall1[6] === utils.NULL_ADDRESS
                 ? null
                 : {
-                      address: proxyAddress,
+                      address:
+                          proxyAddress === EMPTY_ADDRESS ? '' : proxyAddress,
                       coinAllowance: multiCall2[1].isZero()
                           ? null
                           : { amount: parseWad(multiCall2[1]) },

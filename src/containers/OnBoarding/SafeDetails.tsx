@@ -11,7 +11,7 @@ import SafeHistory from '../../components/SafeHistory'
 import SafeStats from '../../components/SafeStats'
 import { useActiveWeb3React } from '../../hooks'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
-import useGeb from '../../hooks/useGeb'
+import useGeb, { useIsOwner } from '../../hooks/useGeb'
 import {
     useHasLeftOver,
     useHasSaviour,
@@ -22,7 +22,6 @@ import { isNumeric } from '../../utils/validations'
 
 const SafeDetails = ({ ...props }) => {
     const { t } = useTranslation()
-    const [isOwner, setIsOwner] = useState(true)
     const { account, library } = useActiveWeb3React()
     const [loading, setIsLoading] = useState(false)
     const geb = useGeb()
@@ -46,6 +45,8 @@ const SafeDetails = ({ ...props }) => {
 
     const history = useHistory()
 
+    const isOwner = useIsOwner(safeId)
+
     useEffect(() => {
         if (!account || !library) return
         if (!isNumeric(safeId)) {
@@ -64,9 +65,6 @@ const SafeDetails = ({ ...props }) => {
                 geb,
                 isRPCAdapterOn,
             })
-            if (!isRPCAdapterOn) {
-                await safeActions.fetchManagedSafe(safeId)
-            }
 
             if (safe) {
                 popupsActions.setIsWaitingModalOpen(false)
@@ -100,15 +98,6 @@ const SafeDetails = ({ ...props }) => {
         safeActions,
         safeId,
     ])
-
-    useEffect(() => {
-        if (account && safeState.managedSafe.owner.id) {
-            setIsOwner(
-                account.toLowerCase() ===
-                    safeState.managedSafe.owner.id.toLowerCase()
-            )
-        }
-    }, [account, safeState.managedSafe.owner.id])
 
     const handleSaviourBtnClick = async (data: {
         status: boolean
