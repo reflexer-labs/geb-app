@@ -138,6 +138,7 @@ describe('actions', () => {
 
     describe('FetchLiquidationData', () => {
         // prettier-ignore
+
         it('Data from RPC and GQL should be the same for liquidation data', async () => {
       const rpcResponse = await gebManager.getLiquidationDataRpc(geb);
 
