@@ -11,7 +11,11 @@ import BalanceUpdater from '../services/BalanceUpdater'
 import { capitalizeName, timeout } from '../utils/helper'
 import WalletModal from '../components/WalletModal'
 import { ChainId } from '@uniswap/sdk'
-import { ETHERSCAN_PREFIXES, SYSTEM_STATUS } from '../utils/constants'
+import {
+    EMPTY_ADDRESS,
+    ETHERSCAN_PREFIXES,
+    SYSTEM_STATUS,
+} from '../utils/constants'
 import { useActiveWeb3React } from '../hooks'
 import LoadingModal from '../components/Modals/LoadingModal'
 import styled from 'styled-components'
@@ -92,7 +96,11 @@ const Shared = ({ children, ...rest }: Props) => {
             connectWalletActions.setIsUserCreated(false)
             connectWalletActions.setProxyAddress('')
             const userProxy = await geb.getProxyAction(account)
-            if (userProxy) {
+            if (
+                userProxy &&
+                userProxy.proxyAddress &&
+                userProxy.proxyAddress !== EMPTY_ADDRESS
+            ) {
                 connectWalletActions.setIsUserCreated(true)
                 connectWalletActions.setProxyAddress(userProxy.proxyAddress)
             }

@@ -12,10 +12,14 @@ describe('App Page - No Safes', () => {
             qs: { type: 'no_safes' },
         })
         cy.wait(2000)
-        cy.get('[data-test-id="waiting-modal"]').then((e) => {
-            if (e.is(':visible')) {
-                cy.waitUntil(() => Cypress.$(e).is(':hidden'), {
-                    timeout: 50000,
+        cy.get('body').then((body) => {
+            if (body.find('[data-test-id="waiting-modal"]').length > 0) {
+                cy.get('[data-test-id="waiting-modal"]').then((e) => {
+                    if (e.is(':visible')) {
+                        cy.waitUntil(() => Cypress.$(e).is(':hidden'), {
+                            timeout: 100000,
+                        })
+                    }
                 })
             }
         })

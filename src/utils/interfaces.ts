@@ -4,7 +4,7 @@ import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { DefaultTheme, ThemedCssFunction } from 'styled-components'
 import { ChainId } from '@uniswap/sdk'
 import { IconName } from '../components/FeatherIconWrapper'
-import { ApproveMethod } from '../components/ApproveRAI'
+import { ApproveMethod } from '../components/ApproveToken'
 import { Geb } from 'geb.js'
 
 export interface DynamicObject {
