@@ -28,7 +28,6 @@ import WaitingModal from '../components/Modals/WaitingModal'
 import TransactionUpdater from '../services/TransactionUpdater'
 import usePrevious from '../hooks/usePrevious'
 import { useHistory } from 'react-router-dom'
-import IncentivesModal from '../components/Modals/IncentivesModal'
 import ProxyModal from '../components/Modals/ProxyModal'
 import ImagePreloader from '../components/ImagePreloader'
 import AuctionsModal from '../components/Modals/AuctionsModal'
@@ -70,7 +69,6 @@ const Shared = ({ children, ...rest }: Props) => {
         popupsActions.setIsConnectedWalletModalOpen(false)
         popupsActions.setIsConnectModalOpen(false)
         popupsActions.setIsConnectorsWalletOpen(false)
-        popupsActions.setIsIncentivesModalOpen(false)
         popupsActions.setIsLoadingModalOpen({ text: '', isOpen: false })
         popupsActions.setIsScreenModalOpen(false)
         popupsActions.setIsSettingModalOpen(false)
@@ -218,7 +216,6 @@ const Shared = ({ children, ...rest }: Props) => {
             <DistributionsModal />
             <SaviourModal />
             <LoadingModal />
-            <IncentivesModal />
             <AuctionsModal />
             <CreateAccountModal />
             <ProxyModal />

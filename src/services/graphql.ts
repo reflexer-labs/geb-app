@@ -8,8 +8,6 @@ import {
 } from '../utils/queries/safe'
 import { GRAPH_API_URLS } from '../utils/constants'
 import { formatUserSafe, formatHistoryArray } from '../utils/helper'
-import { incentiveCampaignsQuery } from '../utils/queries/incentives'
-import { IIncentivesCampaignData, IIncentivesConfig } from '../utils/interfaces'
 import {
     fetchFLXBalanceQuery,
     getSubgraphBlock,
@@ -211,60 +209,6 @@ export const fetchSafeById = async (
         erc20Balance,
         liquidationData,
     }
-}
-
-export const fetchIncentivesCampaigns = async (
-    config: IIncentivesConfig
-): Promise<IIncentivesCampaignData> => {
-    const { address, blockNumber, geb, isRPCAdapterOn } = config
-
-    let response
-
-    if (isRPCAdapterOn) {
-        response = await gebManager.getIncentives({
-            address: address.toLowerCase(),
-            geb,
-        })
-    } else {
-        const res = await request(
-            JSON.stringify({
-                query: incentiveCampaignsQuery(
-                    address.toLowerCase(),
-                    blockNumber
-                ),
-            })
-        )
-        response = res.data.data
-    }
-
-    const payload: IIncentivesCampaignData = isRPCAdapterOn
-        ? response
-        : {
-              user: response.user ? response.user.id : null,
-              proxyData:
-                  response.userProxies && response.userProxies.length > 0
-                      ? response.userProxies[0]
-                      : null,
-              raiBalance:
-                  response.raiBalance && response.raiBalance.length > 0
-                      ? response.raiBalance[0].balance
-                      : '0',
-              protBalance:
-                  response.protBalance && response.protBalance.length > 0
-                      ? response.protBalance[0].balance
-                      : '0',
-              uniswapCoinPool:
-                  response.uniswapCoinPool &&
-                  response.uniswapCoinPool.length > 0
-                      ? response.uniswapCoinPool[0].balance
-                      : '0',
-              old24hData: response.old24hData,
-              allCampaigns: response.incentiveCampaigns,
-              systemState: response.systemState,
-              incentiveBalances: response.incentiveBalances,
-          }
-
-    return payload
 }
 
 export const fetchAuctions = async ({
