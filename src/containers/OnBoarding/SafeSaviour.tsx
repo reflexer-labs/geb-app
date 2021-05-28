@@ -7,7 +7,7 @@ import numeral from 'numeral'
 import GridContainer from '../../components/GridContainer'
 import PageHeader from '../../components/PageHeader'
 import { useActiveWeb3React } from '../../hooks'
-import useGeb from '../../hooks/useGeb'
+import useGeb, { useSafeHandler } from '../../hooks/useGeb'
 import {
     useDisconnectSaviour,
     useHasLeftOver,
@@ -44,37 +44,31 @@ const SafeSaviour = ({ ...props }) => {
         connectWalletModel: connectWalletState,
     } = useStoreState((state) => state)
     const { singleSafe } = safeState
-    const { proxyAddress, fiatPrice: ethPrice } = connectWalletState
+    const { fiatPrice: ethPrice } = connectWalletState
     const {
         popupsModel: popupsActions,
         safeModel: safeActions,
     } = useStoreActions((state) => state)
 
-    const leftOver = useHasLeftOver(safeState.singleSafe?.safeHandler as string)
+    const safeHandler = useSafeHandler(safeId)
+    const leftOver = useHasLeftOver(safeHandler)
 
     useEffect(() => {
         if (!account) return
         if (!isNumeric(safeId)) {
             history.goBack()
         }
-        safeActions.fetchSafeById({
-            safeId,
-            address: account as string,
-            geb,
-            isRPCAdapterOn: true,
-        })
-    }, [account, geb, history, safeActions, safeId])
+    }, [account, history, safeId])
 
     const fetchSaviourDataCallback = useCallback(() => {
-        if (!account || !geb || !singleSafe) return
+        if (!account || !geb || !safeId) return
         safeActions.fetchSaviourData({
             account,
             geb,
-            proxyAddress,
-            safe: singleSafe,
+            safeId,
             ethPrice,
         })
-    }, [account, ethPrice, geb, proxyAddress, safeActions, singleSafe])
+    }, [account, ethPrice, geb, safeActions, safeId])
 
     useEffect(() => {
         fetchSaviourDataCallback()

@@ -9,8 +9,8 @@ import useGeb from './useGeb'
 import { useActiveWeb3React } from '.'
 import { handlePreTxGasEstimate } from './TransactionHooks'
 import {
+    FetchSaviourPayload,
     GetReservesFromSaviour,
-    ISafe,
     SaviourDepositPayload,
     SaviourWithdrawPayload,
 } from '../utils/interfaces'
@@ -18,6 +18,7 @@ import { BigNumber } from '@ethersproject/bignumber'
 import { formatNumber } from '../utils/helper'
 
 export type SaviourData = {
+    safeId: string
     hasSaviour: boolean
     saviourAddress: string
     saviourBalance: string
@@ -76,22 +77,18 @@ export function useHasLeftOver(safeHandler: string) {
     return { status: state, saviourAddress }
 }
 
-export type Config = {
-    account: string
-    proxyAddress: string
-    ethPrice: number
-    geb: Geb
-    safe: ISafe
-}
 export async function fetchSaviourData({
     account,
-    proxyAddress,
+    safeId,
     ethPrice,
     geb,
-    safe,
-}: Config) {
-    if (!account || !proxyAddress || !geb || !safe) return
-    const { safeHandler } = safe
+}: FetchSaviourPayload) {
+    if (!account || !safeId || !geb) return
+
+    const [safeHandler, proxyAddress] = await geb.multiCall([
+        geb.contracts.safeManager.safes(safeId, true),
+        geb.contracts.proxyRegistry.proxies(account.toLowerCase(), true),
+    ])
     const multiCallRequest = geb.multiCall([
         geb.contracts.liquidationEngine.chosenSAFESaviour(
             gebUtils.ETH_A,
@@ -203,6 +200,7 @@ export async function fetchSaviourData({
         .value()
 
     return {
+        safeId,
         hasSaviour: saviourAddress !== EMPTY_ADDRESS,
         saviourAddress,
         saviourBalance: formattedSaviourBalance,

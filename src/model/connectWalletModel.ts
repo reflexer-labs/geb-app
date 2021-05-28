@@ -1,11 +1,7 @@
 import { action, Action, Thunk, thunk } from 'easy-peasy'
 import { NETWORK_ID } from '../connectors'
 import api from '../services/api'
-import {
-    fetchFLXBalance,
-    fetchUniswapPoolBalance,
-    fetchUser,
-} from '../services/graphql'
+import { fetchFLXBalance, fetchUser } from '../services/graphql'
 import { IBlockNumber, ITokenBalance } from '../utils/interfaces'
 
 export interface ConnectWalletModel {
@@ -50,7 +46,6 @@ export interface ConnectWalletModel {
     >
     fetchUser: Thunk<ConnectWalletModel, string>
     fetchProtBalance: Thunk<ConnectWalletModel, string>
-    fetchUniswapPoolBalance: Thunk<ConnectWalletModel, string>
     setStep: Action<ConnectWalletModel, number>
     setIsUserCreated: Action<ConnectWalletModel, boolean>
     setProxyAddress: Action<ConnectWalletModel, string>
@@ -109,16 +104,7 @@ const connectWalletModel: ConnectWalletModel = {
                     : '0',
         })
     }),
-    fetchUniswapPoolBalance: thunk(async (actions, payload) => {
-        const res = await fetchUniswapPoolBalance(payload.toLowerCase())
-        actions.updateUniswapPoolBalance({
-            chainId: NETWORK_ID,
-            balance:
-                res && res.uniswapCoinPool.length > 0
-                    ? res.uniswapCoinPool[0].balance
-                    : '0',
-        })
-    }),
+
     setFiatPrice: action((state, payload) => {
         state.fiatPrice = payload
     }),

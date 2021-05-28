@@ -15,6 +15,7 @@ import Button from '../Button'
 import TransactionOverview from '../TransactionOverview'
 import Results from './Results'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
+import { useSafeHandler } from '../../hooks/useGeb'
 
 const SaviourTransactions = () => {
     const { connector, account, library } = useActiveWeb3React()
@@ -22,12 +23,10 @@ const SaviourTransactions = () => {
     const {
         safeModel: safeActions,
         popupsModel: popupsActions,
-        connectWalletModel: connectWalletActions,
     } = useStoreActions((state) => state)
 
     const { safeModel: safeState } = useStoreState((state) => state)
     const {
-        singleSafe,
         amount,
         targetedCRatio,
         isSaviourDeposit,
@@ -36,8 +35,8 @@ const SaviourTransactions = () => {
 
     const saviourData = useSaviourData()
 
-    const safeId = _.get(singleSafe, 'id', '0')
-    const safeHandler = _.get(singleSafe, 'safeHandler', '')
+    const safeId = _.get(saviourData, 'safeId', '0')
+    const safeHandler = useSafeHandler(safeId)
 
     const { depositCallback } = useSaviourDeposit()
     const { withdrawCallback } = useSaviourWithdraw()
@@ -60,7 +59,7 @@ const SaviourTransactions = () => {
             return
         }
         try {
-            popupsActions.setIsSaviourModalOpen(false)
+            handleClose()
             popupsActions.setIsWaitingModalOpen(true)
             popupsActions.setWaitingPayload({
                 title: 'Waiting For Confirmation',
@@ -73,7 +72,7 @@ const SaviourTransactions = () => {
             const signer = library.getSigner(account)
             const saviourPayload = {
                 safeId: Number(safeId),
-                safeHandler: safeHandler as string,
+                safeHandler,
                 amount,
                 targetedCRatio,
                 isTargetedCRatioChanged:
@@ -93,13 +92,8 @@ const SaviourTransactions = () => {
                     isMaxWithdraw,
                 })
             }
-            await connectWalletActions.fetchUniswapPoolBalance(
-                account.toLowerCase()
-            )
         } catch (e) {
             handleTransactionError(e)
-        } finally {
-            handleClose()
         }
     }
     return (
