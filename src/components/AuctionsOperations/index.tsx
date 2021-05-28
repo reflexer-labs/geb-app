@@ -9,7 +9,7 @@ import ApproveToken from '../ApproveToken'
 import AuctionsPayment from './AuctionsPayment'
 import AuctionsTransactions from './AuctionsTransactions'
 
-const IncentivesOperations = () => {
+const AuctionsOperations = () => {
     const { t } = useTranslation()
     const nodeRef = React.useRef(null)
 
@@ -103,7 +103,7 @@ const IncentivesOperations = () => {
     )
 }
 
-export default IncentivesOperations
+export default AuctionsOperations
 
 const ModalContent = styled.div`
     background: ${(props) => props.theme.colors.background};

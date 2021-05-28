@@ -22,7 +22,6 @@ export interface PopupsModel {
     isProxyModalOpen: boolean
     isScreenModalOpen: boolean
     isVotingModalOpen: boolean
-    isIncentivesModalOpen: boolean
     auctionOperationPayload: IAuctionOperation
     isDistributionsModalOpen: boolean
     alertPayload: IAlert | null
@@ -45,7 +44,6 @@ export interface PopupsModel {
     setAlertPayload: Action<PopupsModel, IAlert | null>
     setESMOperationPayload: Action<PopupsModel, IOperation>
     setIsVotingModalOpen: Action<PopupsModel, boolean>
-    setIsIncentivesModalOpen: Action<PopupsModel, boolean>
     setAuctionOperationPayload: Action<PopupsModel, IAuctionOperation>
     setIsWaitingModalOpen: Action<PopupsModel, boolean>
     setWaitingPayload: Action<PopupsModel, IWaitingPayload>
@@ -71,7 +69,6 @@ const popupsModel: PopupsModel = {
     hasFLXClaim: false,
     isConnectedWalletModalOpen: false,
     isScreenModalOpen: false,
-    isIncentivesModalOpen: false,
     isDistributionsModalOpen: false,
     isWaitingModalOpen: false,
     isSafeManagerOpen: false,
@@ -142,9 +139,6 @@ const popupsModel: PopupsModel = {
     }),
     setIsVotingModalOpen: action((state, payload) => {
         state.isVotingModalOpen = payload
-    }),
-    setIsIncentivesModalOpen: action((state, payload) => {
-        state.isIncentivesModalOpen = payload
     }),
     setAuctionOperationPayload: action((state, payload) => {
         state.auctionOperationPayload = payload
