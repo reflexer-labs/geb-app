@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Scrollbars from 'react-custom-scrollbars'
+import { ArrowUpRight } from 'react-feather'
 import styled from 'styled-components'
 
 type Item =
@@ -101,7 +102,8 @@ const Dropdown = (props: Props) => {
                                                 : ''
                                         }
                                     >
-                                        {selectedItem.item}
+                                        {selectedItem.item}{' '}
+                                        <ArrowUpRight width={17} height={17} />
                                     </Link>
                                 ) : (
                                     selectedItem.item
@@ -240,6 +242,9 @@ const ItemImg = styled.div`
 
 const Link = styled.a`
     color: inherit;
+    text-decoration: underline;
+    display: flex;
+    align-items: center;
     &:hover {
         color: ${(props) => props.theme.colors.inputBorderColor};
     }
