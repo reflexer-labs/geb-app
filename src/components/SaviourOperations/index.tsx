@@ -14,19 +14,21 @@ import { useMinSaviourBalance, useSaviourData } from '../../hooks/useSaviour'
 import { BigNumber, ethers } from 'ethers'
 import { Info } from 'react-feather'
 
-const INITITAL_STATE = [
-    {
-        item: 'Uniswap v2 RAI/ETH',
-        img: require('../../assets/uniswap-icon.svg'),
-    },
-]
-
 const MIN_SAVIOUR_CRATIO = 175
 
 const SaviourOperatrions = () => {
     const { t } = useTranslation()
     const [error, setError] = useState('')
     const saviourData = useSaviourData()
+
+    const SAVIOUR_TOKENS = [
+        {
+            item: 'Uniswap v2 RAI/ETH',
+            img: require('../../assets/uniswap-icon.svg'),
+            href: `https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`,
+            isExternal: true,
+        },
+    ]
 
     const { getMinSaviourBalance } = useMinSaviourBalance()
     const [sliderVal, setSliderVal] = useState<number>(0)
@@ -196,6 +198,11 @@ const SaviourOperatrions = () => {
         }
     }
 
+    const handleSliderChange = (value: number | readonly number[]) => {
+        setSliderVal(value as number)
+        safeActions.setTargetedCRatio(value as number)
+    }
+
     const handleChange = (val: string) => {
         setError('')
         setAmount(val)
@@ -248,7 +255,7 @@ const SaviourOperatrions = () => {
             <DropDownContainer>
                 <Dropdown
                     items={[]}
-                    itemSelected={INITITAL_STATE[0]}
+                    itemSelected={SAVIOUR_TOKENS[0]}
                     label={'Saviour Token'}
                     padding={'22px 20px'}
                     imgSize={'28px'}
@@ -303,10 +310,7 @@ const SaviourOperatrions = () => {
                 <SliderContainer>
                     <StyledSlider
                         value={sliderVal}
-                        onChange={(value) => setSliderVal(value as number)}
-                        onAfterChange={(value) =>
-                            safeActions.setTargetedCRatio(value as number)
-                        }
+                        onChange={handleSliderChange}
                         min={
                             saviourData?.minCollateralRatio ||
                             MIN_SAVIOUR_CRATIO

@@ -1,5 +1,4 @@
 {
-    "incentives": "Incentives",
     "voting": "Voting",
     "analytics": "Analytics",
     "settings": "Settings",
@@ -81,7 +80,6 @@
     "submit": "Submit",
     "invalid_email": "Please enter a valid email address",
     "subscription_success": "Subscribed successfully!",
-    "incentives_header_text": "Use {{coin_ticker}} and earn rewards",
     "liquidity_mining": "Liquidity Mining",
     "assets": "Assets",
     "checkout_rewards": "I also want to cash out my accrued rewards",

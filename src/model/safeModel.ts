@@ -22,7 +22,7 @@ import {
     fetchSafeById,
     fetchUserSafes,
 } from '../services/graphql'
-import { DEFAULT_SAFE_STATE } from '../utils/constants'
+import { DEFAULT_SAFE_STATE, EMPTY_ADDRESS } from '../utils/constants'
 import { timeout } from '../utils/helper'
 import { StoreModel } from '.'
 import { NETWORK_ID } from '../connectors'
@@ -285,7 +285,7 @@ const safeModel: SafeModel = {
             })
             if (res.proxyData) {
                 const { address, coinAllowance } = res.proxyData
-                if (address) {
+                if (address && address !== EMPTY_ADDRESS) {
                     storeActions.connectWalletModel.setProxyAddress(address)
                 }
                 if (coinAllowance) {

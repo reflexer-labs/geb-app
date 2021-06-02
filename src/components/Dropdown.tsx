@@ -2,7 +2,9 @@ import React, { useState, useRef, useEffect } from 'react'
 import Scrollbars from 'react-custom-scrollbars'
 import styled from 'styled-components'
 
-type Item = string | { item: string; img: string }
+type Item =
+    | string
+    | { item: string; img: string; href?: string; isExternal?: boolean }
 interface Props {
     itemSelected: Item
     items: Array<Item>
@@ -74,7 +76,6 @@ const Dropdown = (props: Props) => {
                     style={{
                         padding: padding || '20px',
                         fontSize: fontSize || '16px',
-                        pointerEvents: items.length > 0 ? 'auto' : 'none',
                     }}
                     onClick={() => setIsOpen(!isOpen)}
                 >
@@ -91,7 +92,20 @@ const Dropdown = (props: Props) => {
                                         width: imgSize || '20px',
                                     }}
                                 />{' '}
-                                {selectedItem.item}
+                                {selectedItem.href ? (
+                                    <Link
+                                        href={selectedItem.href}
+                                        target={
+                                            selectedItem.isExternal
+                                                ? '_blank'
+                                                : ''
+                                        }
+                                    >
+                                        {selectedItem.item}
+                                    </Link>
+                                ) : (
+                                    selectedItem.item
+                                )}
                             </ItemImg>
                         )}
                     </span>
@@ -221,5 +235,12 @@ const ItemImg = styled.div`
     align-items: center;
     img {
         margin-right: 10px;
+    }
+`
+
+const Link = styled.a`
+    color: inherit;
+    &:hover {
+        color: ${(props) => props.theme.colors.inputBorderColor};
     }
 `

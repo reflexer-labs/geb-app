@@ -8,14 +8,35 @@ import {
 describe('App Page - Safe Details', () => {
     const getValue = (val: string) => val.replace(/[^\d.]*/g, '')
 
-    let inititalCollateral: string
-    let inititalDebt: string
     beforeEach(() => {
         cy.visit('/')
-        cy.wait(10000)
+        cy.wait(2000)
+        cy.get('body').then((body) => {
+            if (body.find('[data-test-id="waiting-modal"]').length > 0) {
+                cy.get('[data-test-id="waiting-modal"]').then((e) => {
+                    if (e.is(':visible')) {
+                        cy.waitUntil(() => Cypress.$(e).is(':hidden'), {
+                            timeout: 100000,
+                        })
+                    }
+                })
+            }
+        })
         cy.contains('✓ Accept').click()
         cy.get('.safeBlock').first().contains('Manage Safe').click()
-        cy.wait(10000)
+        cy.wait(2000)
+        cy.get('body').then((body) => {
+            if (body.find('[data-test-id="waiting-modal"]').length > 0) {
+                cy.get('[data-test-id="waiting-modal"]').then((e) => {
+                    if (e.is(':visible')) {
+                        cy.waitUntil(() => Cypress.$(e).is(':hidden'), {
+                            timeout: 100000,
+                        })
+                    }
+                })
+            }
+        })
+        cy.wait(5000)
     })
 
     it('is connected', () => {
@@ -54,6 +75,7 @@ describe('App Page - Safe Details', () => {
             .then((tx) => {
                 expect(cy.get('[data-test-id="modal_red_price"]').contains(tx))
             })
+
         cy.get('[data-test-id="details_collateral"]')
             .invoke('text')
             .then((tx) => {
@@ -186,7 +208,7 @@ describe('App Page - Safe Details', () => {
 
     it('should show error if too much debt', () => {
         cy.get('#repay_withdraw').click()
-        cy.get('[data-test-id="repay_withdraw_left"]').type('2')
+        cy.get('[data-test-id="repay_withdraw_left"]').type('1.5')
         cy.contains('Review Transaction').click()
         cy.contains('Too much debt')
     })
@@ -199,81 +221,50 @@ describe('App Page - Safe Details', () => {
     })
 
     it('should perform a successful deposit and borrow transaction', () => {
-        cy.get('[data-test-id="details_collateral"]')
-            .invoke('text')
-            .then((tx) => {
-                const val = tx.split(' ')[0]
-                inititalCollateral = val
-            })
-        cy.get('[data-test-id="details_debt"]')
-            .invoke('text')
-            .then((tx) => {
-                const val = tx.split(' ')[0]
-                inititalDebt = val
-            })
         cy.get('#deposit_borrow').click()
         cy.get('[data-test-id="deposit_borrow_left"]').type('0.001')
         cy.get('[data-test-id="deposit_borrow_right"]').type('0.001')
         cy.contains('Review Transaction').click()
         cy.contains('Confirm Transaction Details')
         cy.get('#confirm_tx').click()
-        cy.wait(65000)
-        cy.contains('Transaction Submitted')
-        cy.contains('Close').click()
-        cy.wait(10000)
-        cy.get('[data-test-id="details_debt"]')
-            .invoke('text')
-            .then((tx) => {
-                const val = tx.split(' ')[0]
-                expect(Number(val)).to.be.greaterThan(Number(inititalDebt))
-            })
-        cy.get('[data-test-id="details_collateral"]')
-            .invoke('text')
-            .then((tx) => {
-                const val = tx.split(' ')[0]
-                expect(Number(val)).to.be.greaterThan(
-                    Number(inititalCollateral)
+        cy.get('[data-test-id="waiting-modal-title"]')
+            .should('be.visible')
+            .then((e) =>
+                cy.waitUntil(
+                    () => Cypress.$(e).text() === 'Transaction Submitted',
+                    {
+                        timeout: 100000,
+                        interval: 2000,
+                    }
                 )
-            })
+            )
+
+        cy.contains('Close').click()
         cy.get('#web3-status-connected').click()
         cy.contains('Clear All').click()
     })
 
     it('should perform a successful repay and withdraw transaction', () => {
-        cy.get('[data-test-id="details_collateral"]')
-            .invoke('text')
-            .then((tx) => {
-                const val = tx.split(' ')[0]
-                inititalCollateral = val
-            })
-        cy.get('[data-test-id="details_debt"]')
-            .invoke('text')
-            .then((tx) => {
-                const val = tx.split(' ')[0]
-                inititalDebt = val
-            })
         cy.get('#repay_withdraw').click()
         cy.get('[data-test-id="repay_withdraw_left"]').type('0.001')
         cy.get('[data-test-id="repay_withdraw_right"]').type('0.001')
         cy.contains('Review Transaction').click()
         cy.contains('Confirm Transaction Details')
         cy.get('#confirm_tx').click()
-        cy.wait(65000)
-        cy.contains('Transaction Submitted')
+
+        cy.get('[data-test-id="waiting-modal-title"]')
+            .should('be.visible')
+            .then((e) =>
+                cy.waitUntil(
+                    () => Cypress.$(e).text() === 'Transaction Submitted',
+                    {
+                        timeout: 100000,
+                        interval: 2000,
+                    }
+                )
+            )
+
         cy.contains('Close').click()
-        cy.wait(10000)
-        cy.get('[data-test-id="details_debt"]')
-            .invoke('text')
-            .then((tx) => {
-                const val = tx.split(' ')[0]
-                expect(Number(val)).to.be.lessThan(Number(inititalDebt))
-            })
-        cy.get('[data-test-id="details_collateral"]')
-            .invoke('text')
-            .then((tx) => {
-                const val = tx.split(' ')[0]
-                expect(Number(val)).to.be.lessThan(Number(inititalCollateral))
-            })
         cy.get('#web3-status-connected').click()
         cy.contains('Clear All').click()
     })

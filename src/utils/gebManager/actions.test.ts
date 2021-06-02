@@ -5,13 +5,9 @@ import axios from 'axios'
 import { GRAPH_API_URLS } from '../constants'
 import { liquidationQuery } from '../queries/safe'
 import { BigNumber, FixedNumber } from 'ethers'
-import { IncentiveBalance, ISafeQuery, IUserSafeList } from '../interfaces'
+import { ISafeQuery, IUserSafeList } from '../interfaces'
 import { geb } from '../../setupTests'
-import {
-    fetchIncentivesCampaigns,
-    fetchSafeById,
-    fetchUserSafes,
-} from '../../services/graphql'
+import { fetchSafeById, fetchUserSafes } from '../../services/graphql'
 
 // Add custom match type
 declare global {
@@ -138,6 +134,7 @@ describe('actions', () => {
 
     describe('FetchLiquidationData', () => {
         // prettier-ignore
+
         it('Data from RPC and GQL should be the same for liquidation data', async () => {
       const rpcResponse = await gebManager.getLiquidationDataRpc(geb);
 
@@ -197,7 +194,7 @@ describe('actions', () => {
 
             // Sort the safes by id to compare each
             rpcResponse.safes.sort(
-                (a, b) => Number(a.safeId) - Number(b.safeId)
+                (a: any, b: any) => Number(a.safeId) - Number(b.safeId)
             )
             gqlResponse.safes.sort(
                 (a, b) => Number(a.safeId) - Number(b.safeId)
@@ -261,84 +258,6 @@ describe('actions', () => {
       
       if(rpcResponse.userProxies[0].coinAllowance && gqlResponse.userProxies[0].coinAllowance) {
         expect(rpcResponse.userProxies[0].coinAllowance.amount).fixedNumberMatch(gqlResponse.userProxies[0].coinAllowance.amount);
-      }
-    });
-    })
-
-    describe('FetchIncentivesCampaigns', () => {
-        // prettier-ignore
-        it('Fetch incentive campaigns', async () => {
-      const blockNumber = 23390141
-      const rpcResponse = await gebManager.getIncentives({geb, address});
-      const gqlResponse = await fetchIncentivesCampaigns({address, blockNumber, geb})
-
-      expect(gqlResponse).toBeTruthy();
-      expect(rpcResponse).toBeTruthy();
-
-      // Check the full object
-
-      // It's not possible to get historical data over RPC
-      expect(rpcResponse.old24hData).toBeNull()
-      expect(rpcResponse.raiBalance).fixedNumberMatch(gqlResponse.raiBalance)
-      expect(rpcResponse.protBalance).fixedNumberMatch(gqlResponse.protBalance)
-      expect(rpcResponse.uniswapCoinPool).fixedNumberMatch(gqlResponse.uniswapCoinPool)
-      expect(rpcResponse.user).toEqual(gqlResponse.user)
-
-      // Check System state data
-      verifyKeys(rpcResponse.systemState, gqlResponse.systemState);
-      expect(rpcResponse.systemState.coinAddress).toEqual(gqlResponse.systemState.coinAddress)
-      expect(rpcResponse.systemState.coinUniswapPair.reserve0).fixedNumberMatch(gqlResponse.systemState.coinUniswapPair.reserve0)
-      expect(rpcResponse.systemState.coinUniswapPair.reserve1).fixedNumberMatch(gqlResponse.systemState.coinUniswapPair.reserve1)
-      expect(rpcResponse.systemState.coinUniswapPair.token0Price).almostEqual(gqlResponse.systemState.coinUniswapPair.token0Price, 0.0001)
-      expect(rpcResponse.systemState.coinUniswapPair.token1Price).almostEqual(gqlResponse.systemState.coinUniswapPair.token1Price, 0.0001)
-      expect(rpcResponse.systemState.coinUniswapPair.totalSupply).fixedNumberMatch(gqlResponse.systemState.coinUniswapPair.totalSupply)
-      expect(rpcResponse.systemState.currentCoinMedianizerUpdate.value).fixedNumberMatch(gqlResponse.systemState.currentCoinMedianizerUpdate.value)
-      expect(rpcResponse.systemState.wethAddress).toEqual(gqlResponse.systemState.wethAddress)
-      
-      
-      // Check Proxy data
-      verifyKeys(rpcResponse.proxyData, gqlResponse.proxyData);
-      if(rpcResponse.proxyData && gqlResponse.proxyData) {
-        expect(rpcResponse.proxyData.address).toEqual(gqlResponse.proxyData.address)
-        if(rpcResponse.proxyData.coinAllowance && gqlResponse.proxyData.coinAllowance) {
-          expect(rpcResponse.proxyData.coinAllowance.amount).fixedNumberMatch(gqlResponse.proxyData.coinAllowance.amount)
-        }
-        if(rpcResponse.proxyData.uniCoinLpAllowance && gqlResponse.proxyData.uniCoinLpAllowance) {
-          expect(rpcResponse.proxyData.uniCoinLpAllowance.amount).fixedNumberMatch(gqlResponse.proxyData.uniCoinLpAllowance.amount)
-        }
-      }
-
-      // Check Campaigns data
-      expect(rpcResponse.allCampaigns.length).toEqual(gqlResponse.allCampaigns.length)
-      const rpcCampaigns = rpcResponse.allCampaigns
-      const gqlCampaigns = gqlResponse.allCampaigns
-      for(let i = 0; i < gqlCampaigns.length; i++) {
-        verifyKeys(rpcCampaigns[i], gqlCampaigns[i])
-        const rpcCampaign = rpcCampaigns[i]
-        const gqlCampaign = gqlCampaigns[i]
-        expect(rpcCampaign).toBeTruthy()
-        expect(rpcCampaign.campaignAddress).toEqual(gqlCampaign.campaignAddress)
-        expect(rpcCampaign.campaignNumber).toEqual(gqlCampaign.campaignNumber)
-        expect(rpcCampaign.lastUpdatedTime).toEqual(gqlCampaign.lastUpdatedTime)
-        expect(rpcCampaign.periodFinish).toEqual(gqlCampaign.periodFinish)
-        expect(rpcCampaign.rewardPerTokenStored).fixedNumberMatch(gqlCampaign.rewardPerTokenStored)
-        expect(rpcCampaign.rewardRate).fixedNumberMatch(gqlCampaign.rewardRate)
-        expect(rpcCampaign.rewardToken).toEqual(gqlCampaign.rewardToken)
-        expect(rpcCampaign.rewardsDuration).toEqual(gqlCampaign.rewardsDuration)
-        expect(rpcCampaign.totalSupply).fixedNumberMatch(gqlCampaign.totalSupply)
-
-      }
-
-      // Incentive balance data
-      expect(rpcResponse.incentiveBalances.length).toEqual(gqlResponse.incentiveBalances.length)
-      for(let gqlBalance of gqlResponse.incentiveBalances) {
-        const rpcBalance = rpcResponse.incentiveBalances.find(x => x.id === gqlBalance.id) as IncentiveBalance
-        expect(rpcBalance).toBeTruthy()
-        expect(rpcBalance.address).toEqual(gqlBalance.address)
-        expect(rpcBalance.owner).toEqual(gqlBalance.owner)
-        expect(rpcBalance.reward).fixedNumberMatch(gqlBalance.reward)
-        expect(rpcBalance.stakeBalance).fixedNumberMatch(gqlBalance.stakeBalance)
-        expect(rpcBalance.userRewardPerTokenPaid).fixedNumberMatch(gqlBalance.userRewardPerTokenPaid)
       }
     });
     })

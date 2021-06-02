@@ -1,10 +1,16 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { X } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import _ from '../utils/lodash'
 import { useStoreState } from '../store'
 import Button from './Button'
+import { formatNumber } from '../utils/helper'
+import { useActiveWeb3React } from '../hooks'
+import { utils } from 'geb.js'
+import { parseRad } from '../utils/gebManager'
+import { geb } from '../utils/constants'
+import Loader from './Loader'
 
 interface Props {
     title: string
@@ -28,11 +34,27 @@ const StepsContent = ({
     id,
 }: Props) => {
     const { t } = useTranslation()
+    const { account } = useActiveWeb3React()
+    const [debtFloor, setDebtFloor] = useState('')
     const { safeModel: safeState } = useStoreState((state) => state)
 
     const [isOpen, setIsOpen] = useState(true)
 
-    const debtFloorVal = _.get(safeState, 'debtFloor', '0')
+    const debtFloorVal = _.get(safeState, 'liquidationData.debtFloor', '0')
+
+    useEffect(() => {
+        async function getDebtFloor() {
+            const res = await geb.contracts.safeEngine.collateralTypes(
+                utils.ETH_A
+            )
+            setDebtFloor(parseRad(res.debtFloor))
+        }
+        if (account) {
+            setDebtFloor(debtFloorVal)
+        } else {
+            getDebtFloor()
+        }
+    }, [account, debtFloorVal])
 
     const handleOpenState = () => setIsOpen(!isOpen)
 
@@ -55,7 +77,14 @@ const StepsContent = ({
                         <Item>{`You do not need to create a new account if you already have a MakerDAO or Balancer proxy`}</Item>
                         <Item>
                             The minimum amount to mint per safe is{' '}
-                            <span>{debtFloorVal}</span> RAI
+                            <span>
+                                {!debtFloor ? (
+                                    <Loader inlineButton />
+                                ) : (
+                                    formatNumber(debtFloor, 0)
+                                )}
+                            </span>{' '}
+                            RAI
                         </Item>
                     </List>
                 </Notes>
@@ -120,6 +149,12 @@ const Item = styled.li`
     text-align: left;
     color: ${(props) => props.theme.colors.secondary};
     margin-top: 5px;
+    span > div {
+        margin: 0;
+    }
+    svg {
+        margin: 0;
+    }
 `
 
 const CloseBtn = styled.div`

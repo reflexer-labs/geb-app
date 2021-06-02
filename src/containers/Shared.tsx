@@ -11,7 +11,11 @@ import BalanceUpdater from '../services/BalanceUpdater'
 import { capitalizeName, timeout } from '../utils/helper'
 import WalletModal from '../components/WalletModal'
 import { ChainId } from '@uniswap/sdk'
-import { ETHERSCAN_PREFIXES, SYSTEM_STATUS } from '../utils/constants'
+import {
+    EMPTY_ADDRESS,
+    ETHERSCAN_PREFIXES,
+    SYSTEM_STATUS,
+} from '../utils/constants'
 import { useActiveWeb3React } from '../hooks'
 import LoadingModal from '../components/Modals/LoadingModal'
 import styled from 'styled-components'
@@ -24,7 +28,6 @@ import WaitingModal from '../components/Modals/WaitingModal'
 import TransactionUpdater from '../services/TransactionUpdater'
 import usePrevious from '../hooks/usePrevious'
 import { useHistory } from 'react-router-dom'
-import IncentivesModal from '../components/Modals/IncentivesModal'
 import ProxyModal from '../components/Modals/ProxyModal'
 import ImagePreloader from '../components/ImagePreloader'
 import AuctionsModal from '../components/Modals/AuctionsModal'
@@ -66,7 +69,6 @@ const Shared = ({ children, ...rest }: Props) => {
         popupsActions.setIsConnectedWalletModalOpen(false)
         popupsActions.setIsConnectModalOpen(false)
         popupsActions.setIsConnectorsWalletOpen(false)
-        popupsActions.setIsIncentivesModalOpen(false)
         popupsActions.setIsLoadingModalOpen({ text: '', isOpen: false })
         popupsActions.setIsScreenModalOpen(false)
         popupsActions.setIsSettingModalOpen(false)
@@ -92,7 +94,11 @@ const Shared = ({ children, ...rest }: Props) => {
             connectWalletActions.setIsUserCreated(false)
             connectWalletActions.setProxyAddress('')
             const userProxy = await geb.getProxyAction(account)
-            if (userProxy) {
+            if (
+                userProxy &&
+                userProxy.proxyAddress &&
+                userProxy.proxyAddress !== EMPTY_ADDRESS
+            ) {
                 connectWalletActions.setIsUserCreated(true)
                 connectWalletActions.setProxyAddress(userProxy.proxyAddress)
             }
@@ -104,7 +110,9 @@ const Shared = ({ children, ...rest }: Props) => {
             if (!connectWalletState.ctHash) {
                 connectWalletActions.setStep(2)
                 const { pathname } = history.location
-                await connectWalletActions.fetchProtBalance(account)
+                if (!settingsState.isRPCAdapterOn) {
+                    await connectWalletActions.fetchProtBalance(account)
+                }
 
                 let address = ''
                 if (pathname && pathname !== '/') {
@@ -215,7 +223,6 @@ const Shared = ({ children, ...rest }: Props) => {
             <DistributionsModal />
             <SaviourModal />
             <LoadingModal />
-            <IncentivesModal />
             <AuctionsModal />
             <CreateAccountModal />
             <ProxyModal />
