@@ -8,14 +8,13 @@ import { COIN_TICKER } from '../utils/constants'
 import AlertLabel from './AlertLabel'
 import Button from './Button'
 import _ from '../utils/lodash'
-import { IAuction, IAuctionBidder } from '../utils/interfaces'
+import { ChainId, IAuction, IAuctionBidder } from '../utils/interfaces'
 import {
     formatNumber,
     getEtherscanLink,
     returnWalletAddress,
 } from '../utils/helper'
 import { useActiveWeb3React } from '../hooks'
-import { ChainId } from '@uniswap/sdk'
 
 type Props = IAuction & { isCollapsed: boolean }
 

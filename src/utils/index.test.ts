@@ -1,4 +1,3 @@
-import { ChainId } from '@uniswap/sdk'
 import {
     formatNumber,
     getCollateralRatio,
@@ -9,6 +8,7 @@ import {
     returnTotalValue,
     safeIsSafe,
 } from './helper'
+import { ChainId } from './interfaces'
 
 describe('utils', () => {
     describe('#getEtherscanLink', () => {

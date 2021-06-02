@@ -2,10 +2,17 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 import { TransactionResponse } from '@ethersproject/providers'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { DefaultTheme, ThemedCssFunction } from 'styled-components'
-import { ChainId } from '@uniswap/sdk'
 import { IconName } from '../components/FeatherIconWrapper'
 import { ApproveMethod } from '../components/ApproveToken'
 import { Geb } from 'geb.js'
+
+export declare enum ChainId {
+    MAINNET = 1,
+    ROPSTEN = 3,
+    RINKEBY = 4,
+    GÖRLI = 5,
+    KOVAN = 42,
+}
 
 export interface DynamicObject {
     [key: string]: any
