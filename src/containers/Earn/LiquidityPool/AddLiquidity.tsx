@@ -6,12 +6,14 @@ import DecimalInput from '../../../components/DecimalInput'
 import { useActiveWeb3React } from '../../../hooks'
 import useGeb from '../../../hooks/useGeb'
 import {
-    ApprovalState,
     useAddLiquidity,
     useInputsHandlers,
     useLiquidityInfo,
-    useTokenApproval,
 } from '../../../hooks/useLiquidityPool'
+import {
+    ApprovalState,
+    useTokenApproval,
+} from '../../../hooks/useTokenApproval'
 import { formatNumber } from '../../../utils/helper'
 
 const AddLiquidity = () => {
@@ -38,12 +40,12 @@ const AddLiquidity = () => {
 
     const ethValue = parsedAmounts.ethAmount
         ? Number(parsedAmounts.ethAmount) > 0
-            ? (formatNumber(parsedAmounts.ethAmount, 6) as string)
+            ? (formatNumber(parsedAmounts.ethAmount) as string)
             : parsedAmounts.ethAmount
         : ''
     const raiValue = parsedAmounts.raiAmount
         ? Number(parsedAmounts.raiAmount) > 0
-            ? (formatNumber(parsedAmounts.raiAmount, 6) as string)
+            ? (formatNumber(parsedAmounts.raiAmount) as string)
             : parsedAmounts.raiAmount
         : ''
     const liqBValue =

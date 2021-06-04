@@ -5,12 +5,14 @@ import DecimalInput from '../../../components/DecimalInput'
 import { useActiveWeb3React } from '../../../hooks'
 import useGeb from '../../../hooks/useGeb'
 import {
-    ApprovalState,
     useInputsHandlers,
-    useTokenApproval,
     useWithdrawLiquidity,
     useWithdrawLiquidityInfo,
 } from '../../../hooks/useLiquidityPool'
+import {
+    ApprovalState,
+    useTokenApproval,
+} from '../../../hooks/useTokenApproval'
 import { formatNumber } from '../../../utils/helper'
 
 const WithdrawLiquidity = () => {

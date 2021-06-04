@@ -1,6 +1,8 @@
 import { Geb } from 'geb.js'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useActiveWeb3React } from '.'
+import { NETWORK_ID } from '../connectors'
+import store, { useStoreState } from '../store'
 import { network_name } from '../utils/constants'
 
 export default function useGeb(): Geb {
@@ -35,4 +37,16 @@ export function useIsOwner(safeId: string): boolean {
     }, [account, geb, safeId])
 
     return state
+}
+
+export function useProxyAddress() {
+    const { connectWalletModel: connectWalletState } = useStoreState(
+        (state) => state
+    )
+    const { proxyAddress } = connectWalletState
+    return useMemo(() => proxyAddress, [proxyAddress])
+}
+
+export function useBlockNumber() {
+    return store.getState().connectWalletModel.blockNumber[NETWORK_ID]
 }
