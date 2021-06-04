@@ -175,9 +175,15 @@ export function useInputsHandlers(): {
                 t2
             )
             earnActions.setData({
-                totalLiquidity: ethers.utils.formatEther(liqB.toString()),
+                totalLiquidity:
+                    Number(typedValue) === 0
+                        ? '0'
+                        : ethers.utils.formatEther(liqB.toString()),
                 raiAmount: typedValue,
-                ethAmount: ethers.utils.formatEther(token1Amt.toString()),
+                ethAmount:
+                    Number(typedValue) === 0
+                        ? '0'
+                        : ethers.utils.formatEther(token1Amt.toString()),
             })
         },
         [earnActions, positionAndThreshold]
@@ -198,11 +204,14 @@ export function useInputsHandlers(): {
                 t1,
                 t2
             )
+            const totalLiquidityVal = ethers.utils.formatEther(liqB.toString())
+            const raiAmountVal = ethers.utils.formatEther(token0Amt.toString())
 
             earnActions.setData({
-                totalLiquidity: ethers.utils.formatEther(liqB.toString()),
+                totalLiquidity:
+                    Number(totalLiquidityVal) < 0 ? '0' : totalLiquidityVal,
                 ethAmount: typedValue,
-                raiAmount: ethers.utils.formatEther(token0Amt.toString()),
+                raiAmount: Number(raiAmountVal) < 0 ? '0' : totalLiquidityVal,
             })
         },
         [earnActions, positionAndThreshold]
