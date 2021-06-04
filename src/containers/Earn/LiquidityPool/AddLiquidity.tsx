@@ -38,6 +38,16 @@ const AddLiquidity = () => {
         account as string
     )
 
+    const ethValue = parsedAmounts.ethAmount
+        ? Number(parsedAmounts.ethAmount) > 0
+            ? (formatNumber(parsedAmounts.ethAmount, 6) as string)
+            : parsedAmounts.ethAmount
+        : ''
+    const raiValue = parsedAmounts.raiAmount
+        ? Number(parsedAmounts.raiAmount) > 0
+            ? (formatNumber(parsedAmounts.raiAmount, 6) as string)
+            : parsedAmounts.raiAmount
+        : ''
     const liqBValue =
         parsedAmounts && parsedAmounts.totalLiquidity
             ? (formatNumber(parsedAmounts.totalLiquidity) as string)
@@ -72,7 +82,7 @@ const AddLiquidity = () => {
                     )})`}
                 </InputLabel>
                 <DecimalInput
-                    value={parsedAmounts.raiAmount}
+                    value={raiValue}
                     onChange={onRaiInput}
                     handleMaxClick={onRaiMaxAmount}
                     label={''}
@@ -89,7 +99,7 @@ const AddLiquidity = () => {
                     )})`}
                 </InputLabel>
                 <DecimalInput
-                    value={parsedAmounts.ethAmount}
+                    value={ethValue}
                     onChange={onEthInput}
                     handleMaxClick={onEthMaxAmount}
                     label={''}
