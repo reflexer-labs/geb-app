@@ -5,6 +5,7 @@ import { DefaultTheme, ThemedCssFunction } from 'styled-components'
 import { IconName } from '../components/FeatherIconWrapper'
 import { ApproveMethod } from '../components/ApproveToken'
 import { Geb } from 'geb.js'
+import { BigNumber } from 'ethers'
 
 export declare enum ChainId {
     MAINNET = 1,
@@ -219,6 +220,7 @@ export interface ITransaction {
     addedTime: number
     confirmedTime?: number
     originalTx: TransactionResponse
+    approval?: { tokenAddress: string; spender: string }
 }
 
 export interface ISafeHistory {
@@ -437,4 +439,40 @@ export interface FetchSaviourPayload {
     ethPrice: number
     geb: Geb
     safe: ISafe
+}
+
+export interface Slot0 {
+    sqrtPriceX96: BigNumber
+    tick: number
+    observationIndex: number
+    observationCardinality: number
+    observationCardinalityNext: number
+    feeProtocol: number
+    unlocked: boolean
+}
+export interface Position {
+    id: string
+    lowerTick: number
+    upperTick: number
+    uniLiquidity: BigNumber
+    threshold: BigNumber
+}
+
+export interface PositionsAndThreshold {
+    slot0: Slot0
+    p1: Position
+    p2: Position
+    t1: Tranche
+    t2: Tranche
+}
+
+export interface Tranche {
+    lowerTick: number
+    upperTick: number
+}
+
+export interface ILiquidityData {
+    raiAmount: string
+    ethAmount: string
+    totalLiquidity: string
 }

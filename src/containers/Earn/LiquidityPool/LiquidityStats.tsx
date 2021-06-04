@@ -1,7 +1,15 @@
 import React from 'react'
 import styled from 'styled-components'
+import { useLiquidityInfo } from '../../../hooks/useLiquidityPool'
+import { formatNumber } from '../../../utils/helper'
 
 const LiquidityStats = () => {
+    const { balances: currencyBalances } = useLiquidityInfo()
+
+    const myPosition =
+        currencyBalances && currencyBalances.totalLiquidity
+            ? formatNumber(currencyBalances.totalLiquidity)
+            : '0'
     return (
         <StatsGrid>
             <StatItem>
@@ -21,7 +29,7 @@ const LiquidityStats = () => {
                             My Position
                         </Position>
                     </Label>
-                    <Value>{`25.06 RAI/ETH`}</Value>
+                    <Value>{`${myPosition} RAI/ETH`}</Value>
                 </StateInner>
             </StatItem>
 

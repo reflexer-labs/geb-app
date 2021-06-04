@@ -4,7 +4,7 @@ import {
     TransactionRequest,
 } from '@ethersproject/providers'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useActiveWeb3React } from '.'
 import store from '../store'
 import { ITransaction } from '../utils/interfaces'
@@ -12,11 +12,16 @@ import { BigNumber } from 'ethers'
 
 export function useTransactionAdder(): (
     response: TransactionResponse,
-    summary?: string
+    summary?: string,
+    approval?: { tokenAddress: string; spender: string }
 ) => void {
     const { chainId, account } = useActiveWeb3React()
     return useCallback(
-        (response: TransactionResponse, summary?: string) => {
+        (
+            response: TransactionResponse,
+            summary?: string,
+            approval?: { tokenAddress: string; spender: string }
+        ) => {
             if (!account) return
             if (!chainId) return
 
@@ -25,13 +30,14 @@ export function useTransactionAdder(): (
                 throw Error('No transaction hash found.')
             }
 
-            const tx: ITransaction = {
+            let tx: ITransaction = {
                 chainId,
                 hash,
                 from: account,
                 summary,
                 addedTime: new Date().getTime(),
                 originalTx: response,
+                approval,
             }
 
             store.dispatch.transactionsModel.addTransaction(tx)
@@ -113,4 +119,33 @@ export function handleTransactionError(e: any) {
     })
     console.error(`Transaction failed`, e)
     console.log('Required String', gebUtils.getRequireString(e))
+}
+
+// returns whether a token has a pending approval transaction
+export function useHasPendingApproval(
+    tokenAddress: string | undefined,
+    spender: string | undefined
+): boolean {
+    const allTransactions = store.getState().transactionsModel.transactions
+    return useMemo(
+        () =>
+            typeof tokenAddress === 'string' &&
+            typeof spender === 'string' &&
+            Object.keys(allTransactions).some((hash) => {
+                const tx = allTransactions[hash]
+                if (!tx) return false
+                if (tx.receipt) {
+                    return false
+                } else {
+                    const approval = tx.approval
+                    if (!approval) return false
+                    return (
+                        approval.spender === spender &&
+                        approval.tokenAddress === tokenAddress &&
+                        isTransactionRecent(tx)
+                    )
+                }
+            }),
+        [allTransactions, spender, tokenAddress]
+    )
 }

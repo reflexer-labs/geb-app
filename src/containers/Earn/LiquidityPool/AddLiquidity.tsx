@@ -1,19 +1,90 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { PlusCircle } from 'react-feather'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
 import DecimalInput from '../../../components/DecimalInput'
+import { useActiveWeb3React } from '../../../hooks'
+import useGeb from '../../../hooks/useGeb'
+import {
+    ApprovalState,
+    useAddLiquidity,
+    useInputsHandlers,
+    useLiquidityInfo,
+    useTokenApproval,
+} from '../../../hooks/useLiquidityPool'
+import { useStoreActions } from '../../../store'
+import { formatNumber } from '../../../utils/helper'
 
 const AddLiquidity = () => {
+    const { account } = useActiveWeb3React()
+    const {
+        error,
+        balances: currencyBalances,
+        parsedAmounts,
+    } = useLiquidityInfo()
+    const geb = useGeb()
+    const { earnModel: earnActions } = useStoreActions((state) => state)
+
+    const isValid = !error
+
+    const { onEthInput, onRaiInput } = useInputsHandlers()
+
+    const { addLiquidityCallback } = useAddLiquidity()
+
+    const [depositApprovalState, approveDeposit] = useTokenApproval(
+        parsedAmounts.raiAmount,
+        'coin',
+        geb?.contracts.uniswapV3TwoTrancheLiquidityManager.address,
+        account as string
+    )
+
+    const ethValue =
+        parsedAmounts && parsedAmounts.ethAmount
+            ? (formatNumber(parsedAmounts.ethAmount) as string)
+            : ''
+    const raiValue =
+        parsedAmounts && parsedAmounts.raiAmount
+            ? (formatNumber(parsedAmounts.raiAmount) as string)
+            : ''
+    const liqBValue =
+        parsedAmounts && parsedAmounts.totalLiquidity
+            ? (formatNumber(parsedAmounts.totalLiquidity) as string)
+            : '0'
+
+    const onEthMaxAmount = () => onEthInput(currencyBalances.eth.toString())
+    const onRaiMaxAmount = () => onRaiInput(currencyBalances.rai.toString())
+
+    const handleAddLiquidity = async () => {
+        try {
+            await addLiquidityCallback()
+            onEthInput('')
+            onRaiInput('')
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        if (!geb) return
+        earnActions.fetchPositionsAndThreshold(geb)
+    }, [earnActions, geb])
+
     return (
         <Container>
             <Title>Add Liquidity</Title>
             <InputContainer>
                 <InputLabel>
                     <img src={require('../../../assets/rai-logo.svg')} alt="" />
-                    {`RAI (Available: 20.342)`}
+                    {`RAI (Available: ${formatNumber(
+                        currencyBalances.rai.toString()
+                    )})`}
                 </InputLabel>
-                <DecimalInput value={''} onChange={() => {}} label={''} />
+                <DecimalInput
+                    value={raiValue}
+                    onChange={onRaiInput}
+                    handleMaxClick={onRaiMaxAmount}
+                    label={''}
+                />
             </InputContainer>
             <SeparatorIcon>
                 <PlusCircle color={'#D8D6D6'} />
@@ -21,9 +92,16 @@ const AddLiquidity = () => {
             <InputContainer>
                 <InputLabel>
                     <img src={require('../../../assets/eth-logo.png')} alt="" />
-                    {`ETH (Available: 20.342)`}
+                    {`ETH (Available: ${formatNumber(
+                        currencyBalances.eth.toString()
+                    )})`}
                 </InputLabel>
-                <DecimalInput value={''} onChange={() => {}} label={''} />
+                <DecimalInput
+                    value={ethValue}
+                    onChange={onEthInput}
+                    handleMaxClick={onEthMaxAmount}
+                    label={''}
+                />
             </InputContainer>
             <Result>
                 <Block>
@@ -41,10 +119,48 @@ const AddLiquidity = () => {
                         <Label>{`Total share of pool`}</Label>
                         <Value>{`0%`}</Value>
                     </Item>
+                    <Item>
+                        <Label>{`Total Liquidity`}</Label>
+                        <Value>{liqBValue} RAI/ETH</Value>
+                    </Item>
                 </Block>
             </Result>
             <BtnContainer>
-                <Button text={'Supply'} onClick={() => {}} />
+                <Button
+                    style={{
+                        width:
+                            !isValid ||
+                            depositApprovalState === ApprovalState.UNKNOWN ||
+                            depositApprovalState === ApprovalState.APPROVED
+                                ? '100%'
+                                : '48%',
+                    }}
+                    disabled={
+                        !isValid ||
+                        depositApprovalState === ApprovalState.NOT_APPROVED ||
+                        depositApprovalState === ApprovalState.PENDING
+                    }
+                    text={error ? error : 'Supply'}
+                    onClick={handleAddLiquidity}
+                />
+
+                {isValid &&
+                (depositApprovalState === ApprovalState.PENDING ||
+                    depositApprovalState === ApprovalState.NOT_APPROVED) ? (
+                    <Button
+                        style={{ width: '48%' }}
+                        disabled={
+                            !isValid ||
+                            depositApprovalState === ApprovalState.PENDING
+                        }
+                        text={
+                            depositApprovalState === ApprovalState.PENDING
+                                ? 'Pending Approval..'
+                                : 'Approve'
+                        }
+                        onClick={approveDeposit}
+                    />
+                ) : null}
             </BtnContainer>
         </Container>
     )
@@ -136,7 +252,7 @@ const Value = styled.div`
 const BtnContainer = styled.div`
     text-align: center;
     margin-top: 20px;
-    button {
-        min-width: 80%;
-    }
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 `
