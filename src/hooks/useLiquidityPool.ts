@@ -13,7 +13,10 @@ import {
     handlePreTxGasEstimate,
     handleTransactionError,
     useHasPendingApproval,
+    useHasPendingTransactions,
 } from './TransactionHooks'
+
+type Token = 'coin' | 'uniswapV3TwoTrancheLiquidityManager'
 
 export enum ApprovalState {
     UNKNOWN,
@@ -28,6 +31,43 @@ const DEFAULT_STATE = {
     raiAmount: '',
 }
 
+export function useWithdrawLiquidityInfo() {
+    const { account } = useActiveWeb3React()
+    const { earnModel: earnState } = useStoreState((state) => state)
+    const { data } = earnState
+    const balances = useBalances()
+    const parsedAmounts = useMemo(() => {
+        return data
+    }, [data])
+
+    let error: string | undefined
+    if (!account) {
+        error = 'Connect Wallet'
+    }
+
+    if (!parsedAmounts.totalLiquidity) {
+        error = error ?? 'Enter an amount'
+    }
+
+    if (
+        balances &&
+        balances.totalLiquidity &&
+        parsedAmounts.totalLiquidity &&
+        ethers.utils
+            .parseEther(balances.totalLiquidity.toString())
+            .lt(
+                ethers.utils.parseEther(parsedAmounts.totalLiquidity.toString())
+            )
+    ) {
+        error = 'Insufficient UNI V3 RAI/ETH balance'
+    }
+
+    return {
+        error,
+        balances,
+        parsedAmounts,
+    }
+}
 export function useLiquidityInfo() {
     const { account } = useActiveWeb3React()
     const { earnModel: earnState } = useStoreState((state) => state)
@@ -82,28 +122,42 @@ export function useBalances() {
     const { connectWalletModel: connectWalletState } = useStoreState(
         (state) => state
     )
-    const { raiBalance, ethBalance } = connectWalletState
-    const [totalLiquidity, setTotalLiquidity] = useState('')
+    const { ethBalance } = connectWalletState
+    const hasPendingTx = useHasPendingTransactions()
+    const [state, setState] = useState({
+        eth: '0',
+        rai: '0',
+        totalLiquidity: '',
+    })
     useEffect(() => {
+        let isCanceled = false
         if (!geb || !account) return
         async function getLiquidityBalance() {
-            const liquidityBalance = await geb.contracts.uniswapV3TwoTrancheLiquidityManager.balanceOf(
-                account as string
-            )
-            if (liquidityBalance) {
-                setTotalLiquidity(ethers.utils.formatEther(liquidityBalance))
+            if (!isCanceled) {
+                const [liquidityBalance, coinBalance] = await geb.multiCall([
+                    geb.contracts.uniswapV3TwoTrancheLiquidityManager.balanceOf(
+                        account as string,
+                        true
+                    ),
+                    geb.contracts.coin.balanceOf(account as string, true),
+                ])
+
+                setState({
+                    eth: ethBalance[NETWORK_ID].toString(),
+                    rai: ethers.utils.formatEther(coinBalance),
+                    totalLiquidity: ethers.utils.formatEther(liquidityBalance),
+                })
             }
         }
         getLiquidityBalance()
-    }, [geb, account])
+        return () => {
+            isCanceled = true
+        }
+    }, [geb, account, hasPendingTx, ethBalance])
 
     return useMemo(() => {
-        return {
-            eth: ethBalance[NETWORK_ID],
-            rai: raiBalance[NETWORK_ID],
-            totalLiquidity,
-        }
-    }, [ethBalance, raiBalance, totalLiquidity])
+        return state
+    }, [state])
 }
 
 function getNextTicksMulticallRequest(geb: Geb, threshold: BigNumberish) {
@@ -152,10 +206,26 @@ export async function fetchPositions(geb: Geb) {
 export function useInputsHandlers(): {
     onEthInput: (typedValue: string) => void
     onRaiInput: (typedValue: string) => void
+    onLiquidityInput: (typedValue: string) => void
 } {
     const { earnModel: earnState } = useStoreState((state) => state)
     const { earnModel: earnActions } = useStoreActions((state) => state)
     const { positionAndThreshold } = earnState
+
+    const onLiquidityInput = useCallback(
+        (typedValue: string) => {
+            if (!typedValue || typedValue === '' || !positionAndThreshold) {
+                earnActions.setData(DEFAULT_STATE)
+                return
+            }
+            earnActions.setData({
+                totalLiquidity: typedValue,
+                raiAmount: '',
+                ethAmount: '',
+            })
+        },
+        [earnActions, positionAndThreshold]
+    )
 
     const onRaiInput = useCallback(
         (typedValue: string) => {
@@ -220,6 +290,7 @@ export function useInputsHandlers(): {
     return {
         onEthInput,
         onRaiInput,
+        onLiquidityInput,
     }
 }
 
@@ -231,7 +302,9 @@ export function useProxyAddress() {
     return useMemo(() => proxyAddress, [proxyAddress])
 }
 
-type Token = 'coin' | 'uniswapV3TwoTrancheLiquidityManager'
+export function useBlockNumber() {
+    return store.getState().connectWalletModel.blockNumber[NETWORK_ID]
+}
 
 export function useTokenAllowance(
     token: Token,
@@ -240,6 +313,9 @@ export function useTokenAllowance(
 ) {
     const [state, setState] = useState<BigNumber>(BigNumber.from('0'))
     const geb = useGeb()
+    const latestBlockNumber = useBlockNumber()
+    const hasPendingTx = useHasPendingTransactions()
+
     useEffect(() => {
         if (
             !geb ||
@@ -251,7 +327,7 @@ export function useTokenAllowance(
         geb.contracts[token]
             .allowance(spender, holder)
             .then((allowance) => setState(allowance))
-    }, [geb, holder, spender, token])
+    }, [geb, holder, spender, token, latestBlockNumber, hasPendingTx])
 
     return state
 }
@@ -401,14 +477,14 @@ export function useAddLiquidity(): {
             if (!txData) throw new Error('No transaction request!')
             const tx = await handlePreTxGasEstimate(signer, txData)
             const txResponse = await signer.sendTransaction(tx)
-
+            store.dispatch.earnModel.setData(DEFAULT_STATE)
             if (txResponse) {
                 const { hash, chainId } = txResponse
                 store.dispatch.transactionsModel.addTransaction({
                     chainId,
                     hash,
                     from: txResponse.from,
-                    summary: 'Adding liquidity Uniswap V3 RAI/ETH',
+                    summary: 'Adding Uniswap V3 RAI/ETH liquidity',
                     addedTime: new Date().getTime(),
                     originalTx: txResponse,
                 })
@@ -425,4 +501,63 @@ export function useAddLiquidity(): {
     }, [account, data, geb, library])
 
     return { addLiquidityCallback }
+}
+
+export function useWithdrawLiquidity(): {
+    withdrawLiquidityCallback: () => Promise<void>
+} {
+    const geb = useGeb()
+    const { account, library } = useActiveWeb3React()
+    const { earnModel: earnState } = useStoreState((state) => state)
+    const { data } = earnState
+    const withdrawLiquidityCallback = useCallback(async () => {
+        const { totalLiquidity } = data
+        if (!library || !totalLiquidity || !account || !geb) {
+            return
+        }
+        try {
+            const totalLiquidityBN = ethers.utils.parseEther(totalLiquidity)
+
+            store.dispatch.popupsModel.setIsWaitingModalOpen(true)
+            store.dispatch.popupsModel.setBlockBackdrop(true)
+            store.dispatch.popupsModel.setWaitingPayload({
+                title: 'Waiting for confirmation',
+                text: 'Confirm this transaction in your wallet',
+                status: 'loading',
+            })
+            const signer = library.getSigner(account)
+
+            const txData = geb.contracts.uniswapV3TwoTrancheLiquidityManager.withdraw(
+                totalLiquidityBN,
+                account
+            )
+
+            if (!txData) throw new Error('No transaction request!')
+            const tx = await handlePreTxGasEstimate(signer, txData)
+            const txResponse = await signer.sendTransaction(tx)
+            store.dispatch.earnModel.setData(DEFAULT_STATE)
+
+            if (txResponse) {
+                const { hash, chainId } = txResponse
+                store.dispatch.transactionsModel.addTransaction({
+                    chainId,
+                    hash,
+                    from: txResponse.from,
+                    summary: 'Withdrawing Uniswap V3 RAI/ETH liquidity',
+                    addedTime: new Date().getTime(),
+                    originalTx: txResponse,
+                })
+                store.dispatch.popupsModel.setWaitingPayload({
+                    title: 'Transaction Submitted',
+                    hash: txResponse.hash,
+                    status: 'success',
+                })
+                await txResponse.wait()
+            }
+        } catch (error) {
+            handleTransactionError(error)
+        }
+    }, [account, data, geb, library])
+
+    return { withdrawLiquidityCallback }
 }

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import GridContainer from '../../../components/GridContainer'
 import PageHeader from '../../../components/PageHeader'
-import AddLiquidity from './AddLiquidity'
+import LiquidityManager from './LiquidityManager'
 import LiquidityStats from './LiquidityStats'
 
 const LiquidityPool = () => {
@@ -21,7 +21,7 @@ const LiquidityPool = () => {
                 </Details>
 
                 <Content>
-                    <AddLiquidity />
+                    <LiquidityManager />
                     <LiquidityStats />
                 </Content>
             </Container>

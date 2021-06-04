@@ -1,5 +1,4 @@
 import React from 'react'
-import { PlusCircle } from 'react-feather'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
 import DecimalInput from '../../../components/DecimalInput'
@@ -7,58 +6,51 @@ import { useActiveWeb3React } from '../../../hooks'
 import useGeb from '../../../hooks/useGeb'
 import {
     ApprovalState,
-    useAddLiquidity,
     useInputsHandlers,
-    useLiquidityInfo,
     useTokenApproval,
+    useWithdrawLiquidity,
+    useWithdrawLiquidityInfo,
 } from '../../../hooks/useLiquidityPool'
 import { formatNumber } from '../../../utils/helper'
 
-const AddLiquidity = () => {
+const WithdrawLiquidity = () => {
     const { account } = useActiveWeb3React()
     const {
-        error,
         balances: currencyBalances,
+        error,
         parsedAmounts,
-    } = useLiquidityInfo()
+    } = useWithdrawLiquidityInfo()
     const geb = useGeb()
 
     const isValid = !error
 
-    const { onEthInput, onRaiInput } = useInputsHandlers()
+    const { onLiquidityInput, onEthInput, onRaiInput } = useInputsHandlers()
 
-    const { addLiquidityCallback } = useAddLiquidity()
+    const { withdrawLiquidityCallback } = useWithdrawLiquidity()
 
-    const [depositApprovalState, approveDeposit] = useTokenApproval(
-        parsedAmounts.raiAmount,
-        'coin',
+    const [withdrawApprovalState, approve] = useTokenApproval(
+        parsedAmounts.totalLiquidity,
+        'uniswapV3TwoTrancheLiquidityManager',
         geb?.contracts.uniswapV3TwoTrancheLiquidityManager.address,
         account as string
     )
 
-    const ethValue = parsedAmounts.ethAmount
-        ? Number(parsedAmounts.ethAmount) > 0
-            ? (formatNumber(parsedAmounts.ethAmount, 6) as string)
-            : parsedAmounts.ethAmount
-        : ''
-    const raiValue = parsedAmounts.raiAmount
-        ? Number(parsedAmounts.raiAmount) > 0
-            ? (formatNumber(parsedAmounts.raiAmount, 6) as string)
-            : parsedAmounts.raiAmount
-        : ''
-    const liqBValue =
-        parsedAmounts && parsedAmounts.totalLiquidity
+    const onLiquidityMaxInput = () =>
+        onLiquidityInput(currencyBalances.totalLiquidity.toString())
+
+    const liqBValue = parsedAmounts.totalLiquidity
+        ? Number(parsedAmounts.totalLiquidity) > 0 &&
+          parsedAmounts.totalLiquidity.length > 10
             ? (formatNumber(parsedAmounts.totalLiquidity) as string)
-            : '0'
+            : parsedAmounts.totalLiquidity
+        : ''
 
-    const onEthMaxAmount = () => onEthInput(currencyBalances.eth.toString())
-    const onRaiMaxAmount = () => onRaiInput(currencyBalances.rai.toString())
-
-    const handleAddLiquidity = async () => {
+    const handleWithdrawLiquidity = async () => {
         try {
-            await addLiquidityCallback()
+            await withdrawLiquidityCallback()
             onEthInput('')
             onRaiInput('')
+            onLiquidityInput('')
         } catch (error) {
             console.log(error)
         }
@@ -68,37 +60,38 @@ const AddLiquidity = () => {
         <Container>
             <InputContainer>
                 <InputLabel>
-                    <img src={require('../../../assets/rai-logo.svg')} alt="" />
-                    {`RAI (Available: ${formatNumber(
-                        currencyBalances.rai.toString()
+                    <Images>
+                        <img
+                            src={require('../../../assets/rai-logo.svg')}
+                            alt=""
+                        />
+                        <img
+                            src={require('../../../assets/eth-logo.png')}
+                            alt=""
+                        />
+                    </Images>
+                    {`UNI V3 RAI/ETH (Available: ${formatNumber(
+                        currencyBalances.totalLiquidity.toString()
                     )})`}
                 </InputLabel>
                 <DecimalInput
-                    value={raiValue}
-                    onChange={onRaiInput}
-                    handleMaxClick={onRaiMaxAmount}
-                    label={''}
-                />
-            </InputContainer>
-            <SeparatorIcon>
-                <PlusCircle color={'#D8D6D6'} />
-            </SeparatorIcon>
-            <InputContainer>
-                <InputLabel>
-                    <img src={require('../../../assets/eth-logo.png')} alt="" />
-                    {`ETH (Available: ${formatNumber(
-                        currencyBalances.eth.toString()
-                    )})`}
-                </InputLabel>
-                <DecimalInput
-                    value={ethValue}
-                    onChange={onEthInput}
-                    handleMaxClick={onEthMaxAmount}
+                    value={liqBValue}
+                    onChange={onLiquidityInput}
+                    handleMaxClick={onLiquidityMaxInput}
                     label={''}
                 />
             </InputContainer>
             <Result>
                 <Block>
+                    <Item>
+                        <Label>{`ETH to Receive`}</Label>
+                        <Value>{`0.0008`}</Value>
+                    </Item>
+
+                    <Item>
+                        <Label>{`RAI to Receive`}</Label>
+                        <Value>{`1230.24`}</Value>
+                    </Item>
                     <Item>
                         <Label>{`ETH per RAI`}</Label>
                         <Value>{`0.0008`}</Value>
@@ -108,15 +101,6 @@ const AddLiquidity = () => {
                         <Label>{`RAI per ETH`}</Label>
                         <Value>{`1230.24`}</Value>
                     </Item>
-
-                    <Item>
-                        <Label>{`Total share of pool`}</Label>
-                        <Value>{`0%`}</Value>
-                    </Item>
-                    <Item>
-                        <Label>{`Total Liquidity`}</Label>
-                        <Value>{liqBValue} RAI/ETH</Value>
-                    </Item>
                 </Block>
             </Result>
             <BtnContainer>
@@ -124,35 +108,38 @@ const AddLiquidity = () => {
                     style={{
                         width:
                             !isValid ||
-                            depositApprovalState === ApprovalState.UNKNOWN ||
-                            depositApprovalState === ApprovalState.APPROVED
+                            withdrawApprovalState === ApprovalState.UNKNOWN ||
+                            withdrawApprovalState === ApprovalState.APPROVED
                                 ? '100%'
                                 : '48%',
                     }}
                     disabled={
                         !isValid ||
-                        depositApprovalState === ApprovalState.NOT_APPROVED ||
-                        depositApprovalState === ApprovalState.PENDING
+                        withdrawApprovalState === ApprovalState.NOT_APPROVED ||
+                        withdrawApprovalState === ApprovalState.PENDING
                     }
-                    text={error ? error : 'Supply'}
-                    onClick={handleAddLiquidity}
+                    text={error ? error : 'Withdraw'}
+                    onClick={handleWithdrawLiquidity}
                 />
 
                 {isValid &&
-                (depositApprovalState === ApprovalState.PENDING ||
-                    depositApprovalState === ApprovalState.NOT_APPROVED) ? (
+                (withdrawApprovalState === ApprovalState.PENDING ||
+                    withdrawApprovalState === ApprovalState.NOT_APPROVED) ? (
                     <Button
+                        isLoading={
+                            withdrawApprovalState === ApprovalState.PENDING
+                        }
                         style={{ width: '48%' }}
                         disabled={
                             !isValid ||
-                            depositApprovalState === ApprovalState.PENDING
+                            withdrawApprovalState === ApprovalState.PENDING
                         }
                         text={
-                            depositApprovalState === ApprovalState.PENDING
+                            withdrawApprovalState === ApprovalState.PENDING
                                 ? 'Pending Approval..'
                                 : 'Approve'
                         }
-                        onClick={approveDeposit}
+                        onClick={approve}
                     />
                 ) : null}
             </BtnContainer>
@@ -160,7 +147,7 @@ const AddLiquidity = () => {
     )
 }
 
-export default AddLiquidity
+export default WithdrawLiquidity
 
 const Container = styled.div``
 const InputLabel = styled.div`
@@ -179,12 +166,6 @@ const InputLabel = styled.div`
 `
 
 const InputContainer = styled.div``
-
-const SeparatorIcon = styled.div`
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
-`
 
 const Result = styled.div`
     margin-top: 20px;
@@ -233,4 +214,16 @@ const BtnContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+`
+
+const Images = styled.div`
+    display: flex;
+    align-items: center;
+    margin-right: 5px;
+    img {
+        width: 23px;
+        &:nth-child(2) {
+            margin-left: -10px;
+        }
+    }
 `

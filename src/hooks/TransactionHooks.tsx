@@ -9,6 +9,7 @@ import { useActiveWeb3React } from '.'
 import store from '../store'
 import { ITransaction } from '../utils/interfaces'
 import { BigNumber } from 'ethers'
+import { newTransactionsFirst } from '../utils/helper'
 
 export function useTransactionAdder(): (
     response: TransactionResponse,
@@ -148,4 +149,20 @@ export function useHasPendingApproval(
             }),
         [allTransactions, spender, tokenAddress]
     )
+}
+
+export function useHasPendingTransactions() {
+    const allTransactions = store.getState().transactionsModel.transactions
+
+    const sortedRecentTransactions = useMemo(() => {
+        const txs = Object.values(allTransactions)
+        return txs.filter(isTransactionRecent).sort(newTransactionsFirst)
+    }, [allTransactions])
+
+    return useMemo(() => {
+        const pending = sortedRecentTransactions
+            .filter((tx) => !tx.receipt)
+            .map((tx) => tx.hash)
+        return !!pending.length
+    }, [sortedRecentTransactions])
 }
