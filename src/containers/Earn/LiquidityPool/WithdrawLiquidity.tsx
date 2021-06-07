@@ -72,7 +72,7 @@ const WithdrawLiquidity = () => {
                             alt=""
                         />
                     </Images>
-                    {`UNI V3 RAI/ETH (Available: ${formatNumber(
+                    {`Flex Manager Shares (Available: ${formatNumber(
                         currencyBalances.totalLiquidity.toString()
                     )})`}
                 </InputLabel>

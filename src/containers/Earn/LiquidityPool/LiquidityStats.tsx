@@ -26,7 +26,7 @@ const LiquidityStats = () => {
                                     alt=""
                                 />
                             </Images>
-                            My Position
+                            Flex Manager Shares
                         </Position>
                     </Label>
                     <Value>{`${myPosition} RAI/ETH`}</Value>
@@ -37,13 +37,6 @@ const LiquidityStats = () => {
                 <StateInner>
                     <Label className="top">{'My Stake'}</Label>
                     <Value>{`0.7185 ETH + 884.0321 RAI`}</Value>
-                </StateInner>
-            </StatItem>
-
-            <StatItem>
-                <StateInner>
-                    <Label className="top">{'Share of Pool'}</Label>
-                    <Value>{`0.1602`}%</Value>
                 </StateInner>
             </StatItem>
         </StatsGrid>

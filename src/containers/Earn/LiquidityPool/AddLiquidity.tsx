@@ -110,11 +110,6 @@ const AddLiquidity = () => {
                         <Label>{`RAI per ETH`}</Label>
                         <Value>{`1230.24`}</Value>
                     </Item>
-
-                    <Item>
-                        <Label>{`Total share of pool`}</Label>
-                        <Value>{`0%`}</Value>
-                    </Item>
                     <Item>
                         <Label>{`Total Liquidity`}</Label>
                         <Value>{liqBValue} RAI/ETH</Value>
@@ -122,24 +117,6 @@ const AddLiquidity = () => {
                 </Block>
             </Result>
             <BtnContainer>
-                <Button
-                    style={{
-                        width:
-                            !isValid ||
-                            depositApprovalState === ApprovalState.UNKNOWN ||
-                            depositApprovalState === ApprovalState.APPROVED
-                                ? '100%'
-                                : '48%',
-                    }}
-                    disabled={
-                        !isValid ||
-                        depositApprovalState === ApprovalState.NOT_APPROVED ||
-                        depositApprovalState === ApprovalState.PENDING
-                    }
-                    text={error ? error : 'Supply'}
-                    onClick={handleAddLiquidity}
-                />
-
                 {isValid &&
                 (depositApprovalState === ApprovalState.PENDING ||
                     depositApprovalState === ApprovalState.NOT_APPROVED) ? (
@@ -157,6 +134,23 @@ const AddLiquidity = () => {
                         onClick={approveDeposit}
                     />
                 ) : null}
+                <Button
+                    style={{
+                        width:
+                            !isValid ||
+                            depositApprovalState === ApprovalState.UNKNOWN ||
+                            depositApprovalState === ApprovalState.APPROVED
+                                ? '100%'
+                                : '48%',
+                    }}
+                    disabled={
+                        !isValid ||
+                        depositApprovalState === ApprovalState.NOT_APPROVED ||
+                        depositApprovalState === ApprovalState.PENDING
+                    }
+                    text={error ? error : 'Supply'}
+                    onClick={handleAddLiquidity}
+                />
             </BtnContainer>
         </Container>
     )
