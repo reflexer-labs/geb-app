@@ -45,7 +45,6 @@
         "react-paginate": "^6.5.0",
         "react-router-dom": "^5.2.0",
         "react-scripts": "3.4.3",
-        "react-slider": "^1.1.4",
         "react-toastify": "^6.0.9",
         "react-tooltip": "^4.2.11",
         "react-transition-group": "^4.4.1",
