@@ -1,4 +1,4 @@
-import { BigNumberish, ethers } from 'ethers'
+import { BigNumber, BigNumberish, ethers } from 'ethers'
 import { Geb } from 'geb.js'
 import { TwoTrancheUniV3ManagerMath } from '../services/UniswapLiquidityManager'
 import { useActiveWeb3React } from '.'
@@ -20,44 +20,8 @@ const DEFAULT_STATE = {
     raiAmount: '',
 }
 
-export function useWithdrawLiquidityInfo() {
-    const { account } = useActiveWeb3React()
-    const { earnModel: earnState } = useStoreState((state) => state)
-    const { data } = earnState
-    const balances = useBalances()
-    const parsedAmounts = useMemo(() => {
-        return data
-    }, [data])
-
-    let error: string | undefined
-    if (!account) {
-        error = 'Connect Wallet'
-    }
-
-    if (!parsedAmounts.totalLiquidity) {
-        error = error ?? 'Enter an amount'
-    }
-
-    if (
-        balances &&
-        balances.totalLiquidity &&
-        parsedAmounts.totalLiquidity &&
-        ethers.utils
-            .parseEther(balances.totalLiquidity.toString())
-            .lt(
-                ethers.utils.parseEther(parsedAmounts.totalLiquidity.toString())
-            )
-    ) {
-        error = 'Insufficient UNI V3 RAI/ETH balance'
-    }
-
-    return {
-        error,
-        balances,
-        parsedAmounts,
-    }
-}
-export function useLiquidityInfo() {
+// liquidity helpers
+export function useLiquidityInfo(isDeposit = true) {
     const { account } = useActiveWeb3React()
     const { earnModel: earnState } = useStoreState((state) => state)
     const { data } = earnState
@@ -67,44 +31,73 @@ export function useLiquidityInfo() {
         return data
     }, [data])
 
+    const sharesToTokens = useTokensFromLiquidity(parsedAmounts.totalLiquidity)
+
+    const tokensStake = useMemo(() => {
+        return sharesToTokens
+    }, [sharesToTokens])
+
     let error: string | undefined
     if (!account) {
         error = 'Connect Wallet'
     }
 
-    if (!parsedAmounts.ethAmount || !parsedAmounts.raiAmount) {
-        error = error ?? 'Enter an amount'
-    }
+    if (isDeposit) {
+        if (!parsedAmounts.ethAmount || !parsedAmounts.raiAmount) {
+            error = error ?? 'Enter an amount'
+        }
 
-    if (
-        balances &&
-        balances.eth &&
-        parsedAmounts.ethAmount &&
-        ethers.utils
-            .parseEther(balances.eth.toString())
-            .lt(ethers.utils.parseEther(parsedAmounts.ethAmount.toString()))
-    ) {
-        error = 'Insufficient ETH balance'
-    }
+        if (
+            balances &&
+            balances.eth &&
+            parsedAmounts.ethAmount &&
+            ethers.utils
+                .parseEther(balances.eth.toString())
+                .lt(ethers.utils.parseEther(parsedAmounts.ethAmount.toString()))
+        ) {
+            error = 'Insufficient ETH balance'
+        }
 
-    if (
-        balances &&
-        parsedAmounts.raiAmount &&
-        balances.rai &&
-        ethers.utils
-            .parseEther(balances.rai.toString())
-            .lt(ethers.utils.parseEther(parsedAmounts.raiAmount.toString()))
-    ) {
-        error = 'Insufficient RAI balance'
+        if (
+            balances &&
+            parsedAmounts.raiAmount &&
+            balances.rai &&
+            ethers.utils
+                .parseEther(balances.rai.toString())
+                .lt(ethers.utils.parseEther(parsedAmounts.raiAmount.toString()))
+        ) {
+            error = 'Insufficient RAI balance'
+        }
+    } else {
+        if (!parsedAmounts.totalLiquidity) {
+            error = error ?? 'Enter an amount'
+        }
+
+        if (
+            balances &&
+            balances.totalLiquidity &&
+            parsedAmounts.totalLiquidity &&
+            ethers.utils
+                .parseEther(balances.totalLiquidity.toString())
+                .lt(
+                    ethers.utils.parseEther(
+                        parsedAmounts.totalLiquidity.toString()
+                    )
+                )
+        ) {
+            error = 'Insufficient UNI V3 RAI/ETH balance'
+        }
     }
 
     return {
         error,
         balances,
         parsedAmounts,
+        tokensStake,
     }
 }
 
+// fetches balances for rai,eth and liquidity
 export function useBalances() {
     const geb = useGeb()
     const { account } = useActiveWeb3React()
@@ -147,49 +140,6 @@ export function useBalances() {
     return useMemo(() => {
         return state
     }, [state])
-}
-
-function getNextTicksMulticallRequest(geb: Geb, threshold: BigNumberish) {
-    const nextTickAbiFragment = {
-        inputs: [
-            {
-                internalType: 'uint256',
-                name: '_threshold',
-                type: 'uint256',
-            },
-        ],
-        name: 'getNextTicks',
-        outputs: [
-            { internalType: 'int24', name: 'lowerTick', type: 'int24' },
-            { internalType: 'int24', name: 'upperTick', type: 'int24' },
-            { internalType: 'int24', name: 'targetTick', type: 'int24' },
-        ],
-        stateMutability: 'nonpayable',
-        type: 'function',
-    }
-
-    const tx = geb.contracts.uniswapV3TwoTrancheLiquidityManager.getNextTicks(
-        threshold
-    )
-    return {
-        data: tx.data as string,
-        to: tx.to as string,
-        abi: nextTickAbiFragment,
-    }
-}
-
-export async function fetchPositions(geb: Geb) {
-    if (!geb) return
-    const [slot0, p1, p2] = await geb.multiCall([
-        geb.contracts.uniswapV3PairCoinEth.slot0(true),
-        geb.contracts.uniswapV3TwoTrancheLiquidityManager.positions(0, true),
-        geb.contracts.uniswapV3TwoTrancheLiquidityManager.positions(1, true),
-    ])
-    const [t1, t2]: [Tranche, Tranche] = await geb.multiCall([
-        getNextTicksMulticallRequest(geb, p1.threshold),
-        getNextTicksMulticallRequest(geb, p2.threshold),
-    ])
-    return { slot0, p1, p2, t1, t2 }
 }
 
 export function useInputsHandlers(): {
@@ -283,6 +233,43 @@ export function useInputsHandlers(): {
     }
 }
 
+export function useTokensFromLiquidity(liquidity: string) {
+    const geb = useGeb()
+    const [state, setState] = useState({ eth: '0', rai: '0' })
+
+    useEffect(() => {
+        let isCanceled = false
+        if (!geb || !liquidity) {
+            setState({ eth: '0', rai: '0' })
+            return
+        }
+        async function getSharesFromLiquidity() {
+            if (!isCanceled) {
+                const liquidityBN = ethers.utils.parseEther(liquidity)
+                const [sharesToT1, sharesToT2]: [
+                    BigNumber,
+                    BigNumber
+                ] = await geb.multiCall([
+                    getTokenXFromLiquidity(geb, true, liquidityBN),
+                    getTokenXFromLiquidity(geb, false, liquidityBN),
+                ])
+
+                setState({
+                    eth: ethers.utils.formatEther(sharesToT1),
+                    rai: ethers.utils.formatEther(sharesToT2),
+                })
+            }
+        }
+        getSharesFromLiquidity()
+        return () => {
+            isCanceled = true
+        }
+    }, [geb, liquidity])
+
+    return state
+}
+
+// add liquidity function
 export function useAddLiquidity(): {
     addLiquidityCallback: () => Promise<void>
 } {
@@ -352,7 +339,7 @@ export function useAddLiquidity(): {
 
     return { addLiquidityCallback }
 }
-
+//withdraw liquidity function
 export function useWithdrawLiquidity(): {
     withdrawLiquidityCallback: () => Promise<void>
 } {
@@ -410,4 +397,80 @@ export function useWithdrawLiquidity(): {
     }, [account, data, geb, library])
 
     return { withdrawLiquidityCallback }
+}
+
+// helper function to fetch ticks
+function getNextTicksMulticallRequest(geb: Geb, threshold: BigNumberish) {
+    const nextTickAbiFragment = {
+        inputs: [
+            {
+                internalType: 'uint256',
+                name: '_threshold',
+                type: 'uint256',
+            },
+        ],
+        name: 'getNextTicks',
+        outputs: [
+            { internalType: 'int24', name: 'lowerTick', type: 'int24' },
+            { internalType: 'int24', name: 'upperTick', type: 'int24' },
+            { internalType: 'int24', name: 'targetTick', type: 'int24' },
+        ],
+        stateMutability: 'nonpayable',
+        type: 'function',
+    }
+
+    const tx = geb.contracts.uniswapV3TwoTrancheLiquidityManager.getNextTicks(
+        threshold
+    )
+    return {
+        data: tx.data as string,
+        to: tx.to as string,
+        abi: nextTickAbiFragment,
+    }
+}
+// helper function to fetch shareAmount of token0 and token1
+export function getTokenXFromLiquidity(
+    geb: Geb,
+    isToken1: boolean,
+    liquidity: BigNumberish
+) {
+    const abiFragment = {
+        inputs: [
+            {
+                internalType: 'uint128',
+                name: '_liquidity',
+                type: 'uint128',
+            },
+        ],
+        name: isToken1 ? 'getToken1FromLiquidity' : 'getToken0FromLiquidity',
+        outputs: [
+            { internalType: 'uint256', name: 'amount0', type: 'uint256' },
+        ],
+        stateMutability: 'nonpayable',
+        type: 'function',
+    }
+
+    const tx = isToken1
+        ? geb.contracts.uniswapV3TwoTrancheLiquidityManager.getToken1FromLiquidity(
+              liquidity
+          )
+        : geb.contracts.uniswapV3TwoTrancheLiquidityManager.getToken0FromLiquidity(
+              liquidity
+          )
+    return { data: tx.data as string, to: tx.to as string, abi: abiFragment }
+}
+
+// helper function fetches positions
+export async function fetchPositions(geb: Geb) {
+    if (!geb) return
+    const [slot0, p1, p2] = await geb.multiCall([
+        geb.contracts.uniswapV3PairCoinEth.slot0(true),
+        geb.contracts.uniswapV3TwoTrancheLiquidityManager.positions(0, true),
+        geb.contracts.uniswapV3TwoTrancheLiquidityManager.positions(1, true),
+    ])
+    const [t1, t2]: [Tranche, Tranche] = await geb.multiCall([
+        getNextTicksMulticallRequest(geb, p1.threshold),
+        getNextTicksMulticallRequest(geb, p2.threshold),
+    ])
+    return { slot0, p1, p2, t1, t2 }
 }

@@ -476,3 +476,7 @@ export interface ILiquidityData {
     ethAmount: string
     totalLiquidity: string
 }
+export interface IStakedLP {
+    eth: string
+    rai: string
+}

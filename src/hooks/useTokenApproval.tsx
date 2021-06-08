@@ -33,6 +33,7 @@ export function useTokenAllowance(
     useEffect(() => {
         if (
             !geb ||
+            !token ||
             !spender ||
             holder === EMPTY_ADDRESS ||
             spender === EMPTY_ADDRESS

@@ -1,6 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useLiquidityInfo } from '../../../hooks/useLiquidityPool'
+import {
+    useLiquidityInfo,
+    useTokensFromLiquidity,
+} from '../../../hooks/useLiquidityPool'
 import { formatNumber } from '../../../utils/helper'
 
 const LiquidityStats = () => {
@@ -10,6 +13,11 @@ const LiquidityStats = () => {
         currencyBalances && currencyBalances.totalLiquidity
             ? formatNumber(currencyBalances.totalLiquidity)
             : '0'
+
+    const { eth: stakedETH, rai: stakedRAI } = useTokensFromLiquidity(
+        currencyBalances.totalLiquidity
+    )
+
     return (
         <StatsGrid>
             <StatItem>
@@ -36,7 +44,11 @@ const LiquidityStats = () => {
             <StatItem>
                 <StateInner>
                     <Label className="top">{'My Stake'}</Label>
-                    <Value>{`0.7185 ETH + 884.0321 RAI`}</Value>
+                    <Value>{`${
+                        stakedETH ? formatNumber(stakedETH) : '0'
+                    } ETH + ${
+                        stakedRAI ? formatNumber(stakedRAI) : '0'
+                    } RAI`}</Value>
                 </StateInner>
             </StatItem>
         </StatsGrid>

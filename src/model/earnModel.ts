@@ -1,14 +1,20 @@
 import { action, Action, thunk, Thunk } from 'easy-peasy'
 import { Geb } from 'geb.js'
 import { fetchPositions } from '../hooks/useLiquidityPool'
-import { ILiquidityData, PositionsAndThreshold } from '../utils/interfaces'
+import {
+    ILiquidityData,
+    IStakedLP,
+    PositionsAndThreshold,
+} from '../utils/interfaces'
 
 export interface EarnModel {
     data: ILiquidityData
+    stakedLP: IStakedLP
     positionAndThreshold: PositionsAndThreshold | null
     fetchPositionsAndThreshold: Thunk<EarnModel, Geb>
     setPositionAndThreshold: Action<EarnModel, PositionsAndThreshold>
     setData: Action<EarnModel, ILiquidityData>
+    setStakedLP: Action<EarnModel, IStakedLP>
 }
 
 const earnModel: EarnModel = {
@@ -17,6 +23,10 @@ const earnModel: EarnModel = {
         ethAmount: '',
         raiAmount: '',
         totalLiquidity: '',
+    },
+    stakedLP: {
+        eth: '',
+        rai: '',
     },
     fetchPositionsAndThreshold: thunk(async (actions, payload) => {
         const res = await fetchPositions(payload)
@@ -29,6 +39,9 @@ const earnModel: EarnModel = {
     }),
     setData: action((state, payload) => {
         state.data = payload
+    }),
+    setStakedLP: action((state, payload) => {
+        state.stakedLP = payload
     }),
 }
 

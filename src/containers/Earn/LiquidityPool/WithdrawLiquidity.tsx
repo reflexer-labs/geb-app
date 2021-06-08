@@ -6,8 +6,8 @@ import { useActiveWeb3React } from '../../../hooks'
 import useGeb from '../../../hooks/useGeb'
 import {
     useInputsHandlers,
+    useLiquidityInfo,
     useWithdrawLiquidity,
-    useWithdrawLiquidityInfo,
 } from '../../../hooks/useLiquidityPool'
 import {
     ApprovalState,
@@ -21,7 +21,8 @@ const WithdrawLiquidity = () => {
         balances: currencyBalances,
         error,
         parsedAmounts,
-    } = useWithdrawLiquidityInfo()
+        tokensStake,
+    } = useLiquidityInfo(false)
     const geb = useGeb()
 
     const isValid = !error
@@ -87,21 +88,25 @@ const WithdrawLiquidity = () => {
                 <Block>
                     <Item>
                         <Label>{`ETH to Receive`}</Label>
-                        <Value>{`0.0008`}</Value>
+                        <Value>{`${
+                            tokensStake.eth
+                                ? formatNumber(tokensStake.eth)
+                                : '0'
+                        } ETH`}</Value>
                     </Item>
 
                     <Item>
                         <Label>{`RAI to Receive`}</Label>
-                        <Value>{`1230.24`}</Value>
-                    </Item>
-                    <Item>
-                        <Label>{`ETH per RAI`}</Label>
-                        <Value>{`0.0008`}</Value>
+                        <Value>{`${
+                            tokensStake.rai
+                                ? formatNumber(tokensStake.rai)
+                                : '0'
+                        } RAI`}</Value>
                     </Item>
 
                     <Item>
-                        <Label>{`RAI per ETH`}</Label>
-                        <Value>{`1230.24`}</Value>
+                        <Label>{`Total Liquidity`}</Label>
+                        <Value>{liqBValue} RAI/ETH</Value>
                     </Item>
                 </Block>
             </Result>
