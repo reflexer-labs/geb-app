@@ -102,15 +102,6 @@ const AddLiquidity = () => {
             <Result>
                 <Block>
                     <Item>
-                        <Label>{`ETH per RAI`}</Label>
-                        <Value>{`0.0008`}</Value>
-                    </Item>
-
-                    <Item>
-                        <Label>{`RAI per ETH`}</Label>
-                        <Value>{`1230.24`}</Value>
-                    </Item>
-                    <Item>
                         <Label>{`Total Liquidity`}</Label>
                         <Value>{liqBValue} RAI/ETH</Value>
                     </Item>
