@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import GridContainer from '../../../components/GridContainer'
 import PageHeader from '../../../components/PageHeader'
-import StakingOps from './StakingOps'
+import StakingManager from './StakingManager'
 import StakingStats from './StakingStats'
+import Statistics from './Statistics'
 
 const Staking = () => {
     const { t } = useTranslation()
@@ -22,13 +23,16 @@ const Staking = () => {
                 <Content>
                     <Header>
                         <img
-                            src={require('../../../assets/flx_uni_rai.svg')}
-                            alt="flx_uni_rai"
+                            src={require('../../../assets/staking.svg')}
+                            alt="flx"
                         />
-                        RAI_FLX_UNI_V2_LP
+                        stFLX
                     </Header>
                     <StakingStats />
-                    <StakingOps />
+                    <Ops>
+                        <StakingManager />
+                        <Statistics />
+                    </Ops>
                 </Content>
             </Container>
         </GridContainer>
@@ -38,6 +42,16 @@ const Staking = () => {
 export default Staking
 
 const Container = styled.div``
+
+const Ops = styled.div`
+    display: flex;
+    align-items: stretch;
+    margin-top: 20px;
+
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+        flex-direction:column-reverse;
+    `}
+`
 
 const Details = styled.div`
     background: ${(props) => props.theme.colors.background};
@@ -61,8 +75,8 @@ const Description = styled.div`
 `
 
 const Content = styled.div`
-    max-width: 980px;
-    margin: 40px auto 20px auto;
+    max-width: 780px;
+    margin: 40px auto 70px auto;
 `
 
 const Header = styled.div`

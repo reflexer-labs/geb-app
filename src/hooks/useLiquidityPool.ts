@@ -239,7 +239,7 @@ export function useTokensFromLiquidity(liquidity: string) {
 
     useEffect(() => {
         let isCanceled = false
-        if (!geb || !liquidity) {
+        if (!geb || Number(liquidity) <= 0) {
             setState({ eth: '0', rai: '0' })
             return
         }

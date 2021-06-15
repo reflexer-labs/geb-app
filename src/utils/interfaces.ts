@@ -480,3 +480,8 @@ export interface IStakedLP {
     eth: string
     rai: string
 }
+
+export interface IStakingData {
+    flxAmount: string
+    stakingAmount: string
+}

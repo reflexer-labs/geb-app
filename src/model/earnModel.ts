@@ -5,20 +5,27 @@ import {
     ILiquidityData,
     IStakedLP,
     PositionsAndThreshold,
+    IStakingData,
 } from '../utils/interfaces'
 
 export interface EarnModel {
     data: ILiquidityData
     stakedLP: IStakedLP
+    stakingData: IStakingData
     positionAndThreshold: PositionsAndThreshold | null
     fetchPositionsAndThreshold: Thunk<EarnModel, Geb>
     setPositionAndThreshold: Action<EarnModel, PositionsAndThreshold>
     setData: Action<EarnModel, ILiquidityData>
     setStakedLP: Action<EarnModel, IStakedLP>
+    setStakingData: Action<EarnModel, IStakingData>
 }
 
 const earnModel: EarnModel = {
     positionAndThreshold: null,
+    stakingData: {
+        flxAmount: '',
+        stakingAmount: '',
+    },
     data: {
         ethAmount: '',
         raiAmount: '',
@@ -42,6 +49,9 @@ const earnModel: EarnModel = {
     }),
     setStakedLP: action((state, payload) => {
         state.stakedLP = payload
+    }),
+    setStakingData: action((state, payload) => {
+        state.stakingData = payload
     }),
 }
 

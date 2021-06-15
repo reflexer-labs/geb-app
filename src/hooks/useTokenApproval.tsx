@@ -1,4 +1,5 @@
 import { BigNumber, ethers } from 'ethers'
+import { TransactionRequest } from 'geb.js'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useActiveWeb3React } from '.'
 import store from '../store'
@@ -11,7 +12,11 @@ import {
 } from './TransactionHooks'
 import useGeb, { useBlockNumber } from './useGeb'
 
-type Token = 'coin' | 'uniswapV3TwoTrancheLiquidityManager'
+type Token =
+    | 'coin'
+    | 'uniswapV3TwoTrancheLiquidityManager'
+    | 'protocolToken'
+    | 'stakingToken'
 
 export enum ApprovalState {
     UNKNOWN,
@@ -111,10 +116,19 @@ export function useTokenApproval(
             })
             const signer = library.getSigner(account)
 
-            const txData = geb.contracts[token].approve(
-                holder,
-                ethers.constants.MaxUint256
-            )
+            let txData: TransactionRequest
+
+            if (token === 'protocolToken') {
+                txData = geb.contracts.protocolToken.approve__AddressUint256(
+                    holder,
+                    ethers.constants.MaxUint256
+                )
+            } else {
+                txData = geb.contracts[token].approve(
+                    holder,
+                    ethers.constants.MaxUint256
+                )
+            }
 
             if (!txData) throw new Error('No transaction request!')
             const tx = await handlePreTxGasEstimate(signer, txData)

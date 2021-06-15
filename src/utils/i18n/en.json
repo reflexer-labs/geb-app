@@ -164,5 +164,6 @@
     "staking_header_title": "Staking",
     "staking_header_desc": "Stake your FLX, protect RAI and earn rewards",
     "staking_title": "FLX/RAI LP Staking",
-    "staking_description": "This dashboard allows you to stake your FLX/RAI Uniswap v2 LP tokens in exchange for getting FLX rewards. As a staker, you risk getting diluted in case the RAI protocol is underwater and needs to be recapitalized."
+    "staking_description": "This dashboard allows you to stake your FLX/RAI Uniswap v2 LP tokens in exchange for getting FLX rewards. As a staker, you risk getting diluted in case the RAI protocol is underwater and needs to be recapitalized.",
+    "myWeekly_reward_tip": "Rewards are being airdropped periodically and will be claimable here"
 }
