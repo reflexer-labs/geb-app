@@ -33,6 +33,10 @@ const UnStake = () => {
     const { onStakingInput } = useInputsHandlers()
     const { requestExitCallback } = useRequestExit()
     const { unStakeCallback } = useUnstake()
+    console.log(exitRequests)
+
+    console.log(hasPendingExitRequests)
+    console.log(allowExit)
 
     const isValid = !error
 
@@ -65,6 +69,11 @@ const UnStake = () => {
         'stakingToken',
         geb?.contracts.stakingFirstResort.address,
         account as string
+    )
+
+    console.log(
+        unStakeApprovalState === ApprovalState.PENDING ||
+            unStakeApprovalState === ApprovalState.NOT_APPROVED
     )
 
     const stakingValue = parsedAmounts.stakingAmount
@@ -108,6 +117,15 @@ const UnStake = () => {
                 </AlertBox>
             ) : null}
 
+            {!hasPendingExitRequests && allowExit ? (
+                <AlertBox>
+                    <AlertLabel
+                        type="success"
+                        text={`You can now unstake ${exitRequests.lockedAmount} stFLX`}
+                    />
+                </AlertBox>
+            ) : null}
+
             <Footer>
                 <BtnContainer>
                     {isValid &&
@@ -126,34 +144,36 @@ const UnStake = () => {
                             }
                             onClick={approveUnStake}
                         />
-                    ) : null}
-
-                    {unStakeApprovalState === ApprovalState.UNKNOWN ||
-                    unStakeApprovalState === ApprovalState.APPROVED ? (
+                    ) : (
                         <>
                             <Button
                                 style={{
-                                    width: !isValid ? '100%' : '48%',
+                                    width:
+                                        !hasPendingExitRequests && !allowExit
+                                            ? '100%'
+                                            : '48%',
                                 }}
                                 disabled={!isValid}
                                 text={error ? error : 'Request Unstake'}
                                 onClick={handleRequestExit}
                             />
-                            {isValid ? (
+
+                            {hasPendingExitRequests || allowExit ? (
                                 <Button
                                     style={{
                                         width: '48%',
                                     }}
                                     disabled={
-                                        !isValid ||
-                                        (hasPendingExitRequests && !allowExit)
+                                        (hasPendingExitRequests &&
+                                            !allowExit) ||
+                                        (!hasPendingExitRequests && !allowExit)
                                     }
-                                    text={error ? error : 'Unstake'}
+                                    text={'Unstake'}
                                     onClick={unStakeCallback}
                                 />
                             ) : null}
                         </>
-                    ) : null}
+                    )}
                 </BtnContainer>
             </Footer>
         </>

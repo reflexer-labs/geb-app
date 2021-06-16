@@ -35,13 +35,17 @@ export function useStakingInfo(isDeposit = true) {
 
     const hasPendingExitRequests = useMemo(() => {
         return (
-            Number(exitRequests.lockedAmount) > 0 && exitRequests.deadline > 0
+            Number(exitRequests.lockedAmount) > 0 &&
+            exitRequests.deadline > 0 &&
+            exitRequests.deadline * 1000 > Date.now()
         )
     }, [exitRequests])
 
     const allowExit = useMemo(() => {
         return (
-            Number(exitRequests.lockedAmount) > 0 && exitRequests.deadline <= 0
+            Number(exitRequests.lockedAmount) > 0 &&
+            exitRequests.deadline > 0 &&
+            exitRequests.deadline * 1000 < Date.now()
         )
     }, [exitRequests])
 
@@ -72,16 +76,18 @@ export function useStakingInfo(isDeposit = true) {
         ) {
             error = error ?? 'Enter an amount'
         }
+
         if (
             balances &&
+            exitRequests.lockedAmount &&
             balances.stakingBalance &&
             parsedAmounts.stakingAmount &&
             ethers.utils
                 .parseEther(balances.stakingBalance.toString())
                 .lt(
-                    ethers.utils.parseEther(
-                        parsedAmounts.stakingAmount.toString()
-                    )
+                    ethers.utils
+                        .parseEther(parsedAmounts.stakingAmount.toString())
+                        .add(ethers.utils.parseEther(exitRequests.lockedAmount))
                 )
         ) {
             error = 'Insufficient stFLX balance'
@@ -206,15 +212,9 @@ export function useGetExitRequests() {
         async function getExitRequest() {
             if (!isCanceled) {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const [requests, delay] = await geb.multiCall([
-                    geb.contracts.stakingFirstResort.exitRequests(
-                        account as string,
-                        true
-                    ),
-                    geb.contracts.stakingFirstResort.exitDelay(true),
-                ])
-
-                //delay is 604800 - might change though
+                const requests = await geb.contracts.stakingFirstResort.exitRequests(
+                    account as string
+                )
                 setState({
                     deadline: requests.deadline.toNumber(),
                     lockedAmount: ethers.utils.formatEther(

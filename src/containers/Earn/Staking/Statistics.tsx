@@ -56,7 +56,10 @@ const Statistics = () => {
                     <Block>
                         <Label>My Staked FLX</Label>
                         <Value>
-                            {myStakedBalance} {returnImg('flx')}
+                            {Number(myStakedBalance) > 0
+                                ? myStakedBalance
+                                : '0'}{' '}
+                            {returnImg('flx')}
                         </Value>
                     </Block>
 
