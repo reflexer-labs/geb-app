@@ -1,7 +1,4 @@
 import React, { useMemo } from 'react'
-import { Info } from 'react-feather'
-import { useTranslation } from 'react-i18next'
-import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { DAILY_REWARD_RATE, useStakingInfo } from '../../../hooks/useStaking'
 import { formatNumber } from '../../../utils/helper'
@@ -19,7 +16,6 @@ const returnImg = (type = 'flx', width = '20px', height = '20px') => {
     )
 }
 const Statistics = () => {
-    const { t } = useTranslation()
     const { balances, poolAmounts } = useStakingInfo()
 
     const { totalSupply } = poolAmounts
@@ -71,16 +67,12 @@ const Statistics = () => {
                     </Block>
 
                     <Block>
-                        <InfoIcon data-tip={t('myWeekly_reward_tip')}>
-                            <Info size="16" />
-                        </InfoIcon>
                         <Label>My Weekly Reward</Label>
                         <Value>
                             {myWeeklyReward} {returnImg('flx')}
                         </Value>
                     </Block>
                 </Blocks>
-                <ReactTooltip multiline type="light" data-effect="solid" />
             </Content>
         </Container>
     )
@@ -136,15 +128,4 @@ const Content = styled.div`
     flex-direction: column;
     height: calc(100% - 61px);
     justify-content: space-between;
-`
-
-const InfoIcon = styled.div`
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-    svg {
-        fill: ${(props) => props.theme.colors.secondary};
-        color: ${(props) => props.theme.colors.neutral};
-    }
 `

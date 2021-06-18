@@ -97,7 +97,7 @@ const UnStake = () => {
         <>
             <Body>
                 <DecimalInput
-                    icon={require('../../../assets/staking.svg')}
+                    icon={require('../../../assets/flx_uni_eth.svg')}
                     iconSize={'30px'}
                     onChange={onStakingInput}
                     value={stakingValue}
