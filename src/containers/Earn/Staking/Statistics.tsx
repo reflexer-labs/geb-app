@@ -10,7 +10,7 @@ const returnImg = (type = 'flx', width = '20px', height = '20px') => {
     return (
         <img
             src={require(`../../../assets/${
-                type === 'flx' ? 'flx-logo.svg' : 'staking.png'
+                type === 'flx' ? 'flx-logo.svg' : 'flx_uni_eth.svg'
             }`)}
             width={width}
             height={height}
@@ -54,12 +54,12 @@ const Statistics = () => {
             <Content>
                 <Blocks>
                     <Block>
-                        <Label>My Staked FLX</Label>
+                        <Label>My Staked FLX/ETH LP</Label>
                         <Value>
                             {Number(myStakedBalance) > 0
                                 ? myStakedBalance
                                 : '0'}{' '}
-                            {returnImg('flx')}
+                            {returnImg('staking')}
                         </Value>
                     </Block>
 
@@ -76,7 +76,7 @@ const Statistics = () => {
                         </InfoIcon>
                         <Label>My Weekly Reward</Label>
                         <Value>
-                            {myWeeklyReward} {returnImg('staking')}
+                            {myWeeklyReward} {returnImg('flx')}
                         </Value>
                     </Block>
                 </Blocks>

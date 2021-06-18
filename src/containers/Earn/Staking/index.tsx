@@ -23,7 +23,7 @@ const Staking = () => {
                 <Content>
                     <Header>
                         <img
-                            src={require('../../../assets/staking.svg')}
+                            src={require('../../../assets/flx_uni_eth.svg')}
                             alt="flx"
                         />
                         stFLX

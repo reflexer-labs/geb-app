@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import StFLX from '../../../components/Icons/StFLX'
 import { useStakingInfo } from '../../../hooks/useStaking'
 import { formatNumber } from '../../../utils/helper'
 
@@ -10,7 +9,7 @@ const StakingStats = () => {
     return (
         <Container>
             <Stat>
-                <StatLabel>Pool Balance</StatLabel>
+                <StatLabel>Total Pool Balance</StatLabel>
                 <StatValue>{formatNumber(poolAmounts.poolBalance)}</StatValue>
             </Stat>
 
@@ -22,7 +21,7 @@ const StakingStats = () => {
             <Stat>
                 <StatLabel>Weekly Rewards</StatLabel>
                 <StatValue>
-                    <StFLX />
+                    <img src={require('../../../assets/flx-logo.svg')} alt="" />
                     {poolAmounts.weeklyReward}
                 </StatValue>
             </Stat>
@@ -63,7 +62,9 @@ const StatValue = styled.div`
     margin: 5px 0 0px;
     display: flex;
     align-items: center;
-    svg {
+    img {
         margin-right: 5px;
+        width: 23px;
+        height: 23px;
     }
 `

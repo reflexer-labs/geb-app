@@ -52,12 +52,12 @@ const Stake = () => {
         <>
             <Body>
                 <DecimalInput
-                    icon={require('../../../assets/flx-logo.svg')}
+                    icon={require('../../../assets/flx_uni_eth.svg')}
                     iconSize={'30px'}
                     onChange={onFLXInput}
                     value={flxValue}
                     handleMaxClick={handleMaxInput}
-                    label={`FLX (Available: ${formatNumber(
+                    label={`FLX/ETH (Available: ${formatNumber(
                         balances.flxBalance
                     )})`}
                 />
