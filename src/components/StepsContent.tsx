@@ -81,7 +81,7 @@ const StepsContent = ({
                                 {!debtFloor ? (
                                     <Loader inlineButton />
                                 ) : (
-                                    formatNumber(debtFloor, 0)
+                                    Math.ceil(Number(formatNumber(debtFloor)))
                                 )}
                             </span>{' '}
                             RAI

@@ -623,7 +623,9 @@ const SafeBody = ({ isChecked }: Props) => {
 
                 <Note data-test-id="debt_floor_note">
                     {isCreate
-                        ? `Note: The minimum amount to mint per safe is ${debtFloor} RAI`
+                        ? `Note: The minimum amount to mint per safe is ${Math.ceil(
+                              Number(formatNumber(debtFloor))
+                          )} RAI`
                         : null}
                 </Note>
 
