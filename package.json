@@ -45,16 +45,12 @@
         "react-paginate": "^6.5.0",
         "react-router-dom": "^5.2.0",
         "react-scripts": "3.4.3",
-        "react-slider": "^1.1.4",
         "react-toastify": "^6.0.9",
         "react-tooltip": "^4.2.11",
         "react-transition-group": "^4.4.1",
         "styled-components": "^5.2.0",
         "typescript": "3.8.3",
         "walletlink": "^2.1.0"
-    },
-    "engines": {
-        "node": "12.18.0"
     },
     "scripts": {
         "start": "react-scripts start",

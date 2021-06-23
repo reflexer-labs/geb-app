@@ -285,7 +285,7 @@ export const fetchSafeHistory = async (safeId: string) => {
             const modifySAFECollateralization =
                 response.safes[0].modifySAFECollateralization ?? []
             const liquidationFixedDiscount =
-                response.safes[0].liquidationFixedDiscount ?? []
+                response.safes[0].liquidationDiscount ?? []
             const safeHistory = formatHistoryArray(
                 modifySAFECollateralization,
                 liquidationFixedDiscount

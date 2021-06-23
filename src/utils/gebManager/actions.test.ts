@@ -241,7 +241,7 @@ describe('actions', () => {
       expect(safeRpc.debt).fixedNumberMatch(safeGql.debt);
       expect(safeRpc.internalCollateralBalance.balance).fixedNumberMatch(safeGql.internalCollateralBalance.balance);
       // There is no way to fetch this over RPC, so we return null
-      expect(safeRpc.liquidationFixedDiscount).toBeNull()
+      expect(safeRpc.liquidationDiscount).toBeNull()
       // There is no way to fetch this over RPC, so we return null
       expect(safeRpc.modifySAFECollateralization).toBeNull()
       expect(safeRpc.safeId).fixedNumberMatch(safeGql.safeId);

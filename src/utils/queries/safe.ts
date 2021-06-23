@@ -51,6 +51,22 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
     internalCollateralBalance{
       balance
     }
+<<<<<<< HEAD
+=======
+    modifySAFECollateralization {
+      deltaDebt
+      deltaCollateral
+      createdAt
+      createdAtTransaction
+      accumulatedRate
+    }
+    liquidationDiscount {
+      sellInitialAmount
+      sellAmount
+      createdAt
+      createdAtTransaction
+    }
+>>>>>>> c26d8d60411de5b9578d4953283d229b8d53cd35
   }
   userProxies(where: {owner: "${address}"}) {
     address
@@ -73,7 +89,7 @@ export const getSafeHistoryQuery = (safeId: string) => `{
       createdAtTransaction
       accumulatedRate
     }
-    liquidationFixedDiscount {
+    liquidationDiscount {
       sellInitialAmount
       sellAmount
       createdAt

@@ -22,6 +22,8 @@ export type SaviourData = {
     hasSaviour: boolean
     saviourAddress: string
     saviourBalance: string
+    coinAddress: string
+    wethAddress: string
     saviourRescueRatio: number
     reserve0: BigNumber
     reserve1: BigNumber
@@ -202,6 +204,8 @@ export async function fetchSaviourData({
     return {
         safeId,
         hasSaviour: saviourAddress !== EMPTY_ADDRESS,
+        coinAddress,
+        wethAddress,
         saviourAddress,
         saviourBalance: formattedSaviourBalance,
         saviourRescueRatio: saviourRescueRatio.toNumber(),

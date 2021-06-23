@@ -317,7 +317,7 @@ export interface ISingleSafe {
         balance: string
     }
     modifySAFECollateralization: Array<IModifySAFECollateralization> | null // Will be null over RPC;
-    liquidationFixedDiscount: Array<ILiquidationFixedDiscount> | null // Will be null over RPC
+    liquidationDiscount: Array<ILiquidationFixedDiscount> | null // Will be null over RPC
 }
 export interface ISafeQuery extends ILiquidationResponse {
     erc20Balances: Array<{ balance: string }>
