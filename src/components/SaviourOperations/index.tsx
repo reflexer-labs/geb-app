@@ -40,12 +40,7 @@ const SaviourOperatrions = () => {
     } = useStoreActions((state) => state)
 
     const { safeModel: safeState } = useStoreState((state) => state)
-    const {
-        singleSafe,
-        isSaviourDeposit,
-        amount: stateAmount,
-        targetedCRatio,
-    } = safeState
+    const { isSaviourDeposit, amount: stateAmount, targetedCRatio } = safeState
 
     const hasSaviour = saviourData && saviourData.hasSaviour
 
@@ -55,7 +50,7 @@ const SaviourOperatrions = () => {
             : saviourData.saviourBalance
         : '0'
 
-    const safeId = _.get(singleSafe, 'id', '')
+    const safeId = _.get(saviourData, 'safeId', '')
 
     const handleCancel = () => {
         popupsActions.setIsSaviourModalOpen(false)

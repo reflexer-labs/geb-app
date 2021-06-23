@@ -1,9 +1,4 @@
 import { COLLATERAL_TYPE_ID } from '../constants'
-export const fetchDebtFloorQuery = `{
-  collateralType(id: "${COLLATERAL_TYPE_ID}") {
-    debtFloor
-  }
-}`
 
 export const liquidationQuery = `
   collateralType(id: "${COLLATERAL_TYPE_ID}") {
@@ -56,6 +51,8 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
     internalCollateralBalance{
       balance
     }
+<<<<<<< HEAD
+=======
     modifySAFECollateralization {
       deltaDebt
       deltaCollateral
@@ -69,6 +66,7 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
       createdAt
       createdAtTransaction
     }
+>>>>>>> c26d8d60411de5b9578d4953283d229b8d53cd35
   }
   userProxies(where: {owner: "${address}"}) {
     address
@@ -82,11 +80,20 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
    ${liquidationQuery}
 }`
 
-export const managedSafeQuery = (safeId: string) => `{
-  safes(where: { safeId: "${safeId}" , proxy_not: null, safeId_not: null}) {
-    safeId
-    owner{
-      id
+export const getSafeHistoryQuery = (safeId: string) => `{
+  safes(where: { safeId: "${safeId}" , proxy_contains: "0x", safeId_not: null}) {
+    modifySAFECollateralization {
+      deltaDebt
+      deltaCollateral
+      createdAt
+      createdAtTransaction
+      accumulatedRate
+    }
+    liquidationDiscount {
+      sellInitialAmount
+      sellAmount
+      createdAt
+      createdAtTransaction
     }
   }
 }`
