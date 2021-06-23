@@ -63,7 +63,7 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
       createdAtTransaction
       accumulatedRate
     }
-    liquidationFixedDiscount {
+    liquidationDiscount {
       sellInitialAmount
       sellAmount
       createdAt

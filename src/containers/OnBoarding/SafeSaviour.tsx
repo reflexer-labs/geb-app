@@ -24,6 +24,7 @@ import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
 import useInterval from '../../hooks/useInterval'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
+import { ExternalLinkArrow } from '../../GlobalStyle'
 
 const SafeSaviour = ({ ...props }) => {
     const { t } = useTranslation()
@@ -207,7 +208,12 @@ const SafeSaviour = ({ ...props }) => {
                                         src={require('../../assets/uniswap-icon.svg')}
                                         alt=""
                                     />{' '}
-                                    Uniswap V2 RAI/ETH
+                                    <Link
+                                        href={`https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`}
+                                        target="_blank"
+                                    >
+                                        Uniswap V2 RAI/ETH
+                                    </Link>
                                 </Value>
                                 <Label className="small"></Label>
                             </StateInner>
@@ -329,6 +335,9 @@ const Description = styled.div`
     font-size: 14px;
     color: ${(props) => props.theme.colors.secondary};
     line-height: 22px;
+    a {
+        ${ExternalLinkArrow}
+    }
 `
 
 const BtnContainer = styled.div`
@@ -453,4 +462,8 @@ const InfoIcon = styled.div`
         fill: ${(props) => props.theme.colors.secondary};
         color: ${(props) => props.theme.colors.neutral};
     }
+`
+
+const Link = styled.a`
+    ${ExternalLinkArrow}
 `
