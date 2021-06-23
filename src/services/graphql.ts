@@ -244,7 +244,7 @@ export const fetchSafeById = async (
     const modifySAFECollateralization =
         safeResponse.safes[0].modifySAFECollateralization ?? []
     const liquidationFixedDiscount =
-        safeResponse.safes[0].liquidationFixedDiscount ?? []
+        safeResponse.safes[0].liquidationDiscount ?? []
     const safeHistory = formatHistoryArray(
         modifySAFECollateralization,
         liquidationFixedDiscount
