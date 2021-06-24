@@ -179,7 +179,7 @@ const getSafeByIdRpc = async (
                     balance: parseWad(multiCall2[1]),
                 },
                 // We can't get these over RPC
-                liquidationFixedDiscount: null,
+                liquidationDiscount: null,
                 modifySAFECollateralization: null,
                 safeId: config.safeId,
             },
