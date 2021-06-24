@@ -4,7 +4,7 @@ import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { DefaultTheme, ThemedCssFunction } from 'styled-components'
 import { ChainId } from '@uniswap/sdk'
 import { IconName } from '../components/FeatherIconWrapper'
-import { ApproveMethod } from '../components/ApproveRAI'
+import { ApproveMethod } from '../components/ApproveToken'
 import { Geb } from 'geb.js'
 
 export interface DynamicObject {
@@ -223,131 +223,6 @@ export interface ISafeHistory {
     icon: IconName
     color: string
 }
-
-export interface IncentivesCampaign {
-    campaignAddress: string
-    campaignNumber: string
-    rewardsDuration: string
-    rewardRate: string
-    totalSupply: string
-    rewardToken: string
-    rewardPerTokenStored: string
-    periodFinish: string
-    lastUpdatedTime: string
-}
-
-export interface IncentiveBalance {
-    id: string
-    stakeBalance: string
-    address: string
-    owner: {
-        id: string
-    }
-    reward: string
-    userRewardPerTokenPaid: string
-}
-
-export interface IIncentivesCampaignData {
-    user: string | null
-    allCampaigns: Array<IncentivesCampaign>
-    systemState: {
-        coinAddress: string
-        wethAddress: string
-        coinUniswapPair: {
-            totalSupply: string
-            reserve0: string
-            reserve1: string
-            token0: string
-            token0Price: string
-            token1Price: string
-        }
-        currentCoinMedianizerUpdate: {
-            value: string
-        }
-    }
-    raiBalance: string
-    protBalance: string
-    uniswapCoinPool: string
-    // old24hData is null when using RPC as this can't be fetched over RPC
-    old24hData: {
-        coinAddress: string
-        wethAddress: string
-        coinUniswapPair: {
-            totalSupply: string
-            reserve0: string
-            reserve1: string
-        }
-        currentCoinMedianizerUpdate: {
-            value: string
-        }
-    } | null
-    incentiveBalances: Array<IncentiveBalance>
-    // proxyData is null when user does not have a proxy
-    proxyData: {
-        address: string
-        // coinAllowance when allowance is 0 TODO: need uniform behavior when 0
-        coinAllowance: { amount: string } | null
-        // uniCoinLpAllowance when allowance is 0 TODO: need uniform behavior when 0
-        uniCoinLpAllowance: { amount: string } | null
-    } | null
-}
-
-export interface IIncentivesFields {
-    ethAmount: string
-    raiAmount: string
-}
-
-export interface IIncentiveHook {
-    campaignNumber: string
-    periodFinish: string
-    campaignAddress: string
-    rewardRate: string
-    totalSupply: string
-    coinAddress: string
-    wethAddress: string
-    coinTotalSupply: string
-    stakedBalance: string
-    campaignEndTime: string
-    dailyFLX: number
-    uniSwapLink: string
-    ethStake: string
-    raiStake: string
-    myRewardRate: string
-    reserveRAI: string
-    reserveETH: string
-    lastUpdatedTime: string
-    rewardPerTokenStored: string
-    token0: string
-    token0Price: string
-    token1Price: string
-    isOngoingCampaign: boolean
-    isCoinLessThanWeth: boolean
-    user: '' | null
-    IB_reward: string
-    IB_userRewardPerTokenPaid: string
-}
-
-export interface IIncentivePayload {
-    incentivesFields: IIncentivesFields
-    signer: JsonRpcSigner
-    campaignAddress: string
-    uniswapShare: string
-    isUniSwapShareChecked: boolean
-}
-export interface IIncentiveClaim {
-    signer: JsonRpcSigner
-    campaignAddress: string
-}
-export interface IIncentiveWithdraw {
-    signer: JsonRpcSigner
-    campaignAddress: string
-    uniPoolAmount: string
-    reserveRAI: string
-    reserveETH: string
-    coinTotalSupply: string
-    isUniSwapShareChecked: boolean
-}
-
 export interface NumberMap {
     [key: string]: number
 }
@@ -467,10 +342,6 @@ export interface IFetchSafeById extends IFetchSafesPayload {
     safeId: string
 }
 
-export interface IIncentivesConfig extends IFetchSafesPayload {
-    blockNumber: number
-}
-
 export interface IAuctionBidder {
     bidder: string
     buyAmount: string
@@ -518,12 +389,6 @@ export interface IPaging {
     to: number
 }
 
-export interface IIncentivesMigrate {
-    from: string
-    to: string
-    signer: JsonRpcSigner
-}
-
 export interface IManageSafe {
     safeId: string
     owner: {
@@ -561,8 +426,7 @@ export interface GetReservesFromSaviour {
 
 export interface FetchSaviourPayload {
     account: string
-    proxyAddress: string
+    safeId: string
     ethPrice: number
     geb: Geb
-    safe: ISafe
 }

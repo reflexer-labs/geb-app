@@ -11,7 +11,7 @@ import SafeHistory from '../../components/SafeHistory'
 import SafeStats from '../../components/SafeStats'
 import { useActiveWeb3React } from '../../hooks'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
-import useGeb from '../../hooks/useGeb'
+import useGeb, { useIsOwner } from '../../hooks/useGeb'
 import {
     useHasLeftOver,
     useHasSaviour,
@@ -22,7 +22,6 @@ import { isNumeric } from '../../utils/validations'
 
 const SafeDetails = ({ ...props }) => {
     const { t } = useTranslation()
-    const [isOwner, setIsOwner] = useState(true)
     const { account, library } = useActiveWeb3React()
     const [loading, setIsLoading] = useState(false)
     const geb = useGeb()
@@ -30,11 +29,7 @@ const SafeDetails = ({ ...props }) => {
         safeModel: safeActions,
         popupsModel: popupsActions,
     } = useStoreActions((state) => state)
-    const {
-        safeModel: safeState,
-        settingsModel: settingsState,
-    } = useStoreState((state) => state)
-    const { isRPCAdapterOn } = settingsState
+    const { safeModel: safeState } = useStoreState((state) => state)
     const safeId = props.match.params.id as string
 
     const hasSaviour = useHasSaviour(
@@ -45,6 +40,8 @@ const SafeDetails = ({ ...props }) => {
     const { getReservesCallback } = useSaviourGetReserves()
 
     const history = useHistory()
+
+    const isOwner = useIsOwner(safeId)
 
     useEffect(() => {
         if (!account || !library) return
@@ -58,57 +55,56 @@ const SafeDetails = ({ ...props }) => {
                 title: 'Fetching Safe Data',
                 status: 'loading',
             })
-            const safe = await safeActions.fetchSafeById({
-                safeId,
-                address: account as string,
-                geb,
-                isRPCAdapterOn,
-            })
-            if (!isRPCAdapterOn) {
-                await safeActions.fetchManagedSafe(safeId)
-            }
+            try {
+                const safe = await safeActions.fetchSafeById({
+                    safeId,
+                    address: account as string,
+                    geb,
+                    isRPCAdapterOn: true,
+                })
+                await safeActions.fetchSafeHistory(safeId)
 
-            if (safe) {
+                if (safe) {
+                    popupsActions.setIsWaitingModalOpen(false)
+                }
+            } catch (error) {
+                console.log('error')
                 popupsActions.setIsWaitingModalOpen(false)
             }
         }
 
         fetchSafe()
 
-        const ms = isRPCAdapterOn ? 5000 : 2000
+        const ms = 3000
 
         const interval = setInterval(() => {
-            safeActions.fetchSafeById({
-                safeId,
-                address: account as string,
-                geb,
-                isRPCAdapterOn,
-            })
+            try {
+                safeActions.fetchSafeById({
+                    safeId,
+                    address: account as string,
+                    geb,
+                    isRPCAdapterOn: true,
+                })
+                safeActions.fetchSafeHistory(safeId)
+            } catch (error) {
+                console.log(error)
+            }
         }, ms)
 
         return () => {
             clearInterval(interval)
             safeActions.setSingleSafe(null)
+            safeActions.setSafeHistoryList([])
         }
     }, [
         account,
         geb,
-        isRPCAdapterOn,
         library,
         popupsActions,
         props.history,
         safeActions,
         safeId,
     ])
-
-    useEffect(() => {
-        if (account && safeState.managedSafe.owner.id) {
-            setIsOwner(
-                account.toLowerCase() ===
-                    safeState.managedSafe.owner.id.toLowerCase()
-            )
-        }
-    }, [account, safeState.managedSafe.owner.id])
 
     const handleSaviourBtnClick = async (data: {
         status: boolean
@@ -186,7 +182,7 @@ const SafeDetails = ({ ...props }) => {
 
                 <>
                     <SafeStats />
-                    {safeState.historyList.length && !isRPCAdapterOn ? (
+                    {safeState.historyList.length ? (
                         <SafeHistory
                             hideHistory={!safeState.historyList.length}
                         />

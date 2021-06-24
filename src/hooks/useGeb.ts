@@ -16,3 +16,38 @@ export default function useGeb(): Geb {
 
     return state as Geb
 }
+
+export function useIsOwner(safeId: string): boolean {
+    const [state, setState] = useState(true)
+    const geb = useGeb()
+    const { account } = useActiveWeb3React()
+    useEffect(() => {
+        if (!geb || !account || !safeId) return
+        async function getSafeData() {
+            const [proxyAddress, safeOwner] = await geb.multiCall([
+                geb.contracts.proxyRegistry.proxies(account as string, true),
+                geb.contracts.safeManager.ownsSAFE(safeId, true),
+            ])
+
+            setState(proxyAddress === safeOwner)
+        }
+        getSafeData()
+    }, [account, geb, safeId])
+
+    return state
+}
+
+export function useSafeHandler(safeId: string): string {
+    const [state, setState] = useState('')
+    const geb = useGeb()
+    useEffect(() => {
+        if (!geb || !safeId) return
+        async function getSafeData() {
+            const safeHandler = await geb.contracts.safeManager.safes(safeId)
+            setState(safeHandler)
+        }
+        getSafeData()
+    }, [geb, safeId])
+
+    return state
+}

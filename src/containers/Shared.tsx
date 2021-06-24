@@ -11,11 +11,15 @@ import BalanceUpdater from '../services/BalanceUpdater'
 import { capitalizeName, timeout } from '../utils/helper'
 import WalletModal from '../components/WalletModal'
 import { ChainId } from '@uniswap/sdk'
-import { ETHERSCAN_PREFIXES, SYSTEM_STATUS } from '../utils/constants'
+import {
+    EMPTY_ADDRESS,
+    ETHERSCAN_PREFIXES,
+    SYSTEM_STATUS,
+} from '../utils/constants'
 import { useActiveWeb3React } from '../hooks'
 import LoadingModal from '../components/Modals/LoadingModal'
 import styled from 'styled-components'
-import { injected, NETWORK_ID } from '../connectors'
+import { NETWORK_ID } from '../connectors'
 import CookieBanner from '../components/CookieBanner'
 import BlockBodyContainer from '../components/BlockBodyContainer'
 import { toast } from 'react-toastify'
@@ -24,7 +28,6 @@ import WaitingModal from '../components/Modals/WaitingModal'
 import TransactionUpdater from '../services/TransactionUpdater'
 import usePrevious from '../hooks/usePrevious'
 import { useHistory } from 'react-router-dom'
-import IncentivesModal from '../components/Modals/IncentivesModal'
 import ProxyModal from '../components/Modals/ProxyModal'
 import ImagePreloader from '../components/ImagePreloader'
 import AuctionsModal from '../components/Modals/AuctionsModal'
@@ -41,7 +44,7 @@ interface Props {
 
 const Shared = ({ children, ...rest }: Props) => {
     const { t } = useTranslation()
-    const { chainId, account, library, connector } = useActiveWeb3React()
+    const { chainId, account, library } = useActiveWeb3React()
     const geb = useGeb()
     const history = useHistory()
 
@@ -66,7 +69,6 @@ const Shared = ({ children, ...rest }: Props) => {
         popupsActions.setIsConnectedWalletModalOpen(false)
         popupsActions.setIsConnectModalOpen(false)
         popupsActions.setIsConnectorsWalletOpen(false)
-        popupsActions.setIsIncentivesModalOpen(false)
         popupsActions.setIsLoadingModalOpen({ text: '', isOpen: false })
         popupsActions.setIsScreenModalOpen(false)
         popupsActions.setIsSettingModalOpen(false)
@@ -92,7 +94,11 @@ const Shared = ({ children, ...rest }: Props) => {
             connectWalletActions.setIsUserCreated(false)
             connectWalletActions.setProxyAddress('')
             const userProxy = await geb.getProxyAction(account)
-            if (userProxy) {
+            if (
+                userProxy &&
+                userProxy.proxyAddress &&
+                userProxy.proxyAddress !== EMPTY_ADDRESS
+            ) {
                 connectWalletActions.setIsUserCreated(true)
                 connectWalletActions.setProxyAddress(userProxy.proxyAddress)
             }
@@ -199,13 +205,6 @@ const Shared = ({ children, ...rest }: Props) => {
         networkCheckerCallBack()
     }, [networkCheckerCallBack])
 
-    // set rpc adapter off if connector isn't injected
-    useEffect(() => {
-        if (connector && connector !== injected) {
-            settingsActions.setIsRPCAdapterOn(false)
-        }
-    }, [connector, settingsActions])
-
     return (
         <Container>
             {settingsState.blockBody ? <BlockBodyContainer /> : null}
@@ -217,7 +216,6 @@ const Shared = ({ children, ...rest }: Props) => {
             <DistributionsModal />
             <SaviourModal />
             <LoadingModal />
-            <IncentivesModal />
             <AuctionsModal />
             <CreateAccountModal />
             <ProxyModal />

@@ -8,7 +8,6 @@ import {
     ISafeHistory,
     IFetchSafesPayload,
     IFetchSafeById,
-    IManageSafe,
     FetchSaviourPayload,
 } from '../utils/interfaces'
 import {
@@ -17,12 +16,11 @@ import {
     handleRepayAndWithdraw,
 } from '../services/blockchain'
 import {
-    fetchDebtFloor,
-    fetchManagedSafe,
     fetchSafeById,
+    fetchSafeHistory,
     fetchUserSafes,
 } from '../services/graphql'
-import { DEFAULT_SAFE_STATE } from '../utils/constants'
+import { DEFAULT_SAFE_STATE, EMPTY_ADDRESS } from '../utils/constants'
 import { timeout } from '../utils/helper'
 import { StoreModel } from '.'
 import { NETWORK_ID } from '../connectors'
@@ -37,13 +35,11 @@ export interface SafeModel {
     targetedCRatio: number
     totalEth: string
     isMaxWithdraw: boolean
-    managedSafe: IManageSafe
     totalRAI: string
     amount: string
     isES: boolean
     isUniSwapPoolChecked: boolean
     stage: number
-    debtFloor: string
     isSaviourDeposit: boolean
     isSuccessfulTx: boolean
     safeData: ISafeData
@@ -64,8 +60,7 @@ export interface SafeModel {
     >
     fetchSafeById: Thunk<SafeModel, IFetchSafeById, any, StoreModel>
     fetchUserSafes: Thunk<SafeModel, IFetchSafesPayload, any, StoreModel>
-    fetchDebtFloor: Thunk<SafeModel>
-    fetchManagedSafe: Thunk<SafeModel, string>
+    fetchSafeHistory: Thunk<SafeModel, string>
     collectETH: Thunk<
         SafeModel,
         { signer: JsonRpcSigner; safe: ISafe },
@@ -87,8 +82,6 @@ export interface SafeModel {
     setStage: Action<SafeModel, number>
     setSafeHistoryList: Action<SafeModel, Array<ISafeHistory>>
     setIsSuccessfulTx: Action<SafeModel, boolean>
-    setDebtFloor: Action<SafeModel, string>
-    setManagedSafe: Action<SafeModel, IManageSafe>
     setIsSaviourDeposit: Action<SafeModel, boolean>
     setAmount: Action<SafeModel, string>
     setTargetedCRatio: Action<SafeModel, number>
@@ -104,12 +97,6 @@ const safeModel: SafeModel = {
     amount: '',
     targetedCRatio: 0,
     saviourData: undefined,
-    managedSafe: {
-        safeId: '',
-        owner: {
-            id: '',
-        },
-    },
     singleSafe: null,
     totalEth: '0.00',
     totalRAI: '0.00',
@@ -117,7 +104,6 @@ const safeModel: SafeModel = {
     isES: true,
     isUniSwapPoolChecked: true,
     stage: 0,
-    debtFloor: '',
     isSaviourDeposit: true,
     safeData: DEFAULT_SAFE_STATE,
     liquidationData: {
@@ -275,9 +261,6 @@ const safeModel: SafeModel = {
         const res = await fetchSafeById(payload)
         if (res) {
             actions.setSingleSafe(res.safe[0])
-            if (res.safeHistory.length > 0) {
-                actions.setSafeHistoryList(res.safeHistory)
-            }
             actions.setLiquidationData(res.liquidationData)
             storeActions.connectWalletModel.updateRaiBalance({
                 chainId: NETWORK_ID,
@@ -285,7 +268,7 @@ const safeModel: SafeModel = {
             })
             if (res.proxyData) {
                 const { address, coinAllowance } = res.proxyData
-                if (address) {
+                if (address && address !== EMPTY_ADDRESS) {
                     storeActions.connectWalletModel.setProxyAddress(address)
                 }
                 if (coinAllowance) {
@@ -300,22 +283,14 @@ const safeModel: SafeModel = {
         }
     }),
 
-    fetchDebtFloor: thunk(async (actions) => {
-        const res = await fetchDebtFloor()
-        if (res) {
-            actions.setDebtFloor(res)
+    fetchSafeHistory: thunk(async (actions, payload) => {
+        const res = await fetchSafeHistory(payload)
+        if (res && res.length > 0) {
+            actions.setSafeHistoryList(res)
             return res
         }
     }),
-    fetchManagedSafe: thunk(async (actions, payload) => {
-        const res = await fetchManagedSafe(payload)
-        if (res) {
-            if (res.safes.length > 0) {
-                actions.setManagedSafe(res.safes[0])
-            }
-            return res
-        }
-    }),
+
     fetchSaviourData: thunk(async (actions, payload) => {
         const res = await fetchSaviourData(payload)
         actions.setSaviourData(res)
@@ -364,12 +339,6 @@ const safeModel: SafeModel = {
     }),
     setIsSuccessfulTx: action((state, payload) => {
         state.isSuccessfulTx = payload
-    }),
-    setDebtFloor: action((state, payload) => {
-        state.debtFloor = payload
-    }),
-    setManagedSafe: action((state, payload) => {
-        state.managedSafe = payload
     }),
     setIsSaviourDeposit: action((state, payload) => {
         state.isSaviourDeposit = payload

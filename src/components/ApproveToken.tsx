@@ -22,7 +22,7 @@ interface Props {
     coinName: string
 }
 
-const ApproveRAI = ({
+const ApproveToken = ({
     amount,
     allowance,
     handleBackBtn,
@@ -200,7 +200,7 @@ const ApproveRAI = ({
     )
 }
 
-export default ApproveRAI
+export default ApproveToken
 
 const Container = styled.div`
     max-width: 400px;

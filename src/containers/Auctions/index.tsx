@@ -1,38 +1,32 @@
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
+import AlertLabel from '../../components/AlertLabel'
 import AuctionsFAQ from '../../components/AuctionsFAQ'
 import Button from '../../components/Button'
 import GridContainer from '../../components/GridContainer'
 import PageHeader from '../../components/PageHeader'
 import { useActiveWeb3React } from '../../hooks'
-import { useStoreActions, useStoreState } from '../../store'
+import { useStoreActions } from '../../store'
 import AuctionsList from './AuctionsList'
 
 export type AuctionEventType = 'DEBT' | 'SURPLUS'
 
 const Auctions = () => {
     const { t } = useTranslation()
-    const history = useHistory()
     const { account } = useActiveWeb3React()
     const {
         auctionsModel: auctionsActions,
         popupsModel: popupsActions,
     } = useStoreActions((state) => state)
-    const { settingsModel: settingsState } = useStoreState((state) => state)
-
-    const { isRPCAdapterOn } = settingsState
 
     const [hide, setHide] = useState(false)
     const [type, setType] = useState<AuctionEventType>('DEBT')
+    const [error, setError] = useState('')
 
     const handleHideFAQ = () => setHide(!hide)
 
     useEffect(() => {
-        if (isRPCAdapterOn) {
-            history.push('/')
-        }
         async function init() {
             popupsActions.setIsWaitingModalOpen(true)
             popupsActions.setWaitingPayload({
@@ -44,10 +38,18 @@ const Auctions = () => {
         }
 
         async function fetchAuctions() {
-            await auctionsActions.fetchAuctions({
-                address: account ? account : '',
-                type,
-            })
+            try {
+                await auctionsActions.fetchAuctions({
+                    address: account ? account : '',
+                    type,
+                })
+                setError('')
+            } catch (error) {
+                console.log(error)
+                if (error.message.includes('failed')) {
+                    setError('Failed to fetch auctions from the graph node')
+                }
+            }
         }
         init()
         fetchAuctions()
@@ -56,11 +58,12 @@ const Auctions = () => {
         }, 2000)
 
         return () => clearInterval(interval)
-    }, [account, auctionsActions, history, isRPCAdapterOn, popupsActions, type])
+    }, [account, auctionsActions, popupsActions, type])
 
     return (
         <>
             <GridContainer>
+                {error ? <AlertLabel type="danger" text={error} /> : null}
                 <Content>
                     <PageHeader
                         breadcrumbs={{ '/': t('auctions') }}

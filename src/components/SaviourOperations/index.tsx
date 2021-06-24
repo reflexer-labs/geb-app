@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import _ from '../../utils/lodash'
-import ReactSlider from 'react-slider'
 import numeral from 'numeral'
 import { useStoreActions, useStoreState } from '../../store'
 import Button from '../Button'
@@ -13,13 +12,7 @@ import { formatNumber } from '../../utils/helper'
 import { useMinSaviourBalance, useSaviourData } from '../../hooks/useSaviour'
 import { BigNumber, ethers } from 'ethers'
 import { Info } from 'react-feather'
-
-const INITITAL_STATE = [
-    {
-        item: 'Uniswap v2 RAI/ETH',
-        img: require('../../assets/uniswap-icon.svg'),
-    },
-]
+import Slider from '../Slider'
 
 const MIN_SAVIOUR_CRATIO = 175
 
@@ -27,6 +20,15 @@ const SaviourOperatrions = () => {
     const { t } = useTranslation()
     const [error, setError] = useState('')
     const saviourData = useSaviourData()
+
+    const SAVIOUR_TOKENS = [
+        {
+            item: 'Uniswap v2 RAI/ETH',
+            img: require('../../assets/uniswap-icon.svg'),
+            href: `https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`,
+            isExternal: true,
+        },
+    ]
 
     const { getMinSaviourBalance } = useMinSaviourBalance()
     const [sliderVal, setSliderVal] = useState<number>(0)
@@ -38,12 +40,7 @@ const SaviourOperatrions = () => {
     } = useStoreActions((state) => state)
 
     const { safeModel: safeState } = useStoreState((state) => state)
-    const {
-        singleSafe,
-        isSaviourDeposit,
-        amount: stateAmount,
-        targetedCRatio,
-    } = safeState
+    const { isSaviourDeposit, amount: stateAmount, targetedCRatio } = safeState
 
     const hasSaviour = saviourData && saviourData.hasSaviour
 
@@ -53,7 +50,7 @@ const SaviourOperatrions = () => {
             : saviourData.saviourBalance
         : '0'
 
-    const safeId = _.get(singleSafe, 'id', '')
+    const safeId = _.get(saviourData, 'safeId', '')
 
     const handleCancel = () => {
         popupsActions.setIsSaviourModalOpen(false)
@@ -196,6 +193,11 @@ const SaviourOperatrions = () => {
         }
     }
 
+    const handleSliderChange = (value: number | readonly number[]) => {
+        setSliderVal(value as number)
+        safeActions.setTargetedCRatio(value as number)
+    }
+
     const handleChange = (val: string) => {
         setError('')
         setAmount(val)
@@ -209,11 +211,6 @@ const SaviourOperatrions = () => {
         }
     }
 
-    const Thumb = (props: any) => <StyledThumb {...props} />
-
-    const Track = (props: any, state: any) => (
-        <StyledTrack {...props} index={state.index} />
-    )
     useEffect(() => {
         if (stateAmount) {
             setAmount(stateAmount)
@@ -248,7 +245,7 @@ const SaviourOperatrions = () => {
             <DropDownContainer>
                 <Dropdown
                     items={[]}
-                    itemSelected={INITITAL_STATE[0]}
+                    itemSelected={SAVIOUR_TOKENS[0]}
                     label={'Saviour Token'}
                     padding={'22px 20px'}
                     imgSize={'28px'}
@@ -301,19 +298,15 @@ const SaviourOperatrions = () => {
                 </Label>
 
                 <SliderContainer>
-                    <StyledSlider
+                    <Slider
                         value={sliderVal}
-                        onChange={(value) => setSliderVal(value as number)}
-                        onAfterChange={(value) =>
-                            safeActions.setTargetedCRatio(value as number)
-                        }
+                        onChange={handleSliderChange}
                         min={
                             saviourData?.minCollateralRatio ||
                             MIN_SAVIOUR_CRATIO
                         }
                         max={300}
-                        renderTrack={Track}
-                        renderThumb={Thumb}
+                        size={25}
                     />
                     <SliderValue>{sliderVal}%</SliderValue>
                 </SliderContainer>
@@ -399,33 +392,6 @@ const Btn = styled.div`
 const MaxBalance = styled.div`
     font-size: 12px;
     margin-top: 10px;
-`
-
-const StyledThumb = styled.div`
-    height: 25px;
-    line-height: 25px;
-    width: 25px;
-    text-align: center;
-    background: ${(props) => props.theme.colors.gradient};
-    border: 2px solid ${(props) => props.theme.colors.neutral};
-    border-radius: 50%;
-    top: -8px;
-    outline: none;
-    cursor: grab;
-`
-const StyledSlider = styled(ReactSlider)`
-    flex: 1;
-    height: 10px;
-`
-
-const StyledTrack = styled.div<{ index: number }>`
-    top: 0;
-    bottom: 0;
-    background: ${(props) =>
-        props.index === 1
-            ? props.theme.colors.secondary
-            : props.theme.colors.gradient};
-    border-radius: 999px;
 `
 
 const RescueRatio = styled.div`
