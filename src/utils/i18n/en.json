@@ -157,7 +157,7 @@
     "current_saviour_desc": "The current saviour for this Safe will try to withdraw your Uniswap V2 RAI/ETH liquidity and repay part of your debt or top up your Safe with ETH. Any leftover RAI or ETH that weren't used to save the Safe will be available for you to withdraw. <b>NOTE: if the saviour doesn't have enough LP tokens to save your Safe, the Safe will get liquidated.</b> <a href='https://docs.reflexer.finance/integrations/liquidation-protection-guide#6-how-does-the-saviour-work-under-the-hood' target='_blank'>Read More</a>",
     "disconnect_saviour": "Disconnect Saviour",
     "earn": "Earn",
-    "incentives_header_title": "Incentives Campaigns",
-    "incentives_header_desc": "incentives_header_desc",
+    "incentives_header_title": "Incentive Campaigns",
+    "incentives_header_desc": "Data about FLX distribution campaigns",
     "no_distros": "There are no distributions for this round"
 }

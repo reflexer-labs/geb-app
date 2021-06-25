@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+import Arrow from '../../../components/Icons/Arrow'
 import { ExternalLinkArrow } from '../../../GlobalStyle'
 import { Round } from '../../../utils/interfaces'
 
@@ -131,6 +132,15 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                                               )
                                             : null}
                                     </Extras>
+
+                                    <BtnContainer>
+                                        <ExtLink
+                                            href={distro.link}
+                                            target="_blank"
+                                        >
+                                            Go to App <Arrow />
+                                        </ExtLink>
+                                    </BtnContainer>
                                 </Distro>
                             )
                         })
@@ -277,8 +287,7 @@ const DistroDesc = styled.div`
 
 const Extras = styled.div`
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    flex-direction: column;
     margin-top: 10px;
 `
 
@@ -287,6 +296,7 @@ const ExtraData = styled.div`
     margin-right: 20px;
     position: relative;
     padding-left: 15px;
+    margin-top: 5px;
     &:before {
         top: 3px;
         left: 0px;
@@ -298,9 +308,6 @@ const ExtraData = styled.div`
         background: ${(props) => props.theme.colors.gradient};
         margin-right: 5px;
     }
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-     margin-top:5px;
-  `}
 `
 
 const StarMessage = styled.div`
@@ -312,4 +319,12 @@ const StarMessage = styled.div`
         margin-right: 5px;
         width: 17px;
     }
+`
+
+const BtnContainer = styled.div`
+    text-align: right;
+`
+
+const ExtLink = styled.a`
+    ${ExternalLinkArrow}
 `
