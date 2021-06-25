@@ -430,3 +430,26 @@ export interface FetchSaviourPayload {
     ethPrice: number
     geb: Geb
 }
+
+export interface Distro {
+    from: string
+    until: string
+    amount: string
+    name: string
+    description: string
+    link: string
+    optional: { [key: string]: string | undefined }
+}
+
+export interface Round {
+    number: number
+    name: string
+    distros: Distro[]
+    snapshotDate: string
+    distributionDate: string
+    starMessage?: string
+}
+
+export interface IncentivesDocument {
+    rounds: Round[]
+}
