@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
+import Button from '../../../components/Button'
 import { DAILY_REWARD_RATE, useStakingInfo } from '../../../hooks/useStaking'
 import { formatNumber } from '../../../utils/helper'
 
@@ -73,6 +74,14 @@ const Statistics = () => {
                         </Value>
                     </Block>
                 </Blocks>
+                <StatsFooter>
+                    <RewardBox>
+                        <RewardLabel>My Current Reward</RewardLabel>
+                        <RewardValue>0 {returnImg('flx')}</RewardValue>
+                    </RewardBox>
+
+                    <Button onClick={() => {}} text={'Claim Reward'} />
+                </StatsFooter>
             </Content>
         </Container>
     )
@@ -81,7 +90,7 @@ const Statistics = () => {
 export default Statistics
 
 const Container = styled.div`
-    flex: 2;
+    flex: 3;
     ${({ theme }) => theme.mediaWidth.upToSmall`
    margin-bottom:20px;
  `}
@@ -97,7 +106,7 @@ const Blocks = styled.div`
 const Block = styled.div`
     position: relative;
     margin-bottom: 20px;
-    flex: 0 0 100%;
+    flex: 0 0 48%;
     border: 1px solid ${(props) => props.theme.colors.border};
     border-radius: ${(props) => props.theme.global.borderRadius};
     background: ${(props) => props.theme.colors.background};
@@ -128,4 +137,38 @@ const Content = styled.div`
     flex-direction: column;
     height: calc(100% - 61px);
     justify-content: space-between;
+`
+
+const StatsFooter = styled.div`
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    border: 1px solid ${(props) => props.theme.colors.border};
+    background: ${(props) => props.theme.colors.background};
+`
+
+const RewardBox = styled.div`
+    /* display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    justify-content: space-between; */
+`
+
+const RewardValue = styled.div`
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    img {
+        margin-left: 5px;
+    }
+`
+const RewardLabel = styled.div`
+    color: ${(props) => props.theme.colors.secondary};
+    font-size: 14px;
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+        font-size: 14px;
+        margin-top:0;
+    `}
 `

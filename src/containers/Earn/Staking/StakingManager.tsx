@@ -33,7 +33,7 @@ const StakingPayment = styled.div`
     background: ${(props) => props.theme.colors.background};
     border-radius: ${(props) => props.theme.global.borderRadius};
     border: 1px solid ${(props) => props.theme.colors.border};
-    flex: 3;
+    flex: 4;
     margin-right: 20px;
     ${({ theme }) => theme.mediaWidth.upToSmall`
    margin-right:0

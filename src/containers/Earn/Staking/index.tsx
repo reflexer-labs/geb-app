@@ -75,7 +75,7 @@ const Description = styled.div`
 `
 
 const Content = styled.div`
-    max-width: 780px;
+    max-width: 980px;
     margin: 40px auto 70px auto;
 `
 
