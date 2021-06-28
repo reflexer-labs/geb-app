@@ -60,9 +60,7 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                                         <LeftBlock>
                                             <DistroData>
                                                 <img
-                                                    src={
-                                                        'https://via.placeholder.com/30'
-                                                    }
+                                                    src={distro.image}
                                                     alt=""
                                                 />{' '}
                                                 {distro.name}

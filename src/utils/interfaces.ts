@@ -439,6 +439,7 @@ export interface Distro {
     description: string
     link: string
     optional: { [key: string]: string | undefined }
+    image: string
 }
 
 export interface Round {
