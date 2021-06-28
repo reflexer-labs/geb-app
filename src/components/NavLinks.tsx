@@ -1,5 +1,5 @@
 import React from 'react'
-import { Shield } from 'react-feather'
+import { DollarSign, Shield } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
@@ -46,6 +46,21 @@ const NavLinks = () => {
                     <AuctionIcon className="opacity" /> {t('auctions')}
                 </NavBarLink>
             )}
+
+            <Box className="has-menu">
+                <LinkItem>
+                    <DollarSign /> {t('earn')}
+                </LinkItem>
+                <MenuBox className="menu-box">
+                    <ExtLink href="/earn/incentives">
+                        Incentives{' '}
+                        <img
+                            src={require('../assets/dark-arrow.svg')}
+                            alt="arrow"
+                        />
+                    </ExtLink>
+                </MenuBox>
+            </Box>
             <Box className="has-menu">
                 <LinkItem>
                     <Shield /> {t('insurance')}
