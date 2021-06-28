@@ -26,6 +26,7 @@ import Auctions from './containers/Auctions'
 import GoogleTagManager from './components/Analytics/GoogleTagManager'
 import { SHOW_AUCTIONS } from './utils/constants'
 import SafeSaviour from './containers/OnBoarding/SafeSaviour'
+import Incentives from './containers/Earn/Incentives'
 
 // Toast css
 
@@ -66,6 +67,11 @@ const App = () => {
                                             exact
                                             component={Privacy}
                                             path={'/privacy'}
+                                        />
+                                        <Route
+                                            exact
+                                            component={Incentives}
+                                            path={'/earn/incentives'}
                                         />
                                         <Route
                                             exact
