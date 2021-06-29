@@ -290,7 +290,7 @@ const Extras = styled.div`
 `
 
 const ExtraData = styled.div`
-    font-size: 13px;
+    font-size: 14px;
     margin-right: 20px;
     position: relative;
     padding-left: 15px;
