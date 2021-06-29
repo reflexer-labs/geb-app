@@ -215,7 +215,7 @@ describe('App Page - Safe Details', () => {
 
     it('should show error if debt is greater than debt floor', () => {
         cy.get('#repay_withdraw').click()
-        cy.get('[data-test-id="repay_withdraw_right"]').type('500')
+        cy.get('[data-test-id="repay_withdraw_right"]').type('530')
         cy.contains('Review Transaction').click()
         cy.contains(`The resulting debt should be at least`)
     })

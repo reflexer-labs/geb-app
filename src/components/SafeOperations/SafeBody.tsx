@@ -327,6 +327,13 @@ const SafeBody = ({ isChecked }: Props) => {
             return false
         }
 
+        if (!connectWalletState.proxyAddress) {
+            setError(
+                'You do not have a proxy address, Create a Reflexer Account to continue'
+            )
+            return
+        }
+
         return true
     }
 
@@ -388,12 +395,6 @@ const SafeBody = ({ isChecked }: Props) => {
                 Number(defaultSafe.rightInput) > 0 &&
                 !isPassed
             ) {
-                if (!connectWalletState.proxyAddress) {
-                    setError(
-                        'You do not have a proxy address, Create a Reflexer Account to continue'
-                    )
-                    return
-                }
                 safeActions.setStage(2)
             } else {
                 safeActions.setStage(3)
