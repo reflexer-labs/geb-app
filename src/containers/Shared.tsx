@@ -130,7 +130,6 @@ const Shared = ({ children, ...rest }: Props) => {
         } catch (error) {
             safeActions.setIsSafeCreated(false)
             connectWalletActions.setStep(1)
-            history.push('/')
         }
 
         await timeout(1000)
