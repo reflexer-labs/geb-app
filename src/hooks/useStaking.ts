@@ -10,7 +10,7 @@ import {
 import useGeb, { useBlockNumber } from './useGeb'
 
 const DEFAULT_STATE = {
-    flxAmount: '',
+    stFlxAmount: '',
     stakingAmount: '',
 }
 
@@ -55,21 +55,6 @@ export function useStakingInfo(isDeposit = true) {
     }
 
     if (isDeposit) {
-        if (!parsedAmounts.flxAmount || Number(parsedAmounts.flxAmount) <= 0) {
-            error = error ?? 'Enter an amount'
-        }
-
-        if (
-            balances &&
-            balances.flxBalance &&
-            parsedAmounts.flxAmount &&
-            ethers.utils
-                .parseEther(balances.flxBalance.toString())
-                .lt(ethers.utils.parseEther(parsedAmounts.flxAmount.toString()))
-        ) {
-            error = 'Insufficient FLX balance'
-        }
-    } else {
         if (
             !parsedAmounts.stakingAmount ||
             Number(parsedAmounts.stakingAmount) <= 0
@@ -90,7 +75,30 @@ export function useStakingInfo(isDeposit = true) {
                         .add(ethers.utils.parseEther(exitRequests.lockedAmount))
                 )
         ) {
-            error = 'Insufficient stFLX balance'
+            error = 'Insufficient FLX/ETH LP balance'
+        }
+    } else {
+        if (
+            !parsedAmounts.stFlxAmount ||
+            Number(parsedAmounts.stFlxAmount) <= 0
+        ) {
+            error = error ?? 'Enter an amount'
+        }
+
+        if (
+            balances &&
+            exitRequests.lockedAmount &&
+            balances.stFlxBalance &&
+            parsedAmounts.stFlxAmount &&
+            ethers.utils
+                .parseEther(balances.stakingBalance.toString())
+                .lt(
+                    ethers.utils
+                        .parseEther(parsedAmounts.stFlxAmount.toString())
+                        .add(ethers.utils.parseEther(exitRequests.lockedAmount))
+                )
+        ) {
+            error = 'Insufficient FLX/ETH LP balance'
         }
     }
 
@@ -112,7 +120,7 @@ export function useBalances() {
     const hasPendingTx = useHasPendingTransactions()
     const latestBlockNumber = useBlockNumber()
     const [state, setState] = useState({
-        flxBalance: '0',
+        stFlxBalance: '0',
         stakingBalance: '0',
     })
     useEffect(() => {
@@ -121,7 +129,7 @@ export function useBalances() {
         async function getBalances() {
             if (!isCanceled) {
                 const [flx, staking] = await geb.multiCall([
-                    geb.contracts.protocolToken.balanceOf(
+                    geb.contracts.stakingFirstResort.descendantBalanceOf(
                         account as string,
                         true
                     ),
@@ -132,7 +140,7 @@ export function useBalances() {
                 ])
 
                 setState({
-                    flxBalance: ethers.utils.formatEther(flx),
+                    stFlxBalance: ethers.utils.formatEther(flx),
                     stakingBalance: ethers.utils.formatEther(staking),
                 })
             }
@@ -164,8 +172,8 @@ export function usePoolData() {
         async function getBalances() {
             if (!isCanceled) {
                 const [balance, totalSupply] = await geb.multiCall([
-                    geb.contracts.protocolToken.balanceOf(
-                        geb.contracts.stakingFirstResort.address,
+                    geb.contracts.stakingToken.balanceOf(
+                        await geb.contracts.stakingFirstResort.ancestorPool(),
                         true
                     ),
                     geb.contracts.stakingToken.totalSupply(true),
@@ -211,7 +219,6 @@ export function useGetExitRequests() {
         if (!geb || !account) return
         async function getExitRequest() {
             if (!isCanceled) {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const requests = await geb.contracts.stakingFirstResort.exitRequests(
                     account as string
                 )
@@ -235,30 +242,20 @@ export function useGetExitRequests() {
 }
 
 export function useInputsHandlers(): {
-    onFLXInput: (typedValue: string) => void
     onStakingInput: (typedValue: string) => void
+    onUnStakingInput: (typedValue: string) => void
 } {
     const { earnModel: earnActions } = useStoreActions((state) => state)
     const { earnModel: earnState } = useStoreState((state) => state)
     const { stakingData } = earnState
-    const onFLXInput = useCallback(
-        (typedValue: string) => {
-            if (!typedValue || typedValue === '') {
-                earnActions.setStakingData({ flxAmount: '', stakingAmount: '' })
-                return
-            }
-            earnActions.setStakingData({
-                ...stakingData,
-                flxAmount: typedValue,
-            })
-        },
-        [earnActions, stakingData]
-    )
 
     const onStakingInput = useCallback(
         (typedValue: string) => {
             if (!typedValue || typedValue === '') {
-                earnActions.setStakingData({ flxAmount: '', stakingAmount: '' })
+                earnActions.setStakingData({
+                    stFlxAmount: '',
+                    stakingAmount: '',
+                })
                 return
             }
             earnActions.setStakingData({
@@ -268,9 +265,25 @@ export function useInputsHandlers(): {
         },
         [earnActions, stakingData]
     )
+    const onUnStakingInput = useCallback(
+        (typedValue: string) => {
+            if (!typedValue || typedValue === '') {
+                earnActions.setStakingData({
+                    stFlxAmount: '',
+                    stakingAmount: '',
+                })
+                return
+            }
+            earnActions.setStakingData({
+                ...stakingData,
+                stFlxAmount: typedValue,
+            })
+        },
+        [earnActions, stakingData]
+    )
 
     return {
-        onFLXInput,
+        onUnStakingInput,
         onStakingInput,
     }
 }
@@ -284,12 +297,12 @@ export function useAddStaking(): {
     const { earnModel: earnState } = useStoreState((state) => state)
     const { stakingData } = earnState
     const addStakingCallback = useCallback(async () => {
-        const { flxAmount } = stakingData
-        if (!library || !flxAmount || !account || !geb) {
+        const { stakingAmount } = stakingData
+        if (!library || !stakingAmount || !account || !geb) {
             return
         }
         try {
-            const flxAmountBN = ethers.utils.parseEther(flxAmount)
+            const stakingAmountBN = ethers.utils.parseEther(stakingAmount)
 
             store.dispatch.popupsModel.setIsWaitingModalOpen(true)
             store.dispatch.popupsModel.setBlockBackdrop(true)
@@ -299,7 +312,9 @@ export function useAddStaking(): {
                 status: 'loading',
             })
             const signer = library.getSigner(account)
-            const txData = geb.contracts.stakingFirstResort.join(flxAmountBN)
+            const txData = geb.contracts.stakingFirstResort.join(
+                stakingAmountBN
+            )
 
             if (!txData) throw new Error('No transaction request!')
             const tx = await handlePreTxGasEstimate(signer, txData)
@@ -339,12 +354,12 @@ export function useRequestExit(): {
     const { earnModel: earnState } = useStoreState((state) => state)
     const { stakingData } = earnState
     const requestExitCallback = useCallback(async () => {
-        const { stakingAmount } = stakingData
-        if (!library || !stakingAmount || !account || !geb) {
+        const { stFlxAmount } = stakingData
+        if (!library || !stFlxAmount || !account || !geb) {
             return
         }
         try {
-            const stakingAmountBN = ethers.utils.parseEther(stakingAmount)
+            const stFlxAmountBN = ethers.utils.parseEther(stFlxAmount)
 
             store.dispatch.popupsModel.setIsWaitingModalOpen(true)
             store.dispatch.popupsModel.setBlockBackdrop(true)
@@ -355,7 +370,7 @@ export function useRequestExit(): {
             })
             const signer = library.getSigner(account)
             const txData = geb.contracts.stakingFirstResort.requestExit(
-                stakingAmountBN
+                stFlxAmountBN
             )
 
             if (!txData) throw new Error('No transaction request!')
@@ -435,4 +450,54 @@ export function useUnstake(): {
     }, [account, geb, library])
 
     return { unStakeCallback }
+}
+
+// claimReward function
+export function useClaimReward(): {
+    claimRewardCallback: () => Promise<void>
+} {
+    const geb = useGeb()
+    const { account, library } = useActiveWeb3React()
+    const claimRewardCallback = useCallback(async () => {
+        if (!library || !account || !geb) {
+            return
+        }
+        try {
+            store.dispatch.popupsModel.setIsWaitingModalOpen(true)
+            store.dispatch.popupsModel.setBlockBackdrop(true)
+            store.dispatch.popupsModel.setWaitingPayload({
+                title: 'Waiting for confirmation',
+                text: 'Confirm this transaction in your wallet',
+                status: 'loading',
+            })
+            const signer = library.getSigner(account)
+            const txData = geb.contracts.stakingFirstResort.getRewards()
+
+            if (!txData) throw new Error('No transaction request!')
+            const tx = await handlePreTxGasEstimate(signer, txData)
+            const txResponse = await signer.sendTransaction(tx)
+            store.dispatch.earnModel.setStakingData(DEFAULT_STATE)
+            if (txResponse) {
+                const { hash, chainId } = txResponse
+                store.dispatch.transactionsModel.addTransaction({
+                    chainId,
+                    hash,
+                    from: txResponse.from,
+                    summary: 'Claiming FLX Reward',
+                    addedTime: new Date().getTime(),
+                    originalTx: txResponse,
+                })
+                store.dispatch.popupsModel.setWaitingPayload({
+                    title: 'Transaction Submitted',
+                    hash: txResponse.hash,
+                    status: 'success',
+                })
+                await txResponse.wait()
+            }
+        } catch (e) {
+            handleTransactionError(e)
+        }
+    }, [account, geb, library])
+
+    return { claimRewardCallback }
 }

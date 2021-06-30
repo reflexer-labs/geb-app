@@ -23,7 +23,7 @@ const Staking = () => {
                 <Content>
                     <Header>
                         <img
-                            src={require('../../../assets/flx_uni_eth.svg')}
+                            src={require('../../../assets/stFLX.svg')}
                             alt="flx"
                         />
                         stFLX
@@ -75,7 +75,7 @@ const Description = styled.div`
 `
 
 const Content = styled.div`
-    max-width: 980px;
+    max-width: 880px;
     margin: 40px auto 70px auto;
 `
 

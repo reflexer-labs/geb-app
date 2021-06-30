@@ -19,30 +19,32 @@ const Stake = () => {
     const { account } = useActiveWeb3React()
     const geb = useGeb()
     const { balances, parsedAmounts, error } = useStakingInfo()
-    const { onFLXInput } = useInputsHandlers()
+    const { onStakingInput } = useInputsHandlers()
     const { addStakingCallback } = useAddStaking()
 
     const isValid = !error
 
     const [depositApprovalState, approveDeposit] = useTokenApproval(
-        parsedAmounts.flxAmount,
-        'protocolToken',
+        parsedAmounts.stakingAmount,
+        'stakingToken',
         geb?.contracts.stakingFirstResort.address,
         account as string
     )
 
-    const flxValue = parsedAmounts.flxAmount
-        ? Number(parsedAmounts.flxAmount) > 0
-            ? (formatNumber(parsedAmounts.flxAmount) as string)
-            : parsedAmounts.flxAmount
+    const stakingValue = parsedAmounts.stakingAmount
+        ? Number(parsedAmounts.stakingAmount) > 0 &&
+          parsedAmounts.stakingAmount.includes('.') &&
+          parsedAmounts.stakingAmount.split('.')[1].length > 5
+            ? (formatNumber(parsedAmounts.stakingAmount) as string)
+            : parsedAmounts.stakingAmount
         : ''
 
-    const handleMaxInput = () => onFLXInput(balances.flxBalance)
+    const handleMaxInput = () => onStakingInput(balances.stakingBalance)
 
     const handleAddStaking = async () => {
         try {
             await addStakingCallback()
-            onFLXInput('')
+            onStakingInput('')
         } catch (error) {
             console.log(error)
         }
@@ -54,11 +56,11 @@ const Stake = () => {
                 <DecimalInput
                     icon={require('../../../assets/flx_uni_eth.svg')}
                     iconSize={'30px'}
-                    onChange={onFLXInput}
-                    value={flxValue}
+                    onChange={onStakingInput}
+                    value={stakingValue}
                     handleMaxClick={handleMaxInput}
                     label={`FLX/ETH (Available: ${formatNumber(
-                        balances.flxBalance
+                        balances.stakingBalance
                     )})`}
                 />
             </Body>

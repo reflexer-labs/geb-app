@@ -30,13 +30,9 @@ const UnStake = () => {
         allowExit,
         exitRequests,
     } = useStakingInfo(false)
-    const { onStakingInput } = useInputsHandlers()
+    const { onUnStakingInput } = useInputsHandlers()
     const { requestExitCallback } = useRequestExit()
     const { unStakeCallback } = useUnstake()
-    console.log(exitRequests)
-
-    console.log(hasPendingExitRequests)
-    console.log(allowExit)
 
     const isValid = !error
 
@@ -71,23 +67,20 @@ const UnStake = () => {
         account as string
     )
 
-    console.log(
-        unStakeApprovalState === ApprovalState.PENDING ||
-            unStakeApprovalState === ApprovalState.NOT_APPROVED
-    )
-
-    const stakingValue = parsedAmounts.stakingAmount
-        ? Number(parsedAmounts.stakingAmount) > 0
-            ? (formatNumber(parsedAmounts.stakingAmount) as string)
-            : parsedAmounts.stakingAmount
+    const stFlxAmountValue = parsedAmounts.stFlxAmount
+        ? Number(parsedAmounts.stFlxAmount) > 0 &&
+          parsedAmounts.stFlxAmount.includes('.') &&
+          parsedAmounts.stFlxAmount.split('.')[1].length > 5
+            ? (formatNumber(parsedAmounts.stFlxAmount) as string)
+            : parsedAmounts.stFlxAmount
         : ''
 
-    const handleMaxInput = () => onStakingInput(balances.stakingBalance)
+    const handleMaxInput = () => onUnStakingInput(balances.stFlxBalance)
 
     const handleRequestExit = async () => {
         try {
             await requestExitCallback()
-            onStakingInput('')
+            onUnStakingInput('')
         } catch (error) {
             console.log(error)
         }
@@ -97,13 +90,13 @@ const UnStake = () => {
         <>
             <Body>
                 <DecimalInput
-                    icon={require('../../../assets/flx_uni_eth.svg')}
+                    icon={require('../../../assets/stFLX.svg')}
                     iconSize={'30px'}
-                    onChange={onStakingInput}
-                    value={stakingValue}
+                    onChange={onUnStakingInput}
+                    value={stFlxAmountValue}
                     handleMaxClick={handleMaxInput}
                     label={`stFLX (Available: ${formatNumber(
-                        balances.stakingBalance
+                        balances.stFlxBalance
                     )})`}
                 />
             </Body>

@@ -23,7 +23,7 @@ export interface EarnModel {
 const earnModel: EarnModel = {
     positionAndThreshold: null,
     stakingData: {
-        flxAmount: '',
+        stFlxAmount: '',
         stakingAmount: '',
     },
     data: {

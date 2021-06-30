@@ -482,6 +482,6 @@ export interface IStakedLP {
 }
 
 export interface IStakingData {
-    flxAmount: string
+    stFlxAmount: string
     stakingAmount: string
 }

@@ -15,14 +15,16 @@ const StakingStats = () => {
 
             <Stat>
                 <StatLabel>APY</StatLabel>
-                <StatValue>{poolAmounts.apy}%</StatValue>
+                <StatValue>
+                    {formatNumber(poolAmounts.apy.toString(), 2)}%
+                </StatValue>
             </Stat>
 
             <Stat>
                 <StatLabel>Weekly Rewards</StatLabel>
                 <StatValue>
                     <img src={require('../../../assets/flx-logo.svg')} alt="" />
-                    {poolAmounts.weeklyReward}
+                    {formatNumber(poolAmounts.weeklyReward.toString(), 2)}
                 </StatValue>
             </Stat>
         </Container>

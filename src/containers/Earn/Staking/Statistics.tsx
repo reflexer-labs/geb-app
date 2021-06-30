@@ -1,14 +1,18 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
-import { DAILY_REWARD_RATE, useStakingInfo } from '../../../hooks/useStaking'
+import {
+    DAILY_REWARD_RATE,
+    useClaimReward,
+    useStakingInfo,
+} from '../../../hooks/useStaking'
 import { formatNumber } from '../../../utils/helper'
 
 const returnImg = (type = 'flx', width = '20px', height = '20px') => {
     return (
         <img
             src={require(`../../../assets/${
-                type === 'flx' ? 'flx-logo.svg' : 'flx_uni_eth.svg'
+                type === 'flx' ? 'flx-logo.svg' : 'stFLX.svg'
             }`)}
             width={width}
             height={height}
@@ -18,18 +22,13 @@ const returnImg = (type = 'flx', width = '20px', height = '20px') => {
 }
 const Statistics = () => {
     const { balances, poolAmounts } = useStakingInfo()
-
+    const { claimRewardCallback } = useClaimReward()
     const { totalSupply } = poolAmounts
-    const myStakedBalance = balances.stakingBalance
-        ? Number(balances.stakingBalance) > 0
-            ? (formatNumber(balances.stakingBalance) as string)
-            : balances.stakingBalance
-        : '0'
 
-    const myFLXBalance = balances.flxBalance
-        ? Number(balances.flxBalance) > 0
-            ? (formatNumber(balances.flxBalance) as string)
-            : balances.flxBalance
+    const mystFLXBalance = balances.stFlxBalance
+        ? Number(balances.stFlxBalance) > 0
+            ? (formatNumber(balances.stFlxBalance) as string)
+            : balances.stFlxBalance
         : '0'
 
     const myWeeklyReward = useMemo(() => {
@@ -46,24 +45,22 @@ const Statistics = () => {
         )
     }, [balances.stakingBalance, totalSupply])
 
+    const handleClaimReward = async () => {
+        try {
+            await claimRewardCallback()
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
         <Container>
             <Content>
                 <Blocks>
                     <Block>
-                        <Label>My Staked FLX/ETH LP</Label>
+                        <Label>stFLX/ETH LP Balance</Label>
                         <Value>
-                            {Number(myStakedBalance) > 0
-                                ? myStakedBalance
-                                : '0'}{' '}
-                            {returnImg('staking')}
-                        </Value>
-                    </Block>
-
-                    <Block>
-                        <Label>My FLX Balance</Label>
-                        <Value>
-                            {myFLXBalance} {returnImg('flx')}
+                            {mystFLXBalance} {returnImg('stFLX')}
                         </Value>
                     </Block>
 
@@ -80,7 +77,7 @@ const Statistics = () => {
                         <RewardValue>0 {returnImg('flx')}</RewardValue>
                     </RewardBox>
 
-                    <Button onClick={() => {}} text={'Claim Reward'} />
+                    <Button onClick={handleClaimReward} text={'Claim Reward'} />
                 </StatsFooter>
             </Content>
         </Container>
@@ -106,7 +103,7 @@ const Blocks = styled.div`
 const Block = styled.div`
     position: relative;
     margin-bottom: 20px;
-    flex: 0 0 48%;
+    flex: 0 0 100%;
     border: 1px solid ${(props) => props.theme.colors.border};
     border-radius: ${(props) => props.theme.global.borderRadius};
     background: ${(props) => props.theme.colors.background};
@@ -141,7 +138,7 @@ const Content = styled.div`
 
 const StatsFooter = styled.div`
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     padding: 20px;
     justify-content: space-between;
     flex-wrap: wrap;
