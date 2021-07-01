@@ -276,7 +276,7 @@ const DistroData = styled.div`
 `
 
 const DistroDesc = styled.div`
-    font-size: 12px;
+    font-size: 14px;
     margin-top: 5px;
     a {
         ${ExternalLinkArrow}
@@ -290,7 +290,7 @@ const Extras = styled.div`
 `
 
 const ExtraData = styled.div`
-    font-size: 12px;
+    font-size: 14px;
     margin-right: 20px;
     position: relative;
     padding-left: 15px;
