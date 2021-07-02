@@ -111,15 +111,6 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                                                   (key) => {
                                                       return (
                                                           <ExtraData
-                                                              style={{
-                                                                  color: key
-                                                                      .toLowerCase()
-                                                                      .includes(
-                                                                          'apr'
-                                                                      )
-                                                                      ? 'red'
-                                                                      : '',
-                                                              }}
                                                               key={
                                                                   key +
                                                                   distro.name +
