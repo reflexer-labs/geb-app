@@ -111,6 +111,15 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                                                   (key) => {
                                                       return (
                                                           <ExtraData
+                                                              style={{
+                                                                  color: key
+                                                                      .toLowerCase()
+                                                                      .includes(
+                                                                          'apr'
+                                                                      )
+                                                                      ? 'red'
+                                                                      : '',
+                                                              }}
                                                               key={
                                                                   key +
                                                                   distro.name +
@@ -296,7 +305,7 @@ const ExtraData = styled.div`
     padding-left: 15px;
     margin-top: 5px;
     &:before {
-        top: 3px;
+        top: 5px;
         left: 0px;
         position: absolute;
         content: '';
