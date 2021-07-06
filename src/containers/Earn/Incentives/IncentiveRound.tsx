@@ -2,9 +2,11 @@ import dayjs from 'dayjs'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
+import { Info as InfoIcon } from 'react-feather'
 import Arrow from '../../../components/Icons/Arrow'
 import { ExternalLinkArrow } from '../../../GlobalStyle'
 import { Round } from '../../../utils/interfaces'
+import ReactTooltip from 'react-tooltip'
 
 const returnDate = (date: string) =>
     dayjs(date).isValid() ? dayjs(date).format('MMM D, YYYY h:mm A') : date
@@ -46,6 +48,7 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                     </Info>
                 </RightBlock>
             </Header>
+
             {isCollapsed ? null : (
                 <Distros>
                     {round.distros.length > 0 ? (
@@ -101,6 +104,29 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                                                         {distro.amount}
                                                     </InfoValue>
                                                 </InfoCol>
+
+                                                {distro.apy ? (
+                                                    <InfoCol
+                                                        className="apy-box"
+                                                        onMouseEnter={() =>
+                                                            ReactTooltip.rebuild()
+                                                        }
+                                                    >
+                                                        <IconBox
+                                                            data-tip={
+                                                                distro.apy_description
+                                                            }
+                                                        >
+                                                            <InfoIcon size="16" />
+                                                        </IconBox>
+                                                        <InfoLabel>
+                                                            {distro.apy_title}
+                                                        </InfoLabel>
+                                                        <InfoValue>
+                                                            {distro.apy}
+                                                        </InfoValue>
+                                                    </InfoCol>
+                                                ) : null}
                                             </Info>
                                         </RightBlock>
                                     </Row>
@@ -156,6 +182,7 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                     ) : null}
                 </Distros>
             )}
+            <ReactTooltip multiline type="light" data-effect="solid" />
         </IncentiveContainer>
     )
 }
@@ -223,6 +250,38 @@ const Info = styled.div`
 const InfoCol = styled.div`
     font-size: ${(props) => props.theme.font.small};
     min-width: 150px;
+
+    &.apy-box {
+        position: relative;
+        border: 1px solid ${(props) => props.theme.colors.alertBorder};
+        background: ${(props) => props.theme.colors.alertBackground};
+        color: ${(props) => props.theme.colors.alertColor};
+        padding: 8px;
+        height: fit-content;
+        text-align: center;
+        font-size: ${(props) => props.theme.font.small};
+        border-radius: ${(props) => props.theme.global.borderRadius};
+        letter-spacing: -0.09px;
+        min-width: 120px;
+        flex: 0 0 120px;
+        > div {
+            color: inherit;
+            font-weight: bold;
+        }
+        ${({ theme }) => theme.mediaWidth.upToSmall`
+      flex: 0 0 100%;
+      min-width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-left:0;
+      margin-top:5px;
+      >div:last-child {
+          padding-right:20px;
+      }
+    
+    `}
+    }
 
     ${({ theme }) => theme.mediaWidth.upToSmall`
       flex: 0 0 100%;
@@ -296,7 +355,7 @@ const ExtraData = styled.div`
     padding-left: 15px;
     margin-top: 5px;
     &:before {
-        top: 3px;
+        top: 5px;
         left: 0px;
         position: absolute;
         content: '';
@@ -325,4 +384,15 @@ const BtnContainer = styled.div`
 
 const ExtLink = styled.a`
     ${ExternalLinkArrow}
+`
+
+const IconBox = styled.div`
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+    svg {
+        fill: ${(props) => props.theme.colors.alertColor};
+        color: ${(props) => props.theme.colors.alertBorder};
+    }
 `
