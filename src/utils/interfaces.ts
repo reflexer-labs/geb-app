@@ -440,6 +440,9 @@ export interface Distro {
     link: string
     optional: { [key: string]: string | undefined }
     image: string
+    apy_description: string
+    apy: string
+    apy_title: string
 }
 
 export interface Round {
