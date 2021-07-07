@@ -27,9 +27,3 @@ export const fetchFLXBalanceQuery = (address: string) => `{
     balance
     }
 }`
-
-export const uniswapPoolBalanceQuery = (address: string) => `{
-  uniswapCoinPool:erc20Balances(where: {address: "${address}", label: "UNISWAP_POOL_TOKEN_COIN"}) {
-    balance
-    }
-}`

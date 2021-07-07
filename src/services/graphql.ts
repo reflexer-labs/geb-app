@@ -2,10 +2,9 @@ import axios from 'axios'
 import retry from 'async-retry'
 import store from '../store'
 import {
-    fetchDebtFloorQuery,
     getSafeByIdQuery,
+    getSafeHistoryQuery,
     getUserSafesListQuery,
-    managedSafeQuery,
 } from '../utils/queries/safe'
 import { GRAPH_API_URLS } from '../utils/constants'
 import { formatUserSafe, formatHistoryArray } from '../utils/helper'
@@ -14,7 +13,6 @@ import {
     getSubgraphBlock,
     getUserQuery,
     internalBalanceQuery,
-    uniswapPoolBalanceQuery,
 } from '../utils/queries/user'
 import {
     IFetchSafeById,
@@ -67,47 +65,6 @@ export const checkSubgraphBlockDiff = async (latesBlockNumber: number) => {
     } catch (error) {
         console.debug('Error with subgraph query: ' + error)
     }
-}
-
-export const fetchDebtFloor = () => {
-    return retry(
-        async (bail, attempt) => {
-            const res = await axios.post(
-                GRAPH_API_URLS[attempt - 1],
-                JSON.stringify({ query: fetchDebtFloorQuery }),
-                { cancelToken: cancelTokenSource.token }
-            )
-
-            if (!res.data.data && attempt < GRAPH_API_URLS.length) {
-                throw new Error('retry')
-            }
-
-            return res.data.data.collateralType.debtFloor
-        },
-        {
-            retries: GRAPH_API_URLS.length - 1,
-        }
-    )
-}
-
-export const fetchManagedSafe = (safeId: string) => {
-    return retry(
-        async (bail, attempt) => {
-            const res = await axios.post(
-                GRAPH_API_URLS[attempt - 1],
-                JSON.stringify({ query: managedSafeQuery(safeId) })
-            )
-
-            if (!res.data.data && attempt < GRAPH_API_URLS.length) {
-                throw new Error('retry')
-            }
-
-            return res.data.data
-        },
-        {
-            retries: GRAPH_API_URLS.length - 1,
-        }
-    )
 }
 
 export const fetchUser = (address: string) => {
@@ -238,16 +195,6 @@ export const fetchSafeById = async (
     }
 
     const safe = formatUserSafe(response.safes, liquidationData)
-
-    const modifySAFECollateralization =
-        safeResponse.safes[0].modifySAFECollateralization ?? []
-    const liquidationFixedDiscount =
-        safeResponse.safes[0].liquidationFixedDiscount ?? []
-    const safeHistory = formatHistoryArray(
-        modifySAFECollateralization,
-        liquidationFixedDiscount
-    )
-
     const proxyData =
         safeResponse.userProxies.length > 0 ? safeResponse.userProxies[0] : null
 
@@ -258,7 +205,6 @@ export const fetchSafeById = async (
 
     return {
         safe,
-        safeHistory,
         proxyData,
         erc20Balance,
         liquidationData,
@@ -275,8 +221,8 @@ export const fetchAuctions = async ({
     const res = await request(
         JSON.stringify({ query: auctionsQuery(address, type) })
     )
-    if (!res.data.data) {
-        throw new Error('retry')
+    if (!res) {
+        throw new Error('failed to fetch')
     }
 
     const response = res.data.data
@@ -323,19 +269,28 @@ export const fetchFLXBalance = async (address: string) => {
     )
 }
 
-export const fetchUniswapPoolBalance = async (address: string) => {
+export const fetchSafeHistory = async (safeId: string) => {
     return retry(
         async (bail, attempt) => {
             const res = await axios.post(
                 GRAPH_API_URLS[attempt - 1],
-                JSON.stringify({ query: uniswapPoolBalanceQuery(address) })
+                JSON.stringify({ query: getSafeHistoryQuery(safeId) })
             )
 
-            if (!res.data.data && attempt < GRAPH_API_URLS.length) {
-                throw new Error('retry')
+            if (!res) {
+                throw new Error('failed to fetch')
             }
+            const response = res.data.data
 
-            return res.data.data
+            const modifySAFECollateralization =
+                response.safes[0].modifySAFECollateralization ?? []
+            const liquidationFixedDiscount =
+                response.safes[0].liquidationDiscount ?? []
+            const safeHistory = formatHistoryArray(
+                modifySAFECollateralization,
+                liquidationFixedDiscount
+            )
+            return safeHistory
         },
         {
             retries: GRAPH_API_URLS.length - 1,

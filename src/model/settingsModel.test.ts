@@ -25,9 +25,9 @@ describe('safe model', () => {
 
     describe('setsRPCAdapter', () => {
         it('sets RPCAdapter', () => {
-            expect(store.getState().isRPCAdapterOn).toBe(false)
-            store.getActions().setIsRPCAdapterOn(true)
             expect(store.getState().isRPCAdapterOn).toBe(true)
+            store.getActions().setIsRPCAdapterOn(false)
+            expect(store.getState().isRPCAdapterOn).toBe(false)
         })
     })
 })

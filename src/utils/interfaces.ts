@@ -326,7 +326,7 @@ export interface ISingleSafe {
         balance: string
     }
     modifySAFECollateralization: Array<IModifySAFECollateralization> | null // Will be null over RPC;
-    liquidationFixedDiscount: Array<ILiquidationFixedDiscount> | null // Will be null over RPC
+    liquidationDiscount: Array<ILiquidationFixedDiscount> | null // Will be null over RPC
 }
 export interface ISafeQuery extends ILiquidationResponse {
     erc20Balances: Array<{ balance: string }>
@@ -435,10 +435,36 @@ export interface GetReservesFromSaviour {
 
 export interface FetchSaviourPayload {
     account: string
-    proxyAddress: string
+    safeId: string
     ethPrice: number
     geb: Geb
-    safe: ISafe
+}
+
+export interface Distro {
+    from: string
+    until: string
+    amount: string
+    name: string
+    description: string
+    link: string
+    optional: { [key: string]: string | undefined }
+    image: string
+    apy_description: string
+    apy: string
+    apy_title: string
+}
+
+export interface Round {
+    number: number
+    name: string
+    distros: Distro[]
+    snapshotDate: string
+    distributionDate: string
+    starMessage?: string
+}
+
+export interface IncentivesDocument {
+    rounds: Round[]
 }
 
 export interface Slot0 {

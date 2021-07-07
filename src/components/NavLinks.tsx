@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { NETWORK_ID } from '../connectors'
-import { useStoreActions, useStoreState } from '../store'
+import { useStoreActions } from '../store'
 import { SHOW_AUCTIONS } from '../utils/constants'
 import AnalyticsIcon from './Icons/AnalyticsIcon'
 import AuctionIcon from './Icons/AuctionIcon'
@@ -13,9 +13,6 @@ import SafeIcon from './Icons/SafeIcon'
 const NavLinks = () => {
     const { t } = useTranslation()
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
-    const { settingsModel: settingsState } = useStoreState((state) => state)
-
-    const { isRPCAdapterOn } = settingsState
 
     const handleLinkClick = (
         e: React.MouseEvent<HTMLElement>,
@@ -41,8 +38,7 @@ const NavLinks = () => {
             >
                 <SafeIcon className="opacity" /> {t('app')}
             </NavBarLink>
-            {isRPCAdapterOn ||
-            (SHOW_AUCTIONS && SHOW_AUCTIONS !== '1') ? null : (
+            {SHOW_AUCTIONS && SHOW_AUCTIONS !== '1' ? null : (
                 <NavBarLink
                     to="/auctions"
                     onClick={(e) => handleLinkClick(e, false)}
@@ -65,6 +61,13 @@ const NavLinks = () => {
                     </ExtLink>
                     <ExtLink href="/earn/staking">
                         Staking{' '}
+                        <img
+                            src={require('../assets/dark-arrow.svg')}
+                            alt="arrow"
+                        />
+                    </ExtLink>
+                    <ExtLink href="/earn/incentives">
+                        Incentives{' '}
                         <img
                             src={require('../assets/dark-arrow.svg')}
                             alt="arrow"

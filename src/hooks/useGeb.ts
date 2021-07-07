@@ -50,3 +50,18 @@ export function useProxyAddress() {
 export function useBlockNumber() {
     return store.getState().connectWalletModel.blockNumber[NETWORK_ID]
 }
+
+export function useSafeHandler(safeId: string): string {
+    const [state, setState] = useState('')
+    const geb = useGeb()
+    useEffect(() => {
+        if (!geb || !safeId) return
+        async function getSafeData() {
+            const safeHandler = await geb.contracts.safeManager.safes(safeId)
+            setState(safeHandler)
+        }
+        getSafeData()
+    }, [geb, safeId])
+
+    return state
+}
