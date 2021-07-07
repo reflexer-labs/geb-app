@@ -7,7 +7,7 @@ import {
     handleTransactionError,
     useHasPendingTransactions,
 } from './TransactionHooks'
-import useGeb, { useBlockNumber } from './useGeb'
+import useGeb, { useBlockNumber, useProxyAddress } from './useGeb'
 
 const DEFAULT_STATE = {
     stFlxAmount: '',
@@ -19,6 +19,8 @@ export const DAILY_REWARD_RATE = 40
 // liquidity helpers
 export function useStakingInfo(isDeposit = true) {
     const { account } = useActiveWeb3React()
+    const proxyAddress = useProxyAddress()
+
     const { earnModel: earnState } = useStoreState((state) => state)
     const { stakingData } = earnState
     const balances = useBalances()
@@ -52,6 +54,10 @@ export function useStakingInfo(isDeposit = true) {
     let error: string | undefined
     if (!account) {
         error = 'Connect Wallet'
+    }
+
+    if (!proxyAddress) {
+        error = 'Create a Reflexer Account to continue'
     }
 
     if (isDeposit) {
@@ -122,13 +128,14 @@ export function useBalances() {
     const [state, setState] = useState({
         stFlxBalance: '0',
         stakingBalance: '0',
+        myCurrentReward: '0',
     })
     useEffect(() => {
         let isCanceled = false
         if (!geb || !account) return
         async function getBalances() {
             if (!isCanceled) {
-                const [flx, staking] = await geb.multiCall([
+                const [flx, staking, currentReward] = await geb.multiCall([
                     geb.contracts.stakingFirstResort.descendantBalanceOf(
                         account as string,
                         true
@@ -137,11 +144,16 @@ export function useBalances() {
                         account as string,
                         true
                     ),
+                    geb.contracts.stakingFirstResort.pendingRewards(
+                        account as string,
+                        true
+                    ),
                 ])
 
                 setState({
                     stFlxBalance: ethers.utils.formatEther(flx),
                     stakingBalance: ethers.utils.formatEther(staking),
+                    myCurrentReward: ethers.utils.formatEther(currentReward),
                 })
             }
         }
@@ -165,22 +177,26 @@ export function usePoolData() {
         apy: '0',
         weeklyReward: 0,
         totalSupply: '0',
+        rewardRate: '0',
     })
     useEffect(() => {
         let isCanceled = false
         if (!geb) return
         async function getBalances() {
             if (!isCanceled) {
-                const [balance, totalSupply] = await geb.multiCall([
+                const [balance, totalSupply, rewardR] = await geb.multiCall([
                     geb.contracts.stakingToken.balanceOf(
                         await geb.contracts.stakingFirstResort.ancestorPool(),
                         true
                     ),
                     geb.contracts.stakingToken.totalSupply(true),
+                    geb.contracts.stakingFirstResort.rewardRate(true),
                 ])
 
+                const rewardRateVal = ethers.utils.formatEther(rewardR)
+
                 const apyVal = !balance.isZero()
-                    ? (DAILY_REWARD_RATE * 365) /
+                    ? (Number(rewardRateVal) * 365) /
                       Number(ethers.utils.formatEther(balance)) /
                       100
                     : '0'
@@ -188,8 +204,9 @@ export function usePoolData() {
                 setState({
                     poolBalance: ethers.utils.formatEther(balance),
                     apy: apyVal.toString(),
-                    weeklyReward: DAILY_REWARD_RATE * 7,
+                    weeklyReward: Number(rewardRateVal) * 7,
                     totalSupply: ethers.utils.formatEther(totalSupply),
+                    rewardRate: ethers.utils.formatEther(rewardR),
                 })
             }
         }

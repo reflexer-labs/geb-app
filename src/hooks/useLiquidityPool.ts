@@ -7,7 +7,7 @@ import store, { useStoreActions, useStoreState } from '../store'
 import JSBI from 'jsbi'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { NETWORK_ID } from '../connectors'
-import useGeb from './useGeb'
+import useGeb, { useProxyAddress } from './useGeb'
 import {
     handlePreTxGasEstimate,
     handleTransactionError,
@@ -23,6 +23,7 @@ const DEFAULT_STATE = {
 // liquidity helpers
 export function useLiquidityInfo(isDeposit = true) {
     const { account } = useActiveWeb3React()
+    const proxyAddress = useProxyAddress()
     const { earnModel: earnState } = useStoreState((state) => state)
     const { data } = earnState
     const balances = useBalances()
@@ -41,7 +42,9 @@ export function useLiquidityInfo(isDeposit = true) {
     if (!account) {
         error = 'Connect Wallet'
     }
-
+    if (!proxyAddress) {
+        error = 'Create a Reflexer Account to continue'
+    }
     if (isDeposit) {
         if (!parsedAmounts.ethAmount || !parsedAmounts.raiAmount) {
             error = error ?? 'Enter an amount'
