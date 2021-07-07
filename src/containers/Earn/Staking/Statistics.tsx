@@ -62,7 +62,11 @@ const Statistics = () => {
                         </RewardValue>
                     </RewardBox>
 
-                    <Button onClick={handleClaimReward} text={'Claim Reward'} />
+                    <Button
+                        onClick={handleClaimReward}
+                        text={'Claim Reward'}
+                        disabled={Number(balances.myCurrentReward) === 0}
+                    />
                 </StatsFooter>
             </Content>
         </Container>
