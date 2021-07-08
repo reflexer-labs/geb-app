@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { ethers } from 'ethers'
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import AlertLabel from '../../../components/AlertLabel'
 import Button from '../../../components/Button'
@@ -20,6 +20,7 @@ import {
 import { formatNumber } from '../../../utils/helper'
 
 const UnStake = () => {
+    const [isPending, setIsPending] = useState(false)
     const { account } = useActiveWeb3React()
     const geb = useGeb()
     const {
@@ -81,6 +82,16 @@ const UnStake = () => {
         try {
             await requestExitCallback()
             onUnStakingInput('')
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleUnstake = async () => {
+        try {
+            setIsPending(true)
+            await unStakeCallback()
+            setIsPending(false)
         } catch (error) {
             console.log(error)
         }
@@ -159,10 +170,12 @@ const UnStake = () => {
                                     disabled={
                                         (hasPendingExitRequests &&
                                             !allowExit) ||
-                                        (!hasPendingExitRequests && !allowExit)
+                                        (!hasPendingExitRequests &&
+                                            !allowExit) ||
+                                        isPending
                                     }
                                     text={'Unstake'}
-                                    onClick={unStakeCallback}
+                                    onClick={handleUnstake}
                                 />
                             ) : null}
                         </>

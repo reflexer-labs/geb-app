@@ -183,31 +183,41 @@ export function usePoolData() {
         let isCanceled = false
         if (!geb) return
         async function getBalances() {
-            if (!isCanceled) {
-                const [balance, totalSupply, rewardR] = await geb.multiCall([
-                    geb.contracts.stakingToken.balanceOf(
-                        await geb.contracts.stakingFirstResort.ancestorPool(),
-                        true
-                    ),
-                    geb.contracts.stakingToken.totalSupply(true),
-                    geb.contracts.stakingFirstResort.rewardRate(true),
-                ])
+            try {
+                if (!isCanceled) {
+                    const [balance, totalSupply] = await geb.multiCall([
+                        geb.contracts.stakingToken.balanceOf(
+                            await geb.contracts.stakingFirstResort.ancestorPool(),
+                            true
+                        ),
+                        geb.contracts.stakingToken.totalSupply(true),
+                    ])
 
-                const rewardRateVal = ethers.utils.formatEther(rewardR)
+                    let rewardR = '0'
+                    try {
+                        const rewardRateRes = await geb.contracts.stakingFirstResort.rewardRate()
+                        rewardR = ethers.utils.formatEther(rewardRateRes)
+                    } catch (error) {
+                        rewardR = '0'
+                        console.info(error)
+                    }
 
-                const apyVal = !balance.isZero()
-                    ? (Number(rewardRateVal) * 365) /
-                      Number(ethers.utils.formatEther(balance)) /
-                      100
-                    : '0'
+                    const apyVal = !balance.isZero()
+                        ? (Number(rewardR) * 365) /
+                          Number(ethers.utils.formatEther(balance)) /
+                          100
+                        : '0'
 
-                setState({
-                    poolBalance: ethers.utils.formatEther(balance),
-                    apy: apyVal.toString(),
-                    weeklyReward: Number(rewardRateVal) * 7,
-                    totalSupply: ethers.utils.formatEther(totalSupply),
-                    rewardRate: ethers.utils.formatEther(rewardR),
-                })
+                    setState({
+                        poolBalance: ethers.utils.formatEther(balance),
+                        apy: apyVal.toString(),
+                        weeklyReward: Number(rewardR) * 7,
+                        totalSupply: ethers.utils.formatEther(totalSupply),
+                        rewardRate: rewardR,
+                    })
+                }
+            } catch (error) {
+                console.info(error)
             }
         }
         getBalances()
