@@ -39,7 +39,7 @@ const Statistics = () => {
             <Content>
                 <Blocks>
                     <Block>
-                        <Label>stFLX/ETH LP Balance</Label>
+                        <Label>stFLX</Label>
                         <Value>
                             {mystFLXBalance} {returnImg('stFLX')}
                         </Value>
