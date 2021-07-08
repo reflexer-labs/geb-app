@@ -126,7 +126,9 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                                                             {distro.apy}
                                                         </InfoValue>
                                                     </InfoCol>
-                                                ) : null}
+                                                ) : (
+                                                    <InfoCol className="apy-box blank" />
+                                                )}
                                             </Info>
                                         </RightBlock>
                                     </Row>
@@ -282,7 +284,11 @@ const InfoCol = styled.div`
     
     `}
     }
-
+    &.blank {
+        background: transparent;
+        border: 0;
+        padding: 0;
+    }
     ${({ theme }) => theme.mediaWidth.upToSmall`
       flex: 0 0 100%;
       min-width:100%;
