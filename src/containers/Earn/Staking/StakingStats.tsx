@@ -1,4 +1,5 @@
 import React from 'react'
+import numeral from 'numeral'
 import styled from 'styled-components'
 import { useStakingInfo } from '../../../hooks/useStaking'
 import { formatNumber } from '../../../utils/helper'
@@ -16,7 +17,12 @@ const StakingStats = () => {
             <Stat>
                 <StatLabel>APR</StatLabel>
                 <StatValue>
-                    {formatNumber(poolAmounts.apr.toString(), 2)}%
+                    {Number(poolAmounts.apr) > 0
+                        ? numeral(
+                              formatNumber(poolAmounts.apr.toString(), 2)
+                          ).format('0,0')
+                        : '0'}
+                    %
                 </StatValue>
             </Stat>
 
