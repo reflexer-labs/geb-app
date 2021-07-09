@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useActiveWeb3React } from '.'
 import store, { useStoreActions, useStoreState } from '../store'
@@ -134,22 +134,18 @@ export function useBalances() {
         let isCanceled = false
         if (!geb || !account) return
         async function getBalances() {
+            const [flx, staking, currentReward] = await geb.multiCall([
+                geb.contracts.stakingFirstResort.descendantBalanceOf(
+                    account as string,
+                    true
+                ),
+                geb.contracts.stakingToken.balanceOf(account as string, true),
+                geb.contracts.stakingFirstResort.pendingRewards(
+                    account as string,
+                    true
+                ),
+            ])
             if (!isCanceled) {
-                const [flx, staking, currentReward] = await geb.multiCall([
-                    geb.contracts.stakingFirstResort.descendantBalanceOf(
-                        account as string,
-                        true
-                    ),
-                    geb.contracts.stakingToken.balanceOf(
-                        account as string,
-                        true
-                    ),
-                    geb.contracts.stakingFirstResort.pendingRewards(
-                        account as string,
-                        true
-                    ),
-                ])
-
                 setState({
                     stFlxBalance: ethers.utils.formatEther(flx),
                     stakingBalance: ethers.utils.formatEther(staking),
@@ -157,7 +153,9 @@ export function useBalances() {
                 })
             }
         }
+
         getBalances()
+
         return () => {
             isCanceled = true
         }
@@ -172,9 +170,13 @@ export function usePoolData() {
     const geb = useGeb()
     const hasPendingTx = useHasPendingTransactions()
     const latestBlockNumber = useBlockNumber()
+    const { connectWalletModel: connectWalletState } = useStoreState(
+        (state) => state
+    )
+    const { flxPrice } = connectWalletState
     const [state, setState] = useState({
         poolBalance: '0',
-        apy: '0',
+        apr: '0',
         weeklyReward: 0,
         totalSupply: '0',
         rewardRate: '0',
@@ -184,35 +186,68 @@ export function usePoolData() {
         if (!geb) return
         async function getBalances() {
             try {
+                const [balance, totalSupply] = await geb.multiCall([
+                    geb.contracts.stakingToken.balanceOf(
+                        await geb.contracts.stakingFirstResort.ancestorPool(),
+                        true
+                    ),
+                    geb.contracts.stakingToken.totalSupply(true),
+                ])
+
+                let rewardR = '0'
+                try {
+                    const rewardRateRes = await geb.contracts.stakingFirstResort.rewardRate()
+                    rewardR = ethers.utils.formatEther(rewardRateRes)
+                } catch (error) {
+                    rewardR = '0'
+                    console.info(error)
+                }
+
+                const reservesCall = geb.contracts.uniswapPairCoinEth.getReserves(
+                    true
+                )
+                reservesCall.to = geb.contracts.stakingToken.address
+                const reserves = await geb.multiCall([reservesCall])
+
+                let flxReserve
+                if (
+                    BigNumber.from(geb.contracts.protocolToken.address).gt(
+                        BigNumber.from(geb.contracts.weth.address)
+                    )
+                ) {
+                    // FLX is token 1
+                    flxReserve = ethers.utils.formatEther(reserves[0]._reserve1)
+                } else {
+                    // FLX is token 0
+                    flxReserve = ethers.utils.formatEther(reserves[0]._reserve0)
+                }
+                const totalSupplyVal = ethers.utils.formatEther(totalSupply)
+
+                const flxEthLpShareUSDPrice =
+                    Number(totalSupplyVal) / (Number(flxReserve) * flxPrice * 2)
+
+                const poolBalanceVal = ethers.utils.formatEther(balance)
+
+                const weeklyRewardVal =
+                    (Number(rewardR) * Number(poolBalanceVal) * 7 * 3600 * 24) /
+                    15
+
+                const aprValue = !balance.isZero()
+                    ? (((Number(rewardR) *
+                          Number(totalSupplyVal) *
+                          365 *
+                          3600 *
+                          24) /
+                          15) *
+                          flxPrice) /
+                      (Number(poolBalanceVal) * flxEthLpShareUSDPrice)
+                    : 0
                 if (!isCanceled) {
-                    const [balance, totalSupply] = await geb.multiCall([
-                        geb.contracts.stakingToken.balanceOf(
-                            await geb.contracts.stakingFirstResort.ancestorPool(),
-                            true
-                        ),
-                        geb.contracts.stakingToken.totalSupply(true),
-                    ])
-
-                    let rewardR = '0'
-                    try {
-                        const rewardRateRes = await geb.contracts.stakingFirstResort.rewardRate()
-                        rewardR = ethers.utils.formatEther(rewardRateRes)
-                    } catch (error) {
-                        rewardR = '0'
-                        console.info(error)
-                    }
-
-                    const apyVal = !balance.isZero()
-                        ? (Number(rewardR) * 365) /
-                          Number(ethers.utils.formatEther(balance)) /
-                          100
-                        : '0'
-
                     setState({
-                        poolBalance: ethers.utils.formatEther(balance),
-                        apy: apyVal.toString(),
-                        weeklyReward: Number(rewardR) * 7,
-                        totalSupply: ethers.utils.formatEther(totalSupply),
+                        poolBalance: poolBalanceVal,
+                        apr: aprValue.toString(),
+                        weeklyReward: weeklyRewardVal,
+                        totalSupply: totalSupplyVal,
                         rewardRate: rewardR,
                     })
                 }
@@ -224,7 +259,7 @@ export function usePoolData() {
         return () => {
             isCanceled = true
         }
-    }, [geb, hasPendingTx, latestBlockNumber])
+    }, [flxPrice, geb, hasPendingTx, latestBlockNumber])
 
     return useMemo(() => {
         return state
@@ -245,10 +280,10 @@ export function useGetExitRequests() {
         let isCanceled = false
         if (!geb || !account) return
         async function getExitRequest() {
+            const requests = await geb.contracts.stakingFirstResort.exitRequests(
+                account as string
+            )
             if (!isCanceled) {
-                const requests = await geb.contracts.stakingFirstResort.exitRequests(
-                    account as string
-                )
                 setState({
                     deadline: requests.deadline.toNumber(),
                     lockedAmount: ethers.utils.formatEther(

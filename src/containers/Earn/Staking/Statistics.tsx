@@ -23,7 +23,7 @@ const Statistics = () => {
     const mystFLXBalance = balances.stFlxBalance
         ? Number(balances.stFlxBalance) > 0
             ? (formatNumber(balances.stFlxBalance) as string)
-            : balances.stFlxBalance
+            : '0'
         : '0'
 
     const handleClaimReward = async () => {

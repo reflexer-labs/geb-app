@@ -7,6 +7,7 @@ import { IBlockNumber, ITokenBalance } from '../utils/interfaces'
 export interface ConnectWalletModel {
     blockNumber: IBlockNumber
     fiatPrice: number
+    flxPrice: number
     step: number
     ethPriceChange: number
     isUserCreated: boolean
@@ -23,6 +24,7 @@ export interface ConnectWalletModel {
     isStepLoading: boolean
     fetchFiatPrice: Thunk<ConnectWalletModel>
     setFiatPrice: Action<ConnectWalletModel, number>
+    setFlxPrice: Action<ConnectWalletModel, number>
     setIsWrongNetwork: Action<ConnectWalletModel, boolean>
     updateBlockNumber: Action<
         ConnectWalletModel,
@@ -69,6 +71,7 @@ const connectWalletModel: ConnectWalletModel = {
     uniswapPoolBalance: { 1: '0', 42: '0' },
     claimableFLX: '0',
     fiatPrice: 0,
+    flxPrice: 0,
     ethPriceChange: 0,
     step: 0,
     proxyAddress: '',
@@ -80,7 +83,9 @@ const connectWalletModel: ConnectWalletModel = {
     isUserCreated: false,
     fetchFiatPrice: thunk(async (actions, payload) => {
         const res = await api.fetchFiatPrice()
+        const flxRes = await api.fetchFiatPrice('reflexer-ungovernance-token')
         actions.setFiatPrice(res.usd)
+        actions.setFlxPrice(flxRes.usd)
         actions.setEthPriceChange(res.usd_24h_change)
     }),
 
@@ -108,7 +113,9 @@ const connectWalletModel: ConnectWalletModel = {
     setFiatPrice: action((state, payload) => {
         state.fiatPrice = payload
     }),
-
+    setFlxPrice: action((state, payload) => {
+        state.flxPrice = payload
+    }),
     setIsWrongNetwork: action((state, payload) => {
         state.isWrongNetwork = payload
     }),

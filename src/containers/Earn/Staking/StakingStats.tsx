@@ -14,9 +14,9 @@ const StakingStats = () => {
             </Stat>
 
             <Stat>
-                <StatLabel>APY</StatLabel>
+                <StatLabel>APR</StatLabel>
                 <StatValue>
-                    {formatNumber(poolAmounts.apy.toString(), 2)}%
+                    {formatNumber(poolAmounts.apr.toString(), 2)}%
                 </StatValue>
             </Stat>
 
