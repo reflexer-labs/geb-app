@@ -223,9 +223,6 @@ export function usePoolData() {
                 }
                 const totalSupplyVal = ethers.utils.formatEther(totalSupply)
 
-                const flxEthLpShareUSDPrice =
-                    Number(totalSupplyVal) / (Number(flxReserve) * flxPrice * 2)
-
                 const poolBalanceVal = ethers.utils.formatEther(balance)
 
                 const weeklyRewardVal =
@@ -233,15 +230,12 @@ export function usePoolData() {
                     15
 
                 const aprValue = !balance.isZero()
-                    ? (((Number(rewardR) *
-                          Number(totalSupplyVal) *
-                          365 *
-                          3600 *
-                          24) /
-                          15) *
-                          flxPrice) /
-                      (Number(poolBalanceVal) * flxEthLpShareUSDPrice)
-                    : 0
+                    ? (((Number(rewardR) * 365 * 3600 * 24) / 15) *
+                          flxPrice ** 2 *
+                          Number(flxReserve) *
+                          2) /
+                      Number(totalSupplyVal)
+                    : '0'
                 if (!isCanceled) {
                     setState({
                         poolBalance: poolBalanceVal,

@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
+import { useActiveWeb3React } from '../../../hooks'
 import { useClaimReward, useStakingInfo } from '../../../hooks/useStaking'
 import { formatNumber } from '../../../utils/helper'
 
@@ -17,6 +18,7 @@ const returnImg = (type = 'flx', width = '20px', height = '20px') => {
     )
 }
 const Statistics = () => {
+    const { account } = useActiveWeb3React()
     const { balances, poolAmounts } = useStakingInfo()
     const { claimRewardCallback } = useClaimReward()
 
@@ -48,7 +50,9 @@ const Statistics = () => {
                     <Block>
                         <Label>My Weekly Reward</Label>
                         <Value>
-                            {formatNumber(poolAmounts.rewardRate)}{' '}
+                            {Number(balances.myCurrentReward) === 0 || !account
+                                ? '0'
+                                : formatNumber(poolAmounts.rewardRate)}{' '}
                             {returnImg('flx')}
                         </Value>
                     </Block>

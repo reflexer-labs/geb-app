@@ -22,7 +22,6 @@ const StakingStats = () => {
                               formatNumber(poolAmounts.apr.toString(), 2)
                           ).format('0,0')
                         : '0'}
-                    %
                 </StatValue>
             </Stat>
 
