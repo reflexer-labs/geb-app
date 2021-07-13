@@ -268,21 +268,29 @@ export function useGetExitRequests() {
     const [state, setState] = useState<{
         deadline: number
         lockedAmount: string
-    }>({ deadline: 0, lockedAmount: '' })
+        exitDelay: number
+    }>({ deadline: 0, lockedAmount: '', exitDelay: 0 })
 
     useEffect(() => {
         let isCanceled = false
         if (!geb || !account) return
         async function getExitRequest() {
-            const requests = await geb.contracts.stakingFirstResort.exitRequests(
-                account as string
-            )
+            const [requests, exitDelayVal] = await geb.multiCall([
+                geb.contracts.stakingFirstResort.exitRequests(
+                    account as string,
+                    true
+                ),
+                geb.contracts.stakingFirstResort.exitDelay(true),
+            ])
             if (!isCanceled) {
+                console.log(exitDelayVal.toNumber())
+
                 setState({
                     deadline: requests.deadline.toNumber(),
                     lockedAmount: ethers.utils.formatEther(
                         requests.lockedAmount
                     ),
+                    exitDelay: exitDelayVal.toNumber(),
                 })
             }
         }

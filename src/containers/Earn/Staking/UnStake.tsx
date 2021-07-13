@@ -1,6 +1,11 @@
 import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { ethers } from 'ethers'
 import React, { useMemo, useState } from 'react'
+import { Info } from 'react-feather'
+import { useTranslation } from 'react-i18next'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import AlertLabel from '../../../components/AlertLabel'
 import Button from '../../../components/Button'
@@ -19,7 +24,10 @@ import {
 } from '../../../hooks/useTokenApproval'
 import { formatNumber } from '../../../utils/helper'
 
+dayjs.extend(duration)
+dayjs.extend(relativeTime)
 const UnStake = () => {
+    const { t } = useTranslation()
     const [isPending, setIsPending] = useState(false)
     const { account } = useActiveWeb3React()
     const geb = useGeb()
@@ -150,17 +158,38 @@ const UnStake = () => {
                         />
                     ) : (
                         <>
-                            <Button
+                            <UnstakeBtn
                                 style={{
                                     width:
                                         !hasPendingExitRequests && !allowExit
                                             ? '100%'
                                             : '48%',
                                 }}
-                                disabled={!isValid}
-                                text={error ? error : 'Request Unstake'}
-                                onClick={handleRequestExit}
-                            />
+                            >
+                                <Button
+                                    style={{
+                                        width: `100%`,
+                                    }}
+                                    disabled={!isValid}
+                                    text={error ? error : 'Request Unstake'}
+                                    onClick={handleRequestExit}
+                                />
+
+                                {hasPendingExitRequests ? (
+                                    <InfoIcon
+                                        data-tip={t('unstake_request_pending', {
+                                            exitDelay: dayjs
+                                                .duration(
+                                                    exitRequests.exitDelay,
+                                                    'seconds'
+                                                )
+                                                .humanize(),
+                                        })}
+                                    >
+                                        <Info size="16" />
+                                    </InfoIcon>
+                                ) : null}
+                            </UnstakeBtn>
 
                             {hasPendingExitRequests || allowExit ? (
                                 <Button
@@ -180,6 +209,7 @@ const UnStake = () => {
                             ) : null}
                         </>
                     )}
+                    <ReactTooltip multiline type="light" data-effect="solid" />
                 </BtnContainer>
             </Footer>
         </>
@@ -209,4 +239,19 @@ const BtnContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+`
+
+const UnstakeBtn = styled.div`
+    position: relative;
+`
+
+const InfoIcon = styled.div`
+    position: absolute;
+    top: 12px;
+    right: 10px;
+    cursor: pointer;
+    svg {
+        fill: ${(props) => props.theme.colors.warningBackground};
+        color: ${(props) => props.theme.colors.warningColor};
+    }
 `

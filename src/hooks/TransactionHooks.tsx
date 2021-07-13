@@ -107,7 +107,10 @@ export async function handlePreTxGasEstimate(
 }
 
 export function handleTransactionError(e: any) {
-    if (typeof e === 'string' && e.toLowerCase().includes('join-not-allowed')) {
+    if (
+        typeof e === 'string' &&
+        (e.toLowerCase().includes('join') || e.toLowerCase().includes('exit'))
+    ) {
         store.dispatch.popupsModel.setWaitingPayload({
             title: 'Cannot join/exit at this time.',
             status: 'error',

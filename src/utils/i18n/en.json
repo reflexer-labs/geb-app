@@ -168,5 +168,6 @@
     "earn": "Earn",
     "incentives_header_title": "Incentive Campaigns",
     "incentives_header_desc": "Data about FLX distribution campaigns",
-    "no_distros": "There are no distributions for this round"
+    "no_distros": "There are no distributions for this round",
+    "unstake_request_pending": "Important: You have currently an ongoing unstaking. By requesting a second unstake, the exit delay of the first request will be extended by {{exitDelay}}"
 }

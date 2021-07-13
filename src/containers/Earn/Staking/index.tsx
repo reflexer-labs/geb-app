@@ -1,14 +1,22 @@
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import duration from 'dayjs/plugin/duration'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import GridContainer from '../../../components/GridContainer'
 import PageHeader from '../../../components/PageHeader'
+import { useStakingInfo } from '../../../hooks/useStaking'
 import StakingManager from './StakingManager'
 import StakingStats from './StakingStats'
 import Statistics from './Statistics'
 
+dayjs.extend(duration)
+dayjs.extend(relativeTime)
+
 const Staking = () => {
     const { t } = useTranslation()
+    const { exitRequests } = useStakingInfo()
     return (
         <GridContainer>
             <PageHeader
@@ -19,6 +27,14 @@ const Staking = () => {
                 <Details>
                     <Title>{t('staking_title')}</Title>
                     <Description>{t('staking_description')}</Description>
+                    {exitRequests.exitDelay ? (
+                        <Note>
+                            Note: Unstaking is subject to a thawing period of{' '}
+                            <b>{`${dayjs
+                                .duration(exitRequests.exitDelay, 'seconds')
+                                .humanize()}`}</b>
+                        </Note>
+                    ) : null}
                 </Details>
                 <Content>
                     <Header>
@@ -89,4 +105,9 @@ const Header = styled.div`
     font-weight: bold;
     font-size: 18px;
     margin-bottom: 20px;
+`
+
+const Note = styled.div`
+    font-size: 14px;
+    margin-top: 10px;
 `
