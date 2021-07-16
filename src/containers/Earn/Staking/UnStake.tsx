@@ -159,6 +159,7 @@ const UnStake = () => {
                     ) : (
                         <>
                             <UnstakeBtn
+                                onMouseEnter={() => ReactTooltip.rebuild()}
                                 style={{
                                     width:
                                         !hasPendingExitRequests && !allowExit
@@ -175,7 +176,7 @@ const UnStake = () => {
                                     onClick={handleRequestExit}
                                 />
 
-                                {hasPendingExitRequests ? (
+                                {hasPendingExitRequests || allowExit ? (
                                     <InfoIcon
                                         data-tip={t('unstake_request_pending', {
                                             exitDelay: dayjs

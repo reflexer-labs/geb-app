@@ -26,7 +26,6 @@ import Auctions from './containers/Auctions'
 import GoogleTagManager from './components/Analytics/GoogleTagManager'
 import { SHOW_AUCTIONS } from './utils/constants'
 import SafeSaviour from './containers/OnBoarding/SafeSaviour'
-import LiquidityPool from './containers/Earn/LiquidityPool'
 import Staking from './containers/Earn/Staking'
 import Incentives from './containers/Earn/Incentives'
 
@@ -69,11 +68,6 @@ const App = () => {
                                             exact
                                             component={Staking}
                                             path={'/earn/staking'}
-                                        />
-                                        <Route
-                                            exact
-                                            component={LiquidityPool}
-                                            path={'/earn/pool'}
                                         />
                                         <Route
                                             exact
