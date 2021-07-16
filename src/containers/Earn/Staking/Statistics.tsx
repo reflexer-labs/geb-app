@@ -41,7 +41,7 @@ const Statistics = () => {
             <Content>
                 <Blocks>
                     <Block>
-                        <Label>stFLX</Label>
+                        <Label>My stFLX</Label>
                         <Value>
                             {mystFLXBalance} {returnImg('stFLX')}
                         </Value>
