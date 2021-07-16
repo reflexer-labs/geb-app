@@ -124,7 +124,10 @@ const UnStake = () => {
                 <AlertBox>
                     <AlertLabel
                         type="alert"
-                        text={`You will be able to unstake ${exitRequests.lockedAmount} stFLX starting on ${exitReqestDeatline}`}
+                        text={`You will be able to unstake approx ${formatNumber(
+                            exitRequests.lockedAmount,
+                            2
+                        )} stFLX starting on ${exitReqestDeatline}`}
                     />
                 </AlertBox>
             ) : null}
@@ -133,7 +136,10 @@ const UnStake = () => {
                 <AlertBox>
                     <AlertLabel
                         type="success"
-                        text={`You can now unstake ${exitRequests.lockedAmount} stFLX`}
+                        text={`You can now unstake ${formatNumber(
+                            exitRequests.lockedAmount,
+                            2
+                        )} stFLX`}
                     />
                 </AlertBox>
             ) : null}
