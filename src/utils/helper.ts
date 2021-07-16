@@ -1,5 +1,4 @@
 import numeral from 'numeral'
-import { ChainId } from '@uniswap/sdk'
 import { BigNumber, FixedNumber } from 'ethers'
 import { utils as gebUtils } from 'geb.js'
 import { AbstractConnector } from '@web3-react/abstract-connector'
@@ -10,6 +9,7 @@ import {
     COIN_TICKER,
 } from './constants'
 import {
+    ChainId,
     ILiquidationData,
     ISafe,
     ISafeHistory,

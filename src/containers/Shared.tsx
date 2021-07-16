@@ -10,7 +10,6 @@ import ApplicationUpdater from '../services/ApplicationUpdater'
 import BalanceUpdater from '../services/BalanceUpdater'
 import { capitalizeName, timeout } from '../utils/helper'
 import WalletModal from '../components/WalletModal'
-import { ChainId } from '@uniswap/sdk'
 import {
     EMPTY_ADDRESS,
     ETHERSCAN_PREFIXES,
@@ -37,6 +36,7 @@ import SafeManagerModal from '../components/Modals/SafeManagerModal'
 import { isAddress } from '@ethersproject/address'
 import DistributionsModal from '../components/Modals/DistributionsModal'
 import SaviourModal from '../components/Modals/SaviourModal'
+import { ChainId } from '../utils/interfaces'
 
 interface Props {
     children: ReactNode
