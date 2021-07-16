@@ -292,7 +292,9 @@ const SafeBody = ({ isChecked }: Props) => {
 
         if (!totalDebtBN.isZero() && totalDebtBN.lt(debtFloorBN)) {
             setError(
-                `The resulting debt should be at least ${debtFloor} ${COIN_TICKER} or zero.`
+                `The resulting debt should be at least ${Math.ceil(
+                    Number(formatNumber(debtFloor))
+                )} ${COIN_TICKER} or zero.`
             )
             return false
         }
