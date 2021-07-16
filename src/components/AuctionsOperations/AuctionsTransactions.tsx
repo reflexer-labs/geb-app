@@ -11,6 +11,7 @@ import Results from './Results'
 import _ from '../../utils/lodash'
 import { COIN_TICKER } from '../../utils/constants'
 
+type AuctionTypes = 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
 const AuctionsTransactions = () => {
     const { t } = useTranslation()
     const { connector, account, library } = useActiveWeb3React()
@@ -28,7 +29,7 @@ const AuctionsTransactions = () => {
 
     const auctionId = _.get(selectedAuction, 'auctionId', '')
     const auctionType = _.get(selectedAuction, 'englishAuctionType', 'DEBT')
-
+    const sellInititalAmount = _.get(selectedAuction, 'sellInitialAmount', '0')
     const isClaim = popupsState.auctionOperationPayload.type.includes('claim')
     const isSettle = popupsState.auctionOperationPayload.type.includes('settle')
     const sectionType = popupsState.auctionOperationPayload.auctionType
@@ -90,6 +91,10 @@ const AuctionsTransactions = () => {
                         title: handleWaitingTitle(),
                         auctionType,
                         amount,
+                        amountToBuy:
+                            auctionType === 'STAKED_TOKEN'
+                                ? sellInititalAmount
+                                : '',
                     })
                 }
 
@@ -100,7 +105,7 @@ const AuctionsTransactions = () => {
                         title: handleWaitingTitle(),
                         auctionType,
                         amount,
-                        type: sectionType as 'DEBT' | 'SURPLUS',
+                        type: sectionType as AuctionTypes,
                     })
                 }
             }

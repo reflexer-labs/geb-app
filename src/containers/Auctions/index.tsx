@@ -10,7 +10,7 @@ import { useActiveWeb3React } from '../../hooks'
 import { useStoreActions } from '../../store'
 import AuctionsList from './AuctionsList'
 
-export type AuctionEventType = 'DEBT' | 'SURPLUS'
+export type AuctionEventType = 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
 
 const Auctions = () => {
     const { t } = useTranslation()
@@ -21,7 +21,7 @@ const Auctions = () => {
     } = useStoreActions((state) => state)
 
     const [hide, setHide] = useState(false)
-    const [type, setType] = useState<AuctionEventType>('DEBT')
+    const [type, setType] = useState<AuctionEventType>('STAKED_TOKEN')
     const [error, setError] = useState('')
 
     const handleHideFAQ = () => setHide(!hide)

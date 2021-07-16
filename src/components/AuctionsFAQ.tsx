@@ -5,7 +5,7 @@ import Button from './Button'
 
 interface Props {
     hideFAQ: () => void
-    type: 'DEBT' | 'SURPLUS'
+    type: 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
 }
 
 interface FAQ {
@@ -16,6 +16,7 @@ interface FAQ {
 interface FAQS {
     debt: Array<FAQ>
     surplus: Array<FAQ>
+    staked_token: Array<FAQ>
 }
 
 const AuctionsFAQ = ({ hideFAQ, type }: Props) => {
@@ -56,6 +57,23 @@ const AuctionsFAQ = ({ hideFAQ, type }: Props) => {
                 image: require('../assets/claim.svg'),
             },
         ],
+        staked_token: [
+            {
+                title: t('surplus_auction_minting_flx_header'),
+                desc: t('surplus_auction_minting_flx_desc'),
+                image: require('../assets/sell-rai.svg'),
+            },
+            {
+                title: t('surplus_auction_how_to_bid'),
+                desc: t('surplus_auction_how_to_bid_desc'),
+                image: require('../assets/bid.svg'),
+            },
+            {
+                title: t('surplus_auction_claim_tokens'),
+                desc: t('surplus_auction_claim_tokens_desc'),
+                image: require('../assets/claim.svg'),
+            },
+        ],
     }
 
     return (
@@ -65,17 +83,17 @@ const AuctionsFAQ = ({ hideFAQ, type }: Props) => {
                 <Button text={t('hide_faq')} onClick={hideFAQ} />
             </Header>
             <Content>
-                {faqs[type.toLowerCase() as 'debt' | 'surplus'].map(
-                    (faq: FAQ) => (
-                        <Col key={faq.title}>
-                            <InnerCol>
-                                <img src={faq.image} alt={faq.title} />
-                                <SectionHeading>{faq.title}</SectionHeading>
-                                <SectionContent>{faq.desc}</SectionContent>
-                            </InnerCol>
-                        </Col>
-                    )
-                )}
+                {faqs[
+                    type.toLowerCase() as 'debt' | 'surplus' | 'staked_token'
+                ].map((faq: FAQ) => (
+                    <Col key={faq.title}>
+                        <InnerCol>
+                            <img src={faq.image} alt={faq.title} />
+                            <SectionHeading>{faq.title}</SectionHeading>
+                            <SectionContent>{faq.desc}</SectionContent>
+                        </InnerCol>
+                    </Col>
+                ))}
             </Content>
         </HeroSection>
     )

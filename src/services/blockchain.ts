@@ -1,4 +1,4 @@
-import { ethers, utils as ethersUtils } from 'ethers'
+import { BigNumber, ethers, utils as ethersUtils } from 'ethers'
 import { Geb, TransactionRequest, utils as gebUtils } from 'geb.js'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { IAuctionBid, ISafe, ISafeData } from '../utils/interfaces'
@@ -141,6 +141,7 @@ export const handleAuctionBid = async ({
     amount,
     auctionId,
     auctionType,
+    amountToBuy,
 }: IAuctionBid) => {
     if (!signer || !auctionId || !amount) {
         return false
@@ -159,11 +160,21 @@ export const handleAuctionBid = async ({
     if (auctionType === 'SURPLUS') {
         txData = proxy.surplusIncreaseBidSize(amountBN, auctionId)
     }
+    if (auctionType === 'STAKED_TOKEN') {
+        if (!amountToBuy) throw new Error('No amountToBuy')
+        const amountToBuyBN = ethersUtils.parseEther(amountToBuy)
+
+        txData = geb.contracts.stakingAuctionHouse.increaseBidSize(
+            auctionId,
+            amountToBuyBN,
+            amountBN
+        )
+    }
 
     if (!txData) throw new Error('No transaction request!')
-
-    let tx = await handlePreTxGasEstimate(signer, txData)
-    const txResponse = await signer.sendTransaction(tx)
+    txData.gasLimit = BigNumber.from('10000000')
+    // let tx = await handlePreTxGasEstimate(signer, txData)
+    const txResponse = await signer.sendTransaction(txData)
     return txResponse
 }
 

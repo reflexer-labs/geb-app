@@ -218,6 +218,8 @@ export const fetchAuctions = async ({
     address: string
     type: string
 }) => {
+    console.log(auctionsQuery(address, type))
+
     const res = await request(
         JSON.stringify({ query: auctionsQuery(address, type) })
     )

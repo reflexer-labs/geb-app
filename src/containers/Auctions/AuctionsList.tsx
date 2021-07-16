@@ -10,7 +10,7 @@ import { useStoreActions, useStoreState } from '../../store'
 import { useActiveWeb3React } from '../../hooks'
 
 interface Props {
-    type: 'DEBT' | 'SURPLUS'
+    type: 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
 }
 const AuctionsList = ({ type }: Props) => {
     const { t } = useTranslation()

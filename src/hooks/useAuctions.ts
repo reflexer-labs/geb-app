@@ -10,6 +10,8 @@ export default function useAuctions() {
         connectWalletModel: connectWalletState,
     } = useStoreState((state) => state)
     const { autctionsData } = auctionsState
+    console.log(autctionsData)
+
     const userProxy: string = _.get(connectWalletState, 'proxyAddress', '')
 
     useEffect(() => {
