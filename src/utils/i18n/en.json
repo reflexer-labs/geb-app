@@ -169,5 +169,5 @@
     "incentives_header_title": "Incentive Campaigns",
     "incentives_header_desc": "Data about FLX distribution campaigns",
     "no_distros": "There are no distributions for this round",
-    "unstake_request_pending": "Important: You have currently an ongoing unstaking. By requesting a second unstake, the exit delay of the first request will be extended by {{exitDelay}}"
+    "unstake_request_pending": "IMPORTANT: You are currently waiting to unstake some tokens. By requesting another unstake, you will need to wait {{exitDelay}} from now on in order to withdraw tokens."
 }
