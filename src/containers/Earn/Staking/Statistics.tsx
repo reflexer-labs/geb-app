@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
 import { useActiveWeb3React } from '../../../hooks'
@@ -21,12 +21,17 @@ const Statistics = () => {
     const { account } = useActiveWeb3React()
     const { balances, poolAmounts } = useStakingInfo()
     const { claimRewardCallback } = useClaimReward()
-
-    const mystFLXBalance = balances.stFlxBalance
-        ? Number(balances.stFlxBalance) > 0
-            ? (formatNumber(balances.stFlxBalance) as string)
+    const { poolBalance, weeklyReward } = poolAmounts
+    const { stFlxBalance, myCurrentReward } = balances
+    const mystFLXBalance = stFlxBalance
+        ? Number(stFlxBalance) > 0
+            ? (formatNumber(stFlxBalance) as string)
             : '0'
         : '0'
+
+    const myWeeklyReward = useMemo(() => {
+        return (Number(stFlxBalance) / Number(poolBalance)) * weeklyReward
+    }, [poolBalance, weeklyReward, stFlxBalance])
 
     const handleClaimReward = async () => {
         try {
@@ -50,9 +55,9 @@ const Statistics = () => {
                     <Block>
                         <Label>My Weekly Reward</Label>
                         <Value>
-                            {Number(balances.myCurrentReward) === 0 || !account
+                            {Number(myCurrentReward) === 0 || !account
                                 ? '0'
-                                : formatNumber(poolAmounts.rewardRate)}{' '}
+                                : formatNumber(myWeeklyReward.toString())}{' '}
                             {returnImg('flx')}
                         </Value>
                     </Block>
@@ -61,15 +66,14 @@ const Statistics = () => {
                     <RewardBox>
                         <RewardLabel>My Current Reward</RewardLabel>
                         <RewardValue>
-                            {formatNumber(balances.myCurrentReward)}{' '}
-                            {returnImg('flx')}
+                            {formatNumber(myCurrentReward)} {returnImg('flx')}
                         </RewardValue>
                     </RewardBox>
 
                     <Button
                         onClick={handleClaimReward}
                         text={'Claim Reward'}
-                        disabled={Number(balances.myCurrentReward) === 0}
+                        disabled={Number(myCurrentReward) === 0}
                     />
                 </StatsFooter>
             </Content>
