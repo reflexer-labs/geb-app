@@ -79,8 +79,9 @@ const AuctionsFAQ = ({ hideFAQ, type }: Props) => {
     return (
         <HeroSection>
             <Header>
-                How do RAI {type.toLowerCase()} auctions work?{' '}
-                <Button text={t('hide_faq')} onClick={hideFAQ} />
+                How do {type === 'STAKED_TOKEN' ? '' : 'RAI'}{' '}
+                {type === 'STAKED_TOKEN' ? 'staked token' : type.toLowerCase()}{' '}
+                auctions work? <Button text={t('hide_faq')} onClick={hideFAQ} />
             </Header>
             <Content>
                 {faqs[

@@ -15,6 +15,9 @@ import {
     returnWalletAddress,
 } from '../utils/helper'
 import { useActiveWeb3React } from '../hooks'
+import { utils as gebUtils } from 'geb.js'
+import { BigNumber } from 'ethers'
+import { parseWad } from '../utils/gebManager'
 
 type Props = IAuction & { isCollapsed: boolean }
 
@@ -43,7 +46,7 @@ const AuctionBlock = (auction: Props) => {
     const sellInititalAmount = _.get(auction, 'sellInitialAmount', '0')
     const buySymbol =
         buyToken === 'PROTOCOL_TOKEN_LP'
-            ? 'Staked Token'
+            ? 'STAKED TOKEN'
             : buyToken === 'COIN'
             ? COIN_TICKER
             : 'FLX'
@@ -77,6 +80,14 @@ const AuctionBlock = (auction: Props) => {
 
     const userProxy = _.get(connectWalletState, 'proxyAddress', '')
 
+    const returnWad = (amount: string, i: number) => {
+        if (!amount) return '0'
+        if (eventType === 'STAKED_TOKEN' && i !== biddersList.length - 1) {
+            const amountBN = BigNumber.from(amount)
+            return parseWad(gebUtils.decimalShift(amountBN, -9))
+        }
+        return formatNumber(amount)
+    }
     const returnEventType = (bidder: IAuctionBidder, i: number) => {
         if (
             !isOngoingAuction &&
@@ -321,7 +332,7 @@ const AuctionBlock = (auction: Props) => {
                                                 <ListItemLabel>
                                                     Buy Amount
                                                 </ListItemLabel>
-                                                {formatNumber(bidder.buyAmount)}{' '}
+                                                {returnWad(bidder.buyAmount, i)}{' '}
                                                 {buySymbol}
                                             </ListItem>
                                             <ListItem>

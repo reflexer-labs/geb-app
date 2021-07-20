@@ -5,6 +5,7 @@ import { IAuctionBid, ISafe, ISafeData } from '../utils/interfaces'
 import { ETH_NETWORK } from '../utils/constants'
 import { handlePreTxGasEstimate } from '../hooks/TransactionHooks'
 import { callAbi, callBytecode } from './abi'
+import { toFixedString } from '../utils/helper'
 
 export const handleDepositAndBorrow = async (
     signer: JsonRpcSigner,
@@ -141,16 +142,15 @@ export const handleAuctionBid = async ({
     amount,
     auctionId,
     auctionType,
-    amountToBuy,
 }: IAuctionBid) => {
     if (!signer || !auctionId || !amount) {
         return false
     }
-
     const geb = new Geb(ETH_NETWORK, signer.provider)
     const proxy = await geb.getProxyAction(signer._address)
 
     const amountBN = ethersUtils.parseEther(amount)
+    console.log(amount)
 
     let txData
 
@@ -161,20 +161,13 @@ export const handleAuctionBid = async ({
         txData = proxy.surplusIncreaseBidSize(amountBN, auctionId)
     }
     if (auctionType === 'STAKED_TOKEN') {
-        if (!amountToBuy) throw new Error('No amountToBuy')
-        const amountToBuyBN = ethersUtils.parseEther(amountToBuy)
-
-        txData = geb.contracts.stakingAuctionHouse.increaseBidSize(
-            auctionId,
-            amountToBuyBN,
-            amountBN
-        )
+        const radAmount = BigNumber.from(toFixedString(amount, 'RAD'))
+        txData = proxy.stakedTokenAuctionIncreaseBidSize(radAmount, auctionId)
     }
 
     if (!txData) throw new Error('No transaction request!')
-    txData.gasLimit = BigNumber.from('10000000')
-    // let tx = await handlePreTxGasEstimate(signer, txData)
-    const txResponse = await signer.sendTransaction(txData)
+    let tx = await handlePreTxGasEstimate(signer, txData)
+    const txResponse = await signer.sendTransaction(tx)
     return txResponse
 }
 
@@ -196,6 +189,9 @@ export const handleAuctionClaim = async ({
     }
     if (auctionType === 'SURPLUS') {
         txData = proxy.surplusSettleAuction(auctionId)
+    }
+    if (auctionType === 'STAKED_TOKEN') {
+        txData = proxy.stakedTokenSettleAuction(auctionId)
     }
 
     if (!txData) throw new Error('No transaction request!')

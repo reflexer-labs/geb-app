@@ -283,8 +283,6 @@ export function useGetExitRequests() {
                 geb.contracts.stakingFirstResort.exitDelay(true),
             ])
             if (!isCanceled) {
-                console.log(exitDelayVal.toNumber())
-
                 setState({
                     deadline: requests.deadline.toNumber(),
                     lockedAmount: ethers.utils.formatEther(

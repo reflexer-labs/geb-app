@@ -25,8 +25,18 @@ const Results = () => {
     const sellToken = _.get(selectedAuction, 'sellToken', 'PROTOCOL_TOKEN')
     const sellAmount = _.get(selectedAuction, 'sellAmount', '0')
 
-    const buySymbol = buyToken === 'COIN' ? COIN_TICKER : 'FLX'
-    const sellSymbol = sellToken === 'COIN' ? COIN_TICKER : 'FLX'
+    const buySymbol =
+        buyToken === 'PROTOCOL_TOKEN_LP'
+            ? 'FLX/ETH LP'
+            : buyToken === 'COIN'
+            ? COIN_TICKER
+            : 'FLX'
+    const sellSymbol =
+        sellToken === 'PROTOCOL_TOKEN_LP'
+            ? 'FLX/ETH LP'
+            : sellToken === 'COIN'
+            ? COIN_TICKER
+            : 'FLX'
 
     const sectionType = popupsState.auctionOperationPayload.auctionType
     const isClaim = popupsState.auctionOperationPayload.type.includes('claim')

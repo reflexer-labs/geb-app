@@ -46,6 +46,7 @@ const AuctionsPayment = () => {
 
     const sellAmount = _.get(selectedAuction, 'sellAmount', '0')
     const buyAmount = _.get(selectedAuction, 'buyAmount', '0')
+    console.log(selectedAuction)
 
     const buyToken = _.get(selectedAuction, 'buyToken', 'COIN')
     const sellToken = _.get(selectedAuction, 'sellToken', 'PROTOCOL_TOKEN')
@@ -69,8 +70,18 @@ const AuctionsPayment = () => {
     const raiAllowance = _.get(connectWalletState, 'coinAllowance', '0')
     const flxAllowance = _.get(connectWalletState, 'protAllowance', '0')
 
-    const buySymbol = buyToken === 'COIN' ? COIN_TICKER : 'FLX'
-    const sellSymbol = sellToken === 'COIN' ? COIN_TICKER : 'FLX'
+    const buySymbol =
+        buyToken === 'PROTOCOL_TOKEN_LP'
+            ? 'FLX/ETH LP'
+            : buyToken === 'COIN'
+            ? COIN_TICKER
+            : 'FLX'
+    const sellSymbol =
+        sellToken === 'PROTOCOL_TOKEN_LP'
+            ? 'FLX/ETH LP'
+            : sellToken === 'COIN'
+            ? COIN_TICKER
+            : 'FLX'
 
     const handleAmountChange = (val: string) => {
         setError('')
@@ -162,6 +173,23 @@ const AuctionsPayment = () => {
             return false
         }
 
+        if (auctionType === 'STAKED_TOKEN') {
+            if (buyAmountBN.gt(totalRaiBalance)) {
+                setError(`Insufficient ${COIN_TICKER} balance.`)
+                return false
+            }
+
+            if (bids.length > 0 && valueBN.lt(maxBidAmountBN)) {
+                setError(
+                    `You need to bid ${(
+                        (Number(bidIncrease) - 1) *
+                        100
+                    ).toFixed(0)}% more FLX vs the highest bid`
+                )
+                return false
+            }
+        }
+
         if (auctionType === 'SURPLUS') {
             if (buyAmountBN.gt(totalFlxBalance)) {
                 setError(`Insufficient FLX balance.`)
@@ -233,7 +261,7 @@ const AuctionsPayment = () => {
             }
             return
         }
-        if (sectionType === 'DEBT') {
+        if (sectionType === 'DEBT' || sectionType === 'STAKED_TOKEN') {
             auctionsActions.setOperation(2)
         } else {
             auctionsActions.setAmount(protInternalBalance)
@@ -290,7 +318,7 @@ const AuctionsPayment = () => {
                                 ? `${sellSymbol} to Receive`
                                 : `${buySymbol} to Bid`
                         }
-                        maxText={auctionType === 'SURPLUS' ? 'min' : 'max'}
+                        maxText={auctionType === 'DEBT' ? 'max' : 'min'}
                         handleMaxClick={() => handleAmountChange(maxBid())}
                     />
                 </>

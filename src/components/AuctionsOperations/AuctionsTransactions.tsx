@@ -29,11 +29,12 @@ const AuctionsTransactions = () => {
 
     const auctionId = _.get(selectedAuction, 'auctionId', '')
     const auctionType = _.get(selectedAuction, 'englishAuctionType', 'DEBT')
-    const sellInititalAmount = _.get(selectedAuction, 'sellInitialAmount', '0')
     const isClaim = popupsState.auctionOperationPayload.type.includes('claim')
     const isSettle = popupsState.auctionOperationPayload.type.includes('settle')
     const sectionType = popupsState.auctionOperationPayload.auctionType
     const handleBack = () => auctionsActions.setOperation(0)
+
+    console.log(amount)
 
     const reset = () => {
         auctionsActions.setAmount('')
@@ -56,6 +57,12 @@ const AuctionsTransactions = () => {
                     : isClaim
                     ? 'Claiming Tokens'
                     : `Bid FLX and Receive ${COIN_TICKER}`
+            case 'STAKED_TOKEN':
+                return isSettle
+                    ? 'Claiming Staked Token'
+                    : isClaim
+                    ? 'Claiming Tokens'
+                    : `Bid RAI and Receive Staked Tokens`
             default:
                 return ''
         }
@@ -91,10 +98,6 @@ const AuctionsTransactions = () => {
                         title: handleWaitingTitle(),
                         auctionType,
                         amount,
-                        amountToBuy:
-                            auctionType === 'STAKED_TOKEN'
-                                ? sellInititalAmount
-                                : '',
                     })
                 }
 

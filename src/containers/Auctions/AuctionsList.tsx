@@ -53,7 +53,12 @@ const AuctionsList = ({ type }: Props) => {
     return (
         <Container>
             <InfoBox>
-                <Title>{type.toLowerCase()} Auctions</Title>
+                <Title>
+                    {type === 'STAKED_TOKEN'
+                        ? 'Staked Token'
+                        : type.toLowerCase()}{' '}
+                    Auctions
+                </Title>
                 {account &&
                 auctions &&
                 auctions.length &&

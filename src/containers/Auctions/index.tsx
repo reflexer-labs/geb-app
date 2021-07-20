@@ -12,17 +12,19 @@ import AuctionsList from './AuctionsList'
 
 export type AuctionEventType = 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
 
-const Auctions = () => {
+const Auctions = ({ ...props }) => {
     const { t } = useTranslation()
     const { account } = useActiveWeb3React()
     const {
         auctionsModel: auctionsActions,
         popupsModel: popupsActions,
     } = useStoreActions((state) => state)
-
     const [hide, setHide] = useState(false)
-    const [type, setType] = useState<AuctionEventType>('STAKED_TOKEN')
+    const [type, setType] = useState<AuctionEventType>('DEBT')
     const [error, setError] = useState('')
+
+    const urlResult = new URLSearchParams(props.location.search)
+    const urlType = urlResult.get('type')
 
     const handleHideFAQ = () => setHide(!hide)
 
@@ -36,12 +38,17 @@ const Auctions = () => {
             await fetchAuctions()
             popupsActions.setIsWaitingModalOpen(false)
         }
-
+        if (urlType && urlType.toLowerCase() === 'staked_token') {
+            setType('STAKED_TOKEN')
+        }
         async function fetchAuctions() {
             try {
                 await auctionsActions.fetchAuctions({
                     address: account ? account : '',
-                    type,
+                    type:
+                        urlType && urlType.toLowerCase() === 'staked_token'
+                            ? 'STAKED_TOKEN'
+                            : type,
                 })
                 setError('')
             } catch (error) {
@@ -58,7 +65,7 @@ const Auctions = () => {
         }, 2000)
 
         return () => clearInterval(interval)
-    }, [account, auctionsActions, popupsActions, type])
+    }, [account, auctionsActions, popupsActions, type, urlType])
 
     return (
         <>
@@ -68,7 +75,10 @@ const Auctions = () => {
                     <PageHeader
                         breadcrumbs={{ '/': t('auctions') }}
                         text={t('auctions_header_text', {
-                            type: type.toLocaleLowerCase(),
+                            type:
+                                type === 'STAKED_TOKEN'
+                                    ? 'staked token'
+                                    : type.toLocaleLowerCase(),
                         })}
                     />
                     {hide ? (
@@ -76,20 +86,22 @@ const Auctions = () => {
                     ) : null}
                 </Content>
 
-                <Switcher>
-                    <Tab
-                        className={type === 'DEBT' ? 'active' : ''}
-                        onClick={() => setType('DEBT')}
-                    >
-                        Debt Auctions
-                    </Tab>
-                    <Tab
-                        className={type === 'SURPLUS' ? 'active' : ''}
-                        onClick={() => setType('SURPLUS')}
-                    >
-                        Surplus Auctions
-                    </Tab>
-                </Switcher>
+                {urlType && urlType.toLowerCase() === 'staked_token' ? null : (
+                    <Switcher>
+                        <Tab
+                            className={type === 'DEBT' ? 'active' : ''}
+                            onClick={() => setType('DEBT')}
+                        >
+                            Debt Auctions
+                        </Tab>
+                        <Tab
+                            className={type === 'SURPLUS' ? 'active' : ''}
+                            onClick={() => setType('SURPLUS')}
+                        >
+                            Surplus Auctions
+                        </Tab>
+                    </Switcher>
+                )}
 
                 {hide ? null : (
                     <AuctionsFAQ hideFAQ={handleHideFAQ} type={type} />
