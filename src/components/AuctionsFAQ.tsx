@@ -59,18 +59,18 @@ const AuctionsFAQ = ({ hideFAQ, type }: Props) => {
         ],
         staked_token: [
             {
-                title: t('surplus_auction_minting_flx_header'),
-                desc: t('surplus_auction_minting_flx_desc'),
+                title: t('staked_auction_minting_flx_header'),
+                desc: t('staked_auction_minting_flx_desc'),
                 image: require('../assets/sell-rai.svg'),
             },
             {
-                title: t('surplus_auction_how_to_bid'),
-                desc: t('surplus_auction_how_to_bid_desc'),
+                title: t('staked_auction_how_to_bid'),
+                desc: t('staked_auction_how_to_bid_desc'),
                 image: require('../assets/bid.svg'),
             },
             {
-                title: t('surplus_auction_claim_tokens'),
-                desc: t('surplus_auction_claim_tokens_desc'),
+                title: t('staked_auction_claim_tokens'),
+                desc: t('staked_auction_claim_tokens_desc'),
                 image: require('../assets/claim.svg'),
             },
         ],

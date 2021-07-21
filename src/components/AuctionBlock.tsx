@@ -46,7 +46,7 @@ const AuctionBlock = (auction: Props) => {
     const sellInititalAmount = _.get(auction, 'sellInitialAmount', '0')
     const buySymbol =
         buyToken === 'PROTOCOL_TOKEN_LP'
-            ? 'STAKED TOKEN'
+            ? 'FLX/ETH LP'
             : buyToken === 'COIN'
             ? COIN_TICKER
             : 'FLX'
@@ -54,7 +54,7 @@ const AuctionBlock = (auction: Props) => {
 
     const sellSymbol =
         sellToken === 'PROTOCOL_TOKEN_LP'
-            ? 'STAKED TOKEN'
+            ? 'FLX/ETH LP'
             : sellToken === 'COIN'
             ? COIN_TICKER
             : 'FLX'
@@ -84,7 +84,7 @@ const AuctionBlock = (auction: Props) => {
         if (!amount) return '0'
         if (eventType === 'STAKED_TOKEN' && i !== biddersList.length - 1) {
             const amountBN = BigNumber.from(amount)
-            return parseWad(gebUtils.decimalShift(amountBN, -9))
+            return formatNumber(parseWad(gebUtils.decimalShift(amountBN, -9)))
         }
         return formatNumber(amount)
     }

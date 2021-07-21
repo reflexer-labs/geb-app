@@ -47,12 +47,12 @@ const Results = () => {
                 {isClaim ? (
                     <Item>
                         <Label>{`${
-                            sectionType === 'DEBT' ? 'RAI' : 'FLX'
+                            sectionType === 'SURPLUS' ? 'FLX' : 'RAI'
                         } Amount`}</Label>
                         <Value>{`${formatNumber(
-                            sectionType === 'DEBT'
-                                ? internalBalance
-                                : protInternalBalance
+                            sectionType === 'SURPLUS'
+                                ? protInternalBalance
+                                : internalBalance
                         )}`}</Value>
                     </Item>
                 ) : (

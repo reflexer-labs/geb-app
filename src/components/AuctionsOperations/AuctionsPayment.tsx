@@ -10,6 +10,7 @@ import _ from '../../utils/lodash'
 import { COIN_TICKER } from '../../utils/constants'
 import { BigNumber } from 'ethers'
 import { toFixedString } from '../../utils/helper'
+import { parseWad } from '../../utils/gebManager'
 
 const AuctionsPayment = () => {
     const { t } = useTranslation()
@@ -46,7 +47,6 @@ const AuctionsPayment = () => {
 
     const sellAmount = _.get(selectedAuction, 'sellAmount', '0')
     const buyAmount = _.get(selectedAuction, 'buyAmount', '0')
-    console.log(selectedAuction)
 
     const buyToken = _.get(selectedAuction, 'buyToken', 'COIN')
     const sellToken = _.get(selectedAuction, 'sellToken', 'PROTOCOL_TOKEN')
@@ -89,12 +89,23 @@ const AuctionsPayment = () => {
         auctionsActions.setAmount(val)
     }
 
+    const parseRadToWad = (amount: string) => {
+        return BigNumber.from(
+            toFixedString(
+                parseWad(gebUtils.decimalShift(BigNumber.from(amount), -9)),
+                'WAD'
+            )
+        )
+    }
+
     const maxBid = (): string => {
         const sellAmountBN = sellAmount
             ? BigNumber.from(toFixedString(sellAmount, 'WAD'))
             : BigNumber.from('0')
         const buyAmountBN = buyAmount
-            ? BigNumber.from(toFixedString(buyAmount, 'WAD'))
+            ? auctionType === 'STAKED_TOKEN'
+                ? parseRadToWad(buyAmount)
+                : BigNumber.from(toFixedString(buyAmount, 'WAD'))
             : BigNumber.from('0')
         const bidIncreaseBN = BigNumber.from(toFixedString(bidIncrease, 'WAD'))
         if (auctionType === 'DEBT') {
@@ -128,7 +139,7 @@ const AuctionsPayment = () => {
             }
         }
 
-        const amountToBuy =
+        let amountToBuy =
             biddersList.length > 0 && buyAmountBN.isZero()
                 ? BigNumber.from(toFixedString(biddersList[0].buyAmount, 'WAD'))
                 : buyAmountBN
@@ -161,7 +172,9 @@ const AuctionsPayment = () => {
         const totalFlxBalance = flxBalanceBN.add(flxInternalBalance)
 
         const buyAmountBN = buyAmount
-            ? BigNumber.from(toFixedString(buyAmount, 'WAD'))
+            ? auctionType === 'STAKED_TOKEN'
+                ? parseRadToWad(buyAmount)
+                : BigNumber.from(toFixedString(buyAmount, 'WAD'))
             : BigNumber.from('0')
 
         if (valueBN.lt(BigNumber.from('0'))) {
@@ -270,7 +283,7 @@ const AuctionsPayment = () => {
     }
 
     const returnClaimValues = () => {
-        if (sectionType === 'DEBT') {
+        if (sectionType === 'DEBT' || sectionType === 'STAKED_TOKEN') {
             return { amount: internalBalance, symbol: 'RAI' }
         }
         return { amount: protInternalBalance, symbol: 'FLX' }

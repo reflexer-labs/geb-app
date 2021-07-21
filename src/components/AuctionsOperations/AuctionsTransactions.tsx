@@ -34,8 +34,6 @@ const AuctionsTransactions = () => {
     const sectionType = popupsState.auctionOperationPayload.auctionType
     const handleBack = () => auctionsActions.setOperation(0)
 
-    console.log(amount)
-
     const reset = () => {
         auctionsActions.setAmount('')
         auctionsActions.setOperation(0)
@@ -59,10 +57,10 @@ const AuctionsTransactions = () => {
                     : `Bid FLX and Receive ${COIN_TICKER}`
             case 'STAKED_TOKEN':
                 return isSettle
-                    ? 'Claiming Staked Token'
+                    ? 'Claiming FLX/ETH LP'
                     : isClaim
                     ? 'Claiming Tokens'
-                    : `Bid RAI and Receive Staked Tokens`
+                    : `Bid RAI and Receive FLX/ETH LP`
             default:
                 return ''
         }

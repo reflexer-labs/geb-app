@@ -169,5 +169,11 @@
     "incentives_header_title": "Incentive Campaigns",
     "incentives_header_desc": "Data about FLX distribution campaigns",
     "no_distros": "There are no distributions for this round",
-    "unstake_request_pending": "Important: You have currently an ongoing unstaking. By requesting a second unstake, the exit delay of the first request will be extended by {{exitDelay}}"
+    "unstake_request_pending": "Important: You have currently an ongoing unstaking. By requesting a second unstake, the exit delay of the first request will be extended by {{exitDelay}}",
+    "staked_auction_minting_flx_header": "Selling Staked Tokens",
+    "staked_auction_minting_flx_desc": "Staked token auctions are meant to sell FLX/ETH LP tokens in exchange for RAI. The proceeds received by an auction will be used to recapitalize the RAI protocol.",
+    "staked_auction_how_to_bid": "How do I bid?",
+    "staked_auction_how_to_bid_desc": "During a staked token auction, you will bid an increasing amount of RAI for a fixed amount of FLX/ETH LP tokens. A practical example: if the current RAI bid is 100 for 5 FLX/ETH LP (resulting in a price of 20 RAI/LP token), the next bidder must bid more RAI for the same amount of LP tokens. The auction also makes sure that each bid must be at least a certain percentage higher than the previous one (e.g the next bid must be at least 3% higher).",
+    "staked_auction_claim_tokens": "What does the Claim Tokens button do?",
+    "staked_auction_claim_tokens_desc": "In case someone outbids you in a staked token auction, your RAI bid will be reimbursed to your Reflexer Account. Claim Tokens can be used to get back RAI that is kept in your Account."
 }

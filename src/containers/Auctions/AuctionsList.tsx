@@ -55,7 +55,7 @@ const AuctionsList = ({ type }: Props) => {
             <InfoBox>
                 <Title>
                     {type === 'STAKED_TOKEN'
-                        ? 'Staked Token'
+                        ? 'FLX/ETH LP'
                         : type.toLowerCase()}{' '}
                     Auctions
                 </Title>
