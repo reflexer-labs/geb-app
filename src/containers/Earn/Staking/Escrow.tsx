@@ -15,7 +15,7 @@ const Escrow = () => {
 
     const date =
         escrowData && escrowData.vestingEndDate > 0
-            ? dayjs.unix(escrowData.vestingEndDate).format('MMM D, YYYY h:mm A')
+            ? dayjs.unix(escrowData.vestingEndDate).format('MMM D, YYYY')
             : 'N/A'
 
     const tokens =
@@ -47,7 +47,7 @@ const Escrow = () => {
         <>
             <Body>
                 <Box>
-                    <Label>Total Vested Amount</Label>
+                    <Label>Amount to Vest</Label>
                     <Value>
                         {total}{' '}
                         <img
@@ -63,7 +63,7 @@ const Escrow = () => {
                 </Box>
 
                 <Box>
-                    <Label>Total Vested Claimable FLX</Label>
+                    <Label>Claimable</Label>
                     <Value>
                         {tokens}{' '}
                         <img
@@ -75,7 +75,7 @@ const Escrow = () => {
 
                 <BtnContainer>
                     <Button
-                        text="Claim Escrowed Tokens"
+                        text="Withdraw from Escrow"
                         disabled={
                             Number(escrowData.claimableTokens) <= 0 || isPending
                         }

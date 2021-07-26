@@ -166,7 +166,7 @@ const StatsFooter = styled.div`
     border: 1px solid ${(props) => props.theme.colors.border};
     background: ${(props) => props.theme.colors.background};
     button {
-        margin-top: 10px;
+        margin-top: 15px;
         width: 100%;
     }
 `
