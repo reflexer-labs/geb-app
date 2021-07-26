@@ -19,9 +19,10 @@ const returnImg = (type = 'flx', width = '20px', height = '20px') => {
 }
 const Statistics = () => {
     const { account } = useActiveWeb3React()
-    const { balances, poolAmounts } = useStakingInfo()
+    const { balances, poolAmounts, escrowData } = useStakingInfo()
     const { claimRewardCallback } = useClaimReward()
     const { poolBalance, weeklyReward } = poolAmounts
+    const { percentVested } = escrowData
     const { stFlxBalance, myCurrentReward } = balances
     const mystFLXBalance = stFlxBalance
         ? Number(stFlxBalance) > 0
@@ -32,6 +33,16 @@ const Statistics = () => {
     const myWeeklyReward = useMemo(() => {
         return (Number(stFlxBalance) / Number(poolBalance)) * weeklyReward
     }, [poolBalance, weeklyReward, stFlxBalance])
+
+    const escrowed = useMemo(() => {
+        if (!percentVested || percentVested === 0) return myCurrentReward
+        const percent = percentVested / 100
+        return (Number(myCurrentReward) * percent).toString()
+    }, [percentVested, myCurrentReward])
+
+    const claimable = useMemo(() => {
+        return (Number(myCurrentReward) - Number(escrowed)).toString()
+    }, [escrowed, myCurrentReward])
 
     const handleClaimReward = async () => {
         try {
@@ -66,7 +77,20 @@ const Statistics = () => {
                     <RewardBox>
                         <RewardLabel>My Current Reward</RewardLabel>
                         <RewardValue>
-                            {formatNumber(myCurrentReward)} {returnImg('flx')}
+                            {Number(claimable) > 0
+                                ? Number(claimable) >= 0.0001
+                                    ? formatNumber(claimable)
+                                    : '< 0.0001'
+                                : '0'}{' '}
+                            {returnImg('flx')}
+                            <span>+</span>
+                            {Number(escrowed) > 0
+                                ? Number(escrowed) >= 0.0001
+                                    ? formatNumber(escrowed)
+                                    : '< 0.0001'
+                                : '0'}{' '}
+                            {returnImg('flx')}
+                            <span></span> Escrowed
                         </RewardValue>
                     </RewardBox>
 
@@ -134,19 +158,22 @@ const Content = styled.div`
 `
 
 const StatsFooter = styled.div`
-    display: flex;
+    /* display: flex;
     align-items: flex-end;
-    padding: 20px;
     justify-content: space-between;
-    flex-wrap: wrap;
+    flex-wrap: wrap; */
+    padding: 20px;
     border: 1px solid ${(props) => props.theme.colors.border};
     background: ${(props) => props.theme.colors.background};
+    button {
+        margin-top: 10px;
+        width: 100%;
+    }
 `
 
 const RewardBox = styled.div`
     /* display: flex;
     align-items: center;
-    flex-direction: row-reverse;
     justify-content: space-between; */
 `
 
@@ -154,8 +181,13 @@ const RewardValue = styled.div`
     margin-top: 10px;
     display: flex;
     align-items: center;
+    font-size: 15px;
     img {
         margin-left: 5px;
+    }
+    span {
+        display: inline-block;
+        margin: 0 5px;
     }
 `
 const RewardLabel = styled.div`

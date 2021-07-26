@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import Escrow from './Escrow'
 import Stake from './Stake'
 import UnStake from './UnStake'
 
 const StakingManager = () => {
-    const [type, setType] = useState<'stake' | 'unstake'>('stake')
+    const [type, setType] = useState<'stake' | 'unstake' | 'escrow'>('stake')
 
     return (
         <StakingPayment>
@@ -21,8 +22,20 @@ const StakingManager = () => {
                 >
                     Unstake
                 </Tab>
+                <Tab
+                    className={type === 'escrow' ? 'active' : ''}
+                    onClick={() => setType('escrow')}
+                >
+                    Escrow
+                </Tab>
             </Header>
-            {type === 'unstake' ? <UnStake /> : <Stake />}
+            {type === 'escrow' ? (
+                <Escrow />
+            ) : type === 'unstake' ? (
+                <UnStake />
+            ) : (
+                <Stake />
+            )}
         </StakingPayment>
     )
 }
