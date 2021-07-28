@@ -76,9 +76,9 @@ export function useStakingInfo(isDeposit = true) {
             ethers.utils
                 .parseEther(balances.stakingBalance.toString())
                 .lt(
-                    ethers.utils
-                        .parseEther(parsedAmounts.stakingAmount.toString())
-                        .add(ethers.utils.parseEther(exitRequests.lockedAmount))
+                    ethers.utils.parseEther(
+                        parsedAmounts.stakingAmount.toString()
+                    )
                 )
         ) {
             error = 'Insufficient FLX/ETH LP balance'
@@ -99,9 +99,9 @@ export function useStakingInfo(isDeposit = true) {
             ethers.utils
                 .parseEther(balances.stFlxBalance.toString())
                 .lt(
-                    ethers.utils
-                        .parseEther(parsedAmounts.stFlxAmount.toString())
-                        .add(ethers.utils.parseEther(exitRequests.lockedAmount))
+                    ethers.utils.parseEther(
+                        parsedAmounts.stFlxAmount.toString()
+                    )
                 )
         ) {
             error = 'Insufficient stFLX balance'
