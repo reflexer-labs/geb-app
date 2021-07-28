@@ -47,7 +47,7 @@ const UnStake = () => {
 
     const exitReqestDeatline =
         exitRequests && exitRequests.deadline > 0
-            ? dayjs.unix(exitRequests.deadline).format('MMM D, YYYY h:mm A')
+            ? dayjs.unix(exitRequests.deadline).format('MMM D, YYYY')
             : null
 
     const totalUnlockedAmount = useMemo(() => {
@@ -227,6 +227,11 @@ export default UnStake
 
 const AlertBox = styled.div`
     padding: 0 20px;
+    @media (min-width: 991px) {
+        > div {
+            padding: 8px 16% !important;
+        }
+    }
 `
 
 const Body = styled.div`
