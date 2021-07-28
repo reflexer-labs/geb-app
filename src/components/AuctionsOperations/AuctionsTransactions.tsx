@@ -86,20 +86,10 @@ const AuctionsTransactions = () => {
                     await auctionsActions.auctionClaim({
                         signer,
                         auctionId,
-                        title: isClaim ? 'Claiming FLX' : 'Settling Auction',
-                        auctionType,
-                    })
-                } else if (!isClaim || !isSettle) {
-                    await auctionsActions.auctionBid({
-                        signer,
-                        auctionId,
                         title: handleWaitingTitle(),
                         auctionType,
-                        amount,
                     })
-                }
-
-                if (isClaim) {
+                } else if (isClaim) {
                     await auctionsActions.auctionClaimInternalBalance({
                         signer,
                         auctionId,
@@ -107,6 +97,14 @@ const AuctionsTransactions = () => {
                         auctionType,
                         amount,
                         type: sectionType as AuctionTypes,
+                    })
+                } else {
+                    await auctionsActions.auctionBid({
+                        signer,
+                        auctionId,
+                        title: handleWaitingTitle(),
+                        auctionType,
+                        amount,
                     })
                 }
             }

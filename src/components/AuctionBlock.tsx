@@ -42,7 +42,7 @@ const AuctionBlock = (auction: Props) => {
     const eventType = _.get(auction, 'englishAuctionType', 'debt')
     const buyToken = _.get(auction, 'buyToken', 'COIN')
     const sellToken = _.get(auction, 'sellToken', 'PROTOCOL_TOKEN')
-    const buyInititalAmount = _.get(auction, 'buyInitialAmount', '0')
+    const buyAmount = _.get(auction, 'buyAmount', '0')
     const sellInititalAmount = _.get(auction, 'sellInitialAmount', '0')
     const buySymbol =
         buyToken === 'PROTOCOL_TOKEN_LP'
@@ -70,6 +70,11 @@ const AuctionBlock = (auction: Props) => {
     const biddersList = _.get(auction, 'biddersList', [])
     const winner = _.get(auction, 'winner', '')
 
+    const parseRadToWad = (amount: string) => {
+        const amountBN = BigNumber.from(amount)
+        return formatNumber(parseWad(gebUtils.decimalShift(amountBN, -9)))
+    }
+
     const kickBidder = {
         bidder: _.get(auction, 'startedBy', ''),
         buyAmount: _.get(auction, 'buyInitialAmount', ''),
@@ -83,8 +88,7 @@ const AuctionBlock = (auction: Props) => {
     const returnWad = (amount: string, i: number) => {
         if (!amount) return '0'
         if (eventType === 'STAKED_TOKEN' && i !== biddersList.length - 1) {
-            const amountBN = BigNumber.from(amount)
-            return formatNumber(parseWad(gebUtils.decimalShift(amountBN, -9)))
+            return parseRadToWad(amount)
         }
         return formatNumber(amount)
     }
@@ -236,7 +240,11 @@ const AuctionBlock = (auction: Props) => {
 
                             <InfoCol>
                                 <InfoLabel>{buySymbol} BID</InfoLabel>
-                                <InfoValue>{`${buyInititalAmount} ${buySymbol}`}</InfoValue>
+                                <InfoValue>{`${
+                                    eventType === 'STAKED_TOKEN'
+                                        ? parseRadToWad(buyAmount)
+                                        : buyAmount
+                                } ${buySymbol}`}</InfoValue>
                             </InfoCol>
 
                             <InfoCol>

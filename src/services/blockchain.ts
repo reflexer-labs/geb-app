@@ -150,7 +150,6 @@ export const handleAuctionBid = async ({
     const proxy = await geb.getProxyAction(signer._address)
 
     const amountBN = ethersUtils.parseEther(amount)
-    console.log(amount)
 
     let txData
 

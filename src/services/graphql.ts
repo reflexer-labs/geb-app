@@ -27,7 +27,9 @@ export const cancelTokenSource = axios.CancelToken.source()
 
 export const request = async (query: string, index = 0): Promise<any> => {
     try {
-        const res = await axios.post(GRAPH_API_URLS[index], query)
+        const res = await axios.post(GRAPH_API_URLS[index], query, {
+            headers: { 'content-type': 'application/json' },
+        })
         return res
     } catch (error) {
         if (index < GRAPH_API_URLS.length - 1) {
@@ -234,7 +236,10 @@ export const fetchInternalBalance = async (proxyAddress: string) => {
         async (bail, attempt) => {
             const res = await axios.post(
                 GRAPH_API_URLS[attempt - 1],
-                JSON.stringify({ query: internalBalanceQuery(proxyAddress) })
+                JSON.stringify({ query: internalBalanceQuery(proxyAddress) }),
+                {
+                    headers: { 'content-type': 'application/json' },
+                }
             )
 
             if (!res.data.data && attempt < GRAPH_API_URLS.length) {
@@ -254,7 +259,10 @@ export const fetchFLXBalance = async (address: string) => {
         async (bail, attempt) => {
             const res = await axios.post(
                 GRAPH_API_URLS[attempt - 1],
-                JSON.stringify({ query: fetchFLXBalanceQuery(address) })
+                JSON.stringify({ query: fetchFLXBalanceQuery(address) }),
+                {
+                    headers: { 'content-type': 'application/json' },
+                }
             )
 
             if (!res.data.data && attempt < GRAPH_API_URLS.length) {
@@ -274,7 +282,10 @@ export const fetchSafeHistory = async (safeId: string) => {
         async (bail, attempt) => {
             const res = await axios.post(
                 GRAPH_API_URLS[attempt - 1],
-                JSON.stringify({ query: getSafeHistoryQuery(safeId) })
+                JSON.stringify({ query: getSafeHistoryQuery(safeId) }),
+                {
+                    headers: { 'content-type': 'application/json' },
+                }
             )
 
             if (!res) {

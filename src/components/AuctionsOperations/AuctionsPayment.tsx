@@ -9,7 +9,7 @@ import { useStoreActions, useStoreState } from '../../store'
 import _ from '../../utils/lodash'
 import { COIN_TICKER } from '../../utils/constants'
 import { BigNumber } from 'ethers'
-import { toFixedString } from '../../utils/helper'
+import { formatNumber, toFixedString } from '../../utils/helper'
 import { parseWad } from '../../utils/gebManager'
 
 const AuctionsPayment = () => {
@@ -144,13 +144,24 @@ const AuctionsPayment = () => {
                 ? BigNumber.from(toFixedString(biddersList[0].buyAmount, 'WAD'))
                 : buyAmountBN
 
-        return gebUtils
+        const max = gebUtils
             .wadToFixed(amountToBuy.mul(bidIncreaseBN).div(gebUtils.WAD))
             .toString()
+
+        if (auctionType === 'STAKED_TOKEN') {
+            return formatNumber(
+                (Number(max) + 0.0001).toString(),
+                4,
+                true
+            ).toString()
+        }
+
+        return max
     }
 
     const passedChecks = () => {
         const maxBidAmountBN = BigNumber.from(toFixedString(maxBid(), 'WAD'))
+
         const valueBN = value
             ? BigNumber.from(toFixedString(value, 'WAD'))
             : BigNumber.from('0')
@@ -197,7 +208,7 @@ const AuctionsPayment = () => {
                     `You need to bid ${(
                         (Number(bidIncrease) - 1) *
                         100
-                    ).toFixed(0)}% more FLX vs the highest bid`
+                    ).toFixed(0)}% more RAI vs the highest bid`
                 )
                 return false
             }
