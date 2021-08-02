@@ -43,6 +43,8 @@ const AuctionBlock = (auction: Props) => {
     const buyToken = _.get(auction, 'buyToken', 'COIN')
     const sellToken = _.get(auction, 'sellToken', 'PROTOCOL_TOKEN')
     const buyAmount = _.get(auction, 'buyAmount', '0')
+    const buyInitialAmount = _.get(auction, 'buyInitialAmount', '0')
+
     const sellInititalAmount = _.get(auction, 'sellInitialAmount', '0')
     const buySymbol =
         buyToken === 'PROTOCOL_TOKEN_LP'
@@ -241,7 +243,9 @@ const AuctionBlock = (auction: Props) => {
                             <InfoCol>
                                 <InfoLabel>{buySymbol} BID</InfoLabel>
                                 <InfoValue>{`${
-                                    eventType === 'STAKED_TOKEN'
+                                    eventType === 'STAKED_TOKEN' &&
+                                    Number(buyAmount) !==
+                                        Number(buyInitialAmount)
                                         ? parseRadToWad(buyAmount)
                                         : buyAmount
                                 } ${buySymbol}`}</InfoValue>
