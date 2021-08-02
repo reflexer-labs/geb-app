@@ -26,7 +26,7 @@ export function useStakingInfo(isDeposit = true) {
     const balances = useBalances()
     const poolData = usePoolData()
     const exitRequests = useGetExitRequests()
-
+    const escrowData = useEscrowData()
     const parsedAmounts = useMemo(() => {
         return stakingData
     }, [stakingData])
@@ -116,7 +116,68 @@ export function useStakingInfo(isDeposit = true) {
         exitRequests,
         hasPendingExitRequests,
         allowExit,
+        escrowData,
     }
+}
+
+// fetches Escrow data
+export function useEscrowData() {
+    const geb = useGeb()
+    const { account } = useActiveWeb3React()
+    const hasPendingTx = useHasPendingTransactions()
+    const latestBlockNumber = useBlockNumber()
+    const [state, setState] = useState({
+        totalVested: '0',
+        percentVested: 0,
+        vestingEndDate: 0,
+        claimableTokens: '0',
+    })
+    useEffect(() => {
+        let isCanceled = false
+        if (!geb || !account) return
+        async function getBalances() {
+            const [total, vestingP, i, tokens] = await geb.multiCall([
+                geb.contracts.stakingEscrow.getTokensBeingEscrowed(
+                    account as string,
+                    true
+                ),
+                geb.contracts.stakingFirstResort.percentageVested(true),
+                geb.contracts.stakingEscrow.currentEscrowSlot(
+                    account as string,
+                    true
+                ),
+                geb.contracts.stakingEscrow.getClaimableTokens(
+                    account as string,
+                    true
+                ),
+            ])
+
+            const slot = await geb.contracts.stakingEscrow.escrows(
+                account as string,
+                i.toNumber() > 0 ? i.toNumber() - 1 : 0
+            )
+
+            if (!isCanceled) {
+                setState({
+                    totalVested: ethers.utils.formatEther(total),
+                    percentVested: vestingP.toNumber(),
+                    vestingEndDate:
+                        slot.startDate.toNumber() + slot.duration.toNumber(),
+                    claimableTokens: ethers.utils.formatEther(tokens),
+                })
+            }
+        }
+
+        getBalances()
+
+        return () => {
+            isCanceled = true
+        }
+    }, [geb, account, hasPendingTx, latestBlockNumber])
+
+    return useMemo(() => {
+        return state
+    }, [state])
 }
 
 // fetches balances for rai,eth and liquidity
@@ -562,4 +623,56 @@ export function useClaimReward(): {
     }, [account, geb, library])
 
     return { claimRewardCallback }
+}
+
+// claim escrowed tokens function
+export function useClaimEscrowedTokens(): {
+    claimEscrowedTokensCallback: () => Promise<void>
+} {
+    const geb = useGeb()
+    const { account, library } = useActiveWeb3React()
+    const claimEscrowedTokensCallback = useCallback(async () => {
+        if (!library || !account || !geb) {
+            return
+        }
+        try {
+            store.dispatch.popupsModel.setIsWaitingModalOpen(true)
+            store.dispatch.popupsModel.setBlockBackdrop(true)
+            store.dispatch.popupsModel.setWaitingPayload({
+                title: 'Waiting for confirmation',
+                text: 'Confirm this transaction in your wallet',
+                status: 'loading',
+            })
+            const signer = library.getSigner(account)
+            const txData = geb.contracts.stakingEscrow.claimTokens(
+                account as string
+            )
+
+            if (!txData) throw new Error('No transaction request!')
+            const tx = await handlePreTxGasEstimate(signer, txData)
+            const txResponse = await signer.sendTransaction(tx)
+
+            if (txResponse) {
+                const { hash, chainId } = txResponse
+                store.dispatch.transactionsModel.addTransaction({
+                    chainId,
+                    hash,
+                    from: txResponse.from,
+                    summary: 'Claiming Escrowed FLX Tokens',
+                    addedTime: new Date().getTime(),
+                    originalTx: txResponse,
+                })
+                store.dispatch.popupsModel.setWaitingPayload({
+                    title: 'Transaction Submitted',
+                    hash: txResponse.hash,
+                    status: 'success',
+                })
+                await txResponse.wait()
+            }
+        } catch (e) {
+            handleTransactionError(e)
+        }
+    }, [account, geb, library])
+
+    return { claimEscrowedTokensCallback }
 }
