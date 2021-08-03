@@ -10,6 +10,7 @@ import { useStakingInfo } from '../../../hooks/useStaking'
 import StakingManager from './StakingManager'
 import StakingStats from './StakingStats'
 import Statistics from './Statistics'
+import { ExternalLinkArrow } from '../../../GlobalStyle'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -26,7 +27,18 @@ const Staking = () => {
             <Container>
                 <Details>
                     <Title>{t('staking_title')}</Title>
-                    <Description>{t('staking_description')}</Description>
+                    <Description>
+                        {t('staking_description')}{' '}
+                        {
+                            <a
+                                rel="noopener noreferrer"
+                                href="https://docs.reflexer.finance/incentives/flx-staking"
+                                target="_blank"
+                            >
+                                Read More
+                            </a>
+                        }
+                    </Description>
                     {exitRequests.exitDelay ? (
                         <Note>
                             Note: Unstaking is subject to a thawing period of{' '}
@@ -88,6 +100,10 @@ const Description = styled.div`
     font-size: 14px;
     color: ${(props) => props.theme.colors.secondary};
     line-height: 22px;
+    a {
+        font-weight: bold;
+        ${ExternalLinkArrow}
+    }
 `
 
 const Content = styled.div`
