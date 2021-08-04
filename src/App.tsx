@@ -26,7 +26,7 @@ import Auctions from './containers/Auctions'
 import GoogleTagManager from './components/Analytics/GoogleTagManager'
 import { SHOW_AUCTIONS } from './utils/constants'
 import SafeSaviour from './containers/OnBoarding/SafeSaviour'
-import Staking from './containers/Earn/Staking'
+// import Staking from './containers/Earn/Staking'
 import Incentives from './containers/Earn/Incentives'
 
 // Toast css
@@ -64,11 +64,11 @@ const App = () => {
                                                 path={'/auctions'}
                                             />
                                         ) : null}
-                                        <Route
+                                        {/* <Route
                                             exact
                                             component={Staking}
                                             path={'/earn/staking'}
-                                        />
+                                        /> */}
                                         <Route
                                             exact
                                             component={Privacy}
