@@ -2,10 +2,18 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 import { TransactionResponse } from '@ethersproject/providers'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { DefaultTheme, ThemedCssFunction } from 'styled-components'
-import { ChainId } from '@uniswap/sdk'
 import { IconName } from '../components/FeatherIconWrapper'
 import { ApproveMethod } from '../components/ApproveToken'
 import { Geb } from 'geb.js'
+import { BigNumber } from 'ethers'
+
+export declare enum ChainId {
+    MAINNET = 1,
+    ROPSTEN = 3,
+    RINKEBY = 4,
+    GÖRLI = 5,
+    KOVAN = 42,
+}
 
 export interface DynamicObject {
     [key: string]: any
@@ -212,6 +220,7 @@ export interface ITransaction {
     addedTime: number
     confirmedTime?: number
     originalTx: TransactionResponse
+    approval?: { tokenAddress: string; spender: string }
 }
 
 export interface ISafeHistory {
@@ -456,4 +465,49 @@ export interface Round {
 
 export interface IncentivesDocument {
     rounds: Round[]
+}
+
+export interface Slot0 {
+    sqrtPriceX96: BigNumber
+    tick: number
+    observationIndex: number
+    observationCardinality: number
+    observationCardinalityNext: number
+    feeProtocol: number
+    unlocked: boolean
+}
+export interface Position {
+    id: string
+    lowerTick: number
+    upperTick: number
+    uniLiquidity: BigNumber
+    threshold: BigNumber
+}
+
+export interface PositionsAndThreshold {
+    slot0: Slot0
+    p1: Position
+    p2: Position
+    t1: Tranche
+    t2: Tranche
+}
+
+export interface Tranche {
+    lowerTick: number
+    upperTick: number
+}
+
+export interface ILiquidityData {
+    raiAmount: string
+    ethAmount: string
+    totalLiquidity: string
+}
+export interface IStakedLP {
+    eth: string
+    rai: string
+}
+
+export interface IStakingData {
+    stFlxAmount: string
+    stakingAmount: string
 }

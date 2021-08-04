@@ -1,9 +1,8 @@
-import { ChainId } from '@uniswap/sdk'
 import { ethers } from 'ethers'
 import { Geb } from 'geb.js'
 import { css } from 'styled-components'
 import { injected, walletconnect, walletlink } from '../connectors'
-import { WalletInfo } from './interfaces'
+import { ChainId, WalletInfo } from './interfaces'
 
 const {
     REACT_APP_GRAPH_API_URLS,
