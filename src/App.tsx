@@ -64,11 +64,11 @@ const App = () => {
                                                 path={'/auctions'}
                                             />
                                         ) : null}
-                                        <Route
+                                        {/* <Route
                                             exact
                                             component={Staking}
                                             path={'/earn/staking'}
-                                        />
+                                        /> */}
                                         <Route
                                             exact
                                             component={Privacy}
