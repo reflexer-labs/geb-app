@@ -14,7 +14,7 @@ const DEFAULT_STATE = {
     stakingAmount: '',
 }
 
-export const DAILY_REWARD_RATE = 40
+export const BLOCK_INTERVAL = 13
 
 // liquidity helpers
 export function useStakingInfo(isDeposit = true) {
@@ -247,28 +247,27 @@ export function usePoolData() {
         if (!geb) return
         async function getBalances() {
             try {
-                const [balance, totalSupply] = await geb.multiCall([
-                    geb.contracts.stakingToken.balanceOf(
-                        await geb.contracts.stakingFirstResort.ancestorPool(),
-                        true
-                    ),
-                    geb.contracts.stakingToken.totalSupply(true),
-                ])
-
-                let rewardR = '0'
-                try {
-                    const rewardRateRes = await geb.contracts.stakingFirstResort.rewardRate()
-                    rewardR = ethers.utils.formatEther(rewardRateRes)
-                } catch (error) {
-                    rewardR = '0'
-                    console.info(error)
-                }
-
                 const reservesCall = geb.contracts.uniswapPairCoinEth.getReserves(
                     true
                 )
                 reservesCall.to = geb.contracts.stakingToken.address
-                const reserves = await geb.multiCall([reservesCall])
+
+                const [
+                    balance,
+                    rewardRateRes,
+                    reserves,
+                    totalSupply,
+                ] = await geb.multiCall([
+                    geb.contracts.stakingToken.balanceOf(
+                        await geb.contracts.stakingFirstResort.ancestorPool(),
+                        true
+                    ),
+                    geb.contracts.stakingFirstResort.rewardRate(true),
+                    reservesCall,
+                    geb.contracts.stakingToken.totalSupply(true),
+                ])
+
+                const rewardR = ethers.utils.formatEther(rewardRateRes)
 
                 let flxReserve
                 if (
@@ -277,10 +276,10 @@ export function usePoolData() {
                     )
                 ) {
                     // FLX is token 1
-                    flxReserve = ethers.utils.formatEther(reserves[0]._reserve1)
+                    flxReserve = ethers.utils.formatEther(reserves._reserve1)
                 } else {
                     // FLX is token 0
-                    flxReserve = ethers.utils.formatEther(reserves[0]._reserve0)
+                    flxReserve = ethers.utils.formatEther(reserves._reserve0)
                 }
                 const totalSupplyVal = ethers.utils.formatEther(totalSupply)
 
@@ -288,15 +287,16 @@ export function usePoolData() {
 
                 const weeklyRewardVal =
                     (Number(rewardR) * Number(poolBalanceVal) * 7 * 3600 * 24) /
-                    15
+                    BLOCK_INTERVAL
 
-                const aprValue = !balance.isZero()
-                    ? (((Number(rewardR) * 365 * 3600 * 24) / 15) *
-                          flxPrice ** 2 *
-                          Number(flxReserve) *
-                          2) /
-                      Number(totalSupplyVal)
-                    : '0'
+                const rw =
+                    ((Number(rewardR) * 365 * 3600 * 24) / BLOCK_INTERVAL) *
+                    Number(totalSupplyVal)
+
+                const LPSharePrice = Number(flxReserve) * 2
+
+                const aprValue = !balance.isZero() ? rw / LPSharePrice : '0'
+
                 if (!isCanceled) {
                     setState({
                         poolBalance: poolBalanceVal,
