@@ -37,6 +37,7 @@ import { isAddress } from '@ethersproject/address'
 import DistributionsModal from '../components/Modals/DistributionsModal'
 import SaviourModal from '../components/Modals/SaviourModal'
 import { ChainId } from '../utils/interfaces'
+import { ethers } from 'ethers'
 
 interface Props {
     children: ReactNode
@@ -110,9 +111,12 @@ const Shared = ({ children, ...rest }: Props) => {
             if (!connectWalletState.ctHash) {
                 connectWalletActions.setStep(2)
                 const { pathname } = history.location
-                if (!settingsState.isRPCAdapterOn) {
-                    await connectWalletActions.fetchProtBalance(account)
-                }
+                const flxBalanceRes =
+                    await geb.contracts.protocolToken.balanceOf(account)
+                connectWalletActions.updateFlxBalance({
+                    chainId: NETWORK_ID,
+                    balance: ethers.utils.formatEther(flxBalanceRes),
+                })
 
                 let address = ''
                 if (pathname && pathname !== '/') {
