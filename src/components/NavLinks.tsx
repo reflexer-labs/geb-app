@@ -52,6 +52,13 @@ const NavLinks = () => {
                     <DollarSign /> {t('earn')}
                 </LinkItem>
                 <MenuBox className="menu-box">
+                    <ExtLink href="/earn/pool">
+                        Liquidity Pool{' '}
+                        <img
+                            src={require('../assets/dark-arrow.svg')}
+                            alt="arrow"
+                        />
+                    </ExtLink>
                     <ExtLink href="/earn/staking">
                         Staking{' '}
                         <img

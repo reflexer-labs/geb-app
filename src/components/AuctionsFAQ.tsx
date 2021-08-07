@@ -2,7 +2,10 @@ import React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import Button from './Button'
-
+import MineImg from '../assets/mine.svg'
+import BidImg from '../assets/bid.svg'
+import ClaimImg from '../assets/claim.svg'
+import SellRai from '../assets/sell-rai.svg'
 interface Props {
     hideFAQ: () => void
     type: 'DEBT' | 'SURPLUS'
@@ -26,34 +29,34 @@ const AuctionsFAQ = ({ hideFAQ, type }: Props) => {
             {
                 title: t('debt_auction_minting_flx_header'),
                 desc: t('debt_auction_minting_flx_desc'),
-                image: require('../assets/mine.svg'),
+                image: MineImg,
             },
             {
                 title: t('debt_auction_how_to_bid'),
                 desc: t('debt_auction_how_to_bid_desc'),
-                image: require('../assets/bid.svg'),
+                image: BidImg,
             },
             {
                 title: t('debt_auction_claim_tokens'),
                 desc: t('debt_auction_claim_tokens_desc'),
-                image: require('../assets/claim.svg'),
+                image: ClaimImg,
             },
         ],
         surplus: [
             {
                 title: t('surplus_auction_minting_flx_header'),
                 desc: t('surplus_auction_minting_flx_desc'),
-                image: require('../assets/sell-rai.svg'),
+                image: SellRai,
             },
             {
                 title: t('surplus_auction_how_to_bid'),
                 desc: t('surplus_auction_how_to_bid_desc'),
-                image: require('../assets/bid.svg'),
+                image: BidImg,
             },
             {
                 title: t('surplus_auction_claim_tokens'),
                 desc: t('surplus_auction_claim_tokens_desc'),
-                image: require('../assets/claim.svg'),
+                image: ClaimImg,
             },
         ],
     }

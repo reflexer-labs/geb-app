@@ -1,10 +1,21 @@
-import React from 'react'
+import { BigNumber } from 'ethers'
+import React, { useMemo, useState } from 'react'
 import { PlusCircle } from 'react-feather'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
 import DecimalInput from '../../../components/DecimalInput'
 import { useActiveWeb3React } from '../../../hooks'
+import {
+    useAllTokens,
+    useCurrency,
+    useMappedTokens,
+} from '../../../hooks/Tokens'
 import useGeb from '../../../hooks/useGeb'
+import {
+    useMintState,
+    useV3DerivedMintInfo,
+    useV3MintActionHandlers,
+} from '../../../hooks/useLiquidity'
 import {
     useAddLiquidity,
     useInputsHandlers,
@@ -14,9 +25,84 @@ import {
     ApprovalState,
     useTokenApproval,
 } from '../../../hooks/useTokenApproval'
-import { formatNumber } from '../../../utils/helper'
+import { formatCurrencyAmount, formatNumber } from '../../../utils/helper'
+
+type PoolType = 'RAI/ETH'
+
+const FEE_AMOUNT = 3000
 
 const AddLiquidity = () => {
+    const mappedTokens = useMappedTokens()
+    const [currentPool, setCurrentPool] = useState<PoolType>('RAI/ETH')
+
+    const pair = useMemo(() => {
+        return currentPool.split('/').map((symbol) => {
+            const foundToken = mappedTokens.find(
+                (token) => token.symbol?.toLowerCase() === symbol.toLowerCase()
+            )
+            if (foundToken) return foundToken.address
+            return 'ETH'
+        })
+    }, [currentPool, mappedTokens])
+
+    const currencyA = useCurrency(pair[0])
+    const currencyB = useCurrency(pair[1])
+
+    // keep track for UI display purposes of user selected base currency
+    const baseCurrency = currencyA
+    const quoteCurrency = useMemo(
+        () =>
+            currencyA && currencyB && baseCurrency
+                ? baseCurrency.equals(currencyA)
+                    ? currencyB
+                    : currencyA
+                : undefined,
+        [currencyA, currencyB, baseCurrency]
+    )
+
+    const { independentField, typedValue, startPriceTypedValue } =
+        useMintState()
+
+    const {
+        pool,
+        ticks,
+        dependentField,
+        price,
+        pricesAtTicks,
+        parsedAmounts: parsedAmountsV3,
+        currencyBalances: balances,
+        position,
+        noLiquidity,
+        currencies,
+        errorMessage,
+        invalidPool,
+        invalidRange,
+        outOfRange,
+        depositADisabled,
+        depositBDisabled,
+        invertPrice,
+    } = useV3DerivedMintInfo(
+        currencyA ?? undefined,
+        currencyB ?? undefined,
+        FEE_AMOUNT,
+        baseCurrency ?? undefined,
+        undefined
+    )
+
+    console.log(balances)
+
+    console.log(formatCurrencyAmount(balances.CURRENCY_A, 4))
+
+    const {
+        onFieldAInput,
+        onFieldBInput,
+        onLeftRangeInput,
+        onRightRangeInput,
+        onStartPriceInput,
+    } = useV3MintActionHandlers(noLiquidity)
+
+    const isValid = !errorMessage && !invalidRange
+
     const { account } = useActiveWeb3React()
     const {
         error,
@@ -24,8 +110,6 @@ const AddLiquidity = () => {
         parsedAmounts,
     } = useLiquidityInfo()
     const geb = useGeb()
-
-    const isValid = !error
 
     const { onEthInput, onRaiInput } = useInputsHandlers()
 
@@ -70,7 +154,10 @@ const AddLiquidity = () => {
         <Container>
             <InputContainer>
                 <InputLabel>
-                    <img src={require('../../../assets/rai-logo.svg')} alt="" />
+                    <img
+                        src={require('../../../assets/rai-logo.svg').default}
+                        alt=""
+                    />
                     {`RAI (Available: ${formatNumber(
                         currencyBalances.rai.toString()
                     )})`}
@@ -87,7 +174,10 @@ const AddLiquidity = () => {
             </SeparatorIcon>
             <InputContainer>
                 <InputLabel>
-                    <img src={require('../../../assets/eth-logo.png')} alt="" />
+                    <img
+                        src={require('../../../assets/eth-logo.png').default}
+                        alt=""
+                    />
                     {`ETH (Available: ${formatNumber(
                         currencyBalances.eth.toString()
                     )})`}

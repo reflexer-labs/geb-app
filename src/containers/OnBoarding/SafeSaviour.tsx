@@ -40,16 +40,12 @@ const SafeSaviour = ({ ...props }) => {
     const { withdrawCallback } = useSaviourWithdraw()
     const { getReservesCallback } = useSaviourGetReserves()
 
-    const {
-        safeModel: safeState,
-        connectWalletModel: connectWalletState,
-    } = useStoreState((state) => state)
+    const { safeModel: safeState, connectWalletModel: connectWalletState } =
+        useStoreState((state) => state)
     const { singleSafe } = safeState
     const { fiatPrice: ethPrice } = connectWalletState
-    const {
-        popupsModel: popupsActions,
-        safeModel: safeActions,
-    } = useStoreActions((state) => state)
+    const { popupsModel: popupsActions, safeModel: safeActions } =
+        useStoreActions((state) => state)
 
     const safeHandler = useSafeHandler(safeId)
     const leftOver = useHasLeftOver(safeHandler)
@@ -159,7 +155,9 @@ const SafeSaviour = ({ ...props }) => {
                     saviourData && saviourData.hasSaviour ? null : (
                         <ImageContainer>
                             <img
-                                src={require('../../assets/saviour.svg')}
+                                src={
+                                    require('../../assets/saviour.svg').default
+                                }
                                 alt="saviour"
                             />
                         </ImageContainer>
@@ -199,7 +197,10 @@ const SafeSaviour = ({ ...props }) => {
                                 </Label>
                                 <Value>
                                     <img
-                                        src={require('../../assets/uniswap-icon.svg')}
+                                        src={
+                                            require('../../assets/uniswap-icon.svg')
+                                                .default
+                                        }
                                         alt=""
                                     />{' '}
                                     <Link

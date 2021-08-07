@@ -6,6 +6,7 @@ import { IconName } from '../components/FeatherIconWrapper'
 import { ApproveMethod } from '../components/ApproveToken'
 import { Geb } from 'geb.js'
 import { BigNumber } from 'ethers'
+import { Field } from '../hooks/useLiquidity'
 
 export declare enum ChainId {
     MAINNET = 1,
@@ -510,4 +511,64 @@ export interface IStakedLP {
 export interface IStakingData {
     stFlxAmount: string
     stakingAmount: string
+}
+
+export interface SerializedToken {
+    chainId: number
+    address: string
+    decimals: number
+    symbol?: string
+    name?: string
+}
+
+export interface Call {
+    address: string
+    callData: string
+    gasRequired?: number
+}
+
+export interface CallListeners {
+    // on a per-chain basis
+    [chainId: number]: {
+        // stores for each call key the listeners' preferences
+        [callKey: string]: {
+            // stores how many listeners there are per each blocks per fetch preference
+            [blocksPerFetch: number]: number
+        }
+    }
+}
+
+export interface CallResults {
+    // on a per-chain basis
+    [chainId: number]: {
+        [callKey: string]: {
+            data?: string | null
+            blockNumber?: number
+            fetchingBlockNumber?: number
+        }
+    }
+}
+
+export interface PositionDetails {
+    nonce: BigNumber
+    tokenId: BigNumber
+    operator: string
+    token0: string
+    token1: string
+    fee: number
+    tickLower: number
+    tickUpper: number
+    liquidity: BigNumber
+    feeGrowthInside0LastX128: BigNumber
+    feeGrowthInside1LastX128: BigNumber
+    tokensOwed0: BigNumber
+    tokensOwed1: BigNumber
+}
+
+export interface MintState {
+    readonly independentField: Field
+    readonly typedValue: string
+    readonly startPriceTypedValue: string // for the case when there's no liquidity
+    readonly leftRangeTypedValue: string
+    readonly rightRangeTypedValue: string
 }

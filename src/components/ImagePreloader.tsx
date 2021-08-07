@@ -1,5 +1,3 @@
-import React from 'react'
-
 const INITIAL_STATE = [
     require('../assets/brand.svg'),
     require('../assets/dark-arrow.svg'),
@@ -21,9 +19,15 @@ const INITIAL_STATE = [
 const ImagePreloader = () => {
     return (
         <div style={{ display: 'none' }}>
-            {INITIAL_STATE.map((img: string) => (
-                <img src={img} alt="" key={img} />
-            ))}
+            {INITIAL_STATE.map((module) => {
+                return (
+                    <img
+                        src={module.default}
+                        alt=""
+                        key={module.default + Math.random()}
+                    />
+                )
+            })}
         </div>
     )
 }

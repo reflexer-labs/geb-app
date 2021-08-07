@@ -28,6 +28,7 @@ import { SHOW_AUCTIONS } from './utils/constants'
 import SafeSaviour from './containers/OnBoarding/SafeSaviour'
 import Staking from './containers/Earn/Staking'
 import Incentives from './containers/Earn/Incentives'
+import LiquidityPool from './containers/Earn/LiquidityPool'
 
 // Toast css
 
@@ -64,6 +65,11 @@ const App = () => {
                                                 path={'/auctions'}
                                             />
                                         ) : null}
+                                        <Route
+                                            exact
+                                            component={LiquidityPool}
+                                            path={'/earn/pool'}
+                                        />
                                         <Route
                                             exact
                                             component={Staking}

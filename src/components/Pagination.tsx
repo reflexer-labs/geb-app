@@ -18,7 +18,7 @@ const Pagination = ({ items, handlePagingMargin, perPage = 5 }: Props) => {
         setTotal(Math.ceil(itemsArray.length / perPage))
     }
 
-    const setPaginationCB = useCallback(setPagination, [])
+    const setPaginationCB = useCallback(setPagination, [perPage])
 
     useEffect(() => {
         setPaginationCB(items)

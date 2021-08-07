@@ -13,6 +13,7 @@
 
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 import { ConnectorUpdate } from '@web3-react/types'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import invariant from 'tiny-invariant'
@@ -124,26 +125,25 @@ class MiniRpcProvider implements AsyncSendable {
                 reject,
                 request: { method },
             } = byKey[result.id]
-            if (resolve && reject) {
-                if ('error' in result) {
-                    reject(
-                        new RequestError(
-                            result?.error?.message,
-                            result?.error?.code,
-                            result?.error?.data
-                        )
+
+            if ('error' in result) {
+                reject(
+                    new RequestError(
+                        result?.error?.message,
+                        result?.error?.code,
+                        result?.error?.data
                     )
-                } else if ('result' in result) {
-                    resolve(result.result)
-                } else {
-                    reject(
-                        new RequestError(
-                            `Received unexpected JSON-RPC response to ${method} request.`,
-                            -32000,
-                            result
-                        )
+                )
+            } else if ('result' in result) {
+                resolve(result.result)
+            } else {
+                reject(
+                    new RequestError(
+                        `Received unexpected JSON-RPC response to ${method} request.`,
+                        -32000,
+                        result
                     )
-                }
+                )
             }
         }
     }

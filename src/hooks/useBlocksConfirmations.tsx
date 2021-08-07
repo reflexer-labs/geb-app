@@ -53,10 +53,16 @@ export function use10BlocksConfirmations() {
     }
 
     const returnConfCallback = useCallback(returnConfirmations, [
+        account,
         chainId,
         blockNumber,
         ctHash,
+        geb,
+        transactions,
         step,
+        connectWalletActions,
+        safeActions,
+        popupsActions,
     ])
 
     useEffect(() => {

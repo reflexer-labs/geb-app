@@ -65,11 +65,15 @@ const WithdrawLiquidity = () => {
                 <InputLabel>
                     <Images>
                         <img
-                            src={require('../../../assets/rai-logo.svg')}
+                            src={
+                                require('../../../assets/rai-logo.svg').default
+                            }
                             alt=""
                         />
                         <img
-                            src={require('../../../assets/eth-logo.png')}
+                            src={
+                                require('../../../assets/eth-logo.png').default
+                            }
                             alt=""
                         />
                     </Images>

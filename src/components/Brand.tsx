@@ -12,7 +12,7 @@ const Brand = ({ height }: Props) => {
             <Link to="/">
                 <img
                     height={height}
-                    src={require('../assets/brand.svg')}
+                    src={require('../assets/brand.svg').default}
                     alt="reflexer labs"
                 />
             </Link>

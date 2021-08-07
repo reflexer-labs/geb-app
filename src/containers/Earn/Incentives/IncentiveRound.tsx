@@ -25,7 +25,9 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                 <LeftBlock>
                     <MainBlock>
                         <img
-                            src={require('../../../assets/incentive.svg')}
+                            src={
+                                require('../../../assets/incentive.svg').default
+                            }
                             alt="incentive"
                         />
                         {round.name}
@@ -176,7 +178,9 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                     {round.starMessage ? (
                         <StarMessage>
                             <img
-                                src={require('../../../assets/siren.svg')}
+                                src={
+                                    require('../../../assets/siren.svg').default
+                                }
                                 alt="siren"
                             />
                             {round.starMessage}

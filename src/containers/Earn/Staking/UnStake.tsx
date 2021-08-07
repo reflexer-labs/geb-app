@@ -109,7 +109,7 @@ const UnStake = () => {
         <>
             <Body>
                 <DecimalInput
-                    icon={require('../../../assets/stFLX.svg')}
+                    icon={require('../../../assets/stFLX.svg').default}
                     iconSize={'30px'}
                     onChange={onUnStakingInput}
                     value={stFlxAmountValue}

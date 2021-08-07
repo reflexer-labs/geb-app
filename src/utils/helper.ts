@@ -2,6 +2,8 @@ import numeral from 'numeral'
 import { BigNumber, FixedNumber } from 'ethers'
 import { utils as gebUtils } from 'geb.js'
 import { AbstractConnector } from '@web3-react/abstract-connector'
+import { Price, CurrencyAmount, Currency, Fraction } from '@uniswap/sdk-core'
+import JSBI from 'jsbi'
 import {
     ETHERSCAN_PREFIXES,
     floatsTypes,
@@ -520,4 +522,38 @@ export const returnTimeOffset = () => {
     const a = new Date().getTimezoneOffset()
     const res = -Math.round(a / 60)
     return res < 0 ? res : '+' + res
+}
+
+export function formatCurrencyAmount(
+    amount: CurrencyAmount<Currency> | undefined,
+    sigFigs: number
+) {
+    if (!amount) {
+        return '-'
+    }
+
+    if (JSBI.equal(amount.quotient, JSBI.BigInt(0))) {
+        return '0'
+    }
+
+    if (amount.divide(amount.decimalScale).lessThan(new Fraction(1, 100000))) {
+        return '<0.00001'
+    }
+
+    return amount.toSignificant(sigFigs)
+}
+
+export function formatPrice(
+    price: Price<Currency, Currency> | undefined,
+    sigFigs: number
+) {
+    if (!price) {
+        return '-'
+    }
+
+    if (parseFloat(price.toFixed(sigFigs)) < 0.0001) {
+        return '<0.0001'
+    }
+
+    return price.toSignificant(sigFigs)
 }

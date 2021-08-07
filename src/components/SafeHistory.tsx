@@ -69,7 +69,7 @@ const SafeHistory = ({ hideHistory }: Props) => {
         setTotal(Math.ceil(history.length / perPage))
     }
 
-    const setPaginationCB = useCallback(setPagination, [])
+    const setPaginationCB = useCallback(setPagination, [perPage])
 
     useEffect(() => {
         setPaginationCB(safeState.historyList)

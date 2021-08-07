@@ -8,9 +8,11 @@ import { formatNumber } from '../../../utils/helper'
 const returnImg = (type = 'flx', width = '20px', height = '20px') => {
     return (
         <img
-            src={require(`../../../assets/${
-                type === 'flx' ? 'flx-logo.svg' : 'stFLX.svg'
-            }`)}
+            src={
+                require(`../../../assets/${
+                    type === 'flx' ? 'flx-logo.svg' : 'stFLX.svg'
+                }`).default
+            }
             width={width}
             height={height}
             alt=""

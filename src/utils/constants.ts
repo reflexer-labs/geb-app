@@ -1,8 +1,10 @@
 import { ethers } from 'ethers'
 import { Geb } from 'geb.js'
 import { css } from 'styled-components'
+import { FACTORY_ADDRESS as V3_FACTORY_ADDRESS } from '@uniswap/v3-sdk'
 import { injected, walletconnect, walletlink } from '../connectors'
 import { ChainId, WalletInfo } from './interfaces'
+import { constructSameAddressMap } from './types/constructSameAddressMap'
 
 const {
     REACT_APP_GRAPH_API_URLS,
@@ -181,7 +183,7 @@ export const INITIAL_INCENTIVE_STATE = [
 
 const INIT_VALUES = {
     name: 'FLX',
-    img: require('../assets/logo192.png'),
+    img: require('../assets/logo192.png').default,
     amount: 0,
     price: 0,
     diff: 0,
@@ -199,3 +201,27 @@ export const network_name =
 
 const provider = new ethers.providers.JsonRpcProvider(REACT_APP_NETWORK_URL)
 export const geb = new Geb(network_name, provider)
+
+type AddressMap = { [chainId: number]: string }
+
+export const UNI_ADDRESS: AddressMap = constructSameAddressMap(
+    '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
+    false
+)
+export const MULTICALL2_ADDRESSES: AddressMap = {
+    ...constructSameAddressMap(
+        '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
+        false
+    ),
+}
+
+export const NONFUNGIBLE_POSITION_MANAGER_ADDRESSES: AddressMap = {
+    ...constructSameAddressMap(
+        '0xC36442b4a4522E871399CD717aBDD847Ab11FE88',
+        false
+    ),
+}
+
+export const V3_CORE_FACTORY_ADDRESSES: AddressMap = {
+    ...constructSameAddressMap(V3_FACTORY_ADDRESS, false),
+}

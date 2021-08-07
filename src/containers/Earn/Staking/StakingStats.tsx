@@ -31,7 +31,10 @@ const StakingStats = () => {
             <Stat>
                 <StatLabel>Weekly Rewards</StatLabel>
                 <StatValue>
-                    <img src={require('../../../assets/flx-logo.svg')} alt="" />
+                    <img
+                        src={require('../../../assets/flx-logo.svg').default}
+                        alt=""
+                    />
                     {formatNumber(poolAmounts.weeklyReward.toString(), 2)}
                 </StatValue>
             </Stat>

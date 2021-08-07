@@ -51,7 +51,7 @@ const Staking = () => {
                 <Content>
                     <Header>
                         <img
-                            src={require('../../../assets/stFLX.svg')}
+                            src={require('../../../assets/stFLX.svg').default}
                             alt="flx"
                         />
                         stFLX

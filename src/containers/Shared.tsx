@@ -37,6 +37,7 @@ import { isAddress } from '@ethersproject/address'
 import DistributionsModal from '../components/Modals/DistributionsModal'
 import SaviourModal from '../components/Modals/SaviourModal'
 import { ChainId } from '../utils/interfaces'
+import MulticallUpdater from '../services/MulticallUpdater'
 
 interface Props {
     children: ReactNode
@@ -110,9 +111,8 @@ const Shared = ({ children, ...rest }: Props) => {
             if (!connectWalletState.ctHash) {
                 connectWalletActions.setStep(2)
                 const { pathname } = history.location
-                if (!settingsState.isRPCAdapterOn) {
-                    await connectWalletActions.fetchProtBalance(account)
-                }
+
+                await connectWalletActions.fetchProtBalance(account)
 
                 let address = ''
                 if (pathname && pathname !== '/') {
@@ -210,6 +210,7 @@ const Shared = ({ children, ...rest }: Props) => {
             <SideMenu />
             <WalletModal />
             <ApplicationUpdater />
+            <MulticallUpdater />
             <BalanceUpdater />
             <TransactionUpdater />
             <DistributionsModal />
