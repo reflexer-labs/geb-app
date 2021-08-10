@@ -1,11 +1,26 @@
-import { Ether } from '@uniswap/sdk-core'
+import { Ether, Token, WETH9 } from '@uniswap/sdk-core'
+import { SupportedChainId } from './chains'
 import { SerializedToken } from './interfaces'
+
+import RaiLogo from '../assets/rai-logo.svg'
+import EthLogo from '../assets/eth-logo.png'
+import DaiLogo from '../assets/dai-logo.svg'
+import UsdcLogo from '../assets/usdc-logo.svg'
 
 type TokensList = {
     [chainId: number]: {
         [address: string]: SerializedToken
     }
 }
+
+export const USDC = new Token(
+    1,
+    '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+    6,
+    'USDC',
+    'USD//C'
+)
+
 export const tokensList: TokensList = {
     1: {
         '0x6b175474e89094c44da98b954eedeac495271d0f': {
@@ -55,7 +70,36 @@ export const tokensList: TokensList = {
     },
 }
 
+export const tokensLogos: { [key: string]: string } = {
+    dai: DaiLogo,
+    rai: RaiLogo,
+    eth: EthLogo,
+    usdc: UsdcLogo,
+}
+
+export const WETH9_EXTENDED: { [chainId: number]: Token } = {
+    ...WETH9,
+    [SupportedChainId.ARBITRUM_KOVAN]: new Token(
+        SupportedChainId.ARBITRUM_KOVAN,
+        '0x4A5e4A42dC430f669086b417AADf2B128beFEfac',
+        18,
+        'WETH9',
+        'Wrapped Ether'
+    ),
+    [SupportedChainId.ARBITRUM_ONE]: new Token(
+        SupportedChainId.ARBITRUM_ONE,
+        '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
+        18,
+        'WETH',
+        'Wrapped Ether'
+    ),
+}
+
 export class ExtendedEther extends Ether {
+    public get wrapped(): Token {
+        if (this.chainId in WETH9_EXTENDED) return WETH9_EXTENDED[this.chainId]
+        throw new Error('Unsupported chain ID')
+    }
     public static onChain(chainId: number): ExtendedEther {
         return new ExtendedEther(chainId)
     }

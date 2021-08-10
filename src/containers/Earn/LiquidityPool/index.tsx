@@ -1,13 +1,15 @@
-import React from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import GridContainer from '../../../components/GridContainer'
 import PageHeader from '../../../components/PageHeader'
 import LiquidityManager from './LiquidityManager'
 import LiquidityStats from './LiquidityStats'
+import Pools from './Pools'
 
 const LiquidityPool = () => {
     const { t } = useTranslation()
+    const [tokenId, setTokenId] = useState<string | undefined>(undefined)
     return (
         <GridContainer>
             <PageHeader
@@ -19,10 +21,10 @@ const LiquidityPool = () => {
                     <Title>{t('lp_title')}</Title>
                     <Description>{t('lp_description')}</Description>
                 </Details>
-
+                <Pools getTokenId={setTokenId} />
                 <Content>
                     <LiquidityManager />
-                    <LiquidityStats />
+                    <LiquidityStats tokenId={tokenId} />
                 </Content>
             </Container>
         </GridContainer>

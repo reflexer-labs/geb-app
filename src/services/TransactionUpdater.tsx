@@ -37,6 +37,7 @@ export default function TransactionUpdater(): null {
         ? connectedWalletState.blockNumber[chainId]
         : null
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const transactions = chainId ? state.transactions ?? {} : {}
 
     useEffect(() => {

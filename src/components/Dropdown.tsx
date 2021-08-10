@@ -114,7 +114,7 @@ const Dropdown = (props: Props) => {
 
                     {items.length > 0 ? (
                         <CaretIcon
-                            src={require('../assets/caret.png')}
+                            src={require('../assets/caret.png').default}
                             className={isOpen ? 'up' : ''}
                         />
                     ) : null}

@@ -17,6 +17,7 @@ const SafeList = () => {
         setTotal(Math.ceil(safes.length / perPage))
     }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const setPaginationCB = useCallback(setPagination, [])
 
     useEffect(() => {

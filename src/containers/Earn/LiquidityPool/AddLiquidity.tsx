@@ -88,10 +88,20 @@ const AddLiquidity = () => {
         baseCurrency ?? undefined,
         undefined
     )
+    // console.log('====================================')
+    // console.log('pool', pool)
+    // console.log('====================================')
+    // console.log('====================================')
+    // console.log(ticks)
+    // console.log('====================================')
 
-    console.log(balances)
-
-    console.log(formatCurrencyAmount(balances.CURRENCY_A, 4))
+    // console.log(balances)
+    // console.log('====================================')
+    // console.log(price?.invert().toSignificant(5))
+    // console.log(price?.toSignificant(5))
+    // console.log('====================================')
+    // console.log(formatCurrencyAmount(balances.CURRENCY_A, 4))
+    // console.log(formatCurrencyAmount(balances.CURRENCY_B, 4))
 
     const {
         onFieldAInput,

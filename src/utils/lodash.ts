@@ -16,6 +16,7 @@ const get = (obj: any, path: string, defaultValue: any = undefined) => {
     return result === undefined || result === obj ? defaultValue : result
 }
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
     get,
 }

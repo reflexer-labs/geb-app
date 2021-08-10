@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useCallback } from 'react'
+import { ReactNode, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import ConnectedWalletModal from '../components/Modals/ConnectedWalletModal'
 import CreateAccountModal from '../components/Modals/SafeOperationsModel'
@@ -38,6 +38,7 @@ import DistributionsModal from '../components/Modals/DistributionsModal'
 import SaviourModal from '../components/Modals/SaviourModal'
 import { ChainId } from '../utils/interfaces'
 import MulticallUpdater from '../services/MulticallUpdater'
+import { ethers } from 'ethers'
 
 interface Props {
     children: ReactNode
@@ -111,8 +112,12 @@ const Shared = ({ children, ...rest }: Props) => {
             if (!connectWalletState.ctHash) {
                 connectWalletActions.setStep(2)
                 const { pathname } = history.location
-
-                await connectWalletActions.fetchProtBalance(account)
+                const flxBalanceRes =
+                    await geb.contracts.protocolToken.balanceOf(account)
+                connectWalletActions.updateFlxBalance({
+                    chainId: NETWORK_ID,
+                    balance: ethers.utils.formatEther(flxBalanceRes),
+                })
 
                 let address = ''
                 if (pathname && pathname !== '/') {
@@ -194,6 +199,7 @@ const Shared = ({ children, ...rest }: Props) => {
         }
     }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const networkCheckerCallBack = useCallback(networkChecker, [
         account,
         chainId,
