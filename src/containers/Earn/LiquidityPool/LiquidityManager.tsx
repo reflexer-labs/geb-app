@@ -1,19 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import { BigNumber } from 'ethers'
+import { useState } from 'react'
 import styled from 'styled-components'
-import useGeb from '../../../hooks/useGeb'
-import { useStoreActions } from '../../../store'
+import { useUserPoolsWithPredefined } from '../../../hooks/usePools'
+
 import AddLiquidity from './AddLiquidity'
 import WithdrawLiquidity from './WithdrawLiquidity'
 
 const LiquidityManager = ({ tokenId }: { tokenId: string | undefined }) => {
     const [type, setType] = useState<'add' | 'withdraw'>('add')
-    const geb = useGeb()
-    const { earnModel: earnActions } = useStoreActions((state) => state)
+    const parsedTokenId = tokenId ? BigNumber.from(tokenId) : undefined
+    const { foundPosition } = useUserPoolsWithPredefined(parsedTokenId)
 
-    useEffect(() => {
-        if (!geb) return
-        earnActions.fetchPositionsAndThreshold(geb)
-    }, [earnActions, geb])
     return (
         <Container>
             <Header>
@@ -23,19 +20,21 @@ const LiquidityManager = ({ tokenId }: { tokenId: string | undefined }) => {
                 >
                     Add Liquidity
                 </Tab>
-                <Tab
-                    className={type === 'withdraw' ? 'active' : ''}
-                    onClick={() => setType('withdraw')}
-                >
-                    Wihdraw
-                </Tab>
+                {foundPosition ? (
+                    <Tab
+                        className={type === 'withdraw' ? 'active' : ''}
+                        onClick={() => setType('withdraw')}
+                    >
+                        Wihdraw
+                    </Tab>
+                ) : null}
             </Header>
             <Content>
                 {type === 'add' ? (
                     <AddLiquidity tokenId={tokenId} />
-                ) : (
-                    <WithdrawLiquidity />
-                )}
+                ) : foundPosition ? (
+                    <WithdrawLiquidity position={foundPosition} />
+                ) : null}
             </Content>
         </Container>
     )

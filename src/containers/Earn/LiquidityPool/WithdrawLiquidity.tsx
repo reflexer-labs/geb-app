@@ -1,158 +1,242 @@
-import React from 'react'
+import { useState, useCallback } from 'react'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
-import DecimalInput from '../../../components/DecimalInput'
+import Slider from '../../../components/Slider'
+import { TransactionResponse } from '@ethersproject/providers'
 import { useActiveWeb3React } from '../../../hooks'
-import useGeb from '../../../hooks/useGeb'
 import {
-    useInputsHandlers,
-    useLiquidityInfo,
-    useWithdrawLiquidity,
-} from '../../../hooks/useLiquidityPool'
+    calculateGasMargin,
+    useTransactionAdder,
+} from '../../../hooks/TransactionHooks'
+import { useV3NFTPositionManagerContract } from '../../../hooks/useContract'
+import useDebouncedChangeHandler from '../../../hooks/useDebouncedChangeHandler'
 import {
-    ApprovalState,
-    useTokenApproval,
-} from '../../../hooks/useTokenApproval'
-import { formatNumber } from '../../../utils/helper'
+    useBurnV3ActionHandlers,
+    useBurnV3State,
+    useDerivedV3BurnInfo,
+} from '../../../hooks/useRemoveLiquidity'
+import { PositionDetails } from '../../../utils/interfaces'
+import { DEFAULT_ADD_IN_RANGE_SLIPPAGE_TOLERANCE } from './AddLiquidity'
+import { NonfungiblePositionManager } from '@uniswap/v3-sdk'
+import useTransactionDeadline from '../../../hooks/useTransactionDeadline'
+import store from '../../../store'
+import CurrencyFormatter from '../../../components/CurrencyFormatter'
 
-const WithdrawLiquidity = () => {
-    const { account } = useActiveWeb3React()
+const WithdrawLiquidity = ({
+    position: foundPosition,
+}: {
+    position: PositionDetails
+}) => {
+    const { account, library, chainId } = useActiveWeb3React()
+    const { percent } = useBurnV3State()
     const {
-        balances: currencyBalances,
+        position: positionSDK,
+        liquidityPercentage,
+        liquidityValue0,
+        liquidityValue1,
+        feeValue0,
+        feeValue1,
         error,
-        parsedAmounts,
-        tokensStake,
-    } = useLiquidityInfo(false)
-    const geb = useGeb()
+    } = useDerivedV3BurnInfo(foundPosition, false)
+    const { onPercentSelect } = useBurnV3ActionHandlers()
 
-    const isValid = !error
+    const addTransaction = useTransactionAdder()
 
-    const { onLiquidityInput, onEthInput, onRaiInput } = useInputsHandlers()
+    const [attemptingTxn, setAttemptingTxn] = useState(false)
 
-    const { withdrawLiquidityCallback } = useWithdrawLiquidity()
+    const removed = foundPosition?.liquidity?.eq(0)
 
-    const [withdrawApprovalState, approve] = useTokenApproval(
-        parsedAmounts.totalLiquidity,
-        'uniswapV3TwoTrancheLiquidityManager',
-        geb?.contracts.uniswapV3TwoTrancheLiquidityManager.address,
-        account as string
-    )
+    // boilerplate for the slider
+    const [percentForSlider, onPercentSelectForSlider] =
+        useDebouncedChangeHandler(percent, onPercentSelect)
 
-    const onLiquidityMaxInput = () =>
-        onLiquidityInput(currencyBalances.totalLiquidity.toString())
+    const deadline = useTransactionDeadline() // custom from users settings
 
-    const liqBValue = parsedAmounts.totalLiquidity
-        ? Number(parsedAmounts.totalLiquidity) > 0 &&
-          parsedAmounts.totalLiquidity.length > 10
-            ? (formatNumber(parsedAmounts.totalLiquidity) as string)
-            : parsedAmounts.totalLiquidity
-        : ''
+    const positionManager = useV3NFTPositionManagerContract()
 
-    const handleWithdrawLiquidity = async () => {
-        try {
-            await withdrawLiquidityCallback()
-            onEthInput('')
-            onRaiInput('')
-            onLiquidityInput('')
-        } catch (error) {
-            console.log(error)
+    const allowedSlippage = DEFAULT_ADD_IN_RANGE_SLIPPAGE_TOLERANCE
+
+    const burn = useCallback(async () => {
+        setAttemptingTxn(true)
+        if (
+            !positionManager ||
+            !liquidityValue0 ||
+            !liquidityValue1 ||
+            !deadline ||
+            !account ||
+            !chainId ||
+            !feeValue0 ||
+            !feeValue1 ||
+            !positionSDK ||
+            !liquidityPercentage ||
+            !library ||
+            !foundPosition
+        ) {
+            return
         }
-    }
+        const { tokenId } = foundPosition
+        store.dispatch.popupsModel.setIsWaitingModalOpen(true)
+        store.dispatch.popupsModel.setBlockBackdrop(true)
+        store.dispatch.popupsModel.setWaitingPayload({
+            title: 'Waiting for confirmation',
+            text: 'Confirm this transaction in your wallet',
+            status: 'loading',
+        })
+
+        const { calldata, value } =
+            NonfungiblePositionManager.removeCallParameters(positionSDK, {
+                tokenId: tokenId.toString(),
+                liquidityPercentage,
+                slippageTolerance: allowedSlippage,
+                deadline: deadline.toString(),
+                collectOptions: {
+                    expectedCurrencyOwed0: feeValue0,
+                    expectedCurrencyOwed1: feeValue1,
+                    recipient: account,
+                },
+            })
+
+        const txn = {
+            to: positionManager.address,
+            data: calldata,
+            value,
+        }
+
+        library
+            .getSigner()
+            .estimateGas(txn)
+            .then((estimate) => {
+                const newTxn = {
+                    ...txn,
+                    gasLimit: calculateGasMargin(estimate),
+                }
+
+                return library
+                    .getSigner()
+                    .sendTransaction(newTxn)
+                    .then((response: TransactionResponse) => {
+                        addTransaction(
+                            response,
+                            `Remove ${liquidityValue0.currency.symbol}/${liquidityValue1.currency.symbol} V3 liquidity`
+                        )
+                        setAttemptingTxn(false)
+                        store.dispatch.popupsModel.setWaitingPayload({
+                            title: 'Transaction Submitted',
+                            hash: response.hash,
+                            status: 'success',
+                        })
+                        onPercentSelect(0)
+                    })
+            })
+            .catch((error) => {
+                setAttemptingTxn(false)
+                console.error(error)
+            })
+    }, [
+        positionManager,
+        liquidityValue0,
+        liquidityValue1,
+        deadline,
+        account,
+        chainId,
+        feeValue0,
+        feeValue1,
+        positionSDK,
+        liquidityPercentage,
+        library,
+        foundPosition,
+        allowedSlippage,
+        addTransaction,
+        onPercentSelect,
+    ])
 
     return (
         <Container>
-            <InputContainer>
-                <InputLabel>
-                    <Images>
-                        <img
-                            src={
-                                require('../../../assets/rai-logo.svg').default
-                            }
-                            alt=""
-                        />
-                        <img
-                            src={
-                                require('../../../assets/eth-logo.png').default
-                            }
-                            alt=""
-                        />
-                    </Images>
-                    {`Flex Manager Shares (Available: ${formatNumber(
-                        currencyBalances.totalLiquidity.toString()
-                    )})`}
-                </InputLabel>
-                <DecimalInput
-                    value={liqBValue}
-                    onChange={onLiquidityInput}
-                    handleMaxClick={onLiquidityMaxInput}
-                    label={''}
+            <SliderContainer>
+                <Label>Amount</Label>
+
+                <Box>
+                    <ValueBox>{percent}%</ValueBox>
+
+                    <Button
+                        text={'Max'}
+                        dimmedNormal
+                        onClick={() => onPercentSelect(100)}
+                    />
+                </Box>
+                <Slider
+                    value={percentForSlider}
+                    onChange={onPercentSelectForSlider}
+                    min={0}
+                    max={100}
                 />
-            </InputContainer>
+            </SliderContainer>
             <Result>
                 <Block>
                     <Item>
-                        <Label>{`ETH to Receive`}</Label>
-                        <Value>{`${
-                            tokensStake.eth
-                                ? formatNumber(tokensStake.eth)
-                                : '0'
-                        } ETH`}</Value>
+                        <Label>{`${liquidityValue0?.currency.symbol} to Receive`}</Label>
+                        <Value>
+                            {liquidityValue0 ? (
+                                <CurrencyFormatter
+                                    currencyAmount={liquidityValue0}
+                                />
+                            ) : (
+                                0
+                            )}
+                        </Value>
                     </Item>
 
                     <Item>
-                        <Label>{`RAI to Receive`}</Label>
-                        <Value>{`${
-                            tokensStake.rai
-                                ? formatNumber(tokensStake.rai)
-                                : '0'
-                        } RAI`}</Value>
+                        <Label>{`${liquidityValue1?.currency.symbol}  to Receive`}</Label>
+                        <Value>
+                            {liquidityValue1 ? (
+                                <CurrencyFormatter
+                                    currencyAmount={liquidityValue1}
+                                />
+                            ) : (
+                                0
+                            )}
+                        </Value>
                     </Item>
-
                     <Item>
-                        <Label>{`Total Liquidity`}</Label>
-                        <Value>{liqBValue} RAI/ETH</Value>
+                        <Label>
+                            {liquidityValue0?.currency?.symbol} Fees Earned
+                        </Label>
+                        <Value>
+                            {feeValue0 ? (
+                                <CurrencyFormatter currencyAmount={feeValue0} />
+                            ) : (
+                                0
+                            )}
+                        </Value>
+                    </Item>
+                    <Item>
+                        <Label>
+                            {liquidityValue1?.currency?.symbol} Fees Earned
+                        </Label>
+                        <Value>
+                            {feeValue1 ? (
+                                <CurrencyFormatter currencyAmount={feeValue1} />
+                            ) : (
+                                0
+                            )}
+                        </Value>
                     </Item>
                 </Block>
             </Result>
+
             <BtnContainer>
                 <Button
-                    style={{
-                        width:
-                            !isValid ||
-                            withdrawApprovalState === ApprovalState.UNKNOWN ||
-                            withdrawApprovalState === ApprovalState.APPROVED
-                                ? '100%'
-                                : '48%',
-                    }}
                     disabled={
-                        !isValid ||
-                        withdrawApprovalState === ApprovalState.NOT_APPROVED ||
-                        withdrawApprovalState === ApprovalState.PENDING
+                        removed ||
+                        percent === 0 ||
+                        !liquidityValue0 ||
+                        attemptingTxn
                     }
-                    text={error ? error : 'Withdraw'}
-                    onClick={handleWithdrawLiquidity}
+                    style={{ width: '100%' }}
+                    onClick={burn}
+                    text={removed ? 'Closed' : error ?? 'Withdraw Liquidity'}
                 />
-
-                {isValid &&
-                (withdrawApprovalState === ApprovalState.PENDING ||
-                    withdrawApprovalState === ApprovalState.NOT_APPROVED) ? (
-                    <Button
-                        isLoading={
-                            withdrawApprovalState === ApprovalState.PENDING
-                        }
-                        style={{ width: '48%' }}
-                        disabled={
-                            !isValid ||
-                            withdrawApprovalState === ApprovalState.PENDING
-                        }
-                        text={
-                            withdrawApprovalState === ApprovalState.PENDING
-                                ? 'Pending Approval..'
-                                : 'Approve'
-                        }
-                        onClick={approve}
-                    />
-                ) : null}
             </BtnContainer>
         </Container>
     )
@@ -161,22 +245,13 @@ const WithdrawLiquidity = () => {
 export default WithdrawLiquidity
 
 const Container = styled.div``
-const InputLabel = styled.div`
-    line-height: 21px;
-    color: ${(props) => props.theme.colors.secondary};
-    font-size: ${(props) => props.theme.font.small};
-    letter-spacing: -0.09px;
-    margin-bottom: 8px;
-    text-transform: capitalize;
-    display: flex;
-    align-items: center;
-    img {
-        width: 23px;
-        margin-right: 5px;
-    }
-`
 
-const InputContainer = styled.div``
+const SliderContainer = styled.div`
+    border-radius: ${(props) => props.theme.global.borderRadius};
+    border: 1px solid ${(props) => props.theme.colors.border};
+    background: ${(props) => props.theme.colors.foreground};
+    padding: 20px;
+`
 
 const Result = styled.div`
     margin-top: 20px;
@@ -219,22 +294,21 @@ const Value = styled.div`
     font-weight: 600;
 `
 
-const BtnContainer = styled.div`
-    text-align: center;
-    margin-top: 20px;
+const Box = styled.div`
+    margin: 15px 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    button {
+        min-width: fit-content;
+        padding: 8px 10px;
+        line-height: 14px;
+    }
+`
+const ValueBox = styled.div`
+    font-size: 30px;
 `
 
-const Images = styled.div`
-    display: flex;
-    align-items: center;
-    margin-right: 5px;
-    img {
-        width: 23px;
-        &:nth-child(2) {
-            margin-left: -10px;
-        }
-    }
+const BtnContainer = styled.div`
+    margin-top: 20px;
 `

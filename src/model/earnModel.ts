@@ -21,6 +21,7 @@ export interface EarnModel {
     mintState: MintState
     data: ILiquidityData
     stakedLP: IStakedLP
+    percent: number
     stakingData: IStakingData
     positionAndThreshold: PositionsAndThreshold | null
     fetchPositionsAndThreshold: Thunk<EarnModel, Geb>
@@ -35,10 +36,12 @@ export interface EarnModel {
     typeLeftRangeInput: Action<EarnModel, { typedValue: string }>
     typeRightRangeInput: Action<EarnModel, { typedValue: string }>
     typeStartPriceInput: Action<EarnModel, { typedValue: string }>
+    selectBurnPercent: Action<EarnModel, { percent: number }>
 }
 
 const earnModel: EarnModel = {
     mintState: initialState,
+    percent: 0,
     positionAndThreshold: null,
     stakingData: {
         stFlxAmount: '',
@@ -115,6 +118,9 @@ const earnModel: EarnModel = {
                 typedValue,
             }
         }
+    }),
+    selectBurnPercent: action((state, { percent }) => {
+        state.percent = percent
     }),
 }
 

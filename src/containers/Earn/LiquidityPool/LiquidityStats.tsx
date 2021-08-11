@@ -3,11 +3,12 @@ import { useCallback, useMemo, useState } from 'react'
 import { NonfungiblePositionManager, Position } from '@uniswap/v3-sdk'
 import styled, { keyframes } from 'styled-components'
 import { useToken } from '../../../hooks/Tokens'
-import { PoolState, usePool } from '../../../hooks/usePools'
 import {
-    useV3PositionFromTokenId,
-    useV3Positions,
-} from '../../../hooks/useV3Positions'
+    PoolState,
+    usePool,
+    useUserPoolsWithPredefined,
+} from '../../../hooks/usePools'
+
 import { TransactionResponse } from '@ethersproject/providers'
 import { Currency, Percent, Price } from '@uniswap/sdk-core'
 import CurrencyLogo from '../../../components/CurrencyLogo'
@@ -30,7 +31,6 @@ import {
     useTransactionAdder,
 } from '../../../hooks/TransactionHooks'
 import store from '../../../store'
-import { PositionDetails } from '../../../utils/interfaces'
 
 interface Props {
     tokenId: string | undefined
@@ -39,28 +39,8 @@ interface Props {
 const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
     const { account, library, chainId } = useActiveWeb3React()
     const parsedTokenId = poolTokenId ? BigNumber.from(poolTokenId) : undefined
-    const { loading, position: definedPosition } =
-        useV3PositionFromTokenId(parsedTokenId)
-
-    const { positions, loading: positionsLoading } = useV3Positions(account)
-    const [openPositions] = positions?.reduce<
-        [PositionDetails[], PositionDetails[]]
-    >(
-        (acc, p) => {
-            acc[p.liquidity?.isZero() ? 1 : 0].push(p)
-            return acc
-        },
-        [[], []]
-    ) ?? [[], []]
-
-    const foundPosition = useMemo(() => {
-        return openPositions.find(
-            (p) =>
-                p.tickLower === definedPosition?.tickLower &&
-                p.tickUpper === definedPosition?.tickUpper &&
-                p.fee === definedPosition.fee
-        )
-    }, [openPositions, definedPosition])
+    const { loading, positionsLoading, foundPosition, definedPosition } =
+        useUserPoolsWithPredefined(parsedTokenId)
 
     const positionDetails = foundPosition || definedPosition
 

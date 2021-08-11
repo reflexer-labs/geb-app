@@ -20,24 +20,23 @@ import {
     useV3MintActionHandlers,
 } from '../../../hooks/useLiquidity'
 
-import { useDerivedPositionInfo, usePool } from '../../../hooks/usePools'
+import {
+    useDerivedPositionInfo,
+    usePool,
+    useUserPoolsWithPredefined,
+} from '../../../hooks/usePools'
 import {
     ApprovalState,
     useApproveCallback,
 } from '../../../hooks/useTokenApproval'
 import useTransactionDeadline from '../../../hooks/useTransactionDeadline'
 
-import {
-    useV3PositionFromTokenId,
-    useV3Positions,
-} from '../../../hooks/useV3Positions'
 import { useCurrencyBalances } from '../../../hooks/Wallet'
 import {
     NONFUNGIBLE_POSITION_MANAGER_ADDRESSES,
     ZERO_PERCENT,
 } from '../../../utils/constants'
 import { formatCurrencyAmount, maxAmountSpend } from '../../../utils/helper'
-import { PositionDetails } from '../../../utils/interfaces'
 import {
     calculateGasMargin,
     handleTransactionError,
@@ -46,39 +45,24 @@ import {
 import store from '../../../store'
 import { LoadingRows } from './LiquidityStats'
 
-const DEFAULT_ADD_IN_RANGE_SLIPPAGE_TOLERANCE = new Percent(50, 10_000)
+export const DEFAULT_ADD_IN_RANGE_SLIPPAGE_TOLERANCE = new Percent(50, 10_000)
 
 const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
     const { account, chainId, library } = useActiveWeb3React()
     const addTransaction = useTransactionAdder()
     const parsedTokenId = tokenId ? BigNumber.from(tokenId) : undefined
-    const { loading: definedLoading, position: definedPosition } =
-        useV3PositionFromTokenId(parsedTokenId)
+    const {
+        loading: definedLoading,
+        positionsLoading,
+        foundPosition,
+        definedPosition,
+    } = useUserPoolsWithPredefined(parsedTokenId)
     const positionManager = useV3NFTPositionManagerContract()
-    const { positions, loading: positionsLoading } = useV3Positions(account)
-    const [openPositions] = positions?.reduce<
-        [PositionDetails[], PositionDetails[]]
-    >(
-        (acc, p) => {
-            acc[p.liquidity?.isZero() ? 1 : 0].push(p)
-            return acc
-        },
-        [[], []]
-    ) ?? [[], []]
-
-    const foundPoisiton = useMemo(() => {
-        return openPositions.find(
-            (p) =>
-                p.tickLower === definedPosition?.tickLower &&
-                p.tickUpper === definedPosition?.tickUpper &&
-                p.fee === definedPosition.fee
-        )
-    }, [openPositions, definedPosition])
 
     const hasExistingPosition =
-        !!foundPoisiton && !definedLoading && !positionsLoading
+        !!foundPosition && !definedLoading && !positionsLoading
 
-    const { position: existingPosition } = useDerivedPositionInfo(foundPoisiton)
+    const { position: existingPosition } = useDerivedPositionInfo(foundPosition)
 
     const {
         token0: token0Address,
@@ -228,9 +212,9 @@ const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
                 : undefined
 
             const { calldata, value } =
-                hasExistingPosition && foundPoisiton
+                hasExistingPosition && foundPosition
                     ? NonfungiblePositionManager.addCallParameters(position, {
-                          tokenId: foundPoisiton.tokenId.toString(),
+                          tokenId: foundPosition.tokenId.toString(),
                           slippageTolerance: allowedSlippage,
                           deadline: deadline.toString(),
                           useNative,

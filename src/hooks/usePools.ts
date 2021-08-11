@@ -10,6 +10,8 @@ import { IUniswapV3PoolStateInterface } from '../utils/types/IUniswapV3PoolState
 import { V3_CORE_FACTORY_ADDRESSES } from '../utils/constants'
 import { PositionDetails } from '../utils/interfaces'
 import { useCurrency } from './Tokens'
+import { useV3PositionFromTokenId, useV3Positions } from './useV3Positions'
+import { BigNumber } from 'ethers'
 
 const POOL_STATE_INTERFACE = new Interface(
     IUniswapV3PoolStateABI
@@ -163,4 +165,36 @@ export function useDerivedPositionInfo(
         position,
         pool: pool ?? undefined,
     }
+}
+
+export function useUserPoolsWithPredefined(
+    parsedTokenId: BigNumber | undefined
+) {
+    const { account } = useActiveWeb3React()
+    const { loading, position: definedPosition } =
+        useV3PositionFromTokenId(parsedTokenId)
+
+    const { positions, loading: positionsLoading } = useV3Positions(account)
+    const [openPositions] = positions?.reduce<
+        [PositionDetails[], PositionDetails[]]
+    >(
+        (acc, p) => {
+            acc[p.liquidity?.isZero() ? 1 : 0].push(p)
+            return acc
+        },
+        [[], []]
+    ) ?? [[], []]
+
+    const foundPosition = useMemo(() => {
+        return openPositions.find(
+            (p) =>
+                p.token0 === definedPosition?.token0 &&
+                p.token1 === definedPosition.token1 &&
+                p.tickLower === definedPosition?.tickLower &&
+                p.tickUpper === definedPosition?.tickUpper &&
+                p.fee === definedPosition.fee
+        )
+    }, [openPositions, definedPosition])
+
+    return { loading, positionsLoading, foundPosition, definedPosition }
 }
