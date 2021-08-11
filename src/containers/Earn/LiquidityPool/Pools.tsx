@@ -1,6 +1,7 @@
 import { memo, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import Dropdown from '../../../components/Dropdown'
+import { useV3MintActionHandlers } from '../../../hooks/useLiquidity'
 import { tokensLogos } from '../../../utils/tokens'
 
 export interface PoolType {
@@ -19,6 +20,13 @@ const Pools = ({
 }: {
     getTokenId: (id: string | undefined) => void
 }) => {
+    const {
+        onFieldAInput,
+        onFieldBInput,
+        onRightRangeInput,
+        onLeftRangeInput,
+    } = useV3MintActionHandlers(false)
+
     const [selectedPool, setSelectedPool] = useState('RAI/ETH')
 
     const poolImgs = useMemo(() => {
@@ -28,6 +36,14 @@ const Pools = ({
             tokensLogos[tokensArray[1].toLowerCase()],
         ]
     }, [selectedPool])
+
+    const handleSelection = (selected: string) => {
+        setSelectedPool(selected)
+        onFieldBInput('')
+        onFieldAInput('')
+        onRightRangeInput('')
+        onLeftRangeInput('')
+    }
 
     useEffect(() => {
         if (selectedPool) {
@@ -51,7 +67,7 @@ const Pools = ({
                     })}
                 </Images>
                 <Dropdown
-                    getSelectedItem={setSelectedPool}
+                    getSelectedItem={handleSelection}
                     itemSelected={selectedPool}
                     items={POOLS.map((pool) => pool.name)}
                 />

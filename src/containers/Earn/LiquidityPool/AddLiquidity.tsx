@@ -290,7 +290,15 @@ const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
     }
 
     useEffect(() => {
-        if (!ticks.LOWER && !ticks.UPPER && priceUpper && priceLower && pool) {
+        if (
+            typeof tickUpper === 'number' &&
+            ticks.UPPER !== tickUpper &&
+            typeof tickUpper === 'number' &&
+            ticks.LOWER !== tickLower &&
+            priceUpper &&
+            priceLower &&
+            pool
+        ) {
             onRightRangeInput(priceUpper.toSignificant(5))
             onLeftRangeInput(priceLower.toSignificant(5))
         }
@@ -301,6 +309,8 @@ const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
         priceLower,
         priceUpper,
         ticks,
+        tickUpper,
+        tickLower,
     ])
 
     const clearAll = useCallback(() => {
