@@ -16,9 +16,7 @@ import { useActiveWeb3React } from '.'
 /**
  * Returns a map of the given addresses to their eventually consistent ETH balances.
  */
-export function useETHBalances(
-    uncheckedAddresses?: (string | undefined)[]
-): {
+export function useETHBalances(uncheckedAddresses?: (string | undefined)[]): {
     [address: string]: CurrencyAmount<Currency> | undefined
 } {
     const { chainId } = useActiveWeb3React()
@@ -107,9 +105,8 @@ export function useTokenBalancesWithLoadingIndicator(
                               ? JSBI.BigInt(value.toString())
                               : undefined
                           if (amount) {
-                              memo[
-                                  token.address
-                              ] = CurrencyAmount.fromRawAmount(token, amount)
+                              memo[token.address] =
+                                  CurrencyAmount.fromRawAmount(token, amount)
                           }
                           return memo
                       }, {})
@@ -181,9 +178,10 @@ export function useAllTokenBalances(): {
 } {
     const { account } = useActiveWeb3React()
     const allTokens = useAllTokens()
-    const allTokensArray = useMemo(() => Object.values(allTokens ?? {}), [
-        allTokens,
-    ])
+    const allTokensArray = useMemo(
+        () => Object.values(allTokens ?? {}),
+        [allTokens]
+    )
     const balances = useTokenBalances(account ?? undefined, allTokensArray)
     return balances ?? {}
 }

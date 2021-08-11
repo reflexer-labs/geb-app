@@ -5,7 +5,7 @@ import { useStoreActions } from '../../../store'
 import AddLiquidity from './AddLiquidity'
 import WithdrawLiquidity from './WithdrawLiquidity'
 
-const LiquidityManager = () => {
+const LiquidityManager = ({ tokenId }: { tokenId: string | undefined }) => {
     const [type, setType] = useState<'add' | 'withdraw'>('add')
     const geb = useGeb()
     const { earnModel: earnActions } = useStoreActions((state) => state)
@@ -31,7 +31,11 @@ const LiquidityManager = () => {
                 </Tab>
             </Header>
             <Content>
-                {type === 'add' ? <AddLiquidity /> : <WithdrawLiquidity />}
+                {type === 'add' ? (
+                    <AddLiquidity tokenId={tokenId} />
+                ) : (
+                    <WithdrawLiquidity />
+                )}
             </Content>
         </Container>
     )

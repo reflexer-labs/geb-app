@@ -1,4 +1,4 @@
-import { computePoolAddress } from '@uniswap/v3-sdk'
+import { computePoolAddress, Position } from '@uniswap/v3-sdk'
 import { Token, Currency } from '@uniswap/sdk-core'
 import { useMemo } from 'react'
 import { Pool, FeeAmount } from '@uniswap/v3-sdk'
@@ -8,6 +8,8 @@ import { useActiveWeb3React } from '.'
 import { useMultipleContractSingleData } from './Multicall'
 import { IUniswapV3PoolStateInterface } from '../utils/types/IUniswapV3PoolState'
 import { V3_CORE_FACTORY_ADDRESSES } from '../utils/constants'
+import { PositionDetails } from '../utils/interfaces'
+import { useCurrency } from './Tokens'
 
 const POOL_STATE_INTERFACE = new Interface(
     IUniswapV3PoolStateABI
@@ -129,4 +131,36 @@ export function usePool(
     )
 
     return usePools(poolKeys)[0]
+}
+
+export function useDerivedPositionInfo(
+    positionDetails: PositionDetails | undefined
+): {
+    position: Position | undefined
+    pool: Pool | undefined
+} {
+    const currency0 = useCurrency(positionDetails?.token0)
+    const currency1 = useCurrency(positionDetails?.token1)
+
+    // construct pool data
+    const [, pool] = usePool(
+        currency0 ?? undefined,
+        currency1 ?? undefined,
+        positionDetails?.fee
+    )
+
+    let position = undefined
+    if (pool && positionDetails) {
+        position = new Position({
+            pool,
+            liquidity: positionDetails.liquidity.toString(),
+            tickLower: positionDetails.tickLower,
+            tickUpper: positionDetails.tickUpper,
+        })
+    }
+
+    return {
+        position,
+        pool: pool ?? undefined,
+    }
 }

@@ -23,7 +23,7 @@ const LiquidityPool = () => {
                 </Details>
                 <Pools getTokenId={setTokenId} />
                 <Content>
-                    <LiquidityManager />
+                    <LiquidityManager tokenId={tokenId} />
                     <LiquidityStats tokenId={tokenId} />
                 </Content>
             </Container>
@@ -59,7 +59,7 @@ const Content = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 30px 0;
+    margin: 20px 0;
     ${({ theme }) => theme.mediaWidth.upToSmall`
    
    flex-direction:column-reverse;

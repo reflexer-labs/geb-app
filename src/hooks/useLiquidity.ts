@@ -27,7 +27,8 @@ import { useBlockNumber } from './useGeb'
 import { useSingleCallResult } from './Multicall'
 import { useV3NFTPositionManagerContract } from './useContract'
 import { BigNumber } from 'ethers'
-import { unwrappedToken } from '../containers/Earn/LiquidityPool/PositionItem'
+import { ExtendedEther, WETH9_EXTENDED } from '../utils/tokens'
+import { SupportedChainId } from '../utils/chains'
 
 export enum Field {
     CURRENCY_A = 'CURRENCY_A',
@@ -51,6 +52,78 @@ export function getTickToPrice(
         return undefined
     }
     return tickToPrice(baseToken, quoteToken, tick)
+}
+
+export function supportedChainId(chainId: number): number | undefined {
+    if (chainId in SupportedChainId) {
+        return chainId
+    }
+    return undefined
+}
+
+export function unwrappedToken(currency: Currency): Currency {
+    if (currency.isNative) return currency
+    const formattedChainId = supportedChainId(currency.chainId)
+    if (formattedChainId && currency.equals(WETH9_EXTENDED[formattedChainId]))
+        return ExtendedEther.onChain(currency.chainId)
+    return currency
+}
+
+export function getPriceOrderingFromPositionForUI(
+    position?: Position,
+    tokens?: Token[]
+): {
+    priceLower?: Price<Token, Token>
+    priceUpper?: Price<Token, Token>
+    quote?: Token
+    base?: Token
+} {
+    if (!position) {
+        return {}
+    }
+
+    const token0 = position.amount0.currency
+    const token1 = position.amount1.currency
+
+    // if token0 is a dollar-stable asset, set it as the quote token
+    const stables = tokens || []
+    if (stables.some((stable) => stable.equals(token0))) {
+        return {
+            priceLower: position.token0PriceUpper.invert(),
+            priceUpper: position.token0PriceLower.invert(),
+            quote: token0,
+            base: token1,
+        }
+    }
+
+    // if token1 is an ETH-/BTC-stable asset, set it as the base token
+    const bases = [...Object.values(WETH9_EXTENDED)]
+    if (bases.some((base) => base.equals(token1))) {
+        return {
+            priceLower: position.token0PriceUpper.invert(),
+            priceUpper: position.token0PriceLower.invert(),
+            quote: token0,
+            base: token1,
+        }
+    }
+
+    // if both prices are below 1, invert
+    if (position.token0PriceUpper.lessThan(1)) {
+        return {
+            priceLower: position.token0PriceUpper.invert(),
+            priceUpper: position.token0PriceLower.invert(),
+            quote: token0,
+            base: token1,
+        }
+    }
+
+    // otherwise, just return the default
+    return {
+        priceLower: position.token0PriceLower,
+        priceUpper: position.token0PriceUpper,
+        quote: token1,
+        base: token0,
+    }
 }
 
 export function tryParseTick(
@@ -200,6 +273,7 @@ export function useV3DerivedMintInfo(
     invertPrice: boolean
 } {
     const { account } = useActiveWeb3React()
+
     const {
         independentField,
         typedValue,

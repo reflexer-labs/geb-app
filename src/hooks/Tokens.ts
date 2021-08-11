@@ -54,7 +54,7 @@ export function useAllTokens() {
 // parse a name or symbol from a token response
 const BYTES32_REGEX = /^0x[a-fA-F0-9]{64}$/
 
-function parseStringOrBytes32(
+export function parseStringOrBytes32(
     str: string | undefined,
     bytes32: string | undefined,
     defaultValue: string
@@ -81,7 +81,9 @@ export function useToken(tokenAddress?: string): Token | undefined | null {
         address ? address : undefined,
         false
     )
-    const token: Token | undefined = address ? tokens[address] : undefined
+    const token: Token | undefined = address
+        ? tokens[address.toLowerCase()]
+        : undefined
 
     const tokenName = useSingleCallResult(
         token ? undefined : tokenContract,
@@ -157,7 +159,7 @@ export function useCurrency(
     const { chainId } = useActiveWeb3React()
     const isETH = currencyId?.toUpperCase() === 'ETH'
     const token = useToken(isETH ? undefined : currencyId)
-    return isETH
+    return isETH || token?.symbol === 'ETH'
         ? chainId
             ? ExtendedEther.onChain(chainId)
             : undefined

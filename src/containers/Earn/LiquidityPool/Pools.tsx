@@ -8,9 +8,10 @@ export interface PoolType {
     tokenId: string
 }
 
-const POOLS: PoolType[] = [
+export const POOLS: PoolType[] = [
     { name: 'RAI/ETH', tokenId: '5374' },
     { name: 'RAI/USDC', tokenId: '5633' },
+    { name: 'RAI/DAI', tokenId: '5754' },
 ]
 
 const Pools = ({
@@ -66,7 +67,7 @@ const Container = styled.div`
     align-items: center;
     justify-content: space-between;
     max-width: 860px;
-    margin: 0 auto;
+    margin: 30px auto 30px auto;
 `
 const DropdownContainer = styled.div`
     min-width: 270px;
@@ -76,6 +77,9 @@ const DropdownContainer = styled.div`
             padding-left: 65px !important;
         }
     }
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+           min-width: 100%;
+        `}
 `
 
 const Images = styled.div`

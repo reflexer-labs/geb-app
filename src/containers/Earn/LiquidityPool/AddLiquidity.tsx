@@ -1,181 +1,347 @@
+import { Currency, CurrencyAmount, Percent } from '@uniswap/sdk-core'
+import { NonfungiblePositionManager, Position } from '@uniswap/v3-sdk'
 import { BigNumber } from 'ethers'
-import React, { useMemo, useState } from 'react'
+import { useEffect, useMemo, useCallback } from 'react'
 import { PlusCircle } from 'react-feather'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
+import CurrencyLogo from '../../../components/CurrencyLogo'
 import DecimalInput from '../../../components/DecimalInput'
+import { TransactionResponse } from '@ethersproject/providers'
 import { useActiveWeb3React } from '../../../hooks'
+import { useToken } from '../../../hooks/Tokens'
+import { useV3NFTPositionManagerContract } from '../../../hooks/useContract'
 import {
-    useAllTokens,
-    useCurrency,
-    useMappedTokens,
-} from '../../../hooks/Tokens'
-import useGeb from '../../../hooks/useGeb'
-import {
+    Field,
+    getPriceOrderingFromPositionForUI,
+    unwrappedToken,
     useMintState,
     useV3DerivedMintInfo,
     useV3MintActionHandlers,
 } from '../../../hooks/useLiquidity'
-import {
-    useAddLiquidity,
-    useInputsHandlers,
-    useLiquidityInfo,
-} from '../../../hooks/useLiquidityPool'
+
+import { useDerivedPositionInfo, usePool } from '../../../hooks/usePools'
 import {
     ApprovalState,
-    useTokenApproval,
+    useApproveCallback,
 } from '../../../hooks/useTokenApproval'
-import { formatCurrencyAmount, formatNumber } from '../../../utils/helper'
+import useTransactionDeadline from '../../../hooks/useTransactionDeadline'
 
-type PoolType = 'RAI/ETH'
+import {
+    useV3PositionFromTokenId,
+    useV3Positions,
+} from '../../../hooks/useV3Positions'
+import { useCurrencyBalances } from '../../../hooks/Wallet'
+import {
+    NONFUNGIBLE_POSITION_MANAGER_ADDRESSES,
+    ZERO_PERCENT,
+} from '../../../utils/constants'
+import { formatCurrencyAmount, maxAmountSpend } from '../../../utils/helper'
+import { PositionDetails } from '../../../utils/interfaces'
+import {
+    calculateGasMargin,
+    handleTransactionError,
+    useTransactionAdder,
+} from '../../../hooks/TransactionHooks'
+import store from '../../../store'
+import { LoadingRows } from './LiquidityStats'
 
-const FEE_AMOUNT = 3000
+const DEFAULT_ADD_IN_RANGE_SLIPPAGE_TOLERANCE = new Percent(50, 10_000)
 
-const AddLiquidity = () => {
-    const mappedTokens = useMappedTokens()
-    const [currentPool, setCurrentPool] = useState<PoolType>('RAI/ETH')
+const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
+    const { account, chainId, library } = useActiveWeb3React()
+    const addTransaction = useTransactionAdder()
+    const parsedTokenId = tokenId ? BigNumber.from(tokenId) : undefined
+    const { loading: definedLoading, position: definedPosition } =
+        useV3PositionFromTokenId(parsedTokenId)
+    const positionManager = useV3NFTPositionManagerContract()
+    const { positions, loading: positionsLoading } = useV3Positions(account)
+    const [openPositions] = positions?.reduce<
+        [PositionDetails[], PositionDetails[]]
+    >(
+        (acc, p) => {
+            acc[p.liquidity?.isZero() ? 1 : 0].push(p)
+            return acc
+        },
+        [[], []]
+    ) ?? [[], []]
 
-    const pair = useMemo(() => {
-        return currentPool.split('/').map((symbol) => {
-            const foundToken = mappedTokens.find(
-                (token) => token.symbol?.toLowerCase() === symbol.toLowerCase()
-            )
-            if (foundToken) return foundToken.address
-            return 'ETH'
-        })
-    }, [currentPool, mappedTokens])
+    const foundPoisiton = useMemo(() => {
+        return openPositions.find(
+            (p) =>
+                p.tickLower === definedPosition?.tickLower &&
+                p.tickUpper === definedPosition?.tickUpper &&
+                p.fee === definedPosition.fee
+        )
+    }, [openPositions, definedPosition])
 
-    const currencyA = useCurrency(pair[0])
-    const currencyB = useCurrency(pair[1])
+    const hasExistingPosition =
+        !!foundPoisiton && !definedLoading && !positionsLoading
 
-    // keep track for UI display purposes of user selected base currency
-    const baseCurrency = currencyA
-    const quoteCurrency = useMemo(
-        () =>
-            currencyA && currencyB && baseCurrency
-                ? baseCurrency.equals(currencyA)
-                    ? currencyB
-                    : currencyA
-                : undefined,
-        [currencyA, currencyB, baseCurrency]
-    )
-
-    const { independentField, typedValue, startPriceTypedValue } =
-        useMintState()
+    const { position: existingPosition } = useDerivedPositionInfo(foundPoisiton)
 
     const {
-        pool,
-        ticks,
+        token0: token0Address,
+        token1: token1Address,
+        fee: feeAmount,
+        tickLower,
+        tickUpper,
+        liquidity: definedLiquidity,
+    } = definedPosition || {}
+
+    const currencyA = useToken(token0Address)
+    const currencyB = useToken(token1Address)
+
+    const currency0 = currencyA ? unwrappedToken(currencyA) : undefined
+    const currency1 = currencyB ? unwrappedToken(currencyB) : undefined
+
+    // construct Position from details returned
+    const [, pool] = usePool(
+        currencyA ?? undefined,
+        currencyB ?? undefined,
+        feeAmount
+    )
+
+    const definedPositionMock = useMemo(() => {
+        if (
+            pool &&
+            definedLiquidity &&
+            typeof tickLower === 'number' &&
+            typeof tickUpper === 'number'
+        ) {
+            return new Position({
+                pool,
+                liquidity: definedLiquidity.toString(),
+                tickLower,
+                tickUpper,
+            })
+        }
+        return undefined
+    }, [definedLiquidity, pool, tickLower, tickUpper])
+
+    let { priceLower, priceUpper, base } =
+        getPriceOrderingFromPositionForUI(definedPositionMock)
+
+    const inverted = currencyB ? base?.equals(currencyB) : undefined
+
+    const currencyBase = inverted ? currency1 : currency0
+
+    const { independentField, typedValue } = useMintState()
+
+    const {
         dependentField,
-        price,
-        pricesAtTicks,
-        parsedAmounts: parsedAmountsV3,
-        currencyBalances: balances,
+        parsedAmounts,
+        currencyBalances,
         position,
         noLiquidity,
         currencies,
         errorMessage,
-        invalidPool,
         invalidRange,
         outOfRange,
-        depositADisabled,
-        depositBDisabled,
-        invertPrice,
+        ticks,
     } = useV3DerivedMintInfo(
-        currencyA ?? undefined,
-        currencyB ?? undefined,
-        FEE_AMOUNT,
-        baseCurrency ?? undefined,
-        undefined
+        currency0 ?? undefined,
+        currency1 ?? undefined,
+        feeAmount,
+        currencyBase ?? undefined,
+        existingPosition
     )
-    // console.log('====================================')
-    // console.log('pool', pool)
-    // console.log('====================================')
-    // console.log('====================================')
-    // console.log(ticks)
-    // console.log('====================================')
-
-    // console.log(balances)
-    // console.log('====================================')
-    // console.log(price?.invert().toSignificant(5))
-    // console.log(price?.toSignificant(5))
-    // console.log('====================================')
-    // console.log(formatCurrencyAmount(balances.CURRENCY_A, 4))
-    // console.log(formatCurrencyAmount(balances.CURRENCY_B, 4))
 
     const {
         onFieldAInput,
         onFieldBInput,
-        onLeftRangeInput,
         onRightRangeInput,
-        onStartPriceInput,
+        onLeftRangeInput,
     } = useV3MintActionHandlers(noLiquidity)
 
     const isValid = !errorMessage && !invalidRange
 
-    const { account } = useActiveWeb3React()
-    const {
-        error,
-        balances: currencyBalances,
-        parsedAmounts,
-    } = useLiquidityInfo()
-    const geb = useGeb()
-
-    const { onEthInput, onRaiInput } = useInputsHandlers()
-
-    const { addLiquidityCallback } = useAddLiquidity()
-
-    const [depositApprovalState, approveDeposit] = useTokenApproval(
-        parsedAmounts.raiAmount,
-        'coin',
-        geb?.contracts.uniswapV3TwoTrancheLiquidityManager.address,
-        account as string
+    const [balanceCurrencyA, balanceCurrencyB] = useCurrencyBalances(
+        account ?? undefined,
+        [currencies[Field.CURRENCY_A], currencies[Field.CURRENCY_B]]
     )
 
-    const ethValue = parsedAmounts.ethAmount
-        ? Number(parsedAmounts.ethAmount) > 0
-            ? (formatNumber(parsedAmounts.ethAmount) as string)
-            : parsedAmounts.ethAmount
-        : ''
-    const raiValue = parsedAmounts.raiAmount
-        ? Number(parsedAmounts.raiAmount) > 0
-            ? (formatNumber(parsedAmounts.raiAmount) as string)
-            : parsedAmounts.raiAmount
-        : ''
-    const liqBValue =
-        parsedAmounts && parsedAmounts.totalLiquidity
-            ? (formatNumber(parsedAmounts.totalLiquidity) as string)
-            : '0'
+    // txn values
+    const deadline = useTransactionDeadline() // custom from users settings
 
-    const onEthMaxAmount = () => onEthInput(currencyBalances.eth.toString())
-    const onRaiMaxAmount = () => onRaiInput(currencyBalances.rai.toString())
+    // get formatted amounts
+    const formattedAmounts = {
+        [independentField]: typedValue,
+        [dependentField]: parsedAmounts[dependentField]?.toSignificant(6) ?? '',
+    }
 
-    const handleAddLiquidity = async () => {
-        try {
-            await addLiquidityCallback()
-            onEthInput('')
-            onRaiInput('')
-        } catch (error) {
-            console.log(error)
+    // get the max amounts user can add
+    const maxAmounts: { [field in Field]?: CurrencyAmount<Currency> } = [
+        Field.CURRENCY_A,
+        Field.CURRENCY_B,
+    ].reduce((accumulator, field) => {
+        return {
+            ...accumulator,
+            [field]: maxAmountSpend(currencyBalances[field]),
+        }
+    }, {})
+
+    // check whether the user has approved the router on the tokens
+    const [approvalA, approveACallback] = useApproveCallback(
+        parsedAmounts[Field.CURRENCY_A],
+        chainId ? NONFUNGIBLE_POSITION_MANAGER_ADDRESSES[chainId] : undefined
+    )
+    const [approvalB, approveBCallback] = useApproveCallback(
+        parsedAmounts[Field.CURRENCY_B],
+        chainId ? NONFUNGIBLE_POSITION_MANAGER_ADDRESSES[chainId] : undefined
+    )
+
+    const allowedSlippage = useMemo(() => {
+        return outOfRange
+            ? ZERO_PERCENT
+            : DEFAULT_ADD_IN_RANGE_SLIPPAGE_TOLERANCE
+    }, [outOfRange])
+
+    // we need an existence check on parsed amounts for single-asset deposits
+    const showApprovalA =
+        approvalA !== ApprovalState.APPROVED &&
+        !!parsedAmounts[Field.CURRENCY_A]
+    const showApprovalB =
+        approvalB !== ApprovalState.APPROVED &&
+        !!parsedAmounts[Field.CURRENCY_B]
+
+    async function onAdd() {
+        if (!chainId || !library || !account) return
+
+        if (!positionManager || !currency0 || !currency1) {
+            return
+        }
+
+        if (position && account && deadline) {
+            store.dispatch.popupsModel.setIsWaitingModalOpen(true)
+            store.dispatch.popupsModel.setBlockBackdrop(true)
+            store.dispatch.popupsModel.setWaitingPayload({
+                title: 'Waiting for confirmation',
+                text: 'Confirm this transaction in your wallet',
+                status: 'loading',
+            })
+
+            const useNative = currency0.isNative
+                ? currency0
+                : currency1.isNative
+                ? currency1
+                : undefined
+
+            const { calldata, value } =
+                hasExistingPosition && foundPoisiton
+                    ? NonfungiblePositionManager.addCallParameters(position, {
+                          tokenId: foundPoisiton.tokenId.toString(),
+                          slippageTolerance: allowedSlippage,
+                          deadline: deadline.toString(),
+                          useNative,
+                      })
+                    : NonfungiblePositionManager.addCallParameters(position, {
+                          slippageTolerance: allowedSlippage,
+                          recipient: account,
+                          deadline: deadline.toString(),
+                          useNative,
+                          createPool: noLiquidity,
+                      })
+
+            let txn: { to: string; data: string; value: string } = {
+                to: NONFUNGIBLE_POSITION_MANAGER_ADDRESSES[chainId],
+                data: calldata,
+                value,
+            }
+
+            library
+                .getSigner()
+                .estimateGas(txn)
+                .then((estimate) => {
+                    const newTxn = {
+                        ...txn,
+                        gasLimit: calculateGasMargin(estimate),
+                    }
+
+                    return library
+                        .getSigner()
+                        .sendTransaction(newTxn)
+                        .then((response: TransactionResponse) => {
+                            addTransaction(
+                                response,
+                                noLiquidity
+                                    ? `Create Position and add ${currency0?.symbol}/${currency1?.symbol} V3 liquidity`
+                                    : `Add ${currency0?.symbol}/${currency1?.symbol} V3 liquidity`
+                            )
+                            store.dispatch.popupsModel.setWaitingPayload({
+                                title: 'Transaction Submitted',
+                                hash: response.hash,
+                                status: 'success',
+                            })
+                            clearAll()
+                        })
+                })
+                .catch((error) => {
+                    console.error('Failed to send transaction', error)
+                    // we only care if the error is something _other_ than the user rejected the tx
+                    if (error?.code !== 4001) {
+                        console.error(error)
+                    }
+                    handleTransactionError(error)
+                })
+        } else {
+            return
         }
     }
 
-    return (
+    useEffect(() => {
+        if (!ticks.LOWER && !ticks.UPPER && priceUpper && priceLower && pool) {
+            onRightRangeInput(priceUpper.toSignificant(5))
+            onLeftRangeInput(priceLower.toSignificant(5))
+        }
+    }, [
+        onLeftRangeInput,
+        pool,
+        onRightRangeInput,
+        priceLower,
+        priceUpper,
+        ticks,
+    ])
+
+    const clearAll = useCallback(() => {
+        onFieldAInput('')
+        onFieldBInput('')
+    }, [onFieldAInput, onFieldBInput])
+
+    return definedLoading || positionsLoading ? (
+        <LoadingRows>
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
+        </LoadingRows>
+    ) : (
         <Container>
             <InputContainer>
                 <InputLabel>
-                    <img
-                        src={require('../../../assets/rai-logo.svg').default}
-                        alt=""
-                    />
-                    {`RAI (Available: ${formatNumber(
-                        currencyBalances.rai.toString()
+                    <CurrencyLogo currency={currency0} />
+                    {`${currency0?.symbol} (Available: ${formatCurrencyAmount(
+                        balanceCurrencyA,
+                        4
                     )})`}
                 </InputLabel>
                 <DecimalInput
-                    value={raiValue}
-                    onChange={onRaiInput}
-                    handleMaxClick={onRaiMaxAmount}
+                    value={formattedAmounts[Field.CURRENCY_A]}
+                    onChange={onFieldAInput}
+                    handleMaxClick={() => {
+                        onFieldAInput(
+                            maxAmounts[Field.CURRENCY_A]?.toExact() ?? ''
+                        )
+                    }}
                     label={''}
                 />
             </InputContainer>
@@ -184,63 +350,100 @@ const AddLiquidity = () => {
             </SeparatorIcon>
             <InputContainer>
                 <InputLabel>
-                    <img
-                        src={require('../../../assets/eth-logo.png').default}
-                        alt=""
-                    />
-                    {`ETH (Available: ${formatNumber(
-                        currencyBalances.eth.toString()
+                    <CurrencyLogo currency={currency1} />
+                    {`${currency1?.symbol} (Available: ${formatCurrencyAmount(
+                        balanceCurrencyB,
+                        4
                     )})`}
                 </InputLabel>
                 <DecimalInput
-                    value={ethValue}
-                    onChange={onEthInput}
-                    handleMaxClick={onEthMaxAmount}
+                    value={formattedAmounts[Field.CURRENCY_B]}
+                    onChange={onFieldBInput}
+                    handleMaxClick={() => {
+                        onFieldBInput(
+                            maxAmounts[Field.CURRENCY_B]?.toExact() ?? ''
+                        )
+                    }}
                     label={''}
                 />
             </InputContainer>
             <Result>
                 <Block>
                     <Item>
-                        <Label>{`Total Liquidity`}</Label>
-                        <Value>{liqBValue} RAI/ETH</Value>
+                        <Label>{`${currencyA?.symbol} Amount`}</Label>
+                        <Value>{`${
+                            formattedAmounts[Field.CURRENCY_A] || 0
+                        }`}</Value>
+                    </Item>
+                    <Item>
+                        <Label>{`${currencyB?.symbol} Amount`}</Label>
+                        <Value>{`${
+                            formattedAmounts[Field.CURRENCY_B] || 0
+                        }`}</Value>
+                    </Item>
+                    <Item>
+                        <Label>{`Fee Tier`}</Label>
+                        <Value>
+                            {feeAmount
+                                ? `${new Percent(
+                                      feeAmount,
+                                      1_000_000
+                                  ).toSignificant()}%`
+                                : '-'}
+                        </Value>
                     </Item>
                 </Block>
             </Result>
+
+            {(approvalA === ApprovalState.NOT_APPROVED ||
+                approvalA === ApprovalState.PENDING ||
+                approvalB === ApprovalState.NOT_APPROVED ||
+                approvalB === ApprovalState.PENDING) &&
+            isValid ? (
+                <BtnContainer>
+                    {showApprovalA ? (
+                        <Button
+                            disabled={approvalA === ApprovalState.PENDING}
+                            style={{ width: showApprovalB ? '48%' : '100%' }}
+                            text={
+                                approvalA === ApprovalState.PENDING
+                                    ? `Approving ${
+                                          currencies[Field.CURRENCY_A]?.symbol
+                                      }`
+                                    : 'Approve ' +
+                                      currencies[Field.CURRENCY_A]?.symbol
+                            }
+                            onClick={approveACallback}
+                        />
+                    ) : null}
+
+                    {showApprovalB ? (
+                        <Button
+                            disabled={approvalB === ApprovalState.PENDING}
+                            text={
+                                approvalB === ApprovalState.PENDING
+                                    ? `Approving ${
+                                          currencies[Field.CURRENCY_B]?.symbol
+                                      }`
+                                    : 'Approve ' +
+                                      currencies[Field.CURRENCY_B]?.symbol
+                            }
+                            style={{ width: showApprovalA ? '48%' : '100%' }}
+                            onClick={approveBCallback}
+                        />
+                    ) : null}
+                </BtnContainer>
+            ) : null}
             <BtnContainer>
-                {isValid &&
-                (depositApprovalState === ApprovalState.PENDING ||
-                    depositApprovalState === ApprovalState.NOT_APPROVED) ? (
-                    <Button
-                        style={{ width: '48%' }}
-                        disabled={
-                            !isValid ||
-                            depositApprovalState === ApprovalState.PENDING
-                        }
-                        text={
-                            depositApprovalState === ApprovalState.PENDING
-                                ? 'Pending Approval..'
-                                : 'Approve'
-                        }
-                        onClick={approveDeposit}
-                    />
-                ) : null}
                 <Button
-                    style={{
-                        width:
-                            !isValid ||
-                            depositApprovalState === ApprovalState.UNKNOWN ||
-                            depositApprovalState === ApprovalState.APPROVED
-                                ? '100%'
-                                : '48%',
-                    }}
+                    style={{ width: '100%' }}
                     disabled={
                         !isValid ||
-                        depositApprovalState === ApprovalState.NOT_APPROVED ||
-                        depositApprovalState === ApprovalState.PENDING
+                        approvalA !== ApprovalState.APPROVED ||
+                        approvalB !== ApprovalState.APPROVED
                     }
-                    text={error ? error : 'Supply'}
-                    onClick={handleAddLiquidity}
+                    text={errorMessage ? errorMessage : 'Add Liquidity'}
+                    onClick={onAdd}
                 />
             </BtnContainer>
         </Container>

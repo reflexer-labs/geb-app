@@ -1,15 +1,21 @@
+import { Currency, CurrencyAmount, Token as SDKToken } from '@uniswap/sdk-core'
+import { MaxUint256 } from '@ethersproject/constants'
 import { BigNumber, ethers } from 'ethers'
+import { TransactionResponse } from '@ethersproject/providers'
 import { TransactionRequest } from 'geb.js'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useActiveWeb3React } from '.'
 import store from '../store'
 import { EMPTY_ADDRESS } from '../utils/constants'
+import { useSingleCallResult } from './Multicall'
 import {
+    calculateGasMargin,
     handlePreTxGasEstimate,
     handleTransactionError,
     useHasPendingApproval,
     useHasPendingTransactions,
 } from './TransactionHooks'
+import { useTokenContract } from './useContract'
 import useGeb, { useBlockNumber } from './useGeb'
 
 type Token =
@@ -23,6 +29,140 @@ export enum ApprovalState {
     NOT_APPROVED,
     PENDING,
     APPROVED,
+}
+
+export function useTokenAllowanceCall(
+    token?: SDKToken,
+    owner?: string,
+    spender?: string
+): CurrencyAmount<SDKToken> | undefined {
+    const contract = useTokenContract(token?.address, false)
+
+    const inputs = useMemo(() => [owner, spender], [owner, spender])
+    const allowance = useSingleCallResult(contract, 'allowance', inputs).result
+
+    return useMemo(
+        () =>
+            token && allowance
+                ? CurrencyAmount.fromRawAmount(token, allowance.toString())
+                : undefined,
+        [token, allowance]
+    )
+}
+
+// returns a variable indicating the state of the approval and a function which approves if necessary or early returns
+export function useApproveCallback(
+    amountToApprove?: CurrencyAmount<Currency>,
+    spender?: string
+): [ApprovalState, () => Promise<void>] {
+    const { account } = useActiveWeb3React()
+    const token = amountToApprove?.currency?.isToken
+        ? amountToApprove.currency
+        : undefined
+    const currentAllowance = useTokenAllowanceCall(
+        token,
+        account ?? undefined,
+        spender
+    )
+    const pendingApproval = useHasPendingApproval(token?.address, spender)
+
+    // check the current approval status
+    const approvalState: ApprovalState = useMemo(() => {
+        if (!amountToApprove || !spender) return ApprovalState.UNKNOWN
+        if (amountToApprove.currency.isNative) return ApprovalState.APPROVED
+        // we might not have enough data to know whether or not we need to approve
+        if (!currentAllowance) return ApprovalState.UNKNOWN
+
+        // amountToApprove will be defined if currentAllowance is
+        return currentAllowance.lessThan(amountToApprove)
+            ? pendingApproval
+                ? ApprovalState.PENDING
+                : ApprovalState.NOT_APPROVED
+            : ApprovalState.APPROVED
+    }, [amountToApprove, currentAllowance, pendingApproval, spender])
+
+    const tokenContract = useTokenContract(token?.address)
+
+    const approve = useCallback(async (): Promise<void> => {
+        if (approvalState !== ApprovalState.NOT_APPROVED) {
+            console.error('approve was called unnecessarily')
+            return
+        }
+        if (!token) {
+            console.error('no token')
+            return
+        }
+
+        if (!tokenContract) {
+            console.error('tokenContract is null')
+            return
+        }
+
+        if (!amountToApprove) {
+            console.error('missing amount to approve')
+            return
+        }
+
+        if (!spender) {
+            console.error('no spender')
+            return
+        }
+
+        store.dispatch.popupsModel.setIsWaitingModalOpen(true)
+        store.dispatch.popupsModel.setBlockBackdrop(true)
+        store.dispatch.popupsModel.setWaitingPayload({
+            title: 'Waiting for confirmation',
+            text: 'Confirm this transaction in your wallet',
+            status: 'loading',
+        })
+
+        let useExact = false
+        const estimatedGas = await tokenContract.estimateGas
+            .approve(spender, MaxUint256)
+            .catch(() => {
+                // general fallback for tokens who restrict approval amounts
+                useExact = true
+                return tokenContract.estimateGas.approve(
+                    spender,
+                    amountToApprove.quotient.toString()
+                )
+            })
+
+        return tokenContract
+            .approve(
+                spender,
+                useExact ? amountToApprove.quotient.toString() : MaxUint256,
+                {
+                    gasLimit: calculateGasMargin(estimatedGas),
+                }
+            )
+            .then((txResponse: TransactionResponse) => {
+                const { hash, chainId } = txResponse
+                store.dispatch.transactionsModel.addTransaction({
+                    chainId,
+                    hash,
+                    from: txResponse.from,
+                    summary: 'Token Approval',
+                    addedTime: new Date().getTime(),
+                    originalTx: txResponse,
+                    approval: {
+                        tokenAddress: token.address,
+                        spender,
+                    },
+                })
+                store.dispatch.popupsModel.setWaitingPayload({
+                    title: 'Transaction Submitted',
+                    hash: txResponse.hash,
+                    status: 'success',
+                })
+            })
+            .catch((error: Error) => {
+                console.debug('Failed to approve token', error)
+                throw error
+            })
+    }, [approvalState, token, tokenContract, amountToApprove, spender])
+
+    return [approvalState, approve]
 }
 
 export function useTokenAllowance(

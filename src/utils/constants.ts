@@ -5,6 +5,7 @@ import { FACTORY_ADDRESS as V3_FACTORY_ADDRESS } from '@uniswap/v3-sdk'
 import { injected, walletconnect, walletlink } from '../connectors'
 import { ChainId, WalletInfo } from './interfaces'
 import { constructSameAddressMap } from './types/constructSameAddressMap'
+import { Percent } from '@uniswap/sdk-core'
 
 const {
     REACT_APP_GRAPH_API_URLS,
@@ -225,3 +226,5 @@ export const NONFUNGIBLE_POSITION_MANAGER_ADDRESSES: AddressMap = {
 export const V3_CORE_FACTORY_ADDRESSES: AddressMap = {
     ...constructSameAddressMap(V3_FACTORY_ADDRESS, false),
 }
+
+export const ZERO_PERCENT = new Percent('0')

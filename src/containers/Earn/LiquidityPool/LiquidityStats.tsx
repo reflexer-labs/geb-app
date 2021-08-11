@@ -4,16 +4,19 @@ import { NonfungiblePositionManager, Position } from '@uniswap/v3-sdk'
 import styled, { keyframes } from 'styled-components'
 import { useToken } from '../../../hooks/Tokens'
 import { PoolState, usePool } from '../../../hooks/usePools'
-import { useV3PositionFromTokenId } from '../../../hooks/useV3Positions'
+import {
+    useV3PositionFromTokenId,
+    useV3Positions,
+} from '../../../hooks/useV3Positions'
 import { TransactionResponse } from '@ethersproject/providers'
+import { Currency, Percent, Price } from '@uniswap/sdk-core'
+import CurrencyLogo from '../../../components/CurrencyLogo'
+import Button from '../../../components/Button'
 import {
     getPriceOrderingFromPositionForUI,
     unwrappedToken,
-} from './PositionItem'
-import { Currency, Price } from '@uniswap/sdk-core'
-import CurrencyLogo from '../../../components/CurrencyLogo'
-import Button from '../../../components/Button'
-import { useV3PositionFees } from '../../../hooks/useLiquidity'
+    useV3PositionFees,
+} from '../../../hooks/useLiquidity'
 import { formatCurrencyAmount } from '../../../utils/helper'
 import { useV3NFTPositionManagerContract } from '../../../hooks/useContract'
 import { useSingleCallResult } from '../../../hooks/Multicall'
@@ -27,6 +30,7 @@ import {
     useTransactionAdder,
 } from '../../../hooks/TransactionHooks'
 import store from '../../../store'
+import { PositionDetails } from '../../../utils/interfaces'
 
 interface Props {
     tokenId: string | undefined
@@ -35,8 +39,30 @@ interface Props {
 const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
     const { account, library, chainId } = useActiveWeb3React()
     const parsedTokenId = poolTokenId ? BigNumber.from(poolTokenId) : undefined
-    const { loading, position: positionDetails } =
+    const { loading, position: definedPosition } =
         useV3PositionFromTokenId(parsedTokenId)
+
+    const { positions, loading: positionsLoading } = useV3Positions(account)
+    const [openPositions] = positions?.reduce<
+        [PositionDetails[], PositionDetails[]]
+    >(
+        (acc, p) => {
+            acc[p.liquidity?.isZero() ? 1 : 0].push(p)
+            return acc
+        },
+        [[], []]
+    ) ?? [[], []]
+
+    const foundPosition = useMemo(() => {
+        return openPositions.find(
+            (p) =>
+                p.tickLower === definedPosition?.tickLower &&
+                p.tickUpper === definedPosition?.tickUpper &&
+                p.fee === definedPosition.fee
+        )
+    }, [openPositions, definedPosition])
+
+    const positionDetails = foundPosition || definedPosition
 
     const {
         token0: token0Address,
@@ -94,6 +120,7 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
     }
 
     const inverted = token1 ? base?.equals(token1) : undefined
+
     const currencyQuote = inverted ? currency0 : currency1
     const currencyBase = inverted ? currency1 : currency0
 
@@ -263,7 +290,7 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
         }
     }
 
-    return loading || poolState === PoolState.LOADING || !feeAmount ? (
+    return positionsLoading || loading || poolState === PoolState.LOADING ? (
         <LoadingRows>
             <div />
             <div />
@@ -280,199 +307,245 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
             <div />
         </LoadingRows>
     ) : (
-        <StatsGrid>
-            <StatItem>
-                <StateInner>
-                    <Label className="top">
-                        <Col>Liquidity</Col>
-                    </Label>
-                    <InfoBox>
-                        <InfoItem>
-                            <Col>
-                                <CurrencyLogo currency={currency0} />
-                                {currency0?.symbol}
-                            </Col>
-                            <Col>
-                                {inverted
-                                    ? position?.amount0.toSignificant(4)
-                                    : position?.amount1.toSignificant(4)}
-                                {typeof ratio === 'number' && !removed ? (
-                                    <Badge>
-                                        {inverted ? ratio : 100 - ratio}%
-                                    </Badge>
-                                ) : null}
-                            </Col>
-                        </InfoItem>
+        <Container>
+            <Info>
+                <Box>
+                    Fee Amount:{' '}
+                    <Badge>
+                        {' '}
+                        {feeAmount
+                            ? `${new Percent(
+                                  feeAmount,
+                                  1_000_000
+                              ).toSignificant()}%`
+                            : '-'}
+                    </Badge>
+                </Box>
+                <AlertLabel
+                    text={
+                        removed
+                            ? 'Closed'
+                            : inRange
+                            ? 'In Range'
+                            : 'Out of Range'
+                    }
+                    type={removed ? 'dimmed' : inRange ? 'success' : 'warning'}
+                />
+            </Info>
 
-                        <InfoItem>
-                            <Col>
-                                <CurrencyLogo currency={currency1} />
-                                {currency1?.symbol}
-                            </Col>
-                            <Col>
-                                {inverted
-                                    ? position?.amount1.toSignificant(4)
-                                    : position?.amount0.toSignificant(4)}
-                                {typeof ratio === 'number' && !removed ? (
-                                    <Badge>
-                                        {inverted ? 100 - ratio : ratio}%
-                                    </Badge>
-                                ) : null}
-                            </Col>
-                        </InfoItem>
-                    </InfoBox>
-                </StateInner>
-            </StatItem>
-
-            <StatItem>
-                <StateInner>
-                    <Label className="top">
-                        <Col>Unclaimed Fees</Col>
-                        {ownsNFT &&
-                        (feeValue0?.greaterThan(0) ||
-                            feeValue1?.greaterThan(0)) ? (
-                            <Button
-                                disabled={collecting || !!collectMigrationHash}
-                                onClick={collect}
-                                text={
-                                    !!collectMigrationHash && !isCollectPending
-                                        ? 'Claimed'
-                                        : isCollectPending || collecting
-                                        ? 'Claiming...'
-                                        : 'Claim Fees'
-                                }
-                            />
-                        ) : null}
-                    </Label>
-                    <InfoBox>
-                        <InfoItem>
-                            <Col>
-                                <CurrencyLogo
-                                    currency={feeValueUpper?.currency}
-                                />
-                                {feeValueUpper?.currency?.symbol}
-                            </Col>
-                            <Col>
-                                {feeValueUpper
-                                    ? formatCurrencyAmount(feeValueUpper, 4)
-                                    : '-'}
-                            </Col>
-                        </InfoItem>
-
-                        <InfoItem>
-                            <Col>
-                                <CurrencyLogo
-                                    currency={feeValueLower?.currency}
-                                />
-                                {feeValueLower?.currency?.symbol}
-                            </Col>
-                            <Col>
-                                {feeValueLower
-                                    ? formatCurrencyAmount(feeValueLower, 4)
-                                    : '-'}
-                            </Col>
-                        </InfoItem>
-                    </InfoBox>
-                </StateInner>
-            </StatItem>
-
-            <StatItem>
-                <StateInner>
-                    <Label className="top has-alert">
-                        <Col>
-                            Pool Range{' '}
-                            <AlertLabel
-                                text={
-                                    removed
-                                        ? 'Closed'
-                                        : inRange
-                                        ? 'In Range'
-                                        : 'Out of Range'
-                                }
-                                type={
-                                    removed
-                                        ? 'dimmed'
-                                        : inRange
-                                        ? 'success'
-                                        : 'warning'
-                                }
-                            />
-                        </Col>
-
-                        {currencyBase && currencyQuote && (
-                            <RateToggle
-                                currencyA={currencyBase}
-                                currencyB={currencyQuote}
-                                handleRateToggle={() =>
-                                    setManuallyInverted(!manuallyInverted)
-                                }
-                            />
-                        )}
-                    </Label>
-                    <Block>
+            <StatsGrid>
+                <StatItem>
+                    <StateInner>
+                        <Label className="top">
+                            <Col>Liquidity</Col>
+                        </Label>
                         <InfoBox>
                             <InfoItem>
-                                <Col> Current Price</Col>
+                                <Col>
+                                    <CurrencyLogo currency={currencyQuote} />
+                                    {currencyQuote?.symbol}
+                                </Col>
+                                <Col>
+                                    {foundPosition
+                                        ? inverted
+                                            ? position?.amount0.toSignificant(4)
+                                            : position?.amount1.toSignificant(4)
+                                        : '-'}
+                                    {foundPosition &&
+                                    typeof ratio === 'number' &&
+                                    !removed ? (
+                                        <Badge>
+                                            {inverted ? ratio : 100 - ratio}%
+                                        </Badge>
+                                    ) : null}
+                                </Col>
+                            </InfoItem>
 
+                            <InfoItem>
                                 <Col>
-                                    {pool ? (
-                                        <b>
-                                            {(inverted
-                                                ? pool.token1Price
-                                                : pool.token0Price
-                                            ).toSignificant(6)}
-                                        </b>
-                                    ) : (
-                                        '-'
-                                    )}{' '}
-                                    {currencyQuote?.symbol} per{' '}
+                                    <CurrencyLogo currency={currencyBase} />
                                     {currencyBase?.symbol}
                                 </Col>
-                            </InfoItem>
-                            <InfoItem>
-                                <Col>Min Price</Col>
                                 <Col>
-                                    <b>{priceLower?.toSignificant(5)}</b>{' '}
-                                    {currencyQuote?.symbol +
-                                        ' per ' +
-                                        currencyBase?.symbol}
-                                </Col>
-                            </InfoItem>
-                            <InfoItem>
-                                <Col> Max Price</Col>
-                                <Col>
-                                    {' '}
-                                    <b>{priceUpper?.toSignificant(5)}</b>{' '}
-                                    {currencyQuote?.symbol} per{' '}
-                                    {currencyBase?.symbol}
+                                    {foundPosition
+                                        ? inverted
+                                            ? position?.amount1.toSignificant(4)
+                                            : position?.amount0.toSignificant(4)
+                                        : '-'}
+                                    {foundPosition &&
+                                    typeof ratio === 'number' &&
+                                    !removed ? (
+                                        <Badge>
+                                            {inverted ? 100 - ratio : ratio}%
+                                        </Badge>
+                                    ) : null}
                                 </Col>
                             </InfoItem>
                         </InfoBox>
-                    </Block>
-                </StateInner>
-            </StatItem>
-        </StatsGrid>
+                    </StateInner>
+                </StatItem>
+
+                <StatItem>
+                    <StateInner>
+                        <Label className="top">
+                            <Col>Unclaimed Fees</Col>
+                            {ownsNFT &&
+                            (feeValue0?.greaterThan(0) ||
+                                feeValue1?.greaterThan(0)) ? (
+                                <Button
+                                    disabled={
+                                        collecting || !!collectMigrationHash
+                                    }
+                                    onClick={collect}
+                                    text={
+                                        !!collectMigrationHash &&
+                                        !isCollectPending
+                                            ? 'Claimed'
+                                            : isCollectPending || collecting
+                                            ? 'Claiming...'
+                                            : 'Claim Fees'
+                                    }
+                                />
+                            ) : null}
+                        </Label>
+                        <InfoBox>
+                            <InfoItem>
+                                <Col>
+                                    <CurrencyLogo
+                                        currency={feeValueUpper?.currency}
+                                    />
+                                    {feeValueUpper?.currency?.symbol}
+                                </Col>
+                                <Col>
+                                    {foundPosition && feeValueUpper
+                                        ? formatCurrencyAmount(feeValueUpper, 4)
+                                        : '-'}
+                                </Col>
+                            </InfoItem>
+
+                            <InfoItem>
+                                <Col>
+                                    <CurrencyLogo
+                                        currency={feeValueLower?.currency}
+                                    />
+                                    {feeValueLower?.currency?.symbol}
+                                </Col>
+                                <Col>
+                                    {foundPosition && feeValueLower
+                                        ? formatCurrencyAmount(feeValueLower, 4)
+                                        : '-'}
+                                </Col>
+                            </InfoItem>
+                        </InfoBox>
+                    </StateInner>
+                </StatItem>
+
+                <StatItem>
+                    <StateInner>
+                        <Label className="top has-alert">
+                            <Col>
+                                Pool Range{' '}
+                                <AlertLabel
+                                    text={
+                                        removed
+                                            ? 'Closed'
+                                            : inRange
+                                            ? 'In Range'
+                                            : 'Out of Range'
+                                    }
+                                    type={
+                                        removed
+                                            ? 'dimmed'
+                                            : inRange
+                                            ? 'success'
+                                            : 'warning'
+                                    }
+                                />
+                            </Col>
+
+                            {currencyBase && currencyQuote && (
+                                <RateToggle
+                                    currencyA={currencyBase}
+                                    currencyB={currencyQuote}
+                                    handleRateToggle={() =>
+                                        setManuallyInverted(!manuallyInverted)
+                                    }
+                                />
+                            )}
+                        </Label>
+                        <Block>
+                            <InfoBox>
+                                <InfoItem>
+                                    <Col> Current Price</Col>
+
+                                    <Col>
+                                        {pool ? (
+                                            <b>
+                                                {(inverted
+                                                    ? pool.token1Price
+                                                    : pool.token0Price
+                                                ).toSignificant(6)}
+                                            </b>
+                                        ) : (
+                                            '-'
+                                        )}{' '}
+                                        {currencyQuote?.symbol} per{' '}
+                                        {currencyBase?.symbol}
+                                    </Col>
+                                </InfoItem>
+                                <InfoItem>
+                                    <Col>Min Price</Col>
+                                    <Col>
+                                        <b>{priceLower?.toSignificant(5)}</b>{' '}
+                                        {currencyQuote?.symbol +
+                                            ' per ' +
+                                            currencyBase?.symbol}
+                                    </Col>
+                                </InfoItem>
+                                <InfoItem>
+                                    <Col> Max Price</Col>
+                                    <Col>
+                                        {' '}
+                                        <b>
+                                            {priceUpper?.toSignificant(5)}
+                                        </b>{' '}
+                                        {currencyQuote?.symbol} per{' '}
+                                        {currencyBase?.symbol}
+                                    </Col>
+                                </InfoItem>
+                            </InfoBox>
+                        </Block>
+                    </StateInner>
+                </StatItem>
+            </StatsGrid>
+        </Container>
     )
 }
 
 export default LiquidityStats
 
-const StatsGrid = styled.div`
+const Container = styled.div`
+    position: relative;
     margin-left: 30px;
     max-width: 400px;
     width: 100%;
     ${({ theme }) => theme.mediaWidth.upToSmall`
         margin-bottom:10px;
         margin-left:0;
+        margin-top:0;
     `}
     ${({ theme }) => theme.mediaWidth.upToExtraSmall`
         max-width: 100%;
-    `}
+        `}
+`
+
+const StatsGrid = styled.div`
+    width: 100%;
 `
 
 const StatItem = styled.div`
     :nth-child(2) {
-        margin: 15px 0;
+        margin: 25px 0;
         ${({ theme }) => theme.mediaWidth.upToSmall`
             margin: 5px 0;
         `}
@@ -602,6 +675,7 @@ const loadingAnimation = keyframes`
 `
 
 export const LoadingRows = styled.div`
+    padding: 0 20px;
     display: grid;
     min-width: 400px;
     grid-column-gap: 0.5em;
@@ -628,4 +702,24 @@ export const LoadingRows = styled.div`
         grid-column: 3 / 4;
         margin-bottom: 2em;
     }
+`
+
+const Info = styled.div`
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: -80px;
+    right: 0;
+
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+           position:static;
+           justify-content:center;
+           margin-bottom:20px;
+        `}
+`
+
+const Box = styled.div`
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
 `
