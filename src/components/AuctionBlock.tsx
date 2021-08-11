@@ -21,10 +21,8 @@ type Props = IAuction & { isCollapsed: boolean }
 const AuctionBlock = (auction: Props) => {
     const { chainId, account } = useActiveWeb3React()
     const { t } = useTranslation()
-    const {
-        popupsModel: popupsActions,
-        auctionsModel: auctionsActions,
-    } = useStoreActions((state) => state)
+    const { popupsModel: popupsActions, auctionsModel: auctionsActions } =
+        useStoreActions((state) => state)
 
     const {
         connectWalletModel: connectWalletState,
@@ -188,7 +186,10 @@ const AuctionBlock = (auction: Props) => {
             <Header onClick={() => setCollapse(!collapse)}>
                 <LeftAucInfo type={eventType.toLowerCase()}>
                     <img
-                        src={require(`../assets/${eventType.toLowerCase()}.svg`)}
+                        src={
+                            require(`../assets/${eventType.toLowerCase()}.svg`)
+                                .default
+                        }
                         alt="debt type auction"
                     />
 

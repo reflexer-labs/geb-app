@@ -16,10 +16,8 @@ const SideMenu = () => {
     const { active, account, chainId } = useWeb3React()
     const [isOpen, setIsOpen] = useState(false)
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
-    const {
-        connectWalletModel: connectWalletState,
-        popupsModel: popupsState,
-    } = useStoreState((state) => state)
+    const { connectWalletModel: connectWalletState, popupsModel: popupsState } =
+        useStoreState((state) => state)
 
     const handleWalletConnect = () =>
         popupsActions.setIsConnectorsWalletOpen(true)
@@ -75,7 +73,10 @@ const SideMenu = () => {
                             ) : (
                                 <ConnectBtnContainer>
                                     <Icon
-                                        src={require('../assets/LogoIcon.png')}
+                                        src={
+                                            require('../assets/LogoIcon.png')
+                                                .default
+                                        }
                                     />
                                     <Title>{t('welcome_reflexer')}</Title>
                                     <Text>

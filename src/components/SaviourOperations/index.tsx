@@ -24,7 +24,7 @@ const SaviourOperatrions = () => {
     const SAVIOUR_TOKENS = [
         {
             item: 'Uniswap v2 RAI/ETH',
-            img: require('../../assets/uniswap-icon.svg'),
+            img: require('../../assets/uniswap-icon.svg').default,
             href: `https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`,
             isExternal: true,
         },
@@ -34,10 +34,8 @@ const SaviourOperatrions = () => {
     const [sliderVal, setSliderVal] = useState<number>(0)
 
     const [amount, setAmount] = useState('')
-    const {
-        popupsModel: popupsActions,
-        safeModel: safeActions,
-    } = useStoreActions((state) => state)
+    const { popupsModel: popupsActions, safeModel: safeActions } =
+        useStoreActions((state) => state)
 
     const { safeModel: safeState } = useStoreState((state) => state)
     const { isSaviourDeposit, amount: stateAmount, targetedCRatio } = safeState

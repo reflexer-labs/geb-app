@@ -55,21 +55,21 @@ const NavLinks = () => {
                     <ExtLink href="/earn/pool">
                         Liquidity Pool{' '}
                         <img
-                            src={require('../assets/dark-arrow.svg')}
+                            src={require('../assets/dark-arrow.svg').default}
                             alt="arrow"
                         />
                     </ExtLink>
                     <ExtLink href="/earn/staking">
                         Staking{' '}
                         <img
-                            src={require('../assets/dark-arrow.svg')}
+                            src={require('../assets/dark-arrow.svg').default}
                             alt="arrow"
                         />
                     </ExtLink>
                     <ExtLink href="/earn/incentives">
                         Incentives{' '}
                         <img
-                            src={require('../assets/dark-arrow.svg')}
+                            src={require('../assets/dark-arrow.svg').default}
                             alt="arrow"
                         />
                     </ExtLink>
@@ -86,7 +86,7 @@ const NavLinks = () => {
                     >
                         Nexus Mutual{' '}
                         <img
-                            src={require('../assets/dark-arrow.svg')}
+                            src={require('../assets/dark-arrow.svg').default}
                             alt="arrow"
                         />
                     </ExtLink>

@@ -48,7 +48,7 @@ const Button = ({
                 <DimmedBtn {...rest} disabled={disabled} onClick={onClick}>
                     {arrowPlacement === 'left' ? (
                         <img
-                            src={require('../assets/dark-arrow.svg')}
+                            src={require('../assets/dark-arrow.svg').default}
                             alt={''}
                         />
                     ) : null}
@@ -56,7 +56,7 @@ const Button = ({
                     {arrowPlacement === 'right' ? (
                         <img
                             className="rotate"
-                            src={require('../assets/dark-arrow.svg')}
+                            src={require('../assets/dark-arrow.svg').default}
                             alt={''}
                         />
                     ) : null}
