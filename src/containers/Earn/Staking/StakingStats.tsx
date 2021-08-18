@@ -22,7 +22,7 @@ const StakingStats = () => {
                     {Number(poolAmounts.apr) > 0
                         ? numeral(
                               formatNumber(poolAmounts.apr.toString(), 2)
-                          ).format('0,0')
+                          ).format('0.0')
                         : '0'}
                     %
                 </StatValue>
