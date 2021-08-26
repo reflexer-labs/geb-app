@@ -79,7 +79,7 @@ export const getSafeByIdQuery = (safeId: string, address: string) => `{
 
 export const getSafeHistoryQuery = (safeId: string) => `{
   safes(where: { safeId: "${safeId}" , proxy_contains: "0x", safeId_not: null}) {
-    modifySAFECollateralization {
+    modifySAFECollateralization (first: 1000, orderBy: createdAt, orderDirection: desc){
       deltaDebt
       deltaCollateral
       createdAt

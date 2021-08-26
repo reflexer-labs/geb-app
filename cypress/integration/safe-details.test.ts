@@ -147,7 +147,7 @@ describe('App Page - Safe Details', () => {
                     getValue(tx)
                 )
                 cy.wait(2000)
-                cy.get('[data-test-id="modal_col_ratio"]').contains('145.00%')
+                cy.get('[data-test-id="modal_col_ratio"]').contains('140.00%')
                 cy.get('[data-test-id="details_eth_price"]')
                     .invoke('text')
                     .then((tx) => {

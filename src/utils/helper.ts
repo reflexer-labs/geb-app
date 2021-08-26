@@ -316,7 +316,6 @@ export const returnAvaiableDebt = (
     const prevDebtBN = BigNumber.from(toFixedString(prevDebt, 'WAD'))
     const totalPrevDebt = prevDebtBN.mul(accumulatedRateRay).div(gebUtils.RAY)
     const availableDebt = totalDebtBN.sub(totalPrevDebt)
-
     return formatNumber(
         gebUtils.wadToFixed(availableDebt).toString()
     ).toString()
