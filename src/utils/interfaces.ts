@@ -572,3 +572,19 @@ export interface MintState {
     readonly leftRangeTypedValue: string
     readonly rightRangeTypedValue: string
 }
+
+export interface RangeData {
+    upperTick: number
+    lowerTick: number
+    apr: string
+}
+export interface PredefinedPool {
+    token1: string
+    ranges: {
+        wide: RangeData
+        tight: RangeData
+    }
+    pair: string
+    token0: string
+    fee: number
+}

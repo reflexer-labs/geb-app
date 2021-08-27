@@ -139,7 +139,7 @@ const ApproveToken = ({
             await txResponse.wait()
             await timeout(10000)
             setIsPaid(true)
-        } catch (e) {
+        } catch (e: any) {
             popupsActions.setBlockBackdrop(false)
             if (e?.code === 4001) {
                 setTextPayload({

@@ -15,10 +15,8 @@ export type AuctionEventType = 'DEBT' | 'SURPLUS'
 const Auctions = () => {
     const { t } = useTranslation()
     const { account } = useActiveWeb3React()
-    const {
-        auctionsModel: auctionsActions,
-        popupsModel: popupsActions,
-    } = useStoreActions((state) => state)
+    const { auctionsModel: auctionsActions, popupsModel: popupsActions } =
+        useStoreActions((state) => state)
 
     const [hide, setHide] = useState(false)
     const [type, setType] = useState<AuctionEventType>('DEBT')
@@ -44,7 +42,7 @@ const Auctions = () => {
                     type,
                 })
                 setError('')
-            } catch (error) {
+            } catch (error: any) {
                 console.log(error)
                 if (error.message.includes('failed')) {
                     setError('Failed to fetch auctions from the graph node')

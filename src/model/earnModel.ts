@@ -1,6 +1,6 @@
 import { action, Action, thunk, Thunk } from 'easy-peasy'
 import { Geb } from 'geb.js'
-import { Field } from '../hooks/useLiquidity'
+import { fetchPredefinedPools, Field } from '../hooks/useLiquidity'
 import { fetchPositions } from '../hooks/useLiquidityPool'
 import {
     ILiquidityData,
@@ -8,6 +8,7 @@ import {
     PositionsAndThreshold,
     IStakingData,
     MintState,
+    PredefinedPool,
 } from '../utils/interfaces'
 
 export const initialState: MintState = {
@@ -21,10 +22,12 @@ export interface EarnModel {
     mintState: MintState
     data: ILiquidityData
     stakedLP: IStakedLP
+    predefinedPools: Array<PredefinedPool>
     percent: number
     stakingData: IStakingData
     positionAndThreshold: PositionsAndThreshold | null
     fetchPositionsAndThreshold: Thunk<EarnModel, Geb>
+    fetchPools: Thunk<EarnModel>
     setPositionAndThreshold: Action<EarnModel, PositionsAndThreshold>
     setData: Action<EarnModel, ILiquidityData>
     setStakedLP: Action<EarnModel, IStakedLP>
@@ -37,11 +40,13 @@ export interface EarnModel {
     typeRightRangeInput: Action<EarnModel, { typedValue: string }>
     typeStartPriceInput: Action<EarnModel, { typedValue: string }>
     selectBurnPercent: Action<EarnModel, { percent: number }>
+    setPredefinedPools: Action<EarnModel, Array<PredefinedPool>>
 }
 
 const earnModel: EarnModel = {
     mintState: initialState,
     percent: 0,
+    predefinedPools: [],
     positionAndThreshold: null,
     stakingData: {
         stFlxAmount: '',
@@ -60,6 +65,12 @@ const earnModel: EarnModel = {
         const res = await fetchPositions(payload)
         if (res) {
             actions.setPositionAndThreshold(res)
+        }
+    }),
+    fetchPools: thunk(async (actions, _payload) => {
+        const res = await fetchPredefinedPools()
+        if (res && res.uniV3PoolConfig) {
+            actions.setPredefinedPools(res.uniV3PoolConfig)
         }
     }),
     setPositionAndThreshold: action((state, payload) => {
@@ -121,6 +132,9 @@ const earnModel: EarnModel = {
     }),
     selectBurnPercent: action((state, { percent }) => {
         state.percent = percent
+    }),
+    setPredefinedPools: action((state, payload) => {
+        state.predefinedPools = payload
     }),
 }
 

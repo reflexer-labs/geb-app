@@ -29,6 +29,7 @@ import { useV3NFTPositionManagerContract } from './useContract'
 import { BigNumber } from 'ethers'
 import { ExtendedEther, WETH9_EXTENDED } from '../utils/tokens'
 import { SupportedChainId } from '../utils/chains'
+import Axios from 'axios'
 
 export enum Field {
     CURRENCY_A = 'CURRENCY_A',
@@ -42,6 +43,20 @@ export enum Bound {
 const MAX_UINT128 = BigNumber.from(2).pow(128).sub(1)
 
 export const BIG_INT_ZERO = JSBI.BigInt(0)
+
+export async function fetchPredefinedPools() {
+    try {
+        const res = await Axios.get(
+            'https://4svutwkz1c.execute-api.eu-west-2.amazonaws.com/v1/'
+        )
+        if (res && res.data) {
+            return res.data
+        }
+        return null
+    } catch (error: any) {
+        console.log(error)
+    }
+}
 
 export function getTickToPrice(
     baseToken?: Token,

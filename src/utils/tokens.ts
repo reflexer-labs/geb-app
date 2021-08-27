@@ -95,6 +95,45 @@ export const WETH9_EXTENDED: { [chainId: number]: Token } = {
     ),
 }
 
+export const PREDEFINED_KOVAN_POOLS = [
+    {
+        token1: '0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa',
+        ranges: {
+            wide: {
+                upperTick: 11040,
+                lowerTick: 10980,
+                apr: '22.23',
+            },
+            tight: {
+                upperTick: 11020,
+                lowerTick: 11000,
+                apr: '13.34',
+            },
+        },
+        pair: 'RAI/DAI',
+        token0: '0x76b06a2f6df6f0514e7bec52a9afb3f603b477cd',
+        fee: 500,
+    },
+    {
+        token1: 'ETH',
+        ranges: {
+            wide: {
+                upperTick: -69160,
+                lowerTick: -69640,
+                apr: '22.23',
+            },
+            tight: {
+                upperTick: -68680,
+                lowerTick: -70120,
+                apr: '13.34',
+            },
+        },
+        pair: 'RAI/ETH',
+        token0: '0x76b06a2f6df6f0514e7bec52a9afb3f603b477cd',
+        fee: 3000,
+    },
+]
+
 export class ExtendedEther extends Ether {
     public get wrapped(): Token {
         if (this.chainId in WETH9_EXTENDED) return WETH9_EXTENDED[this.chainId]
