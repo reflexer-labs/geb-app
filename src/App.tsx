@@ -61,7 +61,7 @@ const App = () => {
                                             <Route
                                                 exact
                                                 component={Auctions}
-                                                path={'/auctions'}
+                                                path={'/auctions/:auctionType?'}
                                             />
                                         ) : null}
                                         <Route

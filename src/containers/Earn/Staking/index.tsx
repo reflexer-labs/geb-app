@@ -46,7 +46,7 @@ const Staking = () => {
                             stFLX
                         </Left>
                         <Right>
-                            <LinkButton href="/auctions?type=staked_token">
+                            <LinkButton href="/auctions/staked_token">
                                 Staked Token Auctions
                             </LinkButton>
                         </Right>

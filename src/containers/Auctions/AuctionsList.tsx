@@ -88,7 +88,12 @@ const AuctionsList = ({ type }: Props) => {
                 </>
             ) : (
                 <NoData>
-                    {t('no_auctions', { type: type.toLowerCase() })}
+                    {t('no_auctions', {
+                        type:
+                            type.toLowerCase() === 'staked_token'
+                                ? 'staked token'
+                                : type.toLowerCase(),
+                    })}
                 </NoData>
             )}
         </Container>

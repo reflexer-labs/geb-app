@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 import AlertLabel from '../../components/AlertLabel'
 import AuctionsFAQ from '../../components/AuctionsFAQ'
@@ -12,19 +13,18 @@ import AuctionsList from './AuctionsList'
 
 export type AuctionEventType = 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
 
-const Auctions = ({ ...props }) => {
+const Auctions = ({
+    match: {
+        params: { auctionType },
+    },
+}: RouteComponentProps<{ auctionType?: string }>) => {
     const { t } = useTranslation()
     const { account } = useActiveWeb3React()
-    const {
-        auctionsModel: auctionsActions,
-        popupsModel: popupsActions,
-    } = useStoreActions((state) => state)
+    const { auctionsModel: auctionsActions, popupsModel: popupsActions } =
+        useStoreActions((state) => state)
     const [hide, setHide] = useState(false)
     const [type, setType] = useState<AuctionEventType>('DEBT')
     const [error, setError] = useState('')
-
-    const urlResult = new URLSearchParams(props.location.search)
-    const urlType = urlResult.get('type')
 
     const handleHideFAQ = () => setHide(!hide)
 
@@ -38,7 +38,7 @@ const Auctions = ({ ...props }) => {
             await fetchAuctions()
             popupsActions.setIsWaitingModalOpen(false)
         }
-        if (urlType && urlType.toLowerCase() === 'staked_token') {
+        if (auctionType && auctionType.toLowerCase() === 'staked_token') {
             setType('STAKED_TOKEN')
         }
         async function fetchAuctions() {
@@ -46,7 +46,8 @@ const Auctions = ({ ...props }) => {
                 await auctionsActions.fetchAuctions({
                     address: account ? account : '',
                     type:
-                        urlType && urlType.toLowerCase() === 'staked_token'
+                        auctionType &&
+                        auctionType.toLowerCase() === 'staked_token'
                             ? 'STAKED_TOKEN'
                             : type,
                 })
@@ -65,7 +66,7 @@ const Auctions = ({ ...props }) => {
         }, 2000)
 
         return () => clearInterval(interval)
-    }, [account, auctionsActions, popupsActions, type, urlType])
+    }, [account, auctionsActions, popupsActions, type, auctionType])
 
     return (
         <>
@@ -86,7 +87,8 @@ const Auctions = ({ ...props }) => {
                     ) : null}
                 </Content>
 
-                {urlType && urlType.toLowerCase() === 'staked_token' ? null : (
+                {auctionType &&
+                auctionType.toLowerCase() === 'staked_token' ? null : (
                     <Switcher>
                         <Tab
                             className={type === 'DEBT' ? 'active' : ''}
