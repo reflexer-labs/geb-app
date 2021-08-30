@@ -9,7 +9,8 @@ import { useStoreActions, useStoreState } from '../../store'
 import _ from '../../utils/lodash'
 import { COIN_TICKER } from '../../utils/constants'
 import { BigNumber } from 'ethers'
-import { toFixedString } from '../../utils/helper'
+import { formatNumber, toFixedString } from '../../utils/helper'
+import { parseWad } from '../../utils/gebManager'
 
 const AuctionsPayment = () => {
     const { t } = useTranslation()
@@ -69,8 +70,18 @@ const AuctionsPayment = () => {
     const raiAllowance = _.get(connectWalletState, 'coinAllowance', '0')
     const flxAllowance = _.get(connectWalletState, 'protAllowance', '0')
 
-    const buySymbol = buyToken === 'COIN' ? COIN_TICKER : 'FLX'
-    const sellSymbol = sellToken === 'COIN' ? COIN_TICKER : 'FLX'
+    const buySymbol =
+        buyToken === 'PROTOCOL_TOKEN_LP'
+            ? 'FLX/ETH LP'
+            : buyToken === 'COIN'
+            ? COIN_TICKER
+            : 'FLX'
+    const sellSymbol =
+        sellToken === 'PROTOCOL_TOKEN_LP'
+            ? 'FLX/ETH LP'
+            : sellToken === 'COIN'
+            ? COIN_TICKER
+            : 'FLX'
 
     const handleAmountChange = (val: string) => {
         setError('')
@@ -78,12 +89,23 @@ const AuctionsPayment = () => {
         auctionsActions.setAmount(val)
     }
 
+    const parseRadToWad = (amount: string) => {
+        return BigNumber.from(
+            toFixedString(
+                parseWad(gebUtils.decimalShift(BigNumber.from(amount), -9)),
+                'WAD'
+            )
+        )
+    }
+
     const maxBid = (): string => {
         const sellAmountBN = sellAmount
             ? BigNumber.from(toFixedString(sellAmount, 'WAD'))
             : BigNumber.from('0')
         const buyAmountBN = buyAmount
-            ? BigNumber.from(toFixedString(buyAmount, 'WAD'))
+            ? auctionType === 'STAKED_TOKEN'
+                ? parseRadToWad(buyAmount)
+                : BigNumber.from(toFixedString(buyAmount, 'WAD'))
             : BigNumber.from('0')
         const bidIncreaseBN = BigNumber.from(toFixedString(bidIncrease, 'WAD'))
         if (auctionType === 'DEBT') {
@@ -117,18 +139,29 @@ const AuctionsPayment = () => {
             }
         }
 
-        const amountToBuy =
+        let amountToBuy =
             biddersList.length > 0 && buyAmountBN.isZero()
                 ? BigNumber.from(toFixedString(biddersList[0].buyAmount, 'WAD'))
                 : buyAmountBN
 
-        return gebUtils
+        const max = gebUtils
             .wadToFixed(amountToBuy.mul(bidIncreaseBN).div(gebUtils.WAD))
             .toString()
+
+        if (auctionType === 'STAKED_TOKEN') {
+            return formatNumber(
+                (Number(max) + 0.0001).toString(),
+                4,
+                true
+            ).toString()
+        }
+
+        return max
     }
 
     const passedChecks = () => {
         const maxBidAmountBN = BigNumber.from(toFixedString(maxBid(), 'WAD'))
+
         const valueBN = value
             ? BigNumber.from(toFixedString(value, 'WAD'))
             : BigNumber.from('0')
@@ -150,7 +183,9 @@ const AuctionsPayment = () => {
         const totalFlxBalance = flxBalanceBN.add(flxInternalBalance)
 
         const buyAmountBN = buyAmount
-            ? BigNumber.from(toFixedString(buyAmount, 'WAD'))
+            ? auctionType === 'STAKED_TOKEN'
+                ? parseRadToWad(buyAmount)
+                : BigNumber.from(toFixedString(buyAmount, 'WAD'))
             : BigNumber.from('0')
 
         if (valueBN.lt(BigNumber.from('0'))) {
@@ -160,6 +195,23 @@ const AuctionsPayment = () => {
         if (valueBN.isZero()) {
             setError(`You cannot submit nothing`)
             return false
+        }
+
+        if (auctionType === 'STAKED_TOKEN') {
+            if (buyAmountBN.gt(totalRaiBalance)) {
+                setError(`Insufficient ${COIN_TICKER} balance.`)
+                return false
+            }
+
+            if (bids.length > 0 && valueBN.lt(maxBidAmountBN)) {
+                setError(
+                    `You need to bid ${(
+                        (Number(bidIncrease) - 1) *
+                        100
+                    ).toFixed(0)}% more RAI vs the highest bid`
+                )
+                return false
+            }
         }
 
         if (auctionType === 'SURPLUS') {
@@ -233,7 +285,7 @@ const AuctionsPayment = () => {
             }
             return
         }
-        if (sectionType === 'DEBT') {
+        if (sectionType === 'DEBT' || sectionType === 'STAKED_TOKEN') {
             auctionsActions.setOperation(2)
         } else {
             auctionsActions.setAmount(protInternalBalance)
@@ -242,7 +294,7 @@ const AuctionsPayment = () => {
     }
 
     const returnClaimValues = () => {
-        if (sectionType === 'DEBT') {
+        if (sectionType === 'DEBT' || sectionType === 'STAKED_TOKEN') {
             return { amount: internalBalance, symbol: 'RAI' }
         }
         return { amount: protInternalBalance, symbol: 'FLX' }
@@ -290,7 +342,7 @@ const AuctionsPayment = () => {
                                 ? `${sellSymbol} to Receive`
                                 : `${buySymbol} to Bid`
                         }
-                        maxText={auctionType === 'SURPLUS' ? 'min' : 'max'}
+                        maxText={auctionType === 'DEBT' ? 'max' : 'min'}
                         handleMaxClick={() => handleAmountChange(maxBid())}
                     />
                 </>

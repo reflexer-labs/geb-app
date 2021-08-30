@@ -10,7 +10,7 @@ import { useStoreActions, useStoreState } from '../../store'
 import { useActiveWeb3React } from '../../hooks'
 
 interface Props {
-    type: 'DEBT' | 'SURPLUS'
+    type: 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
 }
 const AuctionsList = ({ type }: Props) => {
     const { t } = useTranslation()
@@ -53,7 +53,12 @@ const AuctionsList = ({ type }: Props) => {
     return (
         <Container>
             <InfoBox>
-                <Title>{type.toLowerCase()} Auctions</Title>
+                <Title>
+                    {type === 'STAKED_TOKEN'
+                        ? 'FLX/ETH LP'
+                        : type.toLowerCase()}{' '}
+                    Auctions
+                </Title>
                 {account &&
                 auctions &&
                 auctions.length &&
@@ -83,7 +88,12 @@ const AuctionsList = ({ type }: Props) => {
                 </>
             ) : (
                 <NoData>
-                    {t('no_auctions', { type: type.toLowerCase() })}
+                    {t('no_auctions', {
+                        type:
+                            type.toLowerCase() === 'staked_token'
+                                ? 'staked token'
+                                : type.toLowerCase(),
+                    })}
                 </NoData>
             )}
         </Container>
