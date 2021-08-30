@@ -85,6 +85,7 @@ const auctionsModel: AuctionsModel = {
                     )
                 }
                 storeActions.connectWalletModel.setProxyAddress(proxyAddress)
+
                 if (res.userProxies[0].coinAllowance) {
                     storeActions.connectWalletModel.setCoinAllowance(
                         res.userProxies[0].coinAllowance.amount
@@ -95,6 +96,8 @@ const auctionsModel: AuctionsModel = {
                         res.userProxies[0].protAllowance.amount
                     )
                 }
+            } else {
+                storeActions.connectWalletModel.setProxyAddress('')
             }
 
             if (res.user) {

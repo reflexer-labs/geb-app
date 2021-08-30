@@ -5,6 +5,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { useActiveWeb3React } from '../../hooks'
 import {
+    handlePreTxGasEstimate,
     handleTransactionError,
     useTransactionAdder,
 } from '../../hooks/TransactionHooks'
@@ -68,7 +69,8 @@ const ProxyModal = () => {
         try {
             setStatus('loading')
             popupsActions.setBlockBackdrop(true)
-            const txResponse = await signer.sendTransaction(txData)
+            const tx = await handlePreTxGasEstimate(signer, txData)
+            const txResponse = await signer.sendTransaction(tx)
             connectWalletActions.setCtHash(txResponse.hash)
             addTransaction(
                 { ...txResponse, blockNumber: blockNumber[chainId] },
