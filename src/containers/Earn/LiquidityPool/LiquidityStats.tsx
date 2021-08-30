@@ -23,7 +23,6 @@ import { useV3NFTPositionManagerContract } from '../../../hooks/useContract'
 import { useSingleCallResult } from '../../../hooks/Multicall'
 import { useActiveWeb3React } from '../../../hooks'
 import AlertLabel from '../../../components/AlertLabel'
-import RateToggle from '../../../components/RateToggle'
 import {
     calculateGasMargin,
     handleTransactionError,
@@ -88,16 +87,16 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
     let { priceLower, priceUpper, base, quote } =
         getPriceOrderingFromPositionForUI(position)
 
-    const [manuallyInverted, setManuallyInverted] = useState(false)
-    // handle manual inversion
-    if (manuallyInverted) {
-        ;[priceLower, priceUpper, base, quote] = [
-            priceUpper?.invert(),
-            priceLower?.invert(),
-            quote,
-            base,
-        ]
-    }
+    // const [manuallyInverted, setManuallyInverted] = useState(false)
+    // // handle manual inversion
+    // if (manuallyInverted) {
+    //     ;[priceLower, priceUpper, base, quote] = [
+    //         priceUpper?.invert(),
+    //         priceLower?.invert(),
+    //         quote,
+    //         base,
+    //     ]
+    // }
 
     const inverted = token1 ? base?.equals(token1) : undefined
 
@@ -288,32 +287,62 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
         </LoadingRows>
     ) : (
         <Container>
-            <Info>
-                <Box>
-                    Fee Amount:{' '}
-                    <Badge>
-                        {' '}
-                        {feeAmount
-                            ? `${new Percent(
-                                  feeAmount,
-                                  1_000_000
-                              ).toSignificant()}%`
-                            : '-'}
-                    </Badge>
-                </Box>
-                <AlertLabel
-                    text={
-                        removed
-                            ? 'Closed'
-                            : inRange
-                            ? 'In Range'
-                            : 'Out of Range'
-                    }
-                    type={removed ? 'dimmed' : inRange ? 'success' : 'warning'}
-                />
-            </Info>
-
             <StatsGrid>
+                <StatItem>
+                    <StateInner>
+                        <Label className="top has-alert">
+                            <Col>Pool Details </Col>
+                        </Label>
+                        <Block>
+                            <InfoBox>
+                                <InfoItem>
+                                    <Col>Pair</Col>
+                                    <Col>
+                                        {currency0?.symbol}/{currency1?.symbol}
+                                    </Col>
+                                </InfoItem>
+                                <InfoItem>
+                                    <Col> Fee Amount</Col>
+                                    <Col>
+                                        {feeAmount
+                                            ? `${new Percent(
+                                                  feeAmount,
+                                                  1_000_000
+                                              ).toSignificant()}%`
+                                            : '-'}
+                                    </Col>
+                                </InfoItem>
+
+                                <InfoItem>
+                                    <Col>Status</Col>
+                                    <Col>
+                                        {foundPosition ? (
+                                            <AlertLabel
+                                                padding={'5px'}
+                                                text={
+                                                    removed
+                                                        ? 'Closed'
+                                                        : inRange
+                                                        ? 'In Range'
+                                                        : 'Out of Range'
+                                                }
+                                                type={
+                                                    removed
+                                                        ? 'dimmed'
+                                                        : inRange
+                                                        ? 'success'
+                                                        : 'warning'
+                                                }
+                                            />
+                                        ) : (
+                                            '-'
+                                        )}
+                                    </Col>
+                                </InfoItem>
+                            </InfoBox>
+                        </Block>
+                    </StateInner>
+                </StatItem>
                 <StatItem>
                     <StateInner>
                         <Label className="top">
@@ -419,84 +448,6 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
                         </InfoBox>
                     </StateInner>
                 </StatItem>
-
-                <StatItem>
-                    <StateInner>
-                        <Label className="top has-alert">
-                            <Col>
-                                Pool Range{' '}
-                                <AlertLabel
-                                    text={
-                                        removed
-                                            ? 'Closed'
-                                            : inRange
-                                            ? 'In Range'
-                                            : 'Out of Range'
-                                    }
-                                    type={
-                                        removed
-                                            ? 'dimmed'
-                                            : inRange
-                                            ? 'success'
-                                            : 'warning'
-                                    }
-                                />
-                            </Col>
-
-                            {currencyBase && currencyQuote && (
-                                <RateToggle
-                                    currencyA={currencyBase}
-                                    currencyB={currencyQuote}
-                                    handleRateToggle={() =>
-                                        setManuallyInverted(!manuallyInverted)
-                                    }
-                                />
-                            )}
-                        </Label>
-                        <Block>
-                            <InfoBox>
-                                <InfoItem>
-                                    <Col> Current Price</Col>
-
-                                    <Col>
-                                        {pool ? (
-                                            <b>
-                                                {(inverted
-                                                    ? pool.token1Price
-                                                    : pool.token0Price
-                                                ).toSignificant(6)}
-                                            </b>
-                                        ) : (
-                                            '-'
-                                        )}{' '}
-                                        {currencyQuote?.symbol} per{' '}
-                                        {currencyBase?.symbol}
-                                    </Col>
-                                </InfoItem>
-                                <InfoItem>
-                                    <Col>Min Price</Col>
-                                    <Col>
-                                        <b>{priceLower?.toSignificant(5)}</b>{' '}
-                                        {currencyQuote?.symbol +
-                                            ' per ' +
-                                            currencyBase?.symbol}
-                                    </Col>
-                                </InfoItem>
-                                <InfoItem>
-                                    <Col> Max Price</Col>
-                                    <Col>
-                                        {' '}
-                                        <b>
-                                            {priceUpper?.toSignificant(5)}
-                                        </b>{' '}
-                                        {currencyQuote?.symbol} per{' '}
-                                        {currencyBase?.symbol}
-                                    </Col>
-                                </InfoItem>
-                            </InfoBox>
-                        </Block>
-                    </StateInner>
-                </StatItem>
             </StatsGrid>
         </Container>
     )
@@ -525,7 +476,7 @@ const StatsGrid = styled.div`
 
 const StatItem = styled.div`
     :nth-child(2) {
-        margin: 25px 0;
+        margin: 15px 0;
         ${({ theme }) => theme.mediaWidth.upToSmall`
             margin: 5px 0;
         `}
@@ -687,9 +638,6 @@ export const LoadingRows = styled.div`
 const Info = styled.div`
     display: flex;
     align-items: center;
-    position: absolute;
-    top: -80px;
-    right: 0;
 
     ${({ theme }) => theme.mediaWidth.upToSmall`
            position:static;

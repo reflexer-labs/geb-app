@@ -1,22 +1,12 @@
-import { BigNumber } from 'ethers'
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import GridContainer from '../../../components/GridContainer'
-import Loader from '../../../components/Loader'
 import PageHeader from '../../../components/PageHeader'
-import { useUserPoolsWithPredefined } from '../../../hooks/usePools'
-import LiquidityManager from './LiquidityManager'
-import LiquidityStats from './LiquidityStats'
-import Pools from './Pools'
+
+import PositionsList from './PositionsList'
 
 const LiquidityPool = () => {
     const { t } = useTranslation()
-    const [tokenId, setTokenId] = useState<string | undefined>(undefined)
-
-    const parsedTokenId = tokenId ? BigNumber.from(tokenId) : undefined
-    const { loading, positionsLoading } =
-        useUserPoolsWithPredefined(parsedTokenId)
 
     return (
         <GridContainer>
@@ -29,18 +19,9 @@ const LiquidityPool = () => {
                     <Title>{t('lp_title')}</Title>
                     <Description>{t('lp_description')}</Description>
                 </Details>
-                <Pools getTokenId={setTokenId} />
-                {loading || positionsLoading ? (
-                    <LoadingContainer>
-                        <Loader width="40px" />
-                        Fetching pool data...
-                    </LoadingContainer>
-                ) : (
-                    <Content>
-                        <LiquidityManager tokenId={tokenId} />
-                        <LiquidityStats tokenId={tokenId} />
-                    </Content>
-                )}
+                <Content>
+                    <PositionsList />
+                </Content>
             </Container>
         </GridContainer>
     )
@@ -80,21 +61,4 @@ const Content = styled.div`
    flex-direction:column-reverse;
 
  `}
-`
-
-const LoadingContainer = styled.div`
-    background: ${(props) => props.theme.colors.background};
-    border: 1px solid ${(props) => props.theme.colors.border};
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    padding: 30px;
-    max-width: 850px;
-    margin: 0 auto;
-    text-align: center;
-    svg {
-        margin: 25px auto;
-        stroke: #4ac6b2;
-        path {
-            stroke-width: 1 !important;
-        }
-    }
 `

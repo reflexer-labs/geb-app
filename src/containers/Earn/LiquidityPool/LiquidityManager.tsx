@@ -1,16 +1,20 @@
-import { BigNumber } from 'ethers'
 import { useState } from 'react'
 import styled from 'styled-components'
-import { useUserPoolsWithPredefined } from '../../../hooks/usePools'
+import { PositionDetails, PredefinedPool } from '../../../utils/interfaces'
 
 import AddLiquidity from './AddLiquidity'
 import WithdrawLiquidity from './WithdrawLiquidity'
 
-const LiquidityManager = ({ tokenId }: { tokenId: string | undefined }) => {
+const LiquidityManager = ({
+    position: foundPosition,
+    poolData,
+    loading,
+}: {
+    position: PositionDetails | undefined
+    poolData: PredefinedPool | undefined
+    loading: boolean
+}) => {
     const [type, setType] = useState<'add' | 'withdraw'>('add')
-    const parsedTokenId = tokenId ? BigNumber.from(tokenId) : undefined
-    const { foundPosition } = useUserPoolsWithPredefined(parsedTokenId)
-
     return (
         <Container>
             <Header>
@@ -31,7 +35,11 @@ const LiquidityManager = ({ tokenId }: { tokenId: string | undefined }) => {
             </Header>
             <Content>
                 {type === 'add' ? (
-                    <AddLiquidity tokenId={tokenId} />
+                    <AddLiquidity
+                        position={foundPosition}
+                        poolData={poolData}
+                        loading={loading}
+                    />
                 ) : foundPosition ? (
                     <WithdrawLiquidity position={foundPosition} />
                 ) : null}

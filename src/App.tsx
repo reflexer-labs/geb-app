@@ -29,6 +29,7 @@ import SafeSaviour from './containers/OnBoarding/SafeSaviour'
 import Staking from './containers/Earn/Staking'
 import Incentives from './containers/Earn/Incentives'
 import LiquidityPool from './containers/Earn/LiquidityPool'
+import PoolDetails from './containers/Earn/LiquidityPool/PoolDetails'
 
 // Toast css
 
@@ -69,6 +70,13 @@ const App = () => {
                                             exact
                                             component={LiquidityPool}
                                             path={'/earn/pool'}
+                                        />
+                                        <Route
+                                            exact
+                                            component={PoolDetails}
+                                            path={
+                                                '/earn/pool/:tokenA?/:tokenB?/:tokenId?'
+                                            }
                                         />
                                         <Route
                                             exact

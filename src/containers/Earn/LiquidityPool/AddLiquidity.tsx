@@ -1,30 +1,24 @@
 import { Currency, CurrencyAmount, Percent } from '@uniswap/sdk-core'
 import { NonfungiblePositionManager, Position } from '@uniswap/v3-sdk'
-import { BigNumber } from 'ethers'
-import { useEffect, useMemo, useCallback } from 'react'
-import { PlusCircle } from 'react-feather'
+import { useEffect, useMemo, useCallback, useState } from 'react'
+import { Check, PlusCircle } from 'react-feather'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
 import CurrencyLogo from '../../../components/CurrencyLogo'
 import DecimalInput from '../../../components/DecimalInput'
 import { TransactionResponse } from '@ethersproject/providers'
 import { useActiveWeb3React } from '../../../hooks'
-import { useToken } from '../../../hooks/Tokens'
+import { useCurrency } from '../../../hooks/Tokens'
 import { useV3NFTPositionManagerContract } from '../../../hooks/useContract'
 import {
     Field,
     getPriceOrderingFromPositionForUI,
-    unwrappedToken,
     useMintState,
     useV3DerivedMintInfo,
     useV3MintActionHandlers,
 } from '../../../hooks/useLiquidity'
 
-import {
-    useDerivedPositionInfo,
-    usePool,
-    useUserPoolsWithPredefined,
-} from '../../../hooks/usePools'
+import { useDerivedPositionInfo, usePool } from '../../../hooks/usePools'
 import {
     ApprovalState,
     useApproveCallback,
@@ -43,43 +37,46 @@ import {
     useTransactionAdder,
 } from '../../../hooks/TransactionHooks'
 import store from '../../../store'
-import { LoadingRows } from './LiquidityStats'
+import { PositionDetails, PredefinedPool } from '../../../utils/interfaces'
 
 export const DEFAULT_ADD_IN_RANGE_SLIPPAGE_TOLERANCE = new Percent(50, 10_000)
 
-const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
+const AddLiquidity = ({
+    position: foundPosition,
+    poolData,
+    loading,
+}: {
+    position: PositionDetails | undefined
+    poolData: PredefinedPool | undefined
+    loading: boolean
+}) => {
     const { account, chainId, library } = useActiveWeb3React()
+
+    const [rangeWidth, setRangeWidth] = useState<'tight' | 'wide'>('tight')
+
     const addTransaction = useTransactionAdder()
-    const parsedTokenId = tokenId ? BigNumber.from(tokenId) : undefined
-    const {
-        loading: definedLoading,
-        positionsLoading,
-        foundPosition,
-        definedPosition,
-    } = useUserPoolsWithPredefined(parsedTokenId)
+
     const positionManager = useV3NFTPositionManagerContract()
 
-    const hasExistingPosition =
-        !!foundPosition && !definedLoading && !positionsLoading
+    const hasExistingPosition = !!foundPosition
 
     const { position: existingPosition } = useDerivedPositionInfo(foundPosition)
 
-    const {
-        token0: token0Address,
-        token1: token1Address,
-        fee: feeAmount,
-        tickLower,
-        tickUpper,
-        liquidity: definedLiquidity,
-    } = definedPosition || {}
+    const { token0, token1, fee, ranges, pair } = poolData || {}
 
-    const currencyA = useToken(token0Address)
-    const currencyB = useToken(token1Address)
+    const tickLower = useMemo(() => {
+        return ranges ? ranges[rangeWidth].lowerTick : undefined
+    }, [ranges, rangeWidth])
+    const tickUpper = useMemo(() => {
+        return ranges ? ranges[rangeWidth].upperTick : undefined
+    }, [ranges, rangeWidth])
 
-    const currency0 = currencyA ? unwrappedToken(currencyA) : undefined
-    const currency1 = currencyB ? unwrappedToken(currencyB) : undefined
+    const feeAmount = fee || 500
 
-    // construct Position from details returned
+    const currencyA = useCurrency(pair?.startsWith('ETH') ? 'ETH' : token0)
+    const currencyB = useCurrency(pair?.includes('ETH') ? 'ETH' : token1)
+
+    const { independentField, typedValue } = useMintState()
     const [, pool] = usePool(
         currencyA ?? undefined,
         currencyB ?? undefined,
@@ -89,28 +86,25 @@ const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
     const definedPositionMock = useMemo(() => {
         if (
             pool &&
-            definedLiquidity &&
             typeof tickLower === 'number' &&
             typeof tickUpper === 'number'
         ) {
             return new Position({
                 pool,
-                liquidity: definedLiquidity.toString(),
+                liquidity: '0',
                 tickLower,
                 tickUpper,
             })
         }
         return undefined
-    }, [definedLiquidity, pool, tickLower, tickUpper])
+    }, [pool, tickLower, tickUpper])
 
     let { priceLower, priceUpper, base } =
         getPriceOrderingFromPositionForUI(definedPositionMock)
 
     const inverted = currencyB ? base?.equals(currencyB) : undefined
 
-    const currencyBase = inverted ? currency1 : currency0
-
-    const { independentField, typedValue } = useMintState()
+    const baseCurrency = inverted ? currencyA : currencyB
 
     const {
         dependentField,
@@ -124,10 +118,10 @@ const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
         outOfRange,
         ticks,
     } = useV3DerivedMintInfo(
-        currency0 ?? undefined,
-        currency1 ?? undefined,
+        currencyA ?? undefined,
+        currencyB ?? undefined,
         feeAmount,
-        currencyBase ?? undefined,
+        baseCurrency ?? undefined,
         existingPosition
     )
 
@@ -192,7 +186,7 @@ const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
     async function onAdd() {
         if (!chainId || !library || !account) return
 
-        if (!positionManager || !currency0 || !currency1) {
+        if (!positionManager || !currencyA || !currencyB) {
             return
         }
 
@@ -205,10 +199,10 @@ const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
                 status: 'loading',
             })
 
-            const useNative = currency0.isNative
-                ? currency0
-                : currency1.isNative
-                ? currency1
+            const useNative = currencyA.isNative
+                ? currencyA
+                : currencyB.isNative
+                ? currencyB
                 : undefined
 
             const { calldata, value } =
@@ -249,8 +243,8 @@ const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
                             addTransaction(
                                 response,
                                 noLiquidity
-                                    ? `Create Position and add ${currency0?.symbol}/${currency1?.symbol} V3 liquidity`
-                                    : `Add ${currency0?.symbol}/${currency1?.symbol} V3 liquidity`
+                                    ? `Create Position and add ${currencyA?.symbol}/${currencyB?.symbol} V3 liquidity`
+                                    : `Add ${currencyA?.symbol}/${currencyB?.symbol} V3 liquidity`
                             )
                             store.dispatch.popupsModel.setWaitingPayload({
                                 title: 'Transaction Submitted',
@@ -275,6 +269,8 @@ const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
 
     useEffect(() => {
         if (
+            !ticks.LOWER &&
+            !ticks.UPPER &&
             typeof tickUpper === 'number' &&
             ticks.UPPER !== tickUpper &&
             typeof tickUpper === 'number' &&
@@ -302,28 +298,14 @@ const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
         onFieldBInput('')
     }, [onFieldAInput, onFieldBInput])
 
-    return definedLoading || positionsLoading ? (
-        <LoadingRows>
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-        </LoadingRows>
-    ) : (
+    return (
         <Container>
             <InputContainer>
                 <InputLabel>
-                    <CurrencyLogo currency={currency0} />
-                    {`${currency0?.symbol} (Available: ${formatCurrencyAmount(
+                    <CurrencyLogo currency={currencies[Field.CURRENCY_A]} />
+                    {`${
+                        currencies[Field.CURRENCY_A]?.symbol
+                    } (Available: ${formatCurrencyAmount(
                         balanceCurrencyA,
                         4
                     )})`}
@@ -344,8 +326,10 @@ const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
             </SeparatorIcon>
             <InputContainer>
                 <InputLabel>
-                    <CurrencyLogo currency={currency1} />
-                    {`${currency1?.symbol} (Available: ${formatCurrencyAmount(
+                    <CurrencyLogo currency={currencies[Field.CURRENCY_B]} />
+                    {`${
+                        currencies[Field.CURRENCY_B]?.symbol
+                    } (Available: ${formatCurrencyAmount(
                         balanceCurrencyB,
                         4
                     )})`}
@@ -361,33 +345,28 @@ const AddLiquidity = ({ tokenId }: { tokenId: string | undefined }) => {
                     label={''}
                 />
             </InputContainer>
-            <Result>
-                <Block>
-                    <Item>
-                        <Label>{`${currencyA?.symbol} Amount`}</Label>
-                        <Value>{`${
-                            formattedAmounts[Field.CURRENCY_A] || 0
-                        }`}</Value>
-                    </Item>
-                    <Item>
-                        <Label>{`${currencyB?.symbol} Amount`}</Label>
-                        <Value>{`${
-                            formattedAmounts[Field.CURRENCY_B] || 0
-                        }`}</Value>
-                    </Item>
-                    <Item>
-                        <Label>{`Fee Tier`}</Label>
-                        <Value>
-                            {feeAmount
-                                ? `${new Percent(
-                                      feeAmount,
-                                      1_000_000
-                                  ).toSignificant()}%`
-                                : '-'}
-                        </Value>
-                    </Item>
-                </Block>
-            </Result>
+            <RangeContainer>
+                Range Width
+                <RangeSelection>
+                    <Box
+                        className={rangeWidth === 'tight' ? 'active' : ''}
+                        onClick={() => setRangeWidth('tight')}
+                    >
+                        <div>
+                            <Check /> Tight
+                        </div>
+                    </Box>
+                    <Box
+                        className={rangeWidth === 'wide' ? 'active' : ''}
+                        onClick={() => setRangeWidth('wide')}
+                    >
+                        <div>
+                            <Check />
+                            Wide
+                        </div>
+                    </Box>
+                </RangeSelection>
+            </RangeContainer>
 
             {(approvalA === ApprovalState.NOT_APPROVED ||
                 approvalA === ApprovalState.PENDING ||
@@ -470,51 +449,59 @@ const SeparatorIcon = styled.div`
     margin: 20px 0;
 `
 
-const Result = styled.div`
-    margin-top: 20px;
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    border: 1px solid ${(props) => props.theme.colors.border};
-    background: ${(props) => props.theme.colors.foreground};
-`
-
-const Block = styled.div`
-    border-bottom: 1px solid;
-    padding: 16px 20px;
-    border-bottom: 1px solid ${(props) => props.theme.colors.border};
-    &:last-child {
-        border-bottom: 0;
-    }
-`
-
-const Item = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    &:last-child {
-        margin-bottom: 0;
-    }
-`
-
-const Label = styled.div`
-    font-size: ${(props) => props.theme.font.small};
-    color: ${(props) => props.theme.colors.secondary};
-    letter-spacing: -0.09px;
-    line-height: 21px;
-`
-
-const Value = styled.div`
-    font-size: ${(props) => props.theme.font.small};
-    color: ${(props) => props.theme.colors.primary};
-    letter-spacing: -0.09px;
-    line-height: 21px;
-    font-weight: 600;
-`
-
 const BtnContainer = styled.div`
     text-align: center;
-    margin-top: 20px;
+    margin-top: 25px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+`
+
+const RangeContainer = styled.div`
+    font-size: 14px;
+    margin-top: 20px;
+    color: ${(props) => props.theme.colors.secondary};
+`
+
+const RangeSelection = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+`
+
+const Box = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: ${(props) => props.theme.global.borderRadius};
+    cursor: pointer;
+    position: relative;
+    width: 48%;
+    background: ${(props) => props.theme.colors.border};
+    padding: 1px;
+    div {
+        z-index: 2;
+        border-radius: ${(props) => props.theme.global.borderRadius};
+        background: ${(props) => props.theme.colors.background};
+        padding: 1rem;
+        width: 100%;
+    }
+
+    svg {
+        margin-right: 10px;
+        position: absolute;
+        right: 8px;
+        display: none;
+    }
+
+    &.active {
+        color: ${(props) => props.theme.colors.primary};
+        background: ${(props) => props.theme.colors.gradient};
+        svg {
+            display: block;
+            color: green;
+            margin-top: -2px;
+        }
+    }
 `

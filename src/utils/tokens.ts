@@ -100,13 +100,13 @@ export const PREDEFINED_KOVAN_POOLS = [
         token1: '0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa',
         ranges: {
             wide: {
-                upperTick: 11040,
+                upperTick: 11980,
                 lowerTick: 10980,
                 apr: '22.23',
             },
             tight: {
-                upperTick: 11020,
-                lowerTick: 11000,
+                upperTick: 11510,
+                lowerTick: 11380,
                 apr: '13.34',
             },
         },
@@ -115,16 +115,16 @@ export const PREDEFINED_KOVAN_POOLS = [
         fee: 500,
     },
     {
-        token1: 'ETH',
+        token1: '0xd0a1e359811322d97991e03f863a0c30c2cf029c',
         ranges: {
             wide: {
-                upperTick: -69160,
-                lowerTick: -69640,
+                upperTick: -68220,
+                lowerTick: -68340,
                 apr: '22.23',
             },
             tight: {
-                upperTick: -68680,
-                lowerTick: -70120,
+                upperTick: -68040,
+                lowerTick: -70920,
                 apr: '13.34',
             },
         },

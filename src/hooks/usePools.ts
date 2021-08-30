@@ -182,21 +182,36 @@ export function useMatchedPools() {
     const { positions, loading: positionsLoading } = useV3Positions(account)
 
     const foundPositions = useMemo(() => {
-        return positions?.filter((p) =>
-            predefinedPools.find(
-                (definedPosition) =>
-                    p.token0 === definedPosition.token0 &&
-                    p.token1 === definedPosition.token1 &&
-                    p.fee === definedPosition.fee &&
-                    ((p.tickLower === definedPosition.ranges.tight.lowerTick &&
-                        p.tickUpper ===
-                            definedPosition.ranges.tight.upperTick) ||
-                        (p.tickUpper ===
-                            definedPosition.ranges.wide.lowerTick &&
-                            p.tickUpper ===
-                                definedPosition.ranges.wide.upperTick))
-            )
-        )
+        return positions
+            ? positions.filter((p) =>
+                  predefinedPools.find(
+                      (definedPosition) =>
+                          (p.token0.toLowerCase() === definedPosition.token0 ||
+                              p.token0.toLowerCase() ===
+                                  definedPosition.token1) &&
+                          (p.token1.toLowerCase() === definedPosition.token1 ||
+                              p.token1.toLowerCase() ===
+                                  definedPosition.token0) &&
+                          p.fee === definedPosition.fee &&
+                          ((Math.abs(p.tickLower) ===
+                              Math.abs(
+                                  definedPosition.ranges.tight.lowerTick
+                              ) &&
+                              Math.abs(p.tickUpper) ===
+                                  Math.abs(
+                                      definedPosition.ranges.tight.upperTick
+                                  )) ||
+                              (Math.abs(p.tickLower) ===
+                                  Math.abs(
+                                      definedPosition.ranges.wide.lowerTick
+                                  ) &&
+                                  Math.abs(p.tickUpper) ===
+                                      Math.abs(
+                                          definedPosition.ranges.wide.upperTick
+                                      )))
+                  )
+              )
+            : []
     }, [positions, predefinedPools])
 
     return { positionsLoading, foundPositions }

@@ -4,7 +4,7 @@ import { Slash } from 'react-feather'
 import { tokensLogos } from '../utils/tokens'
 
 interface Props {
-    currency: Currency | undefined
+    currency: Currency | null | undefined
 }
 
 const CurrencyLogo = ({ currency }: Props) => {

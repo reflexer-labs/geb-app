@@ -343,7 +343,6 @@ export function useV3DerivedMintInfo(
         currencies[Field.CURRENCY_B],
         feeAmount
     )
-
     const noLiquidity = poolState === PoolState.NOT_EXISTS
 
     // note to parse inputs in reverse
