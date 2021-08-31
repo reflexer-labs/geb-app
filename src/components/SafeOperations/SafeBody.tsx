@@ -36,15 +36,12 @@ const SafeBody = ({ isChecked }: Props) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || false)
     const [error, setError] = useState('')
-    const [defaultSafe, setDefaultSafe] = useState<ISafeData>(
-        DEFAULT_SAFE_STATE
-    )
+    const [defaultSafe, setDefaultSafe] =
+        useState<ISafeData>(DEFAULT_SAFE_STATE)
     const [uniSwapVal, setUniSwapVal] = useState<ISafeData>(DEFAULT_SAFE_STATE)
 
-    const {
-        safeModel: safeActions,
-        popupsModel: popupsActions,
-    } = useStoreActions((state) => state)
+    const { safeModel: safeActions, popupsModel: popupsActions } =
+        useStoreActions((state) => state)
     const {
         connectWalletModel: connectWalletState,
         safeModel: safeState,
@@ -151,13 +148,20 @@ const SafeBody = ({ isChecked }: Props) => {
 
     const returnInputType = (isLeft = true) => {
         if (type === 'deposit_borrow' && isLeft) {
-            return `Deposit ETH (Available ${getAvailableEth()})`
+            return `Deposit ETH (Available: ${formatNumber(
+                getAvailableEth() as string,
+                2
+            )})`
         }
         if (type === 'deposit_borrow' && !isLeft) {
-            return `Borrow ${COIN_TICKER} (Max ${getAvailableRai()})`
+            return `Borrow ${COIN_TICKER} (Max: ${
+                Number(getAvailableRai()) > 0.01
+                    ? formatNumber(getAvailableRai(), 2)
+                    : '< 0.01'
+            })`
         }
         if (type === 'repay_withdraw' && isLeft) {
-            return `Withdraw ETH (Available ${getAvailableEth()})`
+            return `Withdraw ETH (Available: ${getAvailableEth()})`
         }
         if (type === 'repay_withdraw' && singleSafe && !isLeft) {
             return `Repay ${COIN_TICKER} (Owe: ${formatNumber(
@@ -188,7 +192,6 @@ const SafeBody = ({ isChecked }: Props) => {
         liquidationCRatio,
         currentRedemptionPrice
     )
-
     const isPassedValidation = () => {
         const availableEthBN = BigNumber.from(
             toFixedString(getAvailableEth().toString(), 'WAD')

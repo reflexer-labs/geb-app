@@ -74,7 +74,10 @@ export const fetchUser = (address: string) => {
         async (bail, attempt) => {
             const res = await axios.post(
                 GRAPH_API_URLS[attempt - 1],
-                JSON.stringify({ query: getUserQuery(address) })
+                JSON.stringify({ query: getUserQuery(address) }),
+                {
+                    headers: { 'content-type': 'application/json' },
+                }
             )
 
             if (!res.data.data && attempt < GRAPH_API_URLS.length) {
