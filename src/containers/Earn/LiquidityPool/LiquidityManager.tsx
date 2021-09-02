@@ -29,7 +29,7 @@ const LiquidityManager = ({
                         className={type === 'withdraw' ? 'active' : ''}
                         onClick={() => setType('withdraw')}
                     >
-                        Wihdraw
+                        Withdraw
                     </Tab>
                 ) : null}
             </Header>

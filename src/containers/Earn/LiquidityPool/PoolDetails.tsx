@@ -1,11 +1,12 @@
 import { BigNumber } from 'ethers'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RouteComponentProps } from 'react-router-dom'
+import { Link, RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 import GridContainer from '../../../components/GridContainer'
 import Loader from '../../../components/Loader'
 import PageHeader from '../../../components/PageHeader'
+import { ExternalLinkArrow } from '../../../GlobalStyle'
 import { usePredefinedPools } from '../../../hooks/usePools'
 import { useV3PositionFromTokenId } from '../../../hooks/useV3Positions'
 import LiquidityManager from './LiquidityManager'
@@ -24,7 +25,11 @@ const PoolDetails = ({
     const predefinedPools = usePredefinedPools()
 
     const poolData = useMemo(() => {
-        return predefinedPools.find((x) => x.pair === `${tokenA}/${tokenB}`)
+        return predefinedPools.find(
+            (x) =>
+                x.pair === `${tokenA}/${tokenB}` ||
+                x.pair === `${tokenB}/${tokenA}`
+        )
     }, [tokenA, tokenB, predefinedPools])
 
     const parsedTokenId = tokenId ? BigNumber.from(tokenId) : undefined
@@ -48,15 +53,25 @@ const PoolDetails = ({
                             <Loader width="40px" />
                             Fetching position details...
                         </LoadingContainer>
-                    ) : (
+                    ) : poolData ? (
                         <Content>
                             <LiquidityManager
                                 position={position}
                                 poolData={poolData}
                                 loading={loading}
                             />
-                            <LiquidityStats tokenId={tokenId} />
+                            <LiquidityStats
+                                position={position}
+                                poolData={poolData}
+                            />
                         </Content>
+                    ) : (
+                        <LoadingContainer>
+                            Wrong pair, We currently do not support this pair{' '}
+                            <GoBack to="/earn/pool">
+                                Back to RAI Liquidity Pools
+                            </GoBack>
+                        </LoadingContainer>
                     )}
                 </Container>
             </Container>
@@ -107,7 +122,7 @@ const LoadingContainer = styled.div`
     border-radius: ${(props) => props.theme.global.borderRadius};
     padding: 30px;
     max-width: 850px;
-    margin: 0 auto;
+    margin: 20px auto;
     text-align: center;
     svg {
         margin: 25px auto;
@@ -116,4 +131,8 @@ const LoadingContainer = styled.div`
             stroke-width: 1 !important;
         }
     }
+`
+
+const GoBack = styled(Link)`
+    ${ExternalLinkArrow}
 `

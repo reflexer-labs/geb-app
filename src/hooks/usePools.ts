@@ -176,6 +176,34 @@ export function useDerivedPositionInfo(
     }
 }
 
+function valueComparison(
+    mainValue: string | number,
+    value1: string | number,
+    value2: string | number
+) {
+    if (
+        typeof mainValue === 'string' &&
+        typeof value1 === 'string' &&
+        typeof value2 === 'string'
+    ) {
+        return (
+            mainValue.toLowerCase() === value1.toLowerCase() ||
+            mainValue.toLowerCase() === value2.toLowerCase()
+        )
+    }
+    if (
+        typeof mainValue === 'number' &&
+        typeof value1 === 'number' &&
+        typeof value2 === 'number'
+    ) {
+        return (
+            Math.abs(mainValue) === Math.abs(value1) ||
+            Math.abs(mainValue) === Math.abs(value2)
+        )
+    }
+    return false
+}
+
 export function useMatchedPools() {
     const { account } = useActiveWeb3React()
     const predefinedPools = usePredefinedPools()
@@ -186,29 +214,37 @@ export function useMatchedPools() {
             ? positions.filter((p) =>
                   predefinedPools.find(
                       (definedPosition) =>
-                          (p.token0.toLowerCase() === definedPosition.token0 ||
-                              p.token0.toLowerCase() ===
-                                  definedPosition.token1) &&
-                          (p.token1.toLowerCase() === definedPosition.token1 ||
-                              p.token1.toLowerCase() ===
-                                  definedPosition.token0) &&
                           p.fee === definedPosition.fee &&
-                          ((Math.abs(p.tickLower) ===
-                              Math.abs(
-                                  definedPosition.ranges.tight.lowerTick
-                              ) &&
-                              Math.abs(p.tickUpper) ===
-                                  Math.abs(
-                                      definedPosition.ranges.tight.upperTick
-                                  )) ||
-                              (Math.abs(p.tickLower) ===
-                                  Math.abs(
-                                      definedPosition.ranges.wide.lowerTick
-                                  ) &&
-                                  Math.abs(p.tickUpper) ===
-                                      Math.abs(
-                                          definedPosition.ranges.wide.upperTick
-                                      )))
+                          valueComparison(
+                              p.token0,
+                              definedPosition.token0,
+                              definedPosition.token1
+                          ) &&
+                          valueComparison(
+                              p.token1,
+                              definedPosition.token0,
+                              definedPosition.token1
+                          ) &&
+                          (valueComparison(
+                              p.tickLower,
+                              definedPosition.ranges.tight.lowerTick,
+                              definedPosition.ranges.tight.upperTick
+                          ) ||
+                              valueComparison(
+                                  p.tickLower,
+                                  definedPosition.ranges.wide.lowerTick,
+                                  definedPosition.ranges.wide.upperTick
+                              )) &&
+                          (valueComparison(
+                              p.tickUpper,
+                              definedPosition.ranges.tight.upperTick,
+                              definedPosition.ranges.tight.lowerTick
+                          ) ||
+                              valueComparison(
+                                  p.tickUpper,
+                                  definedPosition.ranges.wide.upperTick,
+                                  definedPosition.ranges.wide.lowerTick
+                              ))
                   )
               )
             : []

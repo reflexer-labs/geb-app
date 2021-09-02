@@ -272,6 +272,8 @@ const Images = styled.div`
     margin-right: 5px;
     img {
         width: 23px;
+        height: 23px;
+        border-radius: 50%;
         &:nth-child(2) {
             margin-left: -10px;
         }

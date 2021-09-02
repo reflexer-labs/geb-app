@@ -1,6 +1,6 @@
 import { Currency, CurrencyAmount, Percent } from '@uniswap/sdk-core'
 import { NonfungiblePositionManager, Position } from '@uniswap/v3-sdk'
-import { useEffect, useMemo, useCallback, useState } from 'react'
+import { useEffect, useMemo, useCallback } from 'react'
 import { Check, PlusCircle } from 'react-feather'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
@@ -36,7 +36,7 @@ import {
     handleTransactionError,
     useTransactionAdder,
 } from '../../../hooks/TransactionHooks'
-import store from '../../../store'
+import store, { useStoreActions, useStoreState } from '../../../store'
 import { PositionDetails, PredefinedPool } from '../../../utils/interfaces'
 
 export const DEFAULT_ADD_IN_RANGE_SLIPPAGE_TOLERANCE = new Percent(50, 10_000)
@@ -52,8 +52,9 @@ const AddLiquidity = ({
 }) => {
     const { account, chainId, library } = useActiveWeb3React()
 
-    const [rangeWidth, setRangeWidth] = useState<'tight' | 'wide'>('tight')
-
+    const { earnModel: earnActions } = useStoreActions((state) => state)
+    const { earnModel: earnState } = useStoreState((state) => state)
+    const { rangeWidth } = earnState
     const addTransaction = useTransactionAdder()
 
     const positionManager = useV3NFTPositionManagerContract()
@@ -350,7 +351,7 @@ const AddLiquidity = ({
                 <RangeSelection>
                     <Box
                         className={rangeWidth === 'tight' ? 'active' : ''}
-                        onClick={() => setRangeWidth('tight')}
+                        onClick={() => earnActions.setRangeWidth('tight')}
                     >
                         <div>
                             <Check /> Tight
@@ -358,7 +359,7 @@ const AddLiquidity = ({
                     </Box>
                     <Box
                         className={rangeWidth === 'wide' ? 'active' : ''}
-                        onClick={() => setRangeWidth('wide')}
+                        onClick={() => earnActions.setRangeWidth('wide')}
                     >
                         <div>
                             <Check />

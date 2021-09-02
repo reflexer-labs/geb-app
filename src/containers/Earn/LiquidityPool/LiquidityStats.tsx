@@ -1,13 +1,8 @@
-import { BigNumber } from 'ethers'
 import { useCallback, useMemo, useState } from 'react'
 import { NonfungiblePositionManager, Position } from '@uniswap/v3-sdk'
 import styled, { keyframes } from 'styled-components'
 import { useToken } from '../../../hooks/Tokens'
-import {
-    PoolState,
-    usePool,
-    useUserPoolsWithPredefined,
-} from '../../../hooks/usePools'
+import { usePool } from '../../../hooks/usePools'
 
 import { TransactionResponse } from '@ethersproject/providers'
 import { Currency, Percent, Price } from '@uniswap/sdk-core'
@@ -29,20 +24,18 @@ import {
     useIsTransactionPending,
     useTransactionAdder,
 } from '../../../hooks/TransactionHooks'
-import store from '../../../store'
+import store, { useStoreState } from '../../../store'
+import { PositionDetails, PredefinedPool } from '../../../utils/interfaces'
 
-interface Props {
-    tokenId: string | undefined
-}
-
-const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
+const LiquidityStats = ({
+    position: foundPosition,
+    poolData,
+}: {
+    position: PositionDetails | undefined
+    poolData: PredefinedPool | undefined
+}) => {
     const { account, library, chainId } = useActiveWeb3React()
-    const parsedTokenId = poolTokenId ? BigNumber.from(poolTokenId) : undefined
-    const { loading, positionsLoading, foundPosition, definedPosition } =
-        useUserPoolsWithPredefined(parsedTokenId)
-
-    const positionDetails = foundPosition || definedPosition
-
+    const { earnModel: earnState } = useStoreState((state) => state)
     const {
         token0: token0Address,
         token1: token1Address,
@@ -51,18 +44,18 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
         tickLower,
         tickUpper,
         tokenId,
-    } = positionDetails || {}
+    } = foundPosition || {}
 
     const removed = liquidity?.eq(0)
 
-    const token0 = useToken(token0Address)
-    const token1 = useToken(token1Address)
+    const token0 = useToken(token0Address || poolData?.token0)
+    const token1 = useToken(token1Address || poolData?.token1)
 
     const currency0 = token0 ? unwrappedToken(token0) : undefined
     const currency1 = token1 ? unwrappedToken(token1) : undefined
 
     // construct Position from details returned
-    const [poolState, pool] = usePool(
+    const [, pool] = usePool(
         token0 ?? undefined,
         token1 ?? undefined,
         feeAmount
@@ -84,19 +77,8 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
         return undefined
     }, [liquidity, pool, tickLower, tickUpper])
 
-    let { priceLower, priceUpper, base, quote } =
+    let { priceLower, priceUpper, base } =
         getPriceOrderingFromPositionForUI(position)
-
-    // const [manuallyInverted, setManuallyInverted] = useState(false)
-    // // handle manual inversion
-    // if (manuallyInverted) {
-    //     ;[priceLower, priceUpper, base, quote] = [
-    //         priceUpper?.invert(),
-    //         priceLower?.invert(),
-    //         quote,
-    //         base,
-    //     ]
-    // }
 
     const inverted = token1 ? base?.equals(token1) : undefined
 
@@ -131,7 +113,7 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
 
     const [feeValue0, feeValue1] = useV3PositionFees(
         pool ?? undefined,
-        positionDetails?.tokenId,
+        foundPosition?.tokenId,
         false
     )
 
@@ -145,7 +127,7 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
         'ownerOf',
         [tokenId]
     ).result?.[0]
-    const ownsNFT = owner === account || positionDetails?.operator === account
+    const ownsNFT = owner === account || foundPosition?.operator === account
 
     const addTransaction = useTransactionAdder()
     const [collecting, setCollecting] = useState<boolean>(false)
@@ -269,23 +251,11 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
         }
     }
 
-    return positionsLoading || loading || poolState === PoolState.LOADING ? (
-        <LoadingRows>
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-            <div />
-        </LoadingRows>
-    ) : (
+    const positionFee = useMemo(() => {
+        return foundPosition ? feeAmount : poolData?.fee
+    }, [feeAmount, foundPosition, poolData])
+
+    return (
         <Container>
             <StatsGrid>
                 <StatItem>
@@ -298,15 +268,17 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
                                 <InfoItem>
                                     <Col>Pair</Col>
                                     <Col>
-                                        {currency0?.symbol}/{currency1?.symbol}
+                                        {foundPosition
+                                            ? `${currency0?.symbol}/${currency1?.symbol}`
+                                            : poolData?.pair}
                                     </Col>
                                 </InfoItem>
                                 <InfoItem>
                                     <Col> Fee Amount</Col>
                                     <Col>
-                                        {feeAmount
+                                        {positionFee
                                             ? `${new Percent(
-                                                  feeAmount,
+                                                  positionFee,
                                                   1_000_000
                                               ).toSignificant()}%`
                                             : '-'}
@@ -337,6 +309,17 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
                                         ) : (
                                             '-'
                                         )}
+                                    </Col>
+                                </InfoItem>
+                                <InfoItem>
+                                    <Col>APR</Col>
+                                    <Col>
+                                        {
+                                            poolData?.ranges[
+                                                earnState.rangeWidth
+                                            ].apr
+                                        }
+                                        %
                                     </Col>
                                 </InfoItem>
                             </InfoBox>
@@ -421,9 +404,13 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
                             <InfoItem>
                                 <Col>
                                     <CurrencyLogo
-                                        currency={feeValueUpper?.currency}
+                                        currency={
+                                            feeValueUpper?.currency ||
+                                            currencyQuote
+                                        }
                                     />
-                                    {feeValueUpper?.currency?.symbol}
+                                    {feeValueUpper?.currency?.symbol ||
+                                        currencyQuote?.symbol}
                                 </Col>
                                 <Col>
                                     {foundPosition && feeValueUpper
@@ -435,9 +422,13 @@ const LiquidityStats = ({ tokenId: poolTokenId }: Props) => {
                             <InfoItem>
                                 <Col>
                                     <CurrencyLogo
-                                        currency={feeValueLower?.currency}
+                                        currency={
+                                            feeValueLower?.currency ||
+                                            currencyBase
+                                        }
                                     />
-                                    {feeValueLower?.currency?.symbol}
+                                    {feeValueLower?.currency?.symbol ||
+                                        currencyBase?.symbol}
                                 </Col>
                                 <Col>
                                     {foundPosition && feeValueLower
@@ -633,21 +624,4 @@ export const LoadingRows = styled.div`
         grid-column: 3 / 4;
         margin-bottom: 2em;
     }
-`
-
-const Info = styled.div`
-    display: flex;
-    align-items: center;
-
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-           position:static;
-           justify-content:center;
-           margin-bottom:20px;
-        `}
-`
-
-const Box = styled.div`
-    display: flex;
-    align-items: center;
-    margin-right: 20px;
 `

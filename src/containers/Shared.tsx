@@ -39,6 +39,7 @@ import SaviourModal from '../components/Modals/SaviourModal'
 import { ChainId } from '../utils/interfaces'
 import MulticallUpdater from '../services/MulticallUpdater'
 import { ethers } from 'ethers'
+import PositionsModal from '../components/Modals/PositionsModal'
 
 interface Props {
     children: ReactNode
@@ -229,6 +230,7 @@ const Shared = ({ children, ...rest }: Props) => {
             <SafeManagerModal />
             <ScreenLoader />
             <WaitingModal />
+            <PositionsModal />
             <EmptyDiv>
                 <Navbar />
             </EmptyDiv>

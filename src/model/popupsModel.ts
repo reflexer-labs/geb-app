@@ -16,6 +16,7 @@ export interface PopupsModel {
     showSideMenu: boolean
     isSafeManagerOpen: boolean
     isClaimPopupOpen: boolean
+    isPositionsModalOpen: boolean
     returnProxyFunction: (actions: any) => void | null
     blockBackdrop: boolean
     hasFLXClaim: boolean
@@ -50,6 +51,7 @@ export interface PopupsModel {
     setBlockBackdrop: Action<PopupsModel, boolean>
     setIsProxyModalOpen: Action<PopupsModel, boolean>
     setIsSafeManagerOpen: Action<PopupsModel, boolean>
+    setIsPositionsModalOpen: Action<PopupsModel, boolean>
     setIsDistributionsModalOpen: Action<PopupsModel, boolean>
     setIsClaimPopupOpen: Action<PopupsModel, boolean>
     setHasFLXClaim: Action<PopupsModel, boolean>
@@ -73,6 +75,7 @@ const popupsModel: PopupsModel = {
     isWaitingModalOpen: false,
     isSafeManagerOpen: false,
     isClaimPopupOpen: false,
+    isPositionsModalOpen: false,
     returnProxyFunction: () => {},
     waitingPayload: {
         title: '',
@@ -181,6 +184,9 @@ const popupsModel: PopupsModel = {
     }),
     setIsSaviourModalOpen: action((state, payload) => {
         state.isSaviourModalOpen = payload
+    }),
+    setIsPositionsModalOpen: action((state, payload) => {
+        state.isPositionsModalOpen = payload
     }),
 }
 

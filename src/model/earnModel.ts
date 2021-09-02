@@ -1,11 +1,7 @@
 import { action, Action, thunk, Thunk } from 'easy-peasy'
-import { Geb } from 'geb.js'
 import { fetchPredefinedPools, Field } from '../hooks/useLiquidity'
-import { fetchPositions } from '../hooks/useLiquidityPool'
 import {
-    ILiquidityData,
     IStakedLP,
-    PositionsAndThreshold,
     IStakingData,
     MintState,
     PredefinedPool,
@@ -20,16 +16,12 @@ export const initialState: MintState = {
 }
 export interface EarnModel {
     mintState: MintState
-    data: ILiquidityData
     stakedLP: IStakedLP
+    rangeWidth: 'tight' | 'wide'
     predefinedPools: Array<PredefinedPool>
     percent: number
     stakingData: IStakingData
-    positionAndThreshold: PositionsAndThreshold | null
-    fetchPositionsAndThreshold: Thunk<EarnModel, Geb>
     fetchPools: Thunk<EarnModel>
-    setPositionAndThreshold: Action<EarnModel, PositionsAndThreshold>
-    setData: Action<EarnModel, ILiquidityData>
     setStakedLP: Action<EarnModel, IStakedLP>
     setStakingData: Action<EarnModel, IStakingData>
     typeInput: Action<
@@ -40,45 +32,31 @@ export interface EarnModel {
     typeRightRangeInput: Action<EarnModel, { typedValue: string }>
     typeStartPriceInput: Action<EarnModel, { typedValue: string }>
     selectBurnPercent: Action<EarnModel, { percent: number }>
+    setRangeWidth: Action<EarnModel, 'tight' | 'wide'>
     setPredefinedPools: Action<EarnModel, Array<PredefinedPool>>
 }
 
 const earnModel: EarnModel = {
     mintState: initialState,
     percent: 0,
+    rangeWidth: 'tight',
     predefinedPools: [],
-    positionAndThreshold: null,
     stakingData: {
         stFlxAmount: '',
         stakingAmount: '',
-    },
-    data: {
-        ethAmount: '',
-        raiAmount: '',
-        totalLiquidity: '',
     },
     stakedLP: {
         eth: '',
         rai: '',
     },
-    fetchPositionsAndThreshold: thunk(async (actions, payload) => {
-        const res = await fetchPositions(payload)
-        if (res) {
-            actions.setPositionAndThreshold(res)
-        }
-    }),
+
     fetchPools: thunk(async (actions, _payload) => {
         const res = await fetchPredefinedPools()
         if (res && res.uniV3PoolConfig) {
             actions.setPredefinedPools(res.uniV3PoolConfig)
         }
     }),
-    setPositionAndThreshold: action((state, payload) => {
-        state.positionAndThreshold = payload
-    }),
-    setData: action((state, payload) => {
-        state.data = payload
-    }),
+
     setStakedLP: action((state, payload) => {
         state.stakedLP = payload
     }),
@@ -135,6 +113,9 @@ const earnModel: EarnModel = {
     }),
     setPredefinedPools: action((state, payload) => {
         state.predefinedPools = payload
+    }),
+    setRangeWidth: action((state, payload) => {
+        state.rangeWidth = payload
     }),
 }
 

@@ -6,7 +6,6 @@ import PositionsItem from './PositionItem'
 
 const PositionsList = () => {
     const { foundPositions, positionsLoading } = useMatchedPools()
-    console.log(foundPositions)
 
     return (
         <Block>
