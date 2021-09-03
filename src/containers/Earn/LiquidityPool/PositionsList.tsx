@@ -1,11 +1,19 @@
+import { useState } from 'react'
 import styled from 'styled-components'
+import CheckBox from '../../../components/CheckBox'
 import Loader from '../../../components/Loader'
 import { useMatchedPools } from '../../../hooks/usePools'
 import PoolsMenu from './PoolsMenu'
 import PositionsItem from './PositionItem'
 
 const PositionsList = () => {
-    const { foundPositions, positionsLoading } = useMatchedPools()
+    const [isChecked, setIsChecked] = useState(true)
+    const { filteredPositions: positions, positionsLoading } = useMatchedPools()
+    const [matchedPositions, restPositions] = positions
+    const filteredPositions = [
+        ...matchedPositions,
+        ...(isChecked ? [] : restPositions),
+    ]
 
     return (
         <Block>
@@ -16,21 +24,29 @@ const PositionsList = () => {
                 <LoaderContainer>
                     <Loader width="40px" />
                 </LoaderContainer>
-            ) : foundPositions && foundPositions.length > 0 ? (
-                <Positions>
-                    <Header>
-                        <div>Your Positions ({foundPositions.length})</div>
-                        <div>Status</div>
-                    </Header>
-                    {foundPositions.map((p) => {
-                        return (
-                            <PositionsItem
-                                key={p.tokenId.toString()}
-                                positionDetails={p}
-                            />
-                        )
-                    })}
-                </Positions>
+            ) : filteredPositions && filteredPositions.length > 0 ? (
+                <>
+                    <Positions>
+                        <Header>
+                            <div>
+                                Your Positions ({filteredPositions.length})
+                            </div>
+                            <div>Status</div>
+                        </Header>
+                        {filteredPositions.map((p) => {
+                            return (
+                                <PositionsItem
+                                    key={p.tokenId.toString()}
+                                    positionDetails={p}
+                                />
+                            )
+                        })}
+                    </Positions>
+                    <CheckboxContainer>
+                        <CheckBox checked={isChecked} onChange={setIsChecked} />
+                        <span>Show only incentivized RAI positions</span>
+                    </CheckboxContainer>
+                </>
             ) : (
                 <Box>Your RAI Liquidity Pools will appear here</Box>
             )}
@@ -78,4 +94,16 @@ const Box = styled.div`
     border: 1px solid ${(props) => props.theme.colors.border};
     background: ${(props) => props.theme.colors.background};
     padding: 30px 20px;
+`
+
+const CheckboxContainer = styled.div`
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    justify-content: flex-end;
+    span {
+        margin-left: 10px;
+        position: relative;
+        top: -1px;
+    }
 `

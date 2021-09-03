@@ -219,11 +219,13 @@ const PositionsItem = ({ positionDetails }: PositionListItemProps) => {
                     </InnerContent>
                 ) : null}
 
-                <LinkBox>
-                    <Link to={positionSummaryLink}>
-                        <span>{'Position Details'}</span> <Arrow />
-                    </Link>
-                </LinkBox>
+                {positionDetails.isMatch ? (
+                    <LinkBox>
+                        <Link to={positionSummaryLink}>
+                            <span>{'Position Details'}</span> <Arrow />
+                        </Link>
+                    </LinkBox>
+                ) : null}
             </Content>
         </Container>
     )

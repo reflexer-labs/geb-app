@@ -209,48 +209,52 @@ export function useMatchedPools() {
     const predefinedPools = usePredefinedPools()
     const { positions, loading: positionsLoading } = useV3Positions(account)
 
-    const foundPositions = useMemo(() => {
-        return positions
-            ? positions.filter((p) =>
-                  predefinedPools.find(
-                      (definedPosition) =>
-                          p.fee === definedPosition.fee &&
-                          valueComparison(
-                              p.token0,
-                              definedPosition.token0,
-                              definedPosition.token1
-                          ) &&
-                          valueComparison(
-                              p.token1,
-                              definedPosition.token0,
-                              definedPosition.token1
-                          ) &&
-                          (valueComparison(
-                              p.tickLower,
-                              definedPosition.ranges.tight.lowerTick,
-                              definedPosition.ranges.tight.upperTick
-                          ) ||
-                              valueComparison(
-                                  p.tickLower,
-                                  definedPosition.ranges.wide.lowerTick,
-                                  definedPosition.ranges.wide.upperTick
-                              )) &&
-                          (valueComparison(
-                              p.tickUpper,
-                              definedPosition.ranges.tight.upperTick,
-                              definedPosition.ranges.tight.lowerTick
-                          ) ||
-                              valueComparison(
-                                  p.tickUpper,
-                                  definedPosition.ranges.wide.upperTick,
-                                  definedPosition.ranges.wide.lowerTick
-                              ))
-                  )
-              )
-            : []
-    }, [positions, predefinedPools])
+    const filteredPositions = positions?.reduce<
+        [PositionDetails[], PositionDetails[]]
+    >(
+        (acc, p) => {
+            const isMatch = predefinedPools.find(
+                (definedPosition) =>
+                    p.fee === definedPosition.fee &&
+                    valueComparison(
+                        p.token0,
+                        definedPosition.token0,
+                        definedPosition.token1
+                    ) &&
+                    valueComparison(
+                        p.token1,
+                        definedPosition.token0,
+                        definedPosition.token1
+                    ) &&
+                    (valueComparison(
+                        p.tickLower,
+                        definedPosition.ranges.tight.lowerTick,
+                        definedPosition.ranges.tight.upperTick
+                    ) ||
+                        valueComparison(
+                            p.tickLower,
+                            definedPosition.ranges.wide.lowerTick,
+                            definedPosition.ranges.wide.upperTick
+                        )) &&
+                    (valueComparison(
+                        p.tickUpper,
+                        definedPosition.ranges.tight.upperTick,
+                        definedPosition.ranges.tight.lowerTick
+                    ) ||
+                        valueComparison(
+                            p.tickUpper,
+                            definedPosition.ranges.wide.upperTick,
+                            definedPosition.ranges.wide.lowerTick
+                        ))
+            )
 
-    return { positionsLoading, foundPositions }
+            acc[isMatch ? 0 : 1].push(isMatch ? { ...p, isMatch: true } : p)
+            return acc
+        },
+        [[], []]
+    ) ?? [[], []]
+
+    return { positionsLoading, filteredPositions }
 }
 
 // to be deleted at some point
