@@ -21,7 +21,7 @@ export interface EarnModel {
     predefinedPools: Array<PredefinedPool>
     percent: number
     stakingData: IStakingData
-    fetchPools: Thunk<EarnModel>
+    fetchPredefinedPools: Thunk<EarnModel>
     setStakedLP: Action<EarnModel, IStakedLP>
     setStakingData: Action<EarnModel, IStakingData>
     typeInput: Action<
@@ -50,10 +50,10 @@ const earnModel: EarnModel = {
         rai: '',
     },
 
-    fetchPools: thunk(async (actions, _payload) => {
+    fetchPredefinedPools: thunk(async (actions, _payload) => {
         const res = await fetchPredefinedPools()
-        if (res && res.uniV3PoolConfig) {
-            actions.setPredefinedPools(res.uniV3PoolConfig)
+        if (res && res.data.uniV3PoolConfig) {
+            actions.setPredefinedPools(res.data.uniV3PoolConfig)
         }
     }),
 

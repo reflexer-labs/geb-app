@@ -356,6 +356,7 @@ const AddLiquidity = ({
                         <div>
                             <Check /> Tight
                         </div>
+                        <span>0.1% around RAI's market price</span>
                     </Box>
                     <Box
                         className={rangeWidth === 'wide' ? 'active' : ''}
@@ -365,6 +366,7 @@ const AddLiquidity = ({
                             <Check />
                             Wide
                         </div>
+                        <span>0.3% around RAI's market price</span>
                     </Box>
                 </RangeSelection>
             </RangeContainer>
@@ -472,21 +474,30 @@ const RangeSelection = styled.div`
 `
 
 const Box = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    cursor: pointer;
-    position: relative;
-    width: 48%;
     background: ${(props) => props.theme.colors.border};
+    border-radius: ${(props) => props.theme.global.borderRadius};
     padding: 1px;
+    width: 48%;
+    cursor: pointer;
+
     div {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+
         z-index: 2;
         border-radius: ${(props) => props.theme.global.borderRadius};
         background: ${(props) => props.theme.colors.background};
-        padding: 1rem;
+        padding: 1rem 1rem 0.5rem;
         width: 100%;
+    }
+    span {
+        display: block;
+        background: ${(props) => props.theme.colors.background};
+        font-size: 11px;
+        color: ${(props) => props.theme.colors.secondary};
+        padding: 0rem 1rem 0.5rem 1rem;
     }
 
     svg {

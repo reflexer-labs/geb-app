@@ -155,7 +155,7 @@
     "saviour_target_cratio": "Collateralization ratio toward which the safe will be rebalanced upon liquidation",
     "lp_title": "RAI Liquidity Pools",
     "lp_header_desc": "Add liquidity for RAI in Uniswap V3 and earn more fees",
-    "lp_description": "This dashboard helps you add liquidity to RAI pools in Uniswap V3. Under the hood, your liquidity is concentrated around RAI's redemption price so you get to collect more fees.",
+    "lp_description": "This dashboard helps you add liquidity to RAI pools in Uniswap V3. Under the hood, your liquidity is concentrated around RAI's market price so you get to collect more fees.",
     "lp_header_title": "Uniswap V3 Liquidity Manager",
     "staking_header_title": "Staking",
     "staking_header_desc": "Stake your FLX, protect RAI and earn rewards",

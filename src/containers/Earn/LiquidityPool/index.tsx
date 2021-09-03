@@ -1,13 +1,19 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import GridContainer from '../../../components/GridContainer'
 import PageHeader from '../../../components/PageHeader'
+import { useStoreActions } from '../../../store'
 
 import PositionsList from './PositionsList'
 
 const LiquidityPool = () => {
     const { t } = useTranslation()
+    const { earnModel: earnActions } = useStoreActions((state) => state)
 
+    useEffect(() => {
+        earnActions.fetchPredefinedPools()
+    }, [earnActions])
     return (
         <GridContainer>
             <PageHeader
