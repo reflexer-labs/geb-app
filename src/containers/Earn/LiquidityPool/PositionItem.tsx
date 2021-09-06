@@ -177,6 +177,11 @@ const PositionsItem = ({ positionDetails }: PositionListItemProps) => {
                 </LeftCol>
                 <RightCol>
                     <AlertContainer>
+                        {positionDetails.isMatch ? (
+                            <div style={{ marginRight: '10px' }}>
+                                <AlertLabel text="Managed" type={'greenish'} />
+                            </div>
+                        ) : null}
                         <AlertLabel
                             text={
                                 removed
