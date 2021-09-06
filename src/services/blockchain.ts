@@ -1,10 +1,11 @@
-import { ethers, utils as ethersUtils } from 'ethers'
+import { BigNumber, ethers, utils as ethersUtils } from 'ethers'
 import { Geb, TransactionRequest, utils as gebUtils } from 'geb.js'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { IAuctionBid, ISafe, ISafeData } from '../utils/interfaces'
 import { ETH_NETWORK } from '../utils/constants'
 import { handlePreTxGasEstimate } from '../hooks/TransactionHooks'
 import { callAbi, callBytecode } from './abi'
+import { toFixedString } from '../utils/helper'
 
 export const handleDepositAndBorrow = async (
     signer: JsonRpcSigner,
@@ -145,7 +146,6 @@ export const handleAuctionBid = async ({
     if (!signer || !auctionId || !amount) {
         return false
     }
-
     const geb = new Geb(ETH_NETWORK, signer.provider)
     const proxy = await geb.getProxyAction(signer._address)
 
@@ -159,9 +159,12 @@ export const handleAuctionBid = async ({
     if (auctionType === 'SURPLUS') {
         txData = proxy.surplusIncreaseBidSize(amountBN, auctionId)
     }
+    if (auctionType === 'STAKED_TOKEN') {
+        const radAmount = BigNumber.from(toFixedString(amount, 'RAD'))
+        txData = proxy.stakedTokenAuctionIncreaseBidSize(radAmount, auctionId)
+    }
 
     if (!txData) throw new Error('No transaction request!')
-
     let tx = await handlePreTxGasEstimate(signer, txData)
     const txResponse = await signer.sendTransaction(tx)
     return txResponse
@@ -185,6 +188,9 @@ export const handleAuctionClaim = async ({
     }
     if (auctionType === 'SURPLUS') {
         txData = proxy.surplusSettleAuction(auctionId)
+    }
+    if (auctionType === 'STAKED_TOKEN') {
+        txData = proxy.stakedTokenSettleAuction(auctionId)
     }
 
     if (!txData) throw new Error('No transaction request!')

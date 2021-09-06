@@ -295,8 +295,7 @@ export function usePoolData() {
 
                 const LPSharePrice = Number(flxReserve) * 2
 
-                const aprValue = !balance.isZero() ? rw / LPSharePrice : '0'
-
+                const aprValue = !balance.isZero() ? rw / LPSharePrice * 100 : '0'
                 if (!isCanceled) {
                     setState({
                         poolBalance: poolBalanceVal,

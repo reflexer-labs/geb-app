@@ -209,7 +209,7 @@ export function useMatchedPools() {
     const { positions, loading: positionsLoading } = useV3Positions(account)
 
     const filteredPositions = positions?.reduce<
-        [PositionDetails[], PositionDetails[], PositionDetails[]]
+        [PositionDetails[], PositionDetails[]]
     >(
         (acc, p) => {
             const isMatch = predefinedPools.find(
@@ -247,13 +247,13 @@ export function useMatchedPools() {
                         ))
             )
 
-            acc[p.liquidity.isZero() ? 2 : isMatch ? 0 : 1].push(
-                isMatch ? { ...p, isMatch: true } : p
-            )
+            const obj = { ...p, order: p.liquidity?.isZero() ? 0 : 1 }
+
+            acc[isMatch ? 0 : 1].push(isMatch ? { ...obj, isMatch: true } : obj)
             return acc
         },
-        [[], [], []]
-    ) ?? [[], [], []]
+        [[], []]
+    ) ?? [[], []]
 
     return { positionsLoading, filteredPositions }
 }

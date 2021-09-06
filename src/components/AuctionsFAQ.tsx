@@ -8,7 +8,7 @@ import ClaimImg from '../assets/claim.svg'
 import SellRai from '../assets/sell-rai.svg'
 interface Props {
     hideFAQ: () => void
-    type: 'DEBT' | 'SURPLUS'
+    type: 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
 }
 
 interface FAQ {
@@ -19,6 +19,7 @@ interface FAQ {
 interface FAQS {
     debt: Array<FAQ>
     surplus: Array<FAQ>
+    staked_token: Array<FAQ>
 }
 
 const AuctionsFAQ = ({ hideFAQ, type }: Props) => {
@@ -59,26 +60,44 @@ const AuctionsFAQ = ({ hideFAQ, type }: Props) => {
                 image: ClaimImg,
             },
         ],
+        staked_token: [
+            {
+                title: t('staked_auction_minting_flx_header'),
+                desc: t('staked_auction_minting_flx_desc'),
+                image: require('../assets/sell-rai.svg'),
+            },
+            {
+                title: t('staked_auction_how_to_bid'),
+                desc: t('staked_auction_how_to_bid_desc'),
+                image: require('../assets/bid.svg'),
+            },
+            {
+                title: t('staked_auction_claim_tokens'),
+                desc: t('staked_auction_claim_tokens_desc'),
+                image: require('../assets/claim.svg'),
+            },
+        ],
     }
 
     return (
         <HeroSection>
             <Header>
-                How do RAI {type.toLowerCase()} auctions work?{' '}
-                <Button text={t('hide_faq')} onClick={hideFAQ} />
+                How do {type === 'STAKED_TOKEN' ? '' : 'RAI'}{' '}
+                {type === 'STAKED_TOKEN' ? 'staked token' : type.toLowerCase()}{' '}
+                auctions work? <Button text={t('hide_faq')} onClick={hideFAQ} />
             </Header>
             <Content>
-                {faqs[type.toLowerCase() as 'debt' | 'surplus'].map(
-                    (faq: FAQ) => (
-                        <Col key={faq.title}>
-                            <InnerCol>
-                                <img src={faq.image} alt={faq.title} />
-                                <SectionHeading>{faq.title}</SectionHeading>
-                                <SectionContent>{faq.desc}</SectionContent>
-                            </InnerCol>
-                        </Col>
-                    )
-                )}
+                {faqs[
+                    type.toLowerCase() as 'debt' | 'surplus' | 'staked_token'
+                ].map((faq: FAQ) => (
+                    <Col key={faq.title}>
+                        <InnerCol>
+                            <img src={faq.image} alt={faq.title} />
+                            <SectionHeading>{faq.title}</SectionHeading>
+                            <SectionContent>{faq.desc}</SectionContent>
+                        </InnerCol>
+                    </Col>
+                ))}
             </Content>
         </HeroSection>
     )

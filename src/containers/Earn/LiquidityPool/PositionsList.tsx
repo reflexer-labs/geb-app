@@ -9,11 +9,11 @@ import PositionsItem from './PositionItem'
 const PositionsList = () => {
     const [isChecked, setIsChecked] = useState(true)
     const { filteredPositions: positions, positionsLoading } = useMatchedPools()
-    const [matchedPositions, openPositions, closedPositions] = positions
+    const [matchedPositions, openPositions] = positions
     const filteredPositions = [
         ...matchedPositions,
-        ...(isChecked ? [] : [...openPositions, ...closedPositions]),
-    ]
+        ...(isChecked ? [] : openPositions),
+    ].sort((a, b) => (b.order as number) - (a.order as number))
 
     return (
         <Block>

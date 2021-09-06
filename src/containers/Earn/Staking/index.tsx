@@ -50,11 +50,18 @@ const Staking = () => {
                 </Details>
                 <Content>
                     <Header>
-                        <img
-                            src={require('../../../assets/stFLX.svg').default}
-                            alt="flx"
-                        />
-                        stFLX
+                        <Left>
+                            <img
+                                src={require('../../../assets/stFLX.svg')}
+                                alt="flx"
+                            />
+                            stFLX
+                        </Left>
+                        <Right>
+                            <LinkButton href="/auctions/staked_token">
+                                Staked Token Auctions
+                            </LinkButton>
+                        </Right>
                     </Header>
                     <StakingStats />
                     <Ops>
@@ -114,6 +121,7 @@ const Content = styled.div`
 const Header = styled.div`
     display: flex;
     align-items: center;
+    justify-content: space-between;
     img {
         width: 40px;
         margin-right: 5px;
@@ -126,4 +134,23 @@ const Header = styled.div`
 const Note = styled.div`
     font-size: 14px;
     margin-top: 10px;
+`
+
+const Left = styled.div``
+const Right = styled.div``
+
+const LinkButton = styled.a`
+    outline: none;
+    cursor: pointer;
+    min-width: 134px;
+    border: none;
+    box-shadow: none;
+    padding: ${(props) => props.theme.global.buttonPadding};
+    line-height: 24px;
+    font-size: ${(props) => props.theme.font.small};
+    font-weight: 600;
+    color: ${(props) => props.theme.colors.neutral};
+    background: ${(props) => props.theme.colors.gradient};
+    border-radius: ${(props) => props.theme.global.borderRadius};
+    transition: all 0.3s ease;
 `

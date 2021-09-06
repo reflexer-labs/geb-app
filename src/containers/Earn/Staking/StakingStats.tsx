@@ -12,7 +12,7 @@ const StakingStats = () => {
             <Stat>
                 <StatLabel>Total Pool Balance</StatLabel>
                 <StatValue>
-                    {formatNumber(poolAmounts.poolBalance)} FLX/ETH LP
+                    {numeral(formatNumber(poolAmounts.poolBalance)).format('0.0')} FLX/ETH LP
                 </StatValue>
             </Stat>
 
@@ -22,7 +22,7 @@ const StakingStats = () => {
                     {Number(poolAmounts.apr) > 0
                         ? numeral(
                               formatNumber(poolAmounts.apr.toString(), 2)
-                          ).format('0,0')
+                          ).format('0.0')
                         : '0'}
                     %
                 </StatValue>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 import AlertLabel from '../../components/AlertLabel'
 import AuctionsFAQ from '../../components/AuctionsFAQ'
@@ -10,9 +11,13 @@ import { useActiveWeb3React } from '../../hooks'
 import { useStoreActions } from '../../store'
 import AuctionsList from './AuctionsList'
 
-export type AuctionEventType = 'DEBT' | 'SURPLUS'
+export type AuctionEventType = 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
 
-const Auctions = () => {
+const Auctions = ({
+    match: {
+        params: { auctionType },
+    },
+}: RouteComponentProps<{ auctionType?: string }>) => {
     const { t } = useTranslation()
     const { account } = useActiveWeb3React()
     const { auctionsModel: auctionsActions, popupsModel: popupsActions } =
@@ -34,12 +39,18 @@ const Auctions = () => {
             await fetchAuctions()
             popupsActions.setIsWaitingModalOpen(false)
         }
-
+        if (auctionType && auctionType.toLowerCase() === 'staked_token') {
+            setType('STAKED_TOKEN')
+        }
         async function fetchAuctions() {
             try {
                 await auctionsActions.fetchAuctions({
                     address: account ? account : '',
-                    type,
+                    type:
+                        auctionType &&
+                        auctionType.toLowerCase() === 'staked_token'
+                            ? 'STAKED_TOKEN'
+                            : type,
                 })
                 setError('')
             } catch (error: any) {
@@ -56,7 +67,7 @@ const Auctions = () => {
         }, 2000)
 
         return () => clearInterval(interval)
-    }, [account, auctionsActions, popupsActions, type])
+    }, [account, auctionsActions, popupsActions, type, auctionType])
 
     return (
         <>
@@ -66,7 +77,10 @@ const Auctions = () => {
                     <PageHeader
                         breadcrumbs={{ '/': t('auctions') }}
                         text={t('auctions_header_text', {
-                            type: type.toLocaleLowerCase(),
+                            type:
+                                type === 'STAKED_TOKEN'
+                                    ? 'staked token'
+                                    : type.toLocaleLowerCase(),
                         })}
                     />
                     {hide ? (
@@ -74,20 +88,23 @@ const Auctions = () => {
                     ) : null}
                 </Content>
 
-                <Switcher>
-                    <Tab
-                        className={type === 'DEBT' ? 'active' : ''}
-                        onClick={() => setType('DEBT')}
-                    >
-                        Debt Auctions
-                    </Tab>
-                    <Tab
-                        className={type === 'SURPLUS' ? 'active' : ''}
-                        onClick={() => setType('SURPLUS')}
-                    >
-                        Surplus Auctions
-                    </Tab>
-                </Switcher>
+                {auctionType &&
+                auctionType.toLowerCase() === 'staked_token' ? null : (
+                    <Switcher>
+                        <Tab
+                            className={type === 'DEBT' ? 'active' : ''}
+                            onClick={() => setType('DEBT')}
+                        >
+                            Debt Auctions
+                        </Tab>
+                        <Tab
+                            className={type === 'SURPLUS' ? 'active' : ''}
+                            onClick={() => setType('SURPLUS')}
+                        >
+                            Surplus Auctions
+                        </Tab>
+                    </Switcher>
+                )}
 
                 {hide ? null : (
                     <AuctionsFAQ hideFAQ={handleHideFAQ} type={type} />

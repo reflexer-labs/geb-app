@@ -137,8 +137,9 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
 
                                     <Extras>
                                         {distro.optional
-                                            ? Object.keys(distro.optional).map(
-                                                  (key) => {
+                                            ? Object.keys(distro.optional)
+                                                  .sort()
+                                                  .map((key) => {
                                                       return (
                                                           <ExtraData
                                                               key={
@@ -156,8 +157,7 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                                                               }
                                                           </ExtraData>
                                                       )
-                                                  }
-                                              )
+                                                  })
                                             : null}
                                     </Extras>
 

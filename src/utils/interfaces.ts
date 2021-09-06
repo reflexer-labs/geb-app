@@ -390,8 +390,8 @@ export interface IAuctionBid {
     auctionId: string
     title: string
     signer: JsonRpcSigner
-    auctionType: 'DEBT' | 'SURPLUS'
-    type?: 'DEBT' | 'SURPLUS'
+    auctionType: 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
+    type?: 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
 }
 
 export interface IPaging {

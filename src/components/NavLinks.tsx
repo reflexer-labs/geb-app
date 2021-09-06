@@ -250,7 +250,7 @@ const LinkItem = styled.div`
 const MenuBox = styled.div`
     display: none;
     position: absolute;
-    top: 30px;
+    top: 28px;
     z-index: 99;
     border-radius: 4px;
     background: #fff;

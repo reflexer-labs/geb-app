@@ -11,7 +11,11 @@ import { timeout } from '../utils/helper'
 import Button from './Button'
 import Loader from './Loader'
 
-export type ApproveMethod = 'coin' | 'uniswapPairCoinEth' | 'protocolToken'
+export type ApproveMethod =
+    | 'coin'
+    | 'uniswapPairCoinEth'
+    | 'protocolToken'
+    | 'stakingToken'
 
 interface Props {
     handleBackBtn: () => void

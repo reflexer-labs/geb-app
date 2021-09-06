@@ -15,6 +15,9 @@ import {
     returnWalletAddress,
 } from '../utils/helper'
 import { useActiveWeb3React } from '../hooks'
+import { utils as gebUtils } from 'geb.js'
+import { BigNumber } from 'ethers'
+import { parseWad } from '../utils/gebManager'
 
 type Props = IAuction & { isCollapsed: boolean }
 
@@ -37,12 +40,24 @@ const AuctionBlock = (auction: Props) => {
     const eventType = _.get(auction, 'englishAuctionType', 'debt')
     const buyToken = _.get(auction, 'buyToken', 'COIN')
     const sellToken = _.get(auction, 'sellToken', 'PROTOCOL_TOKEN')
-    const buyInititalAmount = _.get(auction, 'buyInitialAmount', '0')
+    const buyAmount = _.get(auction, 'buyAmount', '0')
+    const buyInitialAmount = _.get(auction, 'buyInitialAmount', '0')
+
     const sellInititalAmount = _.get(auction, 'sellInitialAmount', '0')
-    const buySymbol = buyToken === 'COIN' ? COIN_TICKER : 'FLX'
+    const buySymbol =
+        buyToken === 'PROTOCOL_TOKEN_LP'
+            ? 'FLX/ETH LP'
+            : buyToken === 'COIN'
+            ? COIN_TICKER
+            : 'FLX'
     const sellAmount = _.get(auction, 'sellAmount', '0')
 
-    const sellSymbol = sellToken === 'COIN' ? COIN_TICKER : 'FLX'
+    const sellSymbol =
+        sellToken === 'PROTOCOL_TOKEN_LP'
+            ? 'FLX/ETH LP'
+            : sellToken === 'COIN'
+            ? COIN_TICKER
+            : 'FLX'
     const auctionDeadline = _.get(auction, 'auctionDeadline', '')
     const isClaimed = _.get(auction, 'isClaimed', false)
     const endsOn = auctionDeadline
@@ -55,6 +70,11 @@ const AuctionBlock = (auction: Props) => {
     const biddersList = _.get(auction, 'biddersList', [])
     const winner = _.get(auction, 'winner', '')
 
+    const parseRadToWad = (amount: string) => {
+        const amountBN = BigNumber.from(amount)
+        return formatNumber(parseWad(gebUtils.decimalShift(amountBN, -9)))
+    }
+
     const kickBidder = {
         bidder: _.get(auction, 'startedBy', ''),
         buyAmount: _.get(auction, 'buyInitialAmount', ''),
@@ -65,6 +85,13 @@ const AuctionBlock = (auction: Props) => {
 
     const userProxy = _.get(connectWalletState, 'proxyAddress', '')
 
+    const returnWad = (amount: string, i: number) => {
+        if (!amount) return '0'
+        if (eventType === 'STAKED_TOKEN' && i !== biddersList.length - 1) {
+            return parseRadToWad(amount)
+        }
+        return formatNumber(amount)
+    }
     const returnEventType = (bidder: IAuctionBidder, i: number) => {
         if (
             !isOngoingAuction &&
@@ -186,10 +213,11 @@ const AuctionBlock = (auction: Props) => {
             <Header onClick={() => setCollapse(!collapse)}>
                 <LeftAucInfo type={eventType.toLowerCase()}>
                     <img
-                        src={
-                            require(`../assets/${eventType.toLowerCase()}.svg`)
-                                .default
-                        }
+                        src={require(`../assets/${
+                            eventType === 'STAKED_TOKEN'
+                                ? 'flx_uni_eth'
+                                : eventType.toLowerCase()
+                        }.svg`)}
                         alt="debt type auction"
                     />
 
@@ -199,14 +227,26 @@ const AuctionBlock = (auction: Props) => {
                 <RightAucInfo>
                     <InfoContainer>
                         <Info>
-                            <InfoCol>
+                            <InfoCol
+                                className={
+                                    eventType === 'STAKED_TOKEN'
+                                        ? 'staked_token'
+                                        : ''
+                                }
+                            >
                                 <InfoLabel>{sellSymbol} OFFERED</InfoLabel>
                                 <InfoValue>{`${sellInititalAmount} ${sellSymbol}`}</InfoValue>
                             </InfoCol>
 
                             <InfoCol>
                                 <InfoLabel>{buySymbol} BID</InfoLabel>
-                                <InfoValue>{`${buyInititalAmount} ${buySymbol}`}</InfoValue>
+                                <InfoValue>{`${
+                                    eventType === 'STAKED_TOKEN' &&
+                                    Number(buyAmount) !==
+                                        Number(buyInitialAmount)
+                                        ? parseRadToWad(buyAmount)
+                                        : buyAmount
+                                } ${buySymbol}`}</InfoValue>
                             </InfoCol>
 
                             <InfoCol>
@@ -302,7 +342,7 @@ const AuctionBlock = (auction: Props) => {
                                                 <ListItemLabel>
                                                     Buy Amount
                                                 </ListItemLabel>
-                                                {formatNumber(bidder.buyAmount)}{' '}
+                                                {returnWad(bidder.buyAmount, i)}{' '}
                                                 {buySymbol}
                                             </ListItem>
                                             <ListItem>
@@ -370,6 +410,11 @@ const Info = styled.div`
 const InfoCol = styled.div`
     font-size: ${(props) => props.theme.font.small};
     min-width: 110px;
+    @media (min-width: 991px) {
+        &.staked_token {
+            min-width: 180px;
+        }
+    }
 
     ${({ theme }) => theme.mediaWidth.upToSmall`
       flex: 0 0 100%;
@@ -420,7 +465,8 @@ const LeftAucInfo = styled.div<{ type?: string }>`
     align-items: center;
     img {
         margin-right: 20px;
-        width: ${({ type }) => (type === 'surplus' ? '40px' : 'auto')};
+        width: ${({ type }) =>
+            type === 'surplus' || type === 'staked_token' ? '40px' : 'auto'};
     }
 `
 

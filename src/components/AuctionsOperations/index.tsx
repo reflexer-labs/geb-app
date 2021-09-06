@@ -12,7 +12,6 @@ import AuctionsTransactions from './AuctionsTransactions'
 const AuctionsOperations = () => {
     const { t } = useTranslation()
     const nodeRef = React.useRef(null)
-
     const { auctionsModel: auctionsActions } = useStoreActions((state) => state)
     const {
         auctionsModel: auctionsState,
@@ -67,17 +66,20 @@ const AuctionsOperations = () => {
                             }
                             amount={amount}
                             allowance={
-                                auctionType === 'DEBT'
+                                auctionType === 'DEBT' ||
+                                auctionType === 'STAKED_TOKEN'
                                     ? raiCoinAllowance
                                     : flxAllowance
                             }
                             coinName={
-                                auctionType === 'DEBT'
+                                auctionType === 'DEBT' ||
+                                auctionType === 'STAKED_TOKEN'
                                     ? (COIN_TICKER as string)
                                     : 'FLX'
                             }
                             methodName={
-                                auctionType === 'DEBT'
+                                auctionType === 'DEBT' ||
+                                auctionType === 'STAKED_TOKEN'
                                     ? 'coin'
                                     : 'protocolToken'
                             }
