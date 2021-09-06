@@ -59,7 +59,7 @@ const PoolDetails = ({
                             <LinkContainer>
                                 <CustomLink to="/earn/pool">
                                     <Arrow />
-                                    Back to positions list
+                                    Back to Positions List
                                 </CustomLink>
                             </LinkContainer>
                             <Content>

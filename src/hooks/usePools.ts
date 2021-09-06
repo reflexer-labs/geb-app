@@ -247,7 +247,7 @@ export function useMatchedPools() {
                         ))
             )
 
-            acc[isMatch ? 0 : p.liquidity.isZero() ? 2 : 1].push(
+            acc[p.liquidity.isZero() ? 2 : isMatch ? 0 : 1].push(
                 isMatch ? { ...p, isMatch: true } : p
             )
             return acc
