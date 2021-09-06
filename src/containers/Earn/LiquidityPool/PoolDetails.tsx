@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 import GridContainer from '../../../components/GridContainer'
+import Arrow from '../../../components/Icons/Arrow'
 import Loader from '../../../components/Loader'
 import PageHeader from '../../../components/PageHeader'
 import { ExternalLinkArrow } from '../../../GlobalStyle'
@@ -54,23 +55,28 @@ const PoolDetails = ({
                             Fetching position details...
                         </LoadingContainer>
                     ) : poolData ? (
-                        <Content>
-                            <LiquidityManager
-                                position={position}
-                                poolData={poolData}
-                                loading={loading}
-                            />
-                            <LiquidityStats
-                                position={position}
-                                poolData={poolData}
-                            />
-                        </Content>
+                        <>
+                            <LinkContainer>
+                                <CustomLink to="/earn/pool">
+                                    <Arrow />
+                                    Back to positions list
+                                </CustomLink>
+                            </LinkContainer>
+                            <Content>
+                                <LiquidityManager
+                                    position={position}
+                                    poolData={poolData}
+                                    loading={loading}
+                                />
+                                <LiquidityStats
+                                    position={position}
+                                    poolData={poolData}
+                                />
+                            </Content>
+                        </>
                     ) : (
                         <LoadingContainer>
-                            Wrong pair, We currently do not support this pair{' '}
-                            <GoBack to="/earn/pool">
-                                Back to RAI Liquidity Pools
-                            </GoBack>
+                            Wrong pair, We currently do not support this pair
                         </LoadingContainer>
                     )}
                 </Container>
@@ -133,6 +139,17 @@ const LoadingContainer = styled.div`
     }
 `
 
-const GoBack = styled(Link)`
+const CustomLink = styled(Link)`
     ${ExternalLinkArrow}
+    margin-top:20px;
+    img {
+        transform: rotate(180deg);
+        margin-right: 10px;
+    }
+`
+
+const LinkContainer = styled.div`
+    max-width: 890px;
+    margin: 20px auto;
+    padding: 0 20px;
 `

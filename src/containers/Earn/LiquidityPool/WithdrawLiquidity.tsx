@@ -21,6 +21,7 @@ import { NonfungiblePositionManager } from '@uniswap/v3-sdk'
 import useTransactionDeadline from '../../../hooks/useTransactionDeadline'
 import store from '../../../store'
 import CurrencyFormatter from '../../../components/CurrencyFormatter'
+import { useHistory } from 'react-router-dom'
 
 const WithdrawLiquidity = ({
     position: foundPosition,
@@ -29,6 +30,7 @@ const WithdrawLiquidity = ({
 }) => {
     const { account, library, chainId } = useActiveWeb3React()
     const { percent } = useBurnV3State()
+    const history = useHistory()
     const {
         position: positionSDK,
         liquidityPercentage,
@@ -48,7 +50,7 @@ const WithdrawLiquidity = ({
 
     // boilerplate for the slider
     const [percentForSlider, onPercentSelectForSlider] =
-        useDebouncedChangeHandler(percent, onPercentSelect)
+        useDebouncedChangeHandler(percent, onPercentSelect, 20)
 
     const deadline = useTransactionDeadline() // custom from users settings
 
@@ -126,6 +128,7 @@ const WithdrawLiquidity = ({
                             status: 'success',
                         })
                         onPercentSelect(0)
+                        history.push('/earn/pool')
                     })
             })
             .catch((error) => {
@@ -148,6 +151,7 @@ const WithdrawLiquidity = ({
         allowedSlippage,
         addTransaction,
         onPercentSelect,
+        history,
     ])
 
     return (

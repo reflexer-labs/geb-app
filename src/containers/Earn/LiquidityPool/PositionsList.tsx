@@ -9,10 +9,10 @@ import PositionsItem from './PositionItem'
 const PositionsList = () => {
     const [isChecked, setIsChecked] = useState(true)
     const { filteredPositions: positions, positionsLoading } = useMatchedPools()
-    const [matchedPositions, restPositions] = positions
+    const [matchedPositions, openPositions, closedPositions] = positions
     const filteredPositions = [
         ...matchedPositions,
-        ...(isChecked ? [] : restPositions),
+        ...(isChecked ? [] : [...openPositions, ...closedPositions]),
     ]
 
     return (
@@ -44,11 +44,11 @@ const PositionsList = () => {
                     </Positions>
                     <CheckboxContainer>
                         <CheckBox checked={isChecked} onChange={setIsChecked} />
-                        <span>Show only incentivized RAI positions</span>
+                        <span>Show only active positions</span>
                     </CheckboxContainer>
                 </>
             ) : (
-                <Box>Your RAI Liquidity Pools will appear here</Box>
+                <Box>Your positions will appear here</Box>
             )}
         </Block>
     )

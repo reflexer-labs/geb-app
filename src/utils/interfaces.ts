@@ -564,6 +564,7 @@ export interface PositionDetails {
     tokensOwed0: BigNumber
     tokensOwed1: BigNumber
     isMatch?: boolean
+    order?: number
 }
 
 export interface MintState {

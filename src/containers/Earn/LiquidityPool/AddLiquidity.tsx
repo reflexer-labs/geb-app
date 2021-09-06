@@ -319,6 +319,7 @@ const AddLiquidity = ({
                             maxAmounts[Field.CURRENCY_A]?.toExact() ?? ''
                         )
                     }}
+                    disabled={outOfRange}
                     label={''}
                 />
             </InputContainer>
@@ -343,33 +344,36 @@ const AddLiquidity = ({
                             maxAmounts[Field.CURRENCY_B]?.toExact() ?? ''
                         )
                     }}
+                    disabled={outOfRange}
                     label={''}
                 />
             </InputContainer>
-            <RangeContainer>
-                Range Width
-                <RangeSelection>
-                    <Box
-                        className={rangeWidth === 'tight' ? 'active' : ''}
-                        onClick={() => earnActions.setRangeWidth('tight')}
-                    >
-                        <div>
-                            <Check /> Tight
-                        </div>
-                        <span>0.1% around RAI's market price</span>
-                    </Box>
-                    <Box
-                        className={rangeWidth === 'wide' ? 'active' : ''}
-                        onClick={() => earnActions.setRangeWidth('wide')}
-                    >
-                        <div>
-                            <Check />
-                            Wide
-                        </div>
-                        <span>0.3% around RAI's market price</span>
-                    </Box>
-                </RangeSelection>
-            </RangeContainer>
+            {foundPosition ? null : (
+                <RangeContainer>
+                    Range Width
+                    <RangeSelection>
+                        <Box
+                            className={rangeWidth === 'tight' ? 'active' : ''}
+                            onClick={() => earnActions.setRangeWidth('tight')}
+                        >
+                            <div>
+                                <Check /> Tight
+                            </div>
+                            <span>0.1% around RAI's market price</span>
+                        </Box>
+                        <Box
+                            className={rangeWidth === 'wide' ? 'active' : ''}
+                            onClick={() => earnActions.setRangeWidth('wide')}
+                        >
+                            <div>
+                                <Check />
+                                Wide
+                            </div>
+                            <span>0.3% around RAI's market price</span>
+                        </Box>
+                    </RangeSelection>
+                </RangeContainer>
+            )}
 
             {(approvalA === ApprovalState.NOT_APPROVED ||
                 approvalA === ApprovalState.PENDING ||
@@ -415,6 +419,7 @@ const AddLiquidity = ({
                     style={{ width: '100%' }}
                     disabled={
                         !isValid ||
+                        outOfRange ||
                         approvalA !== ApprovalState.APPROVED ||
                         approvalB !== ApprovalState.APPROVED
                     }
