@@ -34,10 +34,8 @@ const SaviourOperatrions = () => {
     const [sliderVal, setSliderVal] = useState<number>(0)
 
     const [amount, setAmount] = useState('')
-    const {
-        popupsModel: popupsActions,
-        safeModel: safeActions,
-    } = useStoreActions((state) => state)
+    const { popupsModel: popupsActions, safeModel: safeActions } =
+        useStoreActions((state) => state)
 
     const { safeModel: safeState } = useStoreState((state) => state)
     const { isSaviourDeposit, amount: stateAmount, targetedCRatio } = safeState
@@ -386,12 +384,14 @@ const Btn = styled.div`
     }
     &.active {
         background: ${(props) => props.theme.colors.gradient};
+        color: ${(props) => props.theme.colors.neutral};
     }
 `
 
 const MaxBalance = styled.div`
     font-size: 12px;
     margin-top: 10px;
+    color: ${(props) => props.theme.colors.primary};
 `
 
 const RescueRatio = styled.div`
@@ -427,6 +427,7 @@ const SliderContainer = styled.div`
 const SliderValue = styled.div`
     width: 60px;
     text-align: right;
+    color: ${(props) => props.theme.colors.primary};
 `
 
 const Error = styled.p`

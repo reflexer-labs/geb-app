@@ -11,19 +11,14 @@ import { handleTransactionError } from '../hooks/TransactionHooks'
 import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
 
-interface Props {
-    isNotOwner: boolean
-}
 const SafeStats = () => {
     const { t } = useTranslation()
     const { library, account } = useActiveWeb3React()
 
     const [isLoading, setIsLoading] = useState(false)
 
-    const {
-        popupsModel: popupsActions,
-        safeModel: safeActions,
-    } = useStoreActions((state) => state)
+    const { popupsModel: popupsActions, safeModel: safeActions } =
+        useStoreActions((state) => state)
     const { safeModel: safeState } = useStoreState((state) => state)
 
     const { singleSafe, liquidationData } = safeState

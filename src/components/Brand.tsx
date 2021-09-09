@@ -4,15 +4,18 @@ import { Link } from 'react-router-dom'
 
 interface Props {
     height?: number
+    isLight?: boolean
 }
 
-const Brand = ({ height }: Props) => {
+const Brand = ({ height, isLight = true }: Props) => {
     return (
         <Container>
             <Link to="/">
                 <img
                     height={height}
-                    src={require('../assets/brand.svg')}
+                    src={require(`../assets/${
+                        isLight ? 'brand' : 'brand-white'
+                    }.svg`)}
                     alt="reflexer labs"
                 />
             </Link>

@@ -86,6 +86,6 @@ const State = styled.span`
     &.on {
         right: 0;
         left: 8px;
-        color: ${(props) => props.theme.colors.neutral};
+        color: #fff;
     }
 `

@@ -18,14 +18,8 @@ const WaitingModal = () => {
     )
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
     const { chainId } = useActiveWeb3React()
-    const {
-        title,
-        text,
-        hint,
-        status,
-        hash,
-        isCreate,
-    } = popupsState.waitingPayload
+    const { title, text, hint, status, hash, isCreate } =
+        popupsState.waitingPayload
 
     const { list } = safeState
 
@@ -153,7 +147,7 @@ const Hint = styled.div`
 const BtnContainer = styled.div`
     padding: 20px;
     margin: 20px -20px -35px;
-    background-color: rgb(247, 248, 250);
+    background-color: ${(props) => props.theme.colors.border};
     border-radius: 0 0 20px 20px;
     text-align: center;
 `

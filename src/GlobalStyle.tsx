@@ -6,6 +6,7 @@ interface Props {
 
 const GlobalStyle = createGlobalStyle`
         body {
+          color: ${(props) => props.theme.colors.primary};
           background:${(props) => props.theme.colors.foreground};
             overflow: ${(props: Props) =>
                 props.bodyOverflow ? 'hidden' : 'visible'};
@@ -46,10 +47,14 @@ const GlobalStyle = createGlobalStyle`
     padding-top: 20px;
     padding-bottom: 20px;
     border-radius: 5px;
+    color:${(props) => props.theme.colors.primary};
     opacity: 1 !important;
-    background: ${(props) => props.theme.colors.neutral};
-    border: ${(props) => props.theme.colors.border};
+    background: ${(props) => props.theme.colors.background};
+    border: ${(props) => props.theme.colors.border} !important;
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.16);
+    &:after {
+      border-top-color: ${(props) => props.theme.colors.background} !important;
+    }
   }
         }
 `

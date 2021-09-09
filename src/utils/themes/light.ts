@@ -28,6 +28,7 @@ const lightTheme: Theme = {
         dimmedBorder: '#878787',
         placeholder: '#EEF3F9',
         inputBorderColor: '#6fbcdb',
+        boxShadow: '#eef3f9',
     },
     font: {
         extraSmall: '12px',

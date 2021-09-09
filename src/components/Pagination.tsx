@@ -51,7 +51,7 @@ const Pagination = ({ items, handlePagingMargin, perPage = 5 }: Props) => {
 export default Pagination
 
 const PaginationContainer = styled.div`
-    background: ${(props) => props.theme.colors.neutral};
+    background: #fff;
     border-radius: ${(props) => props.theme.global.borderRadius};
     text-align: right;
     border: 1px solid ${(props) => props.theme.colors.border};
@@ -75,7 +75,7 @@ const PaginationContainer = styled.div`
             font-size: ${(props) => props.theme.font.small};
             &.active {
                 background: ${(props) => props.theme.colors.gradient};
-                color: ${(props) => props.theme.colors.neutral};
+                color: #fff;
                 border-radius: 2px;
             }
             a {
@@ -117,7 +117,7 @@ const PaginationContainer = styled.div`
                 &.active {
                     a {
                         background: ${(props) => props.theme.colors.gradient};
-                        color: ${(props) => props.theme.colors.neutral};
+                        color: #fff;
                         border-radius: ${(props) =>
                             props.theme.global.borderRadius};
                     }
