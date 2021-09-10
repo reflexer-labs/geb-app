@@ -20,7 +20,7 @@ const WrappedToastContainer = styled(ToastContainer)`
         padding: 20px;
         border-radius: 5px;
         align-items: center;
-        color: #001428;
+        color: ${(props) => props.theme.colors.primary};
         font-size: 14px;
         line-height: 1.43;
         button {
@@ -34,7 +34,7 @@ const WrappedToastContainer = styled(ToastContainer)`
         }
 
         &.Toastify__toast--success {
-            background: #fff !important;
+            background: ${(props) => props.theme.colors.neutral}!important;
         }
 
         &.Toastify__toast--error {
@@ -47,6 +47,7 @@ const WrappedToastContainer = styled(ToastContainer)`
 
         &.Toastify__toast--info {
             background: #fff !important;
+            color: #272727 !important;
         }
     }
 `

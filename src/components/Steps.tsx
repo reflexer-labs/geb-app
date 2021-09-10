@@ -30,13 +30,8 @@ const Steps = () => {
 
     const addTransaction = useTransactionAdder()
 
-    const {
-        step,
-        isWrongNetwork,
-        isStepLoading,
-        blockNumber,
-        ctHash,
-    } = connectWalletState
+    const { step, isWrongNetwork, isStepLoading, blockNumber, ctHash } =
+        connectWalletState
 
     const handleConnectWallet = () =>
         popupsActions.setIsConnectorsWalletOpen(true)
@@ -171,7 +166,7 @@ const StepsContainer = styled.div`
         padding-bottom: 20px;
         border-radius: 5px;
         opacity: 1 !important;
-        background: ${(props) => props.theme.colors.neutral};
+        background: #fff;
         border: ${(props) => props.theme.colors.border};
         box-shadow: 0 0 6px rgba(0, 0, 0, 0.16);
     }
@@ -211,7 +206,7 @@ const Confirmations = styled.div`
 const InfoBtn = styled.div`
     cursor: pointer;
     background: ${(props) => props.theme.colors.secondary};
-    color: ${(props) => props.theme.colors.neutral};
+    color: #fff;
     width: 15px;
     height: 15px;
     border-radius: 50%;

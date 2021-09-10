@@ -24,10 +24,8 @@ type Props = IAuction & { isCollapsed: boolean }
 const AuctionBlock = (auction: Props) => {
     const { chainId, account } = useActiveWeb3React()
     const { t } = useTranslation()
-    const {
-        popupsModel: popupsActions,
-        auctionsModel: auctionsActions,
-    } = useStoreActions((state) => state)
+    const { popupsModel: popupsActions, auctionsModel: auctionsActions } =
+        useStoreActions((state) => state)
 
     const {
         connectWalletModel: connectWalletState,
@@ -544,9 +542,9 @@ const List = styled.div`
 
         a,
         div {
-            color: #fff !important;
+            color: ${(props) => props.theme.colors.neutral} !important;
             background: transparent;
-            -webkit-text-fill-color: #fff;
+            -webkit-text-fill-color: ${(props) => props.theme.colors.neutral};
         }
     }
 

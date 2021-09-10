@@ -2,6 +2,7 @@ import React from 'react'
 
 const INITIAL_STATE = [
     require('../assets/brand.svg'),
+    require('../assets/brand-white.svg'),
     require('../assets/dark-arrow.svg'),
     require('../assets/connectors/walletConnectIcon.svg'),
     require('../assets/connectors/coinbaseWalletIcon.svg'),

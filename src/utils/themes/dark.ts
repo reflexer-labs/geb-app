@@ -3,15 +3,15 @@ import { Theme } from '../interfaces'
 
 const darkTheme: Theme = {
     colors: {
-        primary: '#2A2A2A',
-        secondary: '#A4ABB7',
+        primary: '#fafafa',
+        secondary: '#c3c5cb',
         gradient: 'linear-gradient(225deg, #78D8FF 0%, #4CE096 100%)',
-        neutral: '#ffffff',
-        background: '#FDFDFD',
+        neutral: '#191b1f',
+        background: '#191b1f',
         overlay: 'rgba(0, 0, 0, 0.8)',
-        border: '#EEF3F9',
-        foreground: '#F8FAFD',
-        dangerColor: '#721C24',
+        border: '#2c2f36',
+        foreground: '#212429',
+        dangerColor: '#ff495a',
         dangerBackground: '#F8D7DA',
         dangerBorder: '#F5C6CB',
         alertColor: '#004085',
@@ -26,8 +26,9 @@ const darkTheme: Theme = {
         dimmedColor: '#ffffff',
         dimmedBackground: '#A4ABB7',
         dimmedBorder: '#878787',
-        placeholder: '#EEF3F9',
+        placeholder: '#212429',
         inputBorderColor: '#6fbcdb',
+        boxShadow: '#323232',
     },
     font: {
         extraSmall: '12px',
