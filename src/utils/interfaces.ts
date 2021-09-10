@@ -45,6 +45,7 @@ interface IColors {
     dimmedBorder: string
     placeholder: string
     inputBorderColor: string
+    boxShadow: string
 }
 
 interface IFonts {

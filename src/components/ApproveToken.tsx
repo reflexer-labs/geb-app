@@ -47,10 +47,8 @@ const ApproveToken = ({
 
     const addTransaction = useTransactionAdder()
 
-    const {
-        connectWalletModel: connectWalletState,
-        popupsModel: popupsState,
-    } = useStoreState((state) => state)
+    const { connectWalletModel: connectWalletState, popupsModel: popupsState } =
+        useStoreState((state) => state)
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
 
     const { proxyAddress } = connectWalletState
@@ -208,13 +206,13 @@ export default ApproveToken
 
 const Container = styled.div`
     max-width: 400px;
-    background: ${(props) => props.theme.colors.neutral};
+    background: #fff;
     border-radius: 25px;
     margin: 0 auto;
 `
 
 const InnerContainer = styled.div`
-    background: ${(props) => props.theme.colors.neutral};
+    background: #fff;
     text-align: center;
     border-radius: 20px;
     padding: 20px 20px 35px 20px;

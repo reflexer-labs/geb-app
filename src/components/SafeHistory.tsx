@@ -276,7 +276,7 @@ const PaginationContainer = styled.div`
             font-size: ${(props) => props.theme.font.small};
             &.active {
                 background: ${(props) => props.theme.colors.gradient};
-                color: ${(props) => props.theme.colors.neutral};
+                color: #fff;
                 border-radius: 2px;
             }
             a {
@@ -318,7 +318,7 @@ const PaginationContainer = styled.div`
                 &.active {
                     a {
                         background: ${(props) => props.theme.colors.gradient};
-                        color: ${(props) => props.theme.colors.neutral};
+                        color: #fff;
                         border-radius: ${(props) =>
                             props.theme.global.borderRadius};
                     }

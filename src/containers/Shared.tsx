@@ -170,6 +170,7 @@ const Shared = ({ children, ...rest }: Props) => {
                     icon={'AlertTriangle'}
                     iconSize={40}
                     iconColor={'orange'}
+                    textColor={'#272727'}
                     text={`${t('wrong_network')} ${capitalizeName(
                         chainName === '' ? 'Mainnet' : chainName
                     )}`}

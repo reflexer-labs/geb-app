@@ -51,19 +51,19 @@ const Container = styled.div`
     &.dimmed {
         border: 1px solid #959595;
         background: ${(props) => props.theme.colors.secondary};
-        color: ${(props) => props.theme.colors.neutral};
+        color: #fff;
     }
 
     &.gradient {
         border: 1px solid ${(props) => props.theme.colors.inputBorderColor};
         background: ${(props) => props.theme.colors.gradient};
-        color: ${(props) => props.theme.colors.neutral};
+        color: #fff;
     }
 
     &.greenish {
         border: 1px solid ${(props) => props.theme.colors.inputBorderColor};
         background: #6dbab5;
-        color: ${(props) => props.theme.colors.neutral};
+        color: #fff;
     }
 
     &.floated {

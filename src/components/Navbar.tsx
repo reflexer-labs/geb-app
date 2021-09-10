@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { memo, useMemo } from 'react'
 import styled from 'styled-components'
 import { useStoreActions, useStoreState } from '../store'
 import Brand from './Brand'
@@ -8,11 +8,28 @@ import { useWeb3React } from '@web3-react/core'
 import { isTransactionRecent } from '../hooks/TransactionHooks'
 import NavLinks from './NavLinks'
 import FLXLogoSmall from './Icons/FLXLogoSmall'
+import { Moon, Sun } from 'react-feather'
+
+const ThemeToggle = memo(() => {
+    const { settingsModel: settingsState } = useStoreState((state) => state)
+    const { settingsModel: settingsActions } = useStoreActions((state) => state)
+
+    return (
+        <ThemeBtn
+            onClick={() =>
+                settingsActions.setIsLightTheme(!settingsState.isLightTheme)
+            }
+        >
+            {settingsState.isLightTheme ? <Moon /> : <Sun />}
+        </ThemeBtn>
+    )
+})
 
 const Navbar = () => {
     const {
         transactionsModel: transactionsState,
         connectWalletModel: connectWalletState,
+        settingsModel: settingsState,
     } = useStoreState((state) => state)
 
     const { transactions } = transactionsState
@@ -40,7 +57,7 @@ const Navbar = () => {
     return (
         <Container>
             <Left>
-                <Brand />
+                <Brand isLight={settingsState.isLightTheme} />
             </Left>
             <HideMobile>
                 <NavLinks />
@@ -78,6 +95,7 @@ const Navbar = () => {
                         }
                     />
                 </BtnContainer>
+                <ThemeToggle />
 
                 <MenuBtn onClick={() => popupsActions.setShowSideMenu(true)}>
                     <RectContainer>
@@ -98,7 +116,7 @@ const Container = styled.div`
     height: 68px;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0px 1px 0px #eef3f9;
+    box-shadow: 0px 1px 0px ${(props) => props.theme.colors.boxShadow};
     padding: 0 40px;
     margin-bottom: 10px;
     border-bottom: 1px solid ${(props) => props.theme.colors.border};
@@ -214,7 +232,7 @@ const FLXInfo = styled.div`
     align-items: center;
     background: #34496c;
     height: 40px;
-    color: ${(props) => props.theme.colors.neutral};
+    color: #fff;
     border-radius: 0 4px 4px 0;
     padding: 0 10px;
 `
@@ -222,4 +240,36 @@ const LogoBox = styled.div`
     margin: 0 5px;
     display: flex;
     align-items: center;
+`
+
+const ThemeBtn = styled.button`
+    background: ${(props) => props.theme.colors.border};
+    box-shadow: none;
+    outline: none;
+    cursor: pointer;
+    border: 0;
+    color: ${(props) => props.theme.colors.secondary};
+    padding: 9px 10px;
+    margin: 0 0 0 15px;
+    line-height: normal;
+    border-radius: ${(props) => props.theme.global.borderRadius};
+    transition: all 0.3s ease;
+    position: relative;
+    svg {
+        width: 20px;
+        height: 20px;
+        display: block;
+        color: ${(props) => props.theme.colors.secondary};
+    }
+
+    &:hover {
+        background: ${(props) => props.theme.colors.secondary};
+        svg {
+            color: ${(props) => props.theme.colors.border};
+        }
+    }
+
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+   margin-right:15px;
+  `}
 `

@@ -36,14 +36,14 @@ const NavLinks = () => {
                 to="/"
                 onClick={(e) => handleLinkClick(e, false)}
             >
-                <SafeIcon className="opacity" /> {t('app')}
+                <SafeIcon className="opacity fill" /> {t('app')}
             </NavBarLink>
             {SHOW_AUCTIONS && SHOW_AUCTIONS !== '1' ? null : (
                 <NavBarLink
                     to="/auctions"
                     onClick={(e) => handleLinkClick(e, false)}
                 >
-                    <AuctionIcon className="opacity" /> {t('auctions')}
+                    <AuctionIcon className="opacity fill" /> {t('auctions')}
                 </NavBarLink>
             )}
 
@@ -152,6 +152,7 @@ const NavBarLink = styled(NavLink)`
         display: none;
         &.fill {
             fill: ${(props) => props.theme.colors.secondary};
+            color: ${(props) => props.theme.colors.secondary};
         }
         &.opacity {
             opacity: 0.5;
@@ -246,7 +247,7 @@ const MenuBox = styled.div`
     top: 28px;
     z-index: 99;
     border-radius: 4px;
-    background: #fff;
+    background: ${(props) => props.theme.colors.background};
     padding: 20px;
 
     min-width: 200px;

@@ -25,10 +25,8 @@ const ProxyModal = () => {
     const addTransaction = useTransactionAdder()
     const blocksSinceCheck = use10BlocksConfirmations()
 
-    const {
-        popupsModel: popupsState,
-        connectWalletModel: connectWalletState,
-    } = useStoreState((state) => state)
+    const { popupsModel: popupsState, connectWalletModel: connectWalletState } =
+        useStoreState((state) => state)
     const storeActions = useStoreActions((state) => state)
     const {
         popupsModel: popupsActions,

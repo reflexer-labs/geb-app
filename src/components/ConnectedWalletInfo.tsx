@@ -167,6 +167,7 @@ const Connection = styled.div`
     align-items: center;
     justify-content: space-between;
     font-size: ${(props) => props.theme.font.small};
+    color: ${(props) => props.theme.colors.primary};
     button {
         width: auto;
         min-width: auto;
@@ -180,6 +181,7 @@ const Address = styled.div`
     display: flex;
     margin: 20px 0;
     align-items: center;
+    color: ${(props) => props.theme.colors.primary};
     img {
         width: 20px;
         margin-right: 10px;
@@ -254,11 +256,12 @@ const DataContainer = styled.div`
 `
 
 const TransactionsContainer = styled.div`
-    background-color: rgb(247, 248, 250);
+    background-color: ${(props) => props.theme.colors.background};
     padding: 20px;
     margin: 20px -20px -20px -20px;
     border-radius: 0 0 25px 25px;
     font-size: ${(props) => props.theme.font.small};
+    color: ${(props) => props.theme.colors.primary};
 `
 
 const Heading = styled.div`

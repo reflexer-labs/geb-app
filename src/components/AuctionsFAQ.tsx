@@ -149,7 +149,7 @@ const SectionContent = styled.div`
     margin-top: 10px;
     font-size: ${(props) => props.theme.font.small};
     line-height: 23px;
-    color: #272727;
+    color: ${(props) => props.theme.colors.secondary};
     text-align: left;
 `
 
