@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { NETWORK_ID } from '../connectors'
-import { useActiveWeb3React } from '../hooks'
 import useSwap from '../hooks/useSwap'
 import { useStoreActions } from '../store'
 import { SHOW_AUCTIONS } from '../utils/constants'
@@ -16,8 +15,7 @@ import SafeIcon from './Icons/SafeIcon'
 const NavLinks = () => {
     const { t } = useTranslation()
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
-    const { account } = useActiveWeb3React()
-    const { generateSwap } = useSwap(account)
+    const { generateSwap } = useSwap()
     const handleLinkClick = async (
         e: React.MouseEvent<HTMLElement>,
         disable = false,
