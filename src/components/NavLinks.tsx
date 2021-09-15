@@ -35,14 +35,14 @@ const NavLinks = () => {
             popupsActions.setIsWaitingModalOpen(true)
             popupsActions.setWaitingPayload({
                 title: 'Please hold...',
-                text: 'Generating Swap URL',
+                text: 'Preparing to swap',
                 status: 'loading',
             })
             const url = await generateSwap()
             await timeout(1000)
             popupsActions.setWaitingPayload({
                 title: 'Cheers!',
-                text: 'You can swap dirty fiat to RAI in the new page that popped up!',
+                text: 'You can now swap dirty fiat to RAI!',
                 status: 'success',
             })
             await timeout(1000)
