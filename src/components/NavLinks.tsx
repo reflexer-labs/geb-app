@@ -42,7 +42,7 @@ const NavLinks = () => {
             await timeout(1000)
             popupsActions.setWaitingPayload({
                 title: 'Cheers!',
-                text: 'Swap URL generated successfully!',
+                text: 'You can swap dirty fiat to RAI in the new page that popped up!',
                 status: 'success',
             })
             await timeout(1000)
