@@ -4,8 +4,11 @@ import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { NETWORK_ID } from '../connectors'
+import { useActiveWeb3React } from '../hooks'
+import useSwap from '../hooks/useSwap'
 import { useStoreActions } from '../store'
 import { SHOW_AUCTIONS } from '../utils/constants'
+import { timeout } from '../utils/helper'
 import AnalyticsIcon from './Icons/AnalyticsIcon'
 import AuctionIcon from './Icons/AuctionIcon'
 import SafeIcon from './Icons/SafeIcon'
@@ -13,11 +16,13 @@ import SafeIcon from './Icons/SafeIcon'
 const NavLinks = () => {
     const { t } = useTranslation()
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
-
-    const handleLinkClick = (
+    const { account } = useActiveWeb3React()
+    const { generateSwap } = useSwap(account)
+    const handleLinkClick = async (
         e: React.MouseEvent<HTMLElement>,
         disable = false,
-        externalLink = ''
+        externalLink = '',
+        isSwap = false
     ) => {
         if (disable) {
             e.preventDefault()
@@ -26,6 +31,27 @@ const NavLinks = () => {
         if (externalLink) {
             window.open(externalLink, '_blank')
             e.preventDefault()
+        }
+
+        if (isSwap) {
+            popupsActions.setIsWaitingModalOpen(true)
+            popupsActions.setWaitingPayload({
+                title: 'Please hold...',
+                text: 'Generating Swap URL',
+                status: 'loading',
+            })
+            const url = await generateSwap()
+            await timeout(1000)
+            popupsActions.setWaitingPayload({
+                title: 'Cheers!',
+                text: 'Swap URL generated successfully!',
+                status: 'success',
+            })
+            await timeout(1000)
+            if (url) {
+                window.open(url, '_blank')
+                e.persist()
+            }
         }
     }
 
@@ -68,6 +94,13 @@ const NavLinks = () => {
                     </IntLink>
                 </MenuBox>
             </Box>
+            <NavBarLink
+                id="app-link"
+                to="/"
+                onClick={(e) => handleLinkClick(e, false, '', true)}
+            >
+                <SafeIcon className="opacity fill" /> {t('swap')}
+            </NavBarLink>
             <Box className="has-menu">
                 <LinkItem>
                     <Shield /> {t('insurance')}
