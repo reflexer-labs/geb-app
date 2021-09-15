@@ -1,5 +1,5 @@
 import React from 'react'
-import { DollarSign, Shield } from 'react-feather'
+import { DollarSign, Repeat, Shield } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
@@ -99,7 +99,7 @@ const NavLinks = () => {
                 to="/"
                 onClick={(e) => handleLinkClick(e, false, '', true)}
             >
-                <SafeIcon className="opacity fill" /> {t('swap')}
+                <Repeat /> {t('swap')}
             </NavBarLink>
             <Box className="has-menu">
                 <LinkItem>
