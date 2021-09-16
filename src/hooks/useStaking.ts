@@ -57,7 +57,7 @@ export function useStakingInfo(isDeposit = true) {
     }
 
     if (!proxyAddress) {
-        error = 'Create a Reflexer Account to continue'
+        error = error ?? 'Create a Reflexer Account to continue'
     }
 
     if (isDeposit) {
@@ -247,25 +247,20 @@ export function usePoolData() {
         if (!geb) return
         async function getBalances() {
             try {
-                const reservesCall = geb.contracts.uniswapPairCoinEth.getReserves(
-                    true
-                )
+                const reservesCall =
+                    geb.contracts.uniswapPairCoinEth.getReserves(true)
                 reservesCall.to = geb.contracts.stakingToken.address
 
-                const [
-                    balance,
-                    rewardRateRes,
-                    reserves,
-                    totalSupply,
-                ] = await geb.multiCall([
-                    geb.contracts.stakingToken.balanceOf(
-                        await geb.contracts.stakingFirstResort.ancestorPool(),
-                        true
-                    ),
-                    geb.contracts.stakingFirstResort.rewardRate(true),
-                    reservesCall,
-                    geb.contracts.stakingToken.totalSupply(true),
-                ])
+                const [balance, rewardRateRes, reserves, totalSupply] =
+                    await geb.multiCall([
+                        geb.contracts.stakingToken.balanceOf(
+                            await geb.contracts.stakingFirstResort.ancestorPool(),
+                            true
+                        ),
+                        geb.contracts.stakingFirstResort.rewardRate(true),
+                        reservesCall,
+                        geb.contracts.stakingToken.totalSupply(true),
+                    ])
 
                 const rewardR = ethers.utils.formatEther(rewardRateRes)
 
@@ -295,7 +290,9 @@ export function usePoolData() {
 
                 const LPSharePrice = Number(flxReserve) * 2
 
-                const aprValue = !balance.isZero() ? rw / LPSharePrice * 100 : '0'
+                const aprValue = !balance.isZero()
+                    ? (rw / LPSharePrice) * 100
+                    : '0'
                 if (!isCanceled) {
                     setState({
                         poolBalance: poolBalanceVal,
@@ -434,9 +431,8 @@ export function useAddStaking(): {
                 status: 'loading',
             })
             const signer = library.getSigner(account)
-            const txData = geb.contracts.stakingFirstResort.join(
-                stakingAmountBN
-            )
+            const txData =
+                geb.contracts.stakingFirstResort.join(stakingAmountBN)
 
             if (!txData) throw new Error('No transaction request!')
             const tx = await handlePreTxGasEstimate(signer, txData)
@@ -491,9 +487,8 @@ export function useRequestExit(): {
                 status: 'loading',
             })
             const signer = library.getSigner(account)
-            const txData = geb.contracts.stakingFirstResort.requestExit(
-                stFlxAmountBN
-            )
+            const txData =
+                geb.contracts.stakingFirstResort.requestExit(stFlxAmountBN)
 
             if (!txData) throw new Error('No transaction request!')
             const tx = await handlePreTxGasEstimate(signer, txData)

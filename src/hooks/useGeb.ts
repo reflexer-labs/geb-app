@@ -2,8 +2,8 @@ import { Geb } from 'geb.js'
 import { useEffect, useMemo, useState } from 'react'
 import { useActiveWeb3React } from '.'
 import { NETWORK_ID } from '../connectors'
-import store, { useStoreState } from '../store'
-import { network_name } from '../utils/constants'
+import store, { useStoreActions, useStoreState } from '../store'
+import { EMPTY_ADDRESS, network_name } from '../utils/constants'
 
 export default function useGeb(): Geb {
     const { library } = useActiveWeb3React()
@@ -40,10 +40,36 @@ export function useIsOwner(safeId: string): boolean {
 }
 
 export function useProxyAddress() {
+    const geb = useGeb()
+    const { account } = useActiveWeb3React()
     const { connectWalletModel: connectWalletState } = useStoreState(
         (state) => state
     )
+    const { connectWalletModel: connectWalletActions } = useStoreActions(
+        (state) => state
+    )
     const { proxyAddress } = connectWalletState
+
+    useEffect(() => {
+        if (!geb || !account || proxyAddress) return
+        async function getProxyAddress() {
+            try {
+                const userProxy = await geb.getProxyAction(account as string)
+                if (
+                    userProxy &&
+                    userProxy.proxyAddress &&
+                    userProxy.proxyAddress !== EMPTY_ADDRESS
+                ) {
+                    connectWalletActions.setIsUserCreated(true)
+                    connectWalletActions.setProxyAddress(userProxy.proxyAddress)
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        getProxyAddress()
+    }, [account, connectWalletActions, geb, proxyAddress])
+
     return useMemo(() => proxyAddress, [proxyAddress])
 }
 
