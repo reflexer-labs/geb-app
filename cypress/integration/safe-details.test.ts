@@ -139,7 +139,13 @@ describe('App Page - Safe Details', () => {
 
     it('tries max borrow, and checks on CRatio and LiquidationPrice', () => {
         cy.get('#deposit_borrow').click()
-        cy.get('[data-test-id="deposit_borrow_left"]').type('4')
+        cy.get('[data-test-id="deposit_borrow_left_label"]')
+            .invoke('text')
+            .then((tx) => {
+                cy.get('[data-test-id="deposit_borrow_left"]').type(
+                    getValue(tx)
+                )
+            })
         cy.get('[data-test-id="deposit_borrow_right_label"]')
             .invoke('text')
             .then((tx) => {
@@ -148,15 +154,6 @@ describe('App Page - Safe Details', () => {
                 )
                 cy.wait(2000)
                 cy.get('[data-test-id="modal_col_ratio"]').contains('140.00%')
-                cy.get('[data-test-id="details_liq_price"]')
-                    .invoke('text')
-                    .then((tx) => {
-                        expect(
-                            cy
-                                .get('[data-test-id="modal_liq_price"]')
-                                .contains(tx)
-                        )
-                    })
             })
     })
 

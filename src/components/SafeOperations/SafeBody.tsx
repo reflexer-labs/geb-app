@@ -25,7 +25,7 @@ import { NETWORK_ID } from '../../connectors'
 import { DEFAULT_SAFE_STATE, COIN_TICKER } from '../../utils/constants'
 import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
-import { useIsOwner } from '../../hooks/useGeb'
+import { useIsOwner, useProxyAddress } from '../../hooks/useGeb'
 
 interface Props {
     isChecked?: boolean
@@ -33,6 +33,7 @@ interface Props {
 
 const SafeBody = ({ isChecked }: Props) => {
     const { t } = useTranslation()
+    const proxyAddress = useProxyAddress()
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || false)
     const [error, setError] = useState('')
@@ -327,7 +328,7 @@ const SafeBody = ({ isChecked }: Props) => {
             return false
         }
 
-        if (!connectWalletState.proxyAddress) {
+        if (!proxyAddress) {
             setError(
                 'You do not have a proxy address, Create a Reflexer Account to continue'
             )
