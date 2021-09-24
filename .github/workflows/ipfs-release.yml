@@ -1,7 +1,7 @@
 name: Release
 on:
     schedule:
-        - cron: '0 12 * * 1-4' #  12:00 UTC from Monday to Friday
+        - cron: '0 12 * * 1-5' # At 12:00 UTC on every day-of-week from Monday to Friday
 
     # manual trigger
     workflow_dispatch:
@@ -56,12 +56,13 @@ jobs:
 
             - name: Pin to IPFS
               id: upload
-              uses: anantaramdas/ipfs-pinata-deploy-action@39bbda1ce1fe24c69c6f57861b8038278d53688d
+              uses: anantaramdas/ipfs-pinata-deploy-action@v1.6.3
               with:
-                  pin-name: Reflexer ${{ needs.bump_version.outputs.new_tag }}
+                  pin-name: Reflexer
                   path: './build'
                   pinata-api-key: ${{ secrets.PINATA_API_KEY }}
                   pinata-secret-api-key: ${{ secrets.PINATA_API_SECRET_KEY }}
+                  remove-old: true
 
             - name: Convert CIDv0 to CIDv1
               id: convert_cidv0
