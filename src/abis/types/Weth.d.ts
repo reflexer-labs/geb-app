@@ -18,7 +18,7 @@ import {
 import { BytesLike } from "@ethersproject/bytes";
 import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface WethInterface extends ethers.utils.Interface {
   functions: {
@@ -95,6 +95,22 @@ interface WethInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Withdrawal"): EventFragment;
 }
+
+export type ApprovalEvent = TypedEvent<
+  [string, string, BigNumber] & { src: string; guy: string; wad: BigNumber }
+>;
+
+export type TransferEvent = TypedEvent<
+  [string, string, BigNumber] & { src: string; dst: string; wad: BigNumber }
+>;
+
+export type DepositEvent = TypedEvent<
+  [string, BigNumber] & { dst: string; wad: BigNumber }
+>;
+
+export type WithdrawalEvent = TypedEvent<
+  [string, BigNumber] & { src: string; wad: BigNumber }
+>;
 
 export class Weth extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -271,6 +287,15 @@ export class Weth extends BaseContract {
   };
 
   filters: {
+    "Approval(address,address,uint256)"(
+      src?: string | null,
+      guy?: string | null,
+      wad?: null
+    ): TypedEventFilter<
+      [string, string, BigNumber],
+      { src: string; guy: string; wad: BigNumber }
+    >;
+
     Approval(
       src?: string | null,
       guy?: string | null,
@@ -278,6 +303,15 @@ export class Weth extends BaseContract {
     ): TypedEventFilter<
       [string, string, BigNumber],
       { src: string; guy: string; wad: BigNumber }
+    >;
+
+    "Transfer(address,address,uint256)"(
+      src?: string | null,
+      dst?: string | null,
+      wad?: null
+    ): TypedEventFilter<
+      [string, string, BigNumber],
+      { src: string; dst: string; wad: BigNumber }
     >;
 
     Transfer(
@@ -289,10 +323,20 @@ export class Weth extends BaseContract {
       { src: string; dst: string; wad: BigNumber }
     >;
 
+    "Deposit(address,uint256)"(
+      dst?: string | null,
+      wad?: null
+    ): TypedEventFilter<[string, BigNumber], { dst: string; wad: BigNumber }>;
+
     Deposit(
       dst?: string | null,
       wad?: null
     ): TypedEventFilter<[string, BigNumber], { dst: string; wad: BigNumber }>;
+
+    "Withdrawal(address,uint256)"(
+      src?: string | null,
+      wad?: null
+    ): TypedEventFilter<[string, BigNumber], { src: string; wad: BigNumber }>;
 
     Withdrawal(
       src?: string | null,

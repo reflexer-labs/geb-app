@@ -84,9 +84,30 @@ const PositionsModal = () => {
                                         <Pair>
                                             {pool.pair}
                                             <div>
-                                                {
-                                                    'Tight: 0.1%, Wide:0.3% around RAI market price'
-                                                }
+                                                {`Tight: ${
+                                                    Math.abs(
+                                                        Math.abs(
+                                                            pool.ranges.tight
+                                                                .upperTick
+                                                        ) -
+                                                            Math.abs(
+                                                                pool.ranges
+                                                                    .tight
+                                                                    .lowerTick
+                                                            )
+                                                    ) * 0.01
+                                                }%, Wide:${
+                                                    Math.abs(
+                                                        Math.abs(
+                                                            pool.ranges.wide
+                                                                .upperTick
+                                                        ) -
+                                                            Math.abs(
+                                                                pool.ranges.wide
+                                                                    .lowerTick
+                                                            )
+                                                    ) * 0.01
+                                                }% around RAI market price`}
                                             </div>
                                         </Pair>
                                         <Fee>

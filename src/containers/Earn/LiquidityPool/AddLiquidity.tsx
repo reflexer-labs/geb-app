@@ -359,7 +359,16 @@ const AddLiquidity = ({
                             <div>
                                 <Check /> Tight
                             </div>
-                            <span>0.1% around RAI's market price</span>
+                            <span>
+                                {ranges?.tight?.lowerTick &&
+                                ranges?.tight?.upperTick
+                                    ? Math.abs(
+                                          Math.abs(ranges.tight.upperTick) -
+                                              Math.abs(ranges.tight.lowerTick)
+                                      ) * 0.01
+                                    : '-'}
+                                % around RAI's market price
+                            </span>
                         </Box>
                         <Box
                             className={rangeWidth === 'wide' ? 'active' : ''}
@@ -369,7 +378,17 @@ const AddLiquidity = ({
                                 <Check />
                                 Wide
                             </div>
-                            <span>0.3% around RAI's market price</span>
+                            <span>
+                                {' '}
+                                {ranges?.wide?.lowerTick &&
+                                ranges?.wide?.upperTick
+                                    ? Math.abs(
+                                          Math.abs(ranges.wide.upperTick) -
+                                              Math.abs(ranges.wide.lowerTick)
+                                      ) * 0.01
+                                    : '-'}
+                                % around RAI's market price
+                            </span>
                         </Box>
                     </RangeSelection>
                 </RangeContainer>
