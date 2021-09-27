@@ -28,6 +28,7 @@ import { SHOW_AUCTIONS } from './utils/constants'
 import SafeSaviour from './containers/OnBoarding/SafeSaviour'
 import Staking from './containers/Earn/Staking'
 import Incentives from './containers/Earn/Incentives'
+import Earn from './containers/Earn'
 
 // Toast css
 
@@ -66,8 +67,13 @@ const App = () => {
                                         ) : null}
                                         <Route
                                             exact
+                                            component={Earn}
+                                            path={'/earn'}
+                                        />
+                                        <Route
+                                            exact
                                             component={Staking}
-                                            path={'/staking'}
+                                            path={'/earn/staking'}
                                         />
                                         <Route
                                             exact
@@ -77,7 +83,7 @@ const App = () => {
                                         <Route
                                             exact
                                             component={Incentives}
-                                            path={'/incentives'}
+                                            path={'/earn/incentives'}
                                         />
                                         <Route
                                             exact
@@ -99,14 +105,7 @@ const App = () => {
                                             component={OnBoarding}
                                             path={'/'}
                                         />
-                                        <Redirect
-                                            from="/earn/staking"
-                                            to="/staking"
-                                        />
-                                        <Redirect
-                                            from="/earn/incentives"
-                                            to="/incentives"
-                                        />
+                                        <Redirect from="/earn" to="/staking" />
                                         <Redirect from="*" to="/" />
                                     </Switch>
                                 </Web3ReactManager>
