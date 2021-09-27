@@ -18,9 +18,12 @@ Deposit your crypto assets, generate RAI and lever up your position.
 - Discord: [Reflexer](https://discord.com/invite/83t3xKT)
 - Whitepaper: [Link](https://github.com/reflexer-labs/whitepapers/blob/master/English/rai-english.pdf)
 
-## Access
+## Accessing the Uniswap Interface
 
-To access Reflexer App, visit [app.reflexer.finance](https://app.reflexer.finance)
+To access the Uniswap Interface, use an IPFS gateway link from the
+[latest release](https://github.com/reflexer-labs/geb-app/releases/latest),
+or visit [https://app.reflexer.finance](https://app.reflexer.finance).
+
 
 ## Development
 
