@@ -28,6 +28,7 @@ import { SHOW_AUCTIONS } from './utils/constants'
 import SafeSaviour from './containers/OnBoarding/SafeSaviour'
 import Staking from './containers/Earn/Staking'
 import Incentives from './containers/Earn/Incentives'
+import Earn from './containers/Earn'
 
 // Toast css
 
@@ -66,6 +67,11 @@ const App = () => {
                                         ) : null}
                                         <Route
                                             exact
+                                            component={Earn}
+                                            path={'/earn'}
+                                        />
+                                        <Route
+                                            exact
                                             component={Staking}
                                             path={'/earn/staking'}
                                         />
@@ -99,6 +105,7 @@ const App = () => {
                                             component={OnBoarding}
                                             path={'/'}
                                         />
+                                        <Redirect from="/earn" to="/staking" />
                                         <Redirect from="*" to="/" />
                                     </Switch>
                                 </Web3ReactManager>
