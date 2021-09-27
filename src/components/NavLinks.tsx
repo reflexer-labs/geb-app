@@ -52,14 +52,14 @@ const NavLinks = () => {
                     <DollarSign /> {t('earn')}
                 </LinkItem>
                 <MenuBox className="menu-box">
-                    <ExtLink href="/earn/staking">
+                    <ExtLink href="/staking">
                         Staking{' '}
                         <img
                             src={require('../assets/dark-arrow.svg')}
                             alt="arrow"
                         />
                     </ExtLink>
-                    <ExtLink href="/earn/incentives">
+                    <ExtLink href="/incentives">
                         Incentives{' '}
                         <img
                             src={require('../assets/dark-arrow.svg')}
