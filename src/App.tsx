@@ -67,7 +67,7 @@ const App = () => {
                                         <Route
                                             exact
                                             component={Staking}
-                                            path={'/earn/staking'}
+                                            path={'/staking'}
                                         />
                                         <Route
                                             exact
@@ -77,7 +77,7 @@ const App = () => {
                                         <Route
                                             exact
                                             component={Incentives}
-                                            path={'/earn/incentives'}
+                                            path={'/incentives'}
                                         />
                                         <Route
                                             exact
@@ -98,6 +98,14 @@ const App = () => {
                                             exact
                                             component={OnBoarding}
                                             path={'/'}
+                                        />
+                                        <Redirect
+                                            from="/earn/staking"
+                                            to="/staking"
+                                        />
+                                        <Redirect
+                                            from="/earn/incentives"
+                                            to="/incentives"
                                         />
                                         <Redirect from="*" to="/" />
                                     </Switch>
