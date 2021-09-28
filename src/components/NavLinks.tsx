@@ -52,20 +52,20 @@ const NavLinks = () => {
                     <DollarSign /> {t('earn')}
                 </LinkItem>
                 <MenuBox className="menu-box">
-                    <ExtLink href="/staking">
+                    <IntLink to="/earn/staking">
                         Staking{' '}
                         <img
                             src={require('../assets/dark-arrow.svg')}
                             alt="arrow"
                         />
-                    </ExtLink>
-                    <ExtLink href="/incentives">
+                    </IntLink>
+                    <IntLink to="/earn/incentives">
                         Incentives{' '}
                         <img
                             src={require('../assets/dark-arrow.svg')}
                             alt="arrow"
                         />
-                    </ExtLink>
+                    </IntLink>
                 </MenuBox>
             </Box>
             <Box className="has-menu">
@@ -264,6 +264,40 @@ const MenuBox = styled.div`
 `
 
 const ExtLink = styled.a`
+    color: ${(props) => props.theme.colors.primary};
+    font-size: 15px;
+    line-height: 24px;
+    letter-spacing: -0.18px;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 5px 0;
+    cursor: pointer;
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    &:hover {
+        text-decoration: none;
+        transform: translateX(5px);
+        color: ${(props) => props.theme.colors.secondary};
+    }
+
+    img {
+        display: none;
+    }
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+        color: ${(props) => props.theme.colors.secondary};
+        transform: translateX(0px) !important;
+        img {
+            display:inline;
+            transform:rotate(180deg);
+            margin-left:5px;
+        }
+
+    `}
+`
+
+const IntLink = styled(NavLink)`
     color: ${(props) => props.theme.colors.primary};
     font-size: 15px;
     line-height: 24px;
