@@ -1,11 +1,6 @@
 import React, { Suspense, useEffect } from 'react'
 import i18next from 'i18next'
-import {
-    BrowserRouter as Router,
-    Redirect,
-    Route,
-    Switch,
-} from 'react-router-dom'
+import { HashRouter as Router, Redirect, Route, Switch } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 import { I18nextProvider } from 'react-i18next'
 import ErrorBoundary from './ErrorBoundary'
@@ -60,27 +55,32 @@ const App = () => {
                                         SHOW_AUCTIONS === '1' ? (
                                             <Route
                                                 exact
+                                                strict
                                                 component={Auctions}
                                                 path={'/auctions/:auctionType?'}
                                             />
                                         ) : null}
                                         <Route
                                             exact
+                                            strict
                                             component={Staking}
-                                            path={'/staking'}
+                                            path={'/earn/staking'}
                                         />
                                         <Route
                                             exact
+                                            strict
                                             component={Privacy}
                                             path={'/privacy'}
                                         />
                                         <Route
                                             exact
+                                            strict
                                             component={Incentives}
-                                            path={'/incentives'}
+                                            path={'/earn/incentives'}
                                         />
                                         <Route
                                             exact
+                                            strict
                                             component={SafeSaviour}
                                             path={'/safes/:id/saviour'}
                                         />
@@ -91,11 +91,13 @@ const App = () => {
                                         />
                                         <Route
                                             exact
+                                            strict
                                             component={OnBoarding}
                                             path={'/:address'}
                                         />
                                         <Route
                                             exact
+                                            strict
                                             component={OnBoarding}
                                             path={'/'}
                                         />
