@@ -11,6 +11,7 @@ import StakingManager from './StakingManager'
 import StakingStats from './StakingStats'
 import Statistics from './Statistics'
 import { ExternalLinkArrow } from '../../../GlobalStyle'
+import { Link } from 'react-router-dom'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -58,7 +59,7 @@ const Staking = () => {
                             stFLX
                         </Left>
                         <Right>
-                            <LinkButton href="/auctions/staked_token">
+                            <LinkButton to="/auctions/staked_token">
                                 Staked Token Auctions
                             </LinkButton>
                         </Right>
@@ -139,7 +140,7 @@ const Note = styled.div`
 const Left = styled.div``
 const Right = styled.div``
 
-const LinkButton = styled.a`
+const LinkButton = styled(Link)`
     outline: none;
     cursor: pointer;
     min-width: 134px;
