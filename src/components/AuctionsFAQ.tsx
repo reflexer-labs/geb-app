@@ -79,12 +79,12 @@ const AuctionsFAQ = ({ hideFAQ, type }: Props) => {
         recycling_surplus: [
             {
                 title: t('surplus_auction_minting_flx_header'),
-                desc: t('surplus_auction_minting_flx_desc'),
+                desc: t('surplus_recycle_auction_minting_flx_desc'),
                 image: require('../assets/sell-rai.svg'),
             },
             {
                 title: t('surplus_auction_how_to_bid'),
-                desc: t('surplus_auction_how_to_bid_desc'),
+                desc: t('surplus_recycle_auction_how_to_bid_desc'),
                 image: require('../assets/bid.svg'),
             },
             {
