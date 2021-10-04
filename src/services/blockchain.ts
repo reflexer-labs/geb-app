@@ -163,6 +163,9 @@ export const handleAuctionBid = async ({
         const radAmount = BigNumber.from(toFixedString(amount, 'RAD'))
         txData = proxy.stakedTokenAuctionIncreaseBidSize(radAmount, auctionId)
     }
+    if (auctionType === 'RECYCLING_SURPLUS') {
+        txData = proxy.recyclingSurplusIncreaseBidSize(amountBN, auctionId)
+    }
 
     if (!txData) throw new Error('No transaction request!')
     let tx = await handlePreTxGasEstimate(signer, txData)
@@ -191,6 +194,10 @@ export const handleAuctionClaim = async ({
     }
     if (auctionType === 'STAKED_TOKEN') {
         txData = proxy.stakedTokenSettleAuction(auctionId)
+    }
+
+    if (auctionType === 'RECYCLING_SURPLUS') {
+        txData = proxy.recyclingSurplusSettleAuction(auctionId)
     }
 
     if (!txData) throw new Error('No transaction request!')

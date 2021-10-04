@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import AuctionBlock from '../../components/AuctionBlock'
@@ -8,9 +8,10 @@ import Pagination from '../../components/Pagination'
 import { IPaging } from '../../utils/interfaces'
 import { useStoreActions, useStoreState } from '../../store'
 import { useActiveWeb3React } from '../../hooks'
+import { AuctionEventType } from '.'
 
 interface Props {
-    type: 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
+    type: AuctionEventType
 }
 const AuctionsList = ({ type }: Props) => {
     const { t } = useTranslation()
@@ -24,6 +25,10 @@ const AuctionsList = ({ type }: Props) => {
     const { internalBalance, protInternalBalance } = auctionsState
     const { proxyAddress } = connectWalletState
     const auctions = useAuctions()
+
+    const humanizedType = useMemo(() => {
+        return type.toLowerCase().split('_').join(' ')
+    }, [type])
 
     const handleClick = (modalType: string) => {
         if (!account) {
@@ -54,9 +59,7 @@ const AuctionsList = ({ type }: Props) => {
         <Container>
             <InfoBox>
                 <Title>
-                    {type === 'STAKED_TOKEN'
-                        ? 'FLX/ETH LP'
-                        : type.toLowerCase()}{' '}
+                    {type === 'STAKED_TOKEN' ? 'FLX/ETH LP' : humanizedType}{' '}
                     Auctions
                 </Title>
                 {account &&
@@ -89,10 +92,7 @@ const AuctionsList = ({ type }: Props) => {
             ) : (
                 <NoData>
                     {t('no_auctions', {
-                        type:
-                            type.toLowerCase() === 'staked_token'
-                                ? 'staked token'
-                                : type.toLowerCase(),
+                        type: humanizedType,
                     })}
                 </NoData>
             )}

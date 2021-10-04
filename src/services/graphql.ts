@@ -21,7 +21,7 @@ import {
     IUserSafeList,
 } from '../utils/interfaces'
 import gebManager from '../utils/gebManager'
-import { auctionsQuery } from '../utils/queries/auctions'
+import { auctionsFullQuery, auctionsQuery } from '../utils/queries/auctions'
 
 export const cancelTokenSource = axios.CancelToken.source()
 
@@ -223,14 +223,29 @@ export const fetchAuctions = async ({
     address: string
     type: string
 }) => {
-    const res = await request(
-        JSON.stringify({ query: auctionsQuery(address, type) })
-    )
+    const query = auctionsFullQuery(address, type)
+    const isRecyclingAuctions = type.toLowerCase().includes('recycling')
+    let recyclingRespose
+    if (isRecyclingAuctions) {
+        recyclingRespose = await axios.post(
+            'https://api.thegraph.com/subgraphs/name/guifel/gebperiphery',
+            JSON.stringify({ query: `{${auctionsQuery(type)}}` }),
+            {
+                headers: { 'content-type': 'application/json' },
+            }
+        )
+    }
+
+    let res = await request(JSON.stringify({ query }))
     if (!res) {
         throw new Error('failed to fetch')
     }
 
-    const response = res.data.data
+    const response =
+        isRecyclingAuctions && recyclingRespose
+            ? { ...res.data.data, ...recyclingRespose.data.data }
+            : res.data.data
+
     return response
 }
 

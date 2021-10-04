@@ -216,6 +216,8 @@ const AuctionBlock = (auction: Props) => {
                         src={require(`../assets/${
                             eventType === 'STAKED_TOKEN'
                                 ? 'flx_uni_eth'
+                                : eventType.toLowerCase().includes('surplus')
+                                ? 'surplus'
                                 : eventType.toLowerCase()
                         }.svg`)}
                         alt="debt type auction"
@@ -465,8 +467,7 @@ const LeftAucInfo = styled.div<{ type?: string }>`
     align-items: center;
     img {
         margin-right: 20px;
-        width: ${({ type }) =>
-            type === 'surplus' || type === 'staked_token' ? '40px' : 'auto'};
+        width: ${({ type }) => (type === 'debt' ? 'auto' : '40px')};
     }
 `
 

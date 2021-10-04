@@ -10,21 +10,18 @@ import TransactionOverview from '../TransactionOverview'
 import Results from './Results'
 import _ from '../../utils/lodash'
 import { COIN_TICKER } from '../../utils/constants'
+import { AuctionEventType } from '../../containers/Auctions'
 
-type AuctionTypes = 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
+type AuctionTypes = AuctionEventType
 const AuctionsTransactions = () => {
     const { t } = useTranslation()
     const { connector, account, library } = useActiveWeb3React()
 
-    const {
-        auctionsModel: auctionsActions,
-        popupsModel: popupsActions,
-    } = useStoreActions((state) => state)
+    const { auctionsModel: auctionsActions, popupsModel: popupsActions } =
+        useStoreActions((state) => state)
 
-    const {
-        auctionsModel: auctionsState,
-        popupsModel: popupsState,
-    } = useStoreState((state) => state)
+    const { auctionsModel: auctionsState, popupsModel: popupsState } =
+        useStoreState((state) => state)
     const { amount, selectedAuction } = auctionsState
 
     const auctionId = _.get(selectedAuction, 'auctionId', '')
@@ -49,7 +46,7 @@ const AuctionsTransactions = () => {
                     ? 'Claiming Tokens'
                     : `Bid ${COIN_TICKER} and Receive FLX`
 
-            case 'SURPLUS':
+            case 'SURPLUS' || 'RECYCLING_SURPLUS':
                 return isSettle
                     ? 'Claiming RAI'
                     : isClaim

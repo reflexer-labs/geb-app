@@ -6,6 +6,7 @@ import { IconName } from '../components/FeatherIconWrapper'
 import { ApproveMethod } from '../components/ApproveToken'
 import { Geb } from 'geb.js'
 import { BigNumber } from 'ethers'
+import { AuctionEventType } from '../containers/Auctions'
 
 export declare enum ChainId {
     MAINNET = 1,
@@ -390,8 +391,8 @@ export interface IAuctionBid {
     auctionId: string
     title: string
     signer: JsonRpcSigner
-    auctionType: 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
-    type?: 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
+    auctionType: AuctionEventType
+    type?: AuctionEventType
 }
 
 export interface IPaging {

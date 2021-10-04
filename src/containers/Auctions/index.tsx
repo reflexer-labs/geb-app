@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
@@ -11,7 +11,11 @@ import { useActiveWeb3React } from '../../hooks'
 import { useStoreActions } from '../../store'
 import AuctionsList from './AuctionsList'
 
-export type AuctionEventType = 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
+export type AuctionEventType =
+    | 'DEBT'
+    | 'SURPLUS'
+    | 'STAKED_TOKEN'
+    | 'RECYCLING_SURPLUS'
 
 const Auctions = ({
     match: {
@@ -68,6 +72,10 @@ const Auctions = ({
         return () => clearInterval(interval)
     }, [account, auctionsActions, popupsActions, type, auctionType])
 
+    const humanizedType = useMemo(() => {
+        return type.toLowerCase().split('_').join(' ')
+    }, [type])
+
     return (
         <>
             <GridContainer>
@@ -76,10 +84,7 @@ const Auctions = ({
                     <PageHeader
                         breadcrumbs={{ '/': t('auctions') }}
                         text={t('auctions_header_text', {
-                            type:
-                                type === 'STAKED_TOKEN'
-                                    ? 'staked token'
-                                    : type.toLocaleLowerCase(),
+                            type: humanizedType,
                         })}
                     />
                     {hide ? (
@@ -101,6 +106,14 @@ const Auctions = ({
                             onClick={() => setType('SURPLUS')}
                         >
                             Surplus Auctions
+                        </Tab>
+                        <Tab
+                            className={
+                                type === 'RECYCLING_SURPLUS' ? 'active' : ''
+                            }
+                            onClick={() => setType('RECYCLING_SURPLUS')}
+                        >
+                            Recycling Surplus Auctions
                         </Tab>
                     </Switcher>
                 )}
@@ -136,7 +149,7 @@ const Switcher = styled.div`
     border-radius: ${(props) => props.theme.global.borderRadius};
     border: 1px solid ${(props) => props.theme.colors.border};
     background: #34496c;
-    max-width: 600px;
+    max-width: 700px;
     margin: 40px auto;
     padding: 10px;
 `

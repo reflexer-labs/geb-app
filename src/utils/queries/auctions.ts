@@ -1,6 +1,7 @@
 import { userQuery } from './user'
 
-export const auctionsQuery = (address: string, type = 'DEBT') => `{
+export const auctionsQuery = (type = 'DEBT') => `
+
   englishAuctions (orderBy:auctionId, orderDirection: desc, where:{englishAuctionType: ${type}}){
     auctionId
     englishAuctionType
@@ -20,8 +21,13 @@ export const auctionsQuery = (address: string, type = 'DEBT') => `{
       bidIncrease
       bidDuration
       totalAuctionLength
-      DEBT_amountSoldIncrease
+      ${
+          type.toLowerCase().includes('recycling')
+              ? ''
+              : 'DEBT_amountSoldIncrease'
+      }
     }
+
     englishAuctionBids {
       bidder
       buyAmount
@@ -30,6 +36,10 @@ export const auctionsQuery = (address: string, type = 'DEBT') => `{
       createdAtTransaction
     }
   }
+`
+
+export const auctionsFullQuery = (address: string, type = 'DEBT') => `{
+  ${type.toLowerCase().includes('recycling') ? '' : auctionsQuery(type)}
   userProxies(where: {owner: "${address}"}) {
     address
     coinAllowance{

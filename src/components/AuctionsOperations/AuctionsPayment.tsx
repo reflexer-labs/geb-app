@@ -22,10 +22,8 @@ const AuctionsPayment = () => {
         popupsModel: popupsState,
         connectWalletModel: connectWalletState,
     } = useStoreState((state) => state)
-    const {
-        auctionsModel: auctionsActions,
-        popupsModel: popupsActions,
-    } = useStoreActions((state) => state)
+    const { auctionsModel: auctionsActions, popupsModel: popupsActions } =
+        useStoreActions((state) => state)
     const {
         selectedAuction,
         amount,
@@ -214,7 +212,7 @@ const AuctionsPayment = () => {
             }
         }
 
-        if (auctionType === 'SURPLUS') {
+        if (auctionType.toLowerCase().includes('surplus')) {
             if (buyAmountBN.gt(totalFlxBalance)) {
                 setError(`Insufficient FLX balance.`)
                 return false
@@ -267,7 +265,7 @@ const AuctionsPayment = () => {
         const valueBN = value
             ? BigNumber.from(toFixedString(value, 'WAD'))
             : BigNumber.from('0')
-        if (auctionType === 'SURPLUS') {
+        if (auctionType.toLowerCase().includes('surplus')) {
             return flxAllowanceBN.gte(valueBN)
         }
 

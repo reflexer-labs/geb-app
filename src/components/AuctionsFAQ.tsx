@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import Button from './Button'
+import { AuctionEventType } from '../containers/Auctions'
 
 interface Props {
     hideFAQ: () => void
-    type: 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
+    type: AuctionEventType
 }
 
 interface FAQ {
@@ -17,6 +18,7 @@ interface FAQS {
     debt: Array<FAQ>
     surplus: Array<FAQ>
     staked_token: Array<FAQ>
+    recycling_surplus: Array<FAQ>
 }
 
 const AuctionsFAQ = ({ hideFAQ, type }: Props) => {
@@ -74,13 +76,33 @@ const AuctionsFAQ = ({ hideFAQ, type }: Props) => {
                 image: require('../assets/claim.svg'),
             },
         ],
+        recycling_surplus: [
+            {
+                title: t('surplus_auction_minting_flx_header'),
+                desc: t('surplus_auction_minting_flx_desc'),
+                image: require('../assets/sell-rai.svg'),
+            },
+            {
+                title: t('surplus_auction_how_to_bid'),
+                desc: t('surplus_auction_how_to_bid_desc'),
+                image: require('../assets/bid.svg'),
+            },
+            {
+                title: t('surplus_auction_claim_tokens'),
+                desc: t('surplus_auction_claim_tokens_desc'),
+                image: require('../assets/claim.svg'),
+            },
+        ],
     }
+
+    const humanizedType = useMemo(() => {
+        return type.toLowerCase().split('_').join(' ')
+    }, [type])
 
     return (
         <HeroSection>
             <Header>
-                How do {type === 'STAKED_TOKEN' ? '' : 'RAI'}{' '}
-                {type === 'STAKED_TOKEN' ? 'staked token' : type.toLowerCase()}{' '}
+                How do {type === 'STAKED_TOKEN' ? '' : 'RAI'} {humanizedType}{' '}
                 auctions work? <Button text={t('hide_faq')} onClick={hideFAQ} />
             </Header>
             <Content>
