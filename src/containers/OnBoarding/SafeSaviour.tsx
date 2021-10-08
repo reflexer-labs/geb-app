@@ -40,16 +40,12 @@ const SafeSaviour = ({ ...props }) => {
     const { withdrawCallback } = useSaviourWithdraw()
     const { getReservesCallback } = useSaviourGetReserves()
 
-    const {
-        safeModel: safeState,
-        connectWalletModel: connectWalletState,
-    } = useStoreState((state) => state)
+    const { safeModel: safeState, connectWalletModel: connectWalletState } =
+        useStoreState((state) => state)
     const { singleSafe } = safeState
     const { fiatPrice: ethPrice } = connectWalletState
-    const {
-        popupsModel: popupsActions,
-        safeModel: safeActions,
-    } = useStoreActions((state) => state)
+    const { popupsModel: popupsActions, safeModel: safeActions } =
+        useStoreActions((state) => state)
 
     const safeHandler = useSafeHandler(safeId)
     const leftOver = useHasLeftOver(safeHandler)
@@ -201,6 +197,7 @@ const SafeSaviour = ({ ...props }) => {
                                     <img
                                         src={require('../../assets/uniswap-icon.svg')}
                                         alt=""
+                                        style={{ marginRight: '5px' }}
                                     />{' '}
                                     <Link
                                         href={`https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`}
