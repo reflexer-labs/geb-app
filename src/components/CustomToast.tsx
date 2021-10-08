@@ -36,6 +36,9 @@ const WrappedToastContainer = styled(ToastContainer)`
         &.Toastify__toast--success {
             background: ${(props) => props.theme.colors.neutral}!important;
         }
+        &.Toastify__toast--default {
+            background: ${(props) => props.theme.colors.neutral}!important;
+        }
 
         &.Toastify__toast--error {
             background: #ffe6ea !important;
