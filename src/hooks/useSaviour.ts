@@ -239,7 +239,7 @@ export function useSaviourData(): SaviourData | undefined {
 
 export function useMinSaviourBalance() {
     const HUNDRED = 100
-    const LIQUIDATION_POINT = 130 // percent
+    const LIQUIDATION_POINT = 125 // percent
 
     const saviourData = useSaviourData()
 

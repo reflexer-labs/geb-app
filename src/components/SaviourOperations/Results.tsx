@@ -73,7 +73,7 @@ const Results = () => {
                             <Info size="16" />
                         </InfoIcon>
                     </Label>
-                    <Value>{`130%`}</Value>
+                    <Value>{`125%`}</Value>
                 </Item>
                 <Item>
                     <Label>
