@@ -17,6 +17,8 @@ import {
 import { BigNumber } from '@ethersproject/bignumber'
 import { formatNumber } from '../utils/helper'
 
+export const LIQUIDATION_POINT = 125 // percent
+
 export type SaviourData = {
     safeId: string
     hasSaviour: boolean
@@ -239,7 +241,6 @@ export function useSaviourData(): SaviourData | undefined {
 
 export function useMinSaviourBalance() {
     const HUNDRED = 100
-    const LIQUIDATION_POINT = 125 // percent
 
     const saviourData = useSaviourData()
 
