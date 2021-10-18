@@ -8,6 +8,7 @@ import { useMinSaviourBalance, useSaviourData } from '../../hooks/useSaviour'
 import { useStoreState } from '../../store'
 import { formatNumber } from '../../utils/helper'
 import { BigNumber, ethers } from 'ethers'
+import { LIQUIDATION_RATIO } from '../SafeOperations/SafeBody'
 
 const Results = () => {
     const { t } = useTranslation()
@@ -69,7 +70,11 @@ const Results = () => {
                 <Item>
                     <Label>
                         {`Protected Liquidation Point`}{' '}
-                        <InfoIcon data-tip={t('liquidation_point_tip')}>
+                        <InfoIcon
+                            data-tip={t('liquidation_point_tip', {
+                                liquidation_ratio: LIQUIDATION_RATIO,
+                            })}
+                        >
                             <Info size="16" />
                         </InfoIcon>
                     </Label>

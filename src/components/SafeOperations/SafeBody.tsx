@@ -27,6 +27,7 @@ import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
 import { useIsOwner, useProxyAddress } from '../../hooks/useGeb'
 
+export const LIQUIDATION_RATIO = 135 // percent
 interface Props {
     isChecked?: boolean
 }
@@ -595,7 +596,11 @@ const SafeBody = ({ isChecked }: Props) => {
                                 {!isCreate
                                     ? 'New Liquidation Price'
                                     : 'Liquidation Price'}
-                                <InfoIcon data-tip={t('liquidation_price_tip')}>
+                                <InfoIcon
+                                    data-tip={t('liquidation_price_tip', {
+                                        lr: LIQUIDATION_RATIO + '%',
+                                    })}
+                                >
                                     <Info size="16" />
                                 </InfoIcon>
                             </Label>{' '}
