@@ -202,7 +202,6 @@ export async function fetchSaviourData({
     const uniPoolPrice = numeral(numerator)
         .divide(formattedCoinTotalSupply)
         .value()
-
     return {
         safeId,
         hasSaviour: saviourAddress !== EMPTY_ADDRESS,
@@ -276,43 +275,33 @@ export function useMinSaviourBalance() {
                       .div(HUNDRED)
                 : BigNumber.from('0')
 
-            // Formula for min savior balance
-            //
-            //                                           targetCRatio * RP * accumulatedRate * debt  -  collateralPrice * collateral
-            // Min savior balance = ----------------------------------------------------------------------------------------------------------------------
-            //                        collateralPrice * (reserveETH / totalLPsupply) + RP * accumulatedRate * (reserveRAI / totalLPsupply) * targetCRatio
+            // The calculation below refers to the formula described at:
+            // https://docs.reflexer.finance/liquidation-protection/uni-v2-rai-eth-savior-math
 
-            // (All calculation are made in RAY)
-            const numerator = redemptionPrice
+            const jVar = redemptionPrice
                 .mul(accumulatedRate)
                 .div(RAY)
-                .mul(generatedDebt.mul(WAD_COMPLEMENT))
-                .div(RAY)
                 .mul(targetCRatio)
-                .div(100)
-                .sub(
-                    liquidationPrice
-                        .mul(lockedCollateral)
-                        .mul(WAD_COMPLEMENT)
-                        .div(RAY)
-                )
+                .div(HUNDRED)
+                .div(liquidationPrice)
 
-            const denominator = liquidationPrice
-                .mul(ethReserve.mul(WAD_COMPLEMENT))
-                .div(lpTotalSupply.mul(WAD_COMPLEMENT))
-                .add(
-                    redemptionPrice
-                        .mul(accumulatedRate)
-                        .div(RAY)
-                        .mul(raiReserve.mul(WAD_COMPLEMENT))
-                        .div(lpTotalSupply.mul(WAD_COMPLEMENT))
-                        .mul(targetCRatio)
-                        .div(100)
-                )
+            // TODO: Rai market price as RAY
+            // const currentRaiMarketPrice = BigNumber.from(
+            //     '3050000000000000000000000000'
+            // )
 
-            let balanceBN = !generatedDebt.isZero()
-                ? numerator.mul(RAY).div(denominator)
-                : BigNumber.from('0')
+            const pVar = redemptionPrice.mul(RAY).div(liquidationPrice)
+
+            // Leave out sqrt(p) from the minimum bal equation because BignNumber doesn't do square root
+            const minSaviorBalanceRayWithoutSqrtP = lockedCollateral
+                .mul(WAD_COMPLEMENT)
+                .sub(generatedDebt.mul(WAD_COMPLEMENT).mul(jVar).div(RAY))
+                .div(jVar.add(pVar))
+            // TODO: Find a better way doing square root if there is
+            const minSaviorBalanceNumber =
+                (Math.sqrt(Number(pVar.toString()) / 1e27) *
+                    Number(minSaviorBalanceRayWithoutSqrtP.toString())) /
+                1e27
 
             // Price USD RAY price of a LP share
             // lpUsdPrice = (reserveETH * priceEth + reserveRAI * priceRAI) / lpTotalSupply
@@ -332,12 +321,15 @@ export function useMinSaviourBalance() {
                 .mul(RAY)
                 .div(lpTokenUsdPrice)
 
-            balanceBN = !generatedDebt.isZero()
-                ? balanceBN.add(keeperPayoutInLP)
-                : BigNumber.from('0')
+            // Add the keeper balance
+            const minSaviorBalanceFinal =
+                minSaviorBalanceNumber + Number(keeperPayoutInLP.toString())
 
-            const minSaviorBalance = parseInt(balanceBN.toString()) / 1e27
-            return formatNumber(minSaviorBalance.toString(), 4, true)
+            return formatNumber(
+                (minSaviorBalanceFinal / 1e27).toString(),
+                4,
+                true
+            )
         },
         [saviourData]
     )
