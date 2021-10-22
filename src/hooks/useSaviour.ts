@@ -18,6 +18,7 @@ import { BigNumber } from '@ethersproject/bignumber'
 import { formatNumber } from '../utils/helper'
 
 export const LIQUIDATION_POINT = 125 // percent
+export const LIQUIDATION_CRATIO = 135 // percent
 
 export type SaviourData = {
     safeId: string
@@ -258,9 +259,6 @@ export function useMinSaviourBalance() {
                 generatedDebt,
                 accumulatedRate,
                 lockedCollateral,
-                reserveETH: ethReserve,
-                reserveRAI: raiReserve,
-                coinTotalSupply: lpTotalSupply,
                 keeperPayOut,
             } = saviourData
 
@@ -282,8 +280,6 @@ export function useMinSaviourBalance() {
 
             // The calculation below refers to the formula described at:
             // https://docs.reflexer.finance/liquidation-protection/uni-v2-rai-eth-savior-math
-
-            // console.log(targetCRatio)
 
             const jVar = redemptionPrice
                 .mul(accumulatedRate)
@@ -310,28 +306,17 @@ export function useMinSaviourBalance() {
                 Math.sqrt(Number(pVar.toString()) / 1e27) *
                 Number(minSaviorBalanceRayWithoutSqrtP.toString())
 
-            // Price USD RAY price of a LP share
-            // lpUsdPrice = (reserveETH * priceEth + reserveRAI * priceRAI) / lpTotalSupply
-            const lpTokenUsdPrice = ethReserve
-                .mul(WAD_COMPLEMENT)
-                .mul(liquidationPrice)
-                .div(RAY)
-                .add(
-                    raiReserve.mul(WAD_COMPLEMENT).mul(redemptionPrice).div(RAY)
-                )
-                .mul(RAY)
-                .div(lpTotalSupply.mul(WAD_COMPLEMENT))
-
-            // Calculate keeper fee and add it to the min balance
-            const keeperPayoutInLP = keeperPayOut
-                .mul(WAD_COMPLEMENT)
-                .mul(RAY)
-                .div(lpTokenUsdPrice)
+            const keeperPayoutInLP =
+                Number(keeperPayOut.mul(WAD_COMPLEMENT).toString()) /
+                (Math.sqrt(
+                    Number(liquidationPrice.mul(redemptionPrice).toString())
+                ) *
+                    2)
 
             // Add the keeper balance
             const minSaviorBalanceFinal =
                 Math.abs(minSaviorBalanceNumber) +
-                Number(keeperPayoutInLP.toString()) / 1e27
+                Number(keeperPayoutInLP.toString())
 
             return formatNumber(minSaviorBalanceFinal.toString(), 4, true)
         },
