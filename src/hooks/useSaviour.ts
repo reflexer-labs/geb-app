@@ -330,7 +330,7 @@ export function useMinSaviourBalance() {
 
             // Add the keeper balance
             const minSaviorBalanceFinal =
-                minSaviorBalanceNumber +
+                Math.abs(minSaviorBalanceNumber) +
                 Number(keeperPayoutInLP.toString()) / 1e27
 
             return formatNumber(minSaviorBalanceFinal.toString(), 4, true)
