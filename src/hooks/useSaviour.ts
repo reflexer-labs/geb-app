@@ -15,7 +15,7 @@ import {
     SaviourWithdrawPayload,
 } from '../utils/interfaces'
 import { BigNumber } from '@ethersproject/bignumber'
-import { formatNumber } from '../utils/helper'
+import { formatNumber, toFixedString } from '../utils/helper'
 
 export const LIQUIDATION_POINT = 125 // percent
 export const LIQUIDATION_CRATIO = 135 // percent
@@ -247,20 +247,33 @@ export function useTargetedCRatio(): number {
 
 export function useMinSaviourBalance() {
     const HUNDRED = 100
-
     const saviourData = useSaviourData()
     const getMinSaviourBalance = useCallback(
-        (targetCRatio: number) => {
+        (
+            targetCRatio?: number,
+            totalDebt?: string,
+            totalCollateral?: string
+        ) => {
             const WAD_COMPLEMENT = BigNumber.from(10 ** 9)
             if (!saviourData || !targetCRatio) return '0'
             const { RAY } = gebUtils
             const {
                 redemptionPrice,
-                generatedDebt,
+                generatedDebt: safeDebt,
                 accumulatedRate,
-                lockedCollateral,
+                lockedCollateral: safeCollateral,
                 keeperPayOut,
             } = saviourData
+
+            const generatedDebt = totalDebt
+                ? BigNumber.from(toFixedString(totalDebt, 'WAD'))
+                      .mul(RAY)
+                      .div(accumulatedRate)
+                : safeDebt
+
+            const lockedCollateral = totalCollateral
+                ? BigNumber.from(toFixedString(totalCollateral, 'WAD'))
+                : safeCollateral
 
             // Liquidation price formula
             //

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BigNumber } from 'ethers'
 import { utils as gebUtils } from 'geb.js'
@@ -26,6 +26,8 @@ import { DEFAULT_SAFE_STATE, COIN_TICKER } from '../../utils/constants'
 import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
 import { useIsOwner, useProxyAddress } from '../../hooks/useGeb'
+import { useMinSaviourBalance, useSaviourData } from '../../hooks/useSaviour'
+import AlertLabel from '../AlertLabel'
 
 export const LIQUIDATION_RATIO = 135 // percent
 interface Props {
@@ -35,6 +37,8 @@ interface Props {
 const SafeBody = ({ isChecked }: Props) => {
     const { t } = useTranslation()
     const proxyAddress = useProxyAddress()
+    const { getMinSaviourBalance } = useMinSaviourBalance()
+    const saviourData = useSaviourData()
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [checkUniSwapPool, setCheckUniSwapPool] = useState(isChecked || false)
     const [error, setError] = useState('')
@@ -487,9 +491,36 @@ const SafeBody = ({ isChecked }: Props) => {
         setUniSwapVal(uniSwapPool)
     }, [safeData, uniSwapPool])
 
+    const returnStatus = useCallback(() => {
+        if (!saviourData) return 'none'
+        const minimumBalance = getMinSaviourBalance(
+            saviourData.saviourRescueRatio,
+            totalDebt,
+            totalCollateral
+        ) as number
+        if (Number(saviourData.saviourBalance) >= minimumBalance) {
+            return 'Protected'
+        }
+        return 'Unprotected'
+    }, [getMinSaviourBalance, saviourData, totalCollateral, totalDebt])
+
     return (
         <>
             <Body>
+                {saviourData && saviourData.hasSaviour ? (
+                    <SaviourLabel>
+                        <AlertLabel
+                            text={`Status: ${returnStatus()}`}
+                            type={
+                                returnStatus() === 'Protected'
+                                    ? 'success'
+                                    : returnStatus() === 'none'
+                                    ? 'dimmed'
+                                    : 'danger'
+                            }
+                        />
+                    </SaviourLabel>
+                ) : null}
                 <DoubleInput
                     className={type === 'repay_withdraw' ? 'reverse' : ''}
                 >
@@ -790,6 +821,7 @@ const Value = styled.div`
 
 const Body = styled.div`
     padding: 20px;
+    position: relative;
 `
 
 const Footer = styled.div`
@@ -832,4 +864,10 @@ const Note = styled.div`
     color: ${(props) => props.theme.colors.secondary};
     font-size: ${(props) => props.theme.font.extraSmall};
     margin-top: 5px;
+`
+
+const SaviourLabel = styled.div`
+    position: absolute;
+    top: -53px;
+    right: 20px;
 `
