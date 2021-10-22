@@ -236,13 +236,18 @@ export function useSaviourData(): SaviourData | undefined {
     return saviourData
 }
 
+export function useTargetedCRatio(): number {
+    const { safeModel: safeState } = useStoreState((state) => state)
+    const { targetedCRatio } = safeState
+    return targetedCRatio
+}
+
 // minSaviourBalance
 
 export function useMinSaviourBalance() {
     const HUNDRED = 100
 
     const saviourData = useSaviourData()
-
     const getMinSaviourBalance = useCallback(
         (targetCRatio: number) => {
             const WAD_COMPLEMENT = BigNumber.from(10 ** 9)
@@ -261,7 +266,7 @@ export function useMinSaviourBalance() {
 
             // Liquidation price formula
             //
-            //                      debt * accumulatedRate * targetCRatio * RP
+            //                              debt * accumulatedRate * RP
             // liquidationPrice = -----------------------------------------------
             //                                     collateral
 
@@ -269,20 +274,23 @@ export function useMinSaviourBalance() {
                 ? redemptionPrice
                       .mul(generatedDebt.mul(WAD_COMPLEMENT))
                       .mul(accumulatedRate)
-                      .div(lockedCollateral.mul(WAD_COMPLEMENT))
-                      .div(RAY)
                       .mul(LIQUIDATION_POINT)
                       .div(HUNDRED)
+                      .div(lockedCollateral.mul(WAD_COMPLEMENT))
+                      .div(RAY)
                 : BigNumber.from('0')
 
             // The calculation below refers to the formula described at:
             // https://docs.reflexer.finance/liquidation-protection/uni-v2-rai-eth-savior-math
+
+            // console.log(targetCRatio)
 
             const jVar = redemptionPrice
                 .mul(accumulatedRate)
                 .div(RAY)
                 .mul(targetCRatio)
                 .div(HUNDRED)
+                .mul(RAY)
                 .div(liquidationPrice)
 
             // TODO: Rai market price as RAY
@@ -299,9 +307,8 @@ export function useMinSaviourBalance() {
                 .div(jVar.add(pVar))
             // TODO: Find a better way doing square root if there is
             const minSaviorBalanceNumber =
-                (Math.sqrt(Number(pVar.toString()) / 1e27) *
-                    Number(minSaviorBalanceRayWithoutSqrtP.toString())) /
-                1e27
+                Math.sqrt(Number(pVar.toString()) / 1e27) *
+                Number(minSaviorBalanceRayWithoutSqrtP.toString())
 
             // Price USD RAY price of a LP share
             // lpUsdPrice = (reserveETH * priceEth + reserveRAI * priceRAI) / lpTotalSupply
@@ -323,13 +330,10 @@ export function useMinSaviourBalance() {
 
             // Add the keeper balance
             const minSaviorBalanceFinal =
-                minSaviorBalanceNumber + Number(keeperPayoutInLP.toString())
+                minSaviorBalanceNumber +
+                Number(keeperPayoutInLP.toString()) / 1e27
 
-            return formatNumber(
-                (minSaviorBalanceFinal / 1e27).toString(),
-                4,
-                true
-            )
+            return formatNumber(minSaviorBalanceFinal.toString(), 4, true)
         },
         [saviourData]
     )
