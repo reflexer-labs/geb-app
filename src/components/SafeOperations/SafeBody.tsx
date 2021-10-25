@@ -790,6 +790,7 @@ const Value = styled.div`
 
 const Body = styled.div`
     padding: 20px;
+    position: relative;
 `
 
 const Footer = styled.div`

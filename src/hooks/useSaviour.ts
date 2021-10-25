@@ -15,9 +15,10 @@ import {
     SaviourWithdrawPayload,
 } from '../utils/interfaces'
 import { BigNumber } from '@ethersproject/bignumber'
-import { formatNumber } from '../utils/helper'
+import { formatNumber, toFixedString } from '../utils/helper'
 
 export const LIQUIDATION_POINT = 125 // percent
+export const LIQUIDATION_CRATIO = 135 // percent
 
 export type SaviourData = {
     safeId: string
@@ -202,7 +203,6 @@ export async function fetchSaviourData({
     const uniPoolPrice = numeral(numerator)
         .divide(formattedCoinTotalSupply)
         .value()
-
     return {
         safeId,
         hasSaviour: saviourAddress !== EMPTY_ADDRESS,
@@ -237,32 +237,47 @@ export function useSaviourData(): SaviourData | undefined {
     return saviourData
 }
 
+export function useTargetedCRatio(): number {
+    const { safeModel: safeState } = useStoreState((state) => state)
+    const { targetedCRatio } = safeState
+    return targetedCRatio
+}
+
 // minSaviourBalance
 
 export function useMinSaviourBalance() {
     const HUNDRED = 100
-
     const saviourData = useSaviourData()
-
     const getMinSaviourBalance = useCallback(
-        (targetCRatio: number) => {
+        (
+            targetCRatio?: number,
+            totalDebt?: string,
+            totalCollateral?: string
+        ) => {
             const WAD_COMPLEMENT = BigNumber.from(10 ** 9)
             if (!saviourData || !targetCRatio) return '0'
             const { RAY } = gebUtils
             const {
                 redemptionPrice,
-                generatedDebt,
+                generatedDebt: safeDebt,
                 accumulatedRate,
-                lockedCollateral,
-                reserveETH: ethReserve,
-                reserveRAI: raiReserve,
-                coinTotalSupply: lpTotalSupply,
+                lockedCollateral: safeCollateral,
                 keeperPayOut,
             } = saviourData
 
+            const generatedDebt = totalDebt
+                ? BigNumber.from(toFixedString(totalDebt, 'WAD'))
+                      .mul(RAY)
+                      .div(accumulatedRate)
+                : safeDebt
+
+            const lockedCollateral = totalCollateral
+                ? BigNumber.from(toFixedString(totalCollateral, 'WAD'))
+                : safeCollateral
+
             // Liquidation price formula
             //
-            //                      debt * accumulatedRate * targetCRatio * RP
+            //                              debt * accumulatedRate * RP
             // liquidationPrice = -----------------------------------------------
             //                                     collateral
 
@@ -270,74 +285,53 @@ export function useMinSaviourBalance() {
                 ? redemptionPrice
                       .mul(generatedDebt.mul(WAD_COMPLEMENT))
                       .mul(accumulatedRate)
-                      .div(lockedCollateral.mul(WAD_COMPLEMENT))
-                      .div(RAY)
                       .mul(LIQUIDATION_POINT)
                       .div(HUNDRED)
+                      .div(lockedCollateral.mul(WAD_COMPLEMENT))
+                      .div(RAY)
                 : BigNumber.from('0')
 
-            // Formula for min savior balance
-            //
-            //                                           targetCRatio * RP * accumulatedRate * debt  -  collateralPrice * collateral
-            // Min savior balance = ----------------------------------------------------------------------------------------------------------------------
-            //                        collateralPrice * (reserveETH / totalLPsupply) + RP * accumulatedRate * (reserveRAI / totalLPsupply) * targetCRatio
+            // The calculation below refers to the formula described at:
+            // https://docs.reflexer.finance/liquidation-protection/uni-v2-rai-eth-savior-math
 
-            // (All calculation are made in RAY)
-            const numerator = redemptionPrice
+            const jVar = redemptionPrice
                 .mul(accumulatedRate)
                 .div(RAY)
-                .mul(generatedDebt.mul(WAD_COMPLEMENT))
-                .div(RAY)
                 .mul(targetCRatio)
-                .div(100)
-                .sub(
-                    liquidationPrice
-                        .mul(lockedCollateral)
-                        .mul(WAD_COMPLEMENT)
-                        .div(RAY)
-                )
-
-            const denominator = liquidationPrice
-                .mul(ethReserve.mul(WAD_COMPLEMENT))
-                .div(lpTotalSupply.mul(WAD_COMPLEMENT))
-                .add(
-                    redemptionPrice
-                        .mul(accumulatedRate)
-                        .div(RAY)
-                        .mul(raiReserve.mul(WAD_COMPLEMENT))
-                        .div(lpTotalSupply.mul(WAD_COMPLEMENT))
-                        .mul(targetCRatio)
-                        .div(100)
-                )
-
-            let balanceBN = !generatedDebt.isZero()
-                ? numerator.mul(RAY).div(denominator)
-                : BigNumber.from('0')
-
-            // Price USD RAY price of a LP share
-            // lpUsdPrice = (reserveETH * priceEth + reserveRAI * priceRAI) / lpTotalSupply
-            const lpTokenUsdPrice = ethReserve
-                .mul(WAD_COMPLEMENT)
-                .mul(liquidationPrice)
-                .div(RAY)
-                .add(
-                    raiReserve.mul(WAD_COMPLEMENT).mul(redemptionPrice).div(RAY)
-                )
+                .div(HUNDRED)
                 .mul(RAY)
-                .div(lpTotalSupply.mul(WAD_COMPLEMENT))
+                .div(liquidationPrice)
 
-            // Calculate keeper fee and add it to the min balance
-            const keeperPayoutInLP = keeperPayOut
+            // TODO: Rai market price as RAY
+            // const currentRaiMarketPrice = BigNumber.from(
+            //     '3050000000000000000000000000'
+            // )
+
+            const pVar = redemptionPrice.mul(RAY).div(liquidationPrice)
+
+            // Leave out sqrt(p) from the minimum bal equation because BignNumber doesn't do square root
+            const minSaviorBalanceRayWithoutSqrtP = lockedCollateral
                 .mul(WAD_COMPLEMENT)
-                .mul(RAY)
-                .div(lpTokenUsdPrice)
+                .sub(generatedDebt.mul(WAD_COMPLEMENT).mul(jVar).div(RAY))
+                .div(jVar.add(pVar))
+            // TODO: Find a better way doing square root if there is
+            const minSaviorBalanceNumber =
+                Math.sqrt(Number(pVar.toString()) / 1e27) *
+                Number(minSaviorBalanceRayWithoutSqrtP.toString())
 
-            balanceBN = !generatedDebt.isZero()
-                ? balanceBN.add(keeperPayoutInLP)
-                : BigNumber.from('0')
+            const keeperPayoutInLP =
+                Number(keeperPayOut.mul(WAD_COMPLEMENT).toString()) /
+                (Math.sqrt(
+                    Number(liquidationPrice.mul(redemptionPrice).toString())
+                ) *
+                    2)
 
-            const minSaviorBalance = parseInt(balanceBN.toString()) / 1e27
-            return formatNumber(minSaviorBalance.toString(), 4, true)
+            // Add the keeper balance
+            const minSaviorBalanceFinal =
+                Math.abs(minSaviorBalanceNumber) +
+                Number(keeperPayoutInLP.toString())
+
+            return formatNumber(minSaviorBalanceFinal.toString(), 4, true)
         },
         [saviourData]
     )

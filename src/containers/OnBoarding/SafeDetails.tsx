@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Link2 } from 'react-feather'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 import AlertLabel from '../../components/AlertLabel'
 import Button from '../../components/Button'
@@ -25,11 +25,13 @@ const SafeDetails = ({ ...props }) => {
     const { account, library } = useActiveWeb3React()
     const [loading, setIsLoading] = useState(false)
     const geb = useGeb()
-    const {
-        safeModel: safeActions,
-        popupsModel: popupsActions,
-    } = useStoreActions((state) => state)
-    const { safeModel: safeState } = useStoreState((state) => state)
+    const { safeModel: safeActions, popupsModel: popupsActions } =
+        useStoreActions((state) => state)
+    const { safeModel: safeState, connectWalletModel: connectWalletState } =
+        useStoreState((state) => state)
+
+    const { fiatPrice: ethPrice } = connectWalletState
+
     const safeId = props.match.params.id as string
 
     const hasSaviour = useHasSaviour(
@@ -105,6 +107,20 @@ const SafeDetails = ({ ...props }) => {
         safeActions,
         safeId,
     ])
+
+    const fetchSaviourDataCallback = useCallback(() => {
+        if (!account || !geb || !safeId) return
+        safeActions.fetchSaviourData({
+            account,
+            geb,
+            safeId,
+            ethPrice,
+        })
+    }, [account, ethPrice, geb, safeActions, safeId])
+
+    useEffect(() => {
+        fetchSaviourDataCallback()
+    }, [fetchSaviourDataCallback])
 
     const handleSaviourBtnClick = async (data: {
         status: boolean
