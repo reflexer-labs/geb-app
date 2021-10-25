@@ -68,6 +68,10 @@ const SafeBody = ({ isChecked }: Props) => {
         globalDebtCeiling,
     } = safeState.liquidationData
 
+    const raiPrice = singleSafe
+        ? (formatNumber(currentRedemptionPrice, 3) as number)
+        : 0
+
     const isOwner = useIsOwner(singleSafe?.id as string)
     const raiBalance = connectWalletState.raiBalance[NETWORK_ID].toString()
 
@@ -164,6 +168,13 @@ const SafeBody = ({ isChecked }: Props) => {
                 Number(getAvailableRai()) > 0.01
                     ? formatNumber(getAvailableRai(), 2)
                     : '< 0.01'
+            } ${
+                isCreate
+                    ? ''
+                    : `≃ $${formatNumber(
+                          String(Number(getAvailableRai()) * raiPrice),
+                          2
+                      )}`
             })`
         }
         if (type === 'repay_withdraw' && isLeft) {
