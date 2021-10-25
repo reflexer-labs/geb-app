@@ -31,6 +31,10 @@ jobs:
         if: ${{ needs.bump_version.outputs.new_tag != null }}
         env:
             SOURCE_DIR: 'build'
+            AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET_PRODUCTION }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             REACT_APP_GRAPH_API_URLS: ${{ secrets.REACT_APP_GRAPH_API_URLS_PRODUCTION }}
             REACT_APP_NETWORK_ID: ${{ secrets.REACT_APP_NETWORK_ID_PRODUCTION }}
             REACT_APP_NETWORK_URL: ${{ secrets.REACT_APP_NETWORK_URL_PRODUCTION }}
@@ -54,6 +58,11 @@ jobs:
             - name: Build the IPFS bundle
               run: yarn build
 
+            - name: Deploy to AWS
+              uses: jakejarvis/s3-sync-action@v0.5.0
+              with:
+                  args: --acl public-read --follow-symlinks --delete
+
             - name: Pin to IPFS
               id: upload
               uses: anantaramdas/ipfs-pinata-deploy-action@v1.6.3
@@ -69,15 +78,15 @@ jobs:
               with:
                   cidv0: ${{ steps.upload.outputs.hash }}
 
-            - name: Update DNS with new IPFS hash
-              env:
-                  CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
-                  RECORD_DOMAIN: 'reflexer.finance'
-                  RECORD_NAME: '_dnslink.app'
-                  CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-              uses: textileio/cloudflare-update-dnslink@0fe7b7a1ffc865db3a4da9773f0f987447ad5848
-              with:
-                  cid: ${{ steps.upload.outputs.hash }}
+            # - name: Update DNS with new IPFS hash
+            #   env:
+            #       CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+            #       RECORD_DOMAIN: 'reflexer.finance'
+            #       RECORD_NAME: '_dnslink.app'
+            #       CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+            #   uses: textileio/cloudflare-update-dnslink@0fe7b7a1ffc865db3a4da9773f0f987447ad5848
+            #   with:
+            #       cid: ${{ steps.upload.outputs.hash }}
 
             - name: Create GitHub Release
               id: create_release
