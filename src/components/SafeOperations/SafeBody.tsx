@@ -521,7 +521,7 @@ const SafeBody = ({ isChecked }: Props) => {
                 {saviourData && saviourData.hasSaviour ? (
                     <SaviourLabel>
                         <AlertLabel
-                            text={`Status: ${returnStatus()}`}
+                            text={`Saviour Status: ${returnStatus()}`}
                             type={
                                 returnStatus() === 'Protected'
                                     ? 'success'
