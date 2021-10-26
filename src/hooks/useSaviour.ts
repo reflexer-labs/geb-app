@@ -281,15 +281,13 @@ export function useMinSaviourBalance() {
             // liquidationPrice = -----------------------------------------------
             //                                     collateral
 
-            const liquidationPrice = !generatedDebt.isZero()
-                ? redemptionPrice
-                      .mul(generatedDebt.mul(WAD_COMPLEMENT))
-                      .mul(accumulatedRate)
-                      .mul(LIQUIDATION_POINT)
-                      .div(HUNDRED)
-                      .div(lockedCollateral.mul(WAD_COMPLEMENT))
-                      .div(RAY)
-                : BigNumber.from('0')
+            const liquidationPrice = redemptionPrice
+                .mul(generatedDebt.mul(WAD_COMPLEMENT))
+                .mul(accumulatedRate)
+                .mul(LIQUIDATION_POINT)
+                .div(HUNDRED)
+                .div(lockedCollateral.mul(WAD_COMPLEMENT))
+                .div(RAY)
 
             // The calculation below refers to the formula described at:
             // https://docs.reflexer.finance/liquidation-protection/uni-v2-rai-eth-savior-math
@@ -310,10 +308,19 @@ export function useMinSaviourBalance() {
             const pVar = redemptionPrice.mul(RAY).div(liquidationPrice)
 
             // Leave out sqrt(p) from the minimum bal equation because BignNumber doesn't do square root
-            const minSaviorBalanceRayWithoutSqrtP = lockedCollateral
-                .mul(WAD_COMPLEMENT)
-                .sub(generatedDebt.mul(WAD_COMPLEMENT).mul(jVar).div(RAY))
-                .div(jVar.add(pVar))
+            const minSaviorBalanceRayWithoutSqrtP =
+                !jVar.isZero() && !pVar.isZero()
+                    ? lockedCollateral
+                          .mul(WAD_COMPLEMENT)
+                          .sub(
+                              generatedDebt
+                                  .mul(WAD_COMPLEMENT)
+                                  .mul(jVar)
+                                  .div(RAY)
+                          )
+                          .div(jVar.add(pVar))
+                    : BigNumber.from('0')
+
             // TODO: Find a better way doing square root if there is
             const minSaviorBalanceNumber =
                 Math.sqrt(Number(pVar.toString()) / 1e27) *
