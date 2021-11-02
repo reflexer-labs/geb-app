@@ -47,7 +47,7 @@ const UnStake = () => {
 
     const exitReqestDeatline =
         exitRequests && exitRequests.deadline > 0
-            ? dayjs.unix(exitRequests.deadline).format('MMM D, YYYY')
+            ? dayjs.unix(exitRequests.deadline).format('MMM D, YYYY h:mm A')
             : null
 
     const totalUnlockedAmount = useMemo(() => {
