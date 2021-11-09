@@ -1,11 +1,13 @@
 import React from 'react'
-import { DollarSign, Shield } from 'react-feather'
+import { DollarSign, Repeat, Shield } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { NETWORK_ID } from '../connectors'
+import useSwap from '../hooks/useSwap'
 import { useStoreActions } from '../store'
 import { SHOW_AUCTIONS } from '../utils/constants'
+import { timeout } from '../utils/helper'
 import AnalyticsIcon from './Icons/AnalyticsIcon'
 import AuctionIcon from './Icons/AuctionIcon'
 import SafeIcon from './Icons/SafeIcon'
@@ -13,11 +15,12 @@ import SafeIcon from './Icons/SafeIcon'
 const NavLinks = () => {
     const { t } = useTranslation()
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
-
-    const handleLinkClick = (
+    const { generateSwap } = useSwap()
+    const handleLinkClick = async (
         e: React.MouseEvent<HTMLElement>,
         disable = false,
-        externalLink = ''
+        externalLink = '',
+        isSwap = false
     ) => {
         if (disable) {
             e.preventDefault()
@@ -26,6 +29,33 @@ const NavLinks = () => {
         if (externalLink) {
             window.open(externalLink, '_blank')
             e.preventDefault()
+        }
+
+        if (isSwap) {
+            popupsActions.setIsWaitingModalOpen(true)
+            popupsActions.setWaitingPayload({
+                title: 'Please hold...',
+                text: 'Preparing to swap',
+                status: 'loading',
+            })
+            const url = await generateSwap()
+            await timeout(1000)
+            if (url) {
+                popupsActions.setWaitingPayload({
+                    title: 'Cheers!',
+                    text: 'You can now swap dirty fiat to RAI!',
+                    status: 'success',
+                })
+                await timeout(1000)
+                window.open(url, '_blank')
+                e.persist()
+            } else {
+                popupsActions.setWaitingPayload({
+                    title: 'FAILED!',
+                    text: 'Something went wrong generating swap url.',
+                    status: 'error',
+                })
+            }
         }
     }
 
@@ -68,6 +98,13 @@ const NavLinks = () => {
                     </IntLink>
                 </MenuBox>
             </Box>
+            <NavBarLink
+                id="app-link"
+                to="/"
+                onClick={(e) => handleLinkClick(e, false, '', true)}
+            >
+                <Repeat /> {t('swap')}
+            </NavBarLink>
             <Box className="has-menu">
                 <LinkItem>
                     <Shield /> {t('insurance')}
