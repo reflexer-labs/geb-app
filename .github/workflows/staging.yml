@@ -20,6 +20,7 @@ jobs:
             REACT_APP_SYSTEM_STATUS: ${{ secrets.REACT_APP_SYSTEM_STATUS_STAGING }}
             REACT_APP_GOOGLE_ANALYTICS_ID: ${{ secrets.REACT_APP_GOOGLE_ANALYTICS_ID_STAGING }}
             REACT_APP_SHOW_AUCTIONS: ${{ secrets.REACT_APP_SHOW_AUCTIONS_STAGING }}
+            REACT_APP_WYRE_WORKER: ${{ secrets.REACT_APP_WYRE_WORKER }}
 
         steps:
             - uses: actions/checkout@v2
