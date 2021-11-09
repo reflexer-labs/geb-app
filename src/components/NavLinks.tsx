@@ -40,15 +40,21 @@ const NavLinks = () => {
             })
             const url = await generateSwap()
             await timeout(1000)
-            popupsActions.setWaitingPayload({
-                title: 'Cheers!',
-                text: 'You can now swap dirty fiat to RAI!',
-                status: 'success',
-            })
-            await timeout(1000)
             if (url) {
+                popupsActions.setWaitingPayload({
+                    title: 'Cheers!',
+                    text: 'You can now swap dirty fiat to RAI!',
+                    status: 'success',
+                })
+                await timeout(1000)
                 window.open(url, '_blank')
                 e.persist()
+            } else {
+                popupsActions.setWaitingPayload({
+                    title: 'FAILED!',
+                    text: 'Something went wrong generating swap url.',
+                    status: 'error',
+                })
             }
         }
     }

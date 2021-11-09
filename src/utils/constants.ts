@@ -13,6 +13,7 @@ const {
     REACT_APP_MAILCHIMP_URL,
     REACT_APP_SHOW_AUCTIONS,
     REACT_APP_NETWORK_URL,
+    REACT_APP_WYRE_WORKER,
 } = process.env
 
 export enum Network {
@@ -34,6 +35,7 @@ export const COLLATERAL_TYPE_ID = 'ETH-A'
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000'
 export const SYSTEM_STATUS = REACT_APP_SYSTEM_STATUS || ''
 export const SHOW_AUCTIONS = REACT_APP_SHOW_AUCTIONS || ''
+export const WYRE_WORKER = REACT_APP_WYRE_WORKER || ''
 
 // 'https://api.thegraph.com/subgraphs/name/guifel/kovan_1_3_0'
 export const GRAPH_API_URLS = REACT_APP_GRAPH_API_URLS

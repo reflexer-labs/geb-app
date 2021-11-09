@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+import { WYRE_WORKER } from '../utils/constants'
 
 export default function useSwap() {
     const generateSwap = useCallback(async () => {
@@ -12,7 +13,7 @@ export default function useSwap() {
 }
 
 function generateSwapUrl() {
-    return fetch(`https://reservation.paytest.workers.dev`)
+    return fetch(WYRE_WORKER)
         .then((res) => {
             if (res.status === 200) {
                 return res.json()
