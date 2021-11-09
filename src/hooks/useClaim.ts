@@ -11,7 +11,7 @@ import { ChainId, Distribution, Distributions } from '../utils/interfaces'
 import { handlePreTxGasEstimate } from './TransactionHooks'
 import useGeb from './useGeb'
 
-function isAddress(value: any): string | false {
+export function isAddress(value: any): string | false {
     try {
         return getAddress(value)
     } catch {
@@ -94,9 +94,10 @@ export function useClaimableDistributions() {
         if (!geb || !account || !userClaimData) return
         const claims = await Promise.all(
             userClaimData.map(async (claim) => {
-                const distributorAddress = await geb.contracts.merkleDistributorFactory.distributors(
-                    claim.distributionIndex
-                )
+                const distributorAddress =
+                    await geb.contracts.merkleDistributorFactory.distributors(
+                        claim.distributionIndex
+                    )
                 const distro = geb.getMerkleDistributor(distributorAddress)
                 const isClaimed = await distro.isClaimed(claim.index)
                 const deploymentTime = await distro.deploymentTime()
