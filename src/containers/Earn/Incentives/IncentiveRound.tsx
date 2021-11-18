@@ -31,7 +31,7 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                         {round.name}
                     </MainBlock>
                 </LeftBlock>
-                <RightBlock>
+                {/* <RightBlock>
                     <Info>
                         <InfoCol>
                             <InfoLabel>Snapshot Date</InfoLabel>
@@ -46,7 +46,7 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                             </InfoValue>
                         </InfoCol>
                     </Info>
-                </RightBlock>
+                </RightBlock> */}
             </Header>
 
             {isCollapsed ? null : (
