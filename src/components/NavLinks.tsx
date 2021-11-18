@@ -120,6 +120,16 @@ const NavLinks = () => {
                             alt="arrow"
                         />
                     </ExtLink>
+                    <ExtLink
+                        href="https://app.insurace.io/Insurance/BuyCovers?referrer=1429350351089631541390481795260252294441502731750"
+                        target="_blank"
+                    >
+                        InsurAce{' '}
+                        <img
+                            src={require('../assets/dark-arrow.svg')}
+                            alt="arrow"
+                        />
+                    </ExtLink>
                 </MenuBox>
             </Box>
             <NavBarLink
