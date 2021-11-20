@@ -280,7 +280,9 @@ export function useMinSaviourBalance() {
             //                              debt * accumulatedRate * RP
             // liquidationPrice = -----------------------------------------------
             //                                     collateral
-
+            if (lockedCollateral.isZero()) {
+                return '0'
+            }
             const liquidationPrice = redemptionPrice
                 .mul(generatedDebt.mul(WAD_COMPLEMENT))
                 .mul(accumulatedRate)
@@ -292,20 +294,24 @@ export function useMinSaviourBalance() {
             // The calculation below refers to the formula described at:
             // https://docs.reflexer.finance/liquidation-protection/uni-v2-rai-eth-savior-math
 
-            const jVar = redemptionPrice
-                .mul(accumulatedRate)
-                .div(RAY)
-                .mul(targetCRatio)
-                .div(HUNDRED)
-                .mul(RAY)
-                .div(liquidationPrice)
+            const jVar = lockedCollateral.isZero()
+                ? redemptionPrice
+                      .mul(accumulatedRate)
+                      .div(RAY)
+                      .mul(targetCRatio)
+                      .div(HUNDRED)
+                      .mul(RAY)
+                      .div(liquidationPrice)
+                : BigNumber.from('0')
 
             // TODO: Rai market price as RAY
             // const currentRaiMarketPrice = BigNumber.from(
             //     '3050000000000000000000000000'
             // )
 
-            const pVar = redemptionPrice.mul(RAY).div(liquidationPrice)
+            const pVar = lockedCollateral.isZero()
+                ? redemptionPrice.mul(RAY).div(liquidationPrice)
+                : BigNumber.from('0')
 
             // Leave out sqrt(p) from the minimum bal equation because BignNumber doesn't do square root
             const minSaviorBalanceRayWithoutSqrtP =
@@ -337,8 +343,14 @@ export function useMinSaviourBalance() {
             const minSaviorBalanceFinal =
                 Math.abs(minSaviorBalanceNumber) +
                 Number(keeperPayoutInLP.toString())
-
-            return formatNumber(minSaviorBalanceFinal.toString(), 4, true)
+            const minSavBalance = formatNumber(
+                minSaviorBalanceFinal.toString(),
+                4,
+                true
+            )
+            return isNaN(parseFloat(minSavBalance as string))
+                ? '0.00'
+                : minSavBalance
         },
         [saviourData]
     )
