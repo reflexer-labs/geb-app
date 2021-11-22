@@ -277,7 +277,7 @@ export function useMinSaviourBalance() {
 
             // Liquidation price formula
             //
-            //                              debt * accumulatedRate * RP
+            //                              debt * accumulatedRate * RP * Liq Point
             // liquidationPrice = -----------------------------------------------
             //                                     collateral
             if (lockedCollateral.isZero()) {
@@ -294,7 +294,7 @@ export function useMinSaviourBalance() {
             // The calculation below refers to the formula described at:
             // https://docs.reflexer.finance/liquidation-protection/uni-v2-rai-eth-savior-math
 
-            const jVar = lockedCollateral.isZero()
+            const jVar = !lockedCollateral.isZero()
                 ? redemptionPrice
                       .mul(accumulatedRate)
                       .div(RAY)
@@ -309,7 +309,7 @@ export function useMinSaviourBalance() {
             //     '3050000000000000000000000000'
             // )
 
-            const pVar = lockedCollateral.isZero()
+            const pVar = !lockedCollateral.isZero()
                 ? redemptionPrice.mul(RAY).div(liquidationPrice)
                 : BigNumber.from('0')
 
