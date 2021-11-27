@@ -63,6 +63,16 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                                         <LeftBlock>
                                             <DistroData>
                                                 <img
+                                                    style={{
+                                                        borderRadius:
+                                                            distro.name
+                                                                .toLowerCase()
+                                                                .includes(
+                                                                    'flx/eth'
+                                                                )
+                                                                ? '0'
+                                                                : '50%',
+                                                    }}
                                                     src={distro.image}
                                                     alt=""
                                                 />{' '}
