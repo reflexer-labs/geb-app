@@ -1,35 +1,21 @@
-import React, { memo, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import { useStoreActions, useStoreState } from '../store'
 import Brand from './Brand'
 import Button from './Button'
+import FLXLogoSmall from './Icons/FLXLogoSmall'
 import { newTransactionsFirst, returnWalletAddress } from '../utils/helper'
 import { useWeb3React } from '@web3-react/core'
 import { isTransactionRecent } from '../hooks/TransactionHooks'
 import NavLinks from './NavLinks'
-import FLXLogoSmall from './Icons/FLXLogoSmall'
-import { Moon, Sun } from 'react-feather'
-
-const ThemeToggle = memo(() => {
-    const { settingsModel: settingsState } = useStoreState((state) => state)
-    const { settingsModel: settingsActions } = useStoreActions((state) => state)
-
-    return (
-        <ThemeBtn
-            onClick={() =>
-                settingsActions.setIsLightTheme(!settingsState.isLightTheme)
-            }
-        >
-            {settingsState.isLightTheme ? <Moon /> : <Sun />}
-        </ThemeBtn>
-    )
-})
+import { useTranslation } from 'react-i18next'
+import Identicon from './Icons/Identicon'
 
 const Navbar = () => {
+    const { t } = useTranslation()
     const {
         transactionsModel: transactionsState,
         connectWalletModel: connectWalletState,
-        settingsModel: settingsState,
     } = useStoreState((state) => state)
 
     const { transactions } = transactionsState
@@ -57,45 +43,50 @@ const Navbar = () => {
     return (
         <Container>
             <Left>
-                <Brand isLight={settingsState.isLightTheme} />
+                <Brand />
             </Left>
             <HideMobile>
                 <NavLinks />
             </HideMobile>
             <RightSide>
                 {active && account ? (
-                    <FLXButton
+                    <Button
+                        style={{ marginRight: '10px' }}
                         data-test-id="flx-btn"
                         onClick={() =>
                             popupsActions.setIsDistributionsModalOpen(true)
                         }
+                        secondary
                     >
-                        <Balance>
-                            {connectWalletState.claimableFLX.slice(0, 10)}
-                        </Balance>
-                        <FLXInfo>
+                        <Flex>
                             <LogoBox>
                                 <FLXLogoSmall />
                             </LogoBox>
-                            FLX
-                        </FLXInfo>
-                    </FLXButton>
+                            {connectWalletState.claimableFLX.slice(0, 10)} FLX
+                        </Flex>
+                    </Button>
                 ) : null}
                 <BtnContainer>
                     <Button
+                        primary={active && account ? true : false}
                         id="web3-status-connected"
                         isLoading={hasPendingTransactions}
                         onClick={handleWalletConnect}
-                        text={
-                            active && account
-                                ? hasPendingTransactions
-                                    ? `${pending.length} Pending`
-                                    : returnWalletAddress(account)
-                                : 'connect_wallet'
-                        }
-                    />
+                    >
+                        {active && account ? (
+                            hasPendingTransactions ? (
+                                `${pending.length} Pending`
+                            ) : (
+                                <InnerBtn>
+                                    {returnWalletAddress(account)}
+                                    <Identicon />
+                                </InnerBtn>
+                            )
+                        ) : (
+                            t('connect_wallet')
+                        )}
+                    </Button>
                 </BtnContainer>
-                <ThemeToggle />
 
                 <MenuBtn onClick={() => popupsActions.setShowSideMenu(true)}>
                     <RectContainer>
@@ -116,13 +107,12 @@ const Container = styled.div`
     height: 68px;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0px 1px 0px ${(props) => props.theme.colors.boxShadow};
-    padding: 0 40px;
-    margin-bottom: 10px;
-    border-bottom: 1px solid ${(props) => props.theme.colors.border};
-    background: ${(props) => props.theme.colors.background};
+    padding: 40px 40px 0 40px;
+    position: relative;
+    z-index: 5;
     ${({ theme }) => theme.mediaWidth.upToSmall`
      padding: 0 20px;
+     top:0 !important;
   `}
 `
 
@@ -196,80 +186,22 @@ const Left = styled.div`
   `}
 `
 
-const FLXButton = styled.button`
-    box-shadow: none;
-    border: 0;
-    background: transparent;
-    display: flex;
-    padding: 0;
-    outline: none;
+const Flex = styled.div`
     align-items: center;
-    font-weight: bold;
-    height: 40px;
-    line-height: 24px;
-    position: relative;
-    cursor: pointer;
-    margin-right: 15px;
-`
-const Balance = styled.div`
-    border-radius: 4px;
-    background: ${(props) => props.theme.colors.gradient};
-    color: ${(props) => props.theme.colors.neutral};
-    font-weight: bold;
-    position: relative;
-    font-size: 15px;
-    height: 40px;
-    padding: 0 10px;
-    min-width: 50px;
+    display: flex;
     justify-content: center;
-    display: flex;
-    align-items: center;
-    margin-right: -10px;
-`
-
-const FLXInfo = styled.div`
-    display: flex;
-    align-items: center;
-    background: #34496c;
-    height: 40px;
-    color: #fff;
-    border-radius: 0 4px 4px 0;
-    padding: 0 10px;
 `
 const LogoBox = styled.div`
-    margin: 0 5px;
+    margin-right: 5px;
     display: flex;
     align-items: center;
 `
-
-const ThemeBtn = styled.button`
-    background: ${(props) => props.theme.colors.border};
-    box-shadow: none;
-    outline: none;
-    cursor: pointer;
-    border: 0;
-    color: ${(props) => props.theme.colors.secondary};
-    padding: 9px 10px;
-    margin: 0 0 0 15px;
-    line-height: normal;
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    transition: all 0.3s ease;
-    position: relative;
-    svg {
-        width: 20px;
-        height: 20px;
-        display: block;
-        color: ${(props) => props.theme.colors.secondary};
-    }
-
-    &:hover {
-        background: ${(props) => props.theme.colors.secondary};
+const InnerBtn = styled(Flex)`
+    div {
+        display: block !important;
+        margin-left: 5px;
         svg {
-            color: ${(props) => props.theme.colors.border};
+            top: 0 !important;
         }
     }
-
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-   margin-right:15px;
-  `}
 `

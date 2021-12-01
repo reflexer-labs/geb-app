@@ -34,7 +34,7 @@ const CheckboxContainer = styled.label`
 
 const Icon = styled.svg`
     fill: none;
-    stroke: white;
+    stroke: ${(props) => props.theme.colors.blueish};
     stroke-width: 2px;
     visibility: hidden;
     display: block;
@@ -60,14 +60,13 @@ const StyledCheckbox = styled.div`
     border-radius: 2.5px;
     transition: all 150ms;
     padding: 1px;
-    background: ${(props) => props.theme.colors.gradient};
     div {
-        background: ${(props) => props.theme.colors.background};
         border-radius: 2.5px;
+        border: 1px solid ${(props) => props.theme.colors.blueish};
     }
     &.checked {
         div {
-            background: ${(props) => props.theme.colors.gradient};
+            border: 1px solid ${(props) => props.theme.colors.blueish};
         }
         svg {
             visibility: visible;

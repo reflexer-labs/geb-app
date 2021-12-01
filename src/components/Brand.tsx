@@ -1,24 +1,17 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
 
 interface Props {
     height?: number
-    isLight?: boolean
 }
 
-const Brand = ({ height, isLight = true }: Props) => {
+const Brand = ({ height }: Props) => {
+    const imgUrl = require(`../assets/brand-white.png`)
     return (
         <Container>
-            <Link to="/">
-                <img
-                    height={height}
-                    src={require(`../assets/${
-                        isLight ? 'brand' : 'brand-white'
-                    }.svg`)}
-                    alt="reflexer labs"
-                />
-            </Link>
+            <a href={'/'}>
+                <img src={imgUrl} alt="Reflexer Labs" />
+            </a>
         </Container>
     )
 }
@@ -30,8 +23,16 @@ const Container = styled.div`
         color: inherit;
         text-decoration: none;
         img {
-            width: 105.14px;
-            height: 25.49px;
+            width: 160px;
+            &.small {
+                width: 105.14px;
+                height: 25.49px;
+            }
+            ${({ theme }) => theme.mediaWidth.upToSmall`
+        width: 105.14px;
+        height: 25.49px;
+      }
+      `}
         }
     }
 `

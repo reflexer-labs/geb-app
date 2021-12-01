@@ -2,7 +2,7 @@ import React from 'react'
 import { DollarSign, Repeat, Shield } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { NETWORK_ID } from '../connectors'
 import useSwap from '../hooks/useSwap'
 import { useStoreActions } from '../store'
@@ -11,8 +11,12 @@ import { timeout } from '../utils/helper'
 import AnalyticsIcon from './Icons/AnalyticsIcon'
 import AuctionIcon from './Icons/AuctionIcon'
 import SafeIcon from './Icons/SafeIcon'
+import { useHistory } from 'react-router-dom'
 
 const NavLinks = () => {
+    const history = useHistory()
+    const { location } = history
+
     const { t } = useTranslation()
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
     const { generateSwap } = useSwap()
@@ -65,6 +69,12 @@ const NavLinks = () => {
                 id="app-link"
                 to="/"
                 onClick={(e) => handleLinkClick(e, false)}
+                className={
+                    location.pathname === '/' ||
+                    location.pathname.startsWith('/safes')
+                        ? 'activeLink'
+                        : ''
+                }
             >
                 <SafeIcon className="opacity fill" /> {t('app')}
             </NavBarLink>
@@ -72,13 +82,22 @@ const NavLinks = () => {
                 <NavBarLink
                     to="/auctions"
                     onClick={(e) => handleLinkClick(e, false)}
+                    className={
+                        location.pathname === '/auctions' ? 'activeLink' : ''
+                    }
                 >
                     <AuctionIcon className="opacity fill" /> {t('auctions')}
                 </NavBarLink>
             )}
 
             <Box className="has-menu">
-                <LinkItem>
+                <LinkItem
+                    className={
+                        location.pathname.startsWith('/earn')
+                            ? 'activeLink'
+                            : ''
+                    }
+                >
                     <DollarSign /> {t('earn')}
                 </LinkItem>
                 <MenuBox className="menu-box">
@@ -98,13 +117,9 @@ const NavLinks = () => {
                     </IntLink>
                 </MenuBox>
             </Box>
-            <NavBarLink
-                id="app-link"
-                to="/"
-                onClick={(e) => handleLinkClick(e, false, '', true)}
-            >
+            <NavExtLink onClick={(e) => handleLinkClick(e, false, '', true)}>
                 <Repeat /> {t('swap')}
-            </NavBarLink>
+            </NavExtLink>
             <Box className="has-menu">
                 <LinkItem>
                     <Shield /> {t('insurance')}
@@ -132,8 +147,7 @@ const NavLinks = () => {
                     </ExtLink>
                 </MenuBox>
             </Box>
-            <NavBarLink
-                to="/"
+            <NavExtLink
                 onClick={(e) =>
                     handleLinkClick(
                         e,
@@ -145,26 +159,7 @@ const NavLinks = () => {
                 }
             >
                 <AnalyticsIcon className="fill" /> {t('analytics')}
-            </NavBarLink>
-
-            {/* <SepBlock className="disableDesktop">
-        <NavBarLink to="" onClick={(e) => handleLinkClick(e, false)}>
-          {t('request_features')}
-        </NavBarLink>
-
-        <NavBarBtn
-          onClick={() => {
-            popupsActions.setShowSideMenu(false);
-            popupsActions.setIsSettingModalOpen(true);
-          }}
-        >
-          {t('settings')}
-        </NavBarBtn>
-
-        <NavBarLink to="" onClick={(e) => handleLinkClick(e, true)}>
-          {t('talk_to_us')}
-        </NavBarLink>
-      </SepBlock> */}
+            </NavExtLink>
         </Nav>
     )
 }
@@ -182,17 +177,12 @@ const Nav = styled.div`
   `}
 `
 
-const NavBarLink = styled(NavLink)`
+const BtnStyle = css`
     color: ${(props) => props.theme.colors.secondary};
-    font-weight: 600;
     transition: all 0.3s ease;
 
     &:hover {
-        background: ${(props) => props.theme.colors.gradient};
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        color: ${(props) => props.theme.colors.inputBorderColor};
+        color: ${(props) => props.theme.colors.blueish};
     }
 
     svg {
@@ -209,7 +199,7 @@ const NavBarLink = styled(NavLink)`
          height: 18px;
          display: inline !important;
          margin-right:10px;
-         color: ${(props) => props.theme.colors.secondary}
+         color: ${(props) => props.theme.colors.neutral}
         `}
     }
 
@@ -234,6 +224,27 @@ const NavBarLink = styled(NavLink)`
       color :${(props) => props.theme.colors.primary};
     
   `}
+`
+const NavExtLink = styled.a`
+    ${BtnStyle}
+    cursor: pointer;
+`
+const NavBarLink = styled(NavLink)`
+    ${BtnStyle}
+    position: relative;
+    &.activeLink {
+        color: ${(props) => props.theme.colors.neutral};
+        &:before {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            border-radius: 2px;
+            background: ${(props) => props.theme.colors.blueish};
+        }
+    }
 `
 
 const Box = styled.div`
@@ -266,21 +277,30 @@ const Box = styled.div`
 
 const LinkItem = styled.div`
     color: ${(props) => props.theme.colors.secondary};
-    font-weight: 600;
     transition: all 0.3s ease;
     cursor: pointer;
     display: flex;
     align-items: center;
     padding: 5px 0;
     margin-right: 20px;
+    &.activeLink {
+        color: ${(props) => props.theme.colors.neutral};
+        &:before {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: calc(100% - 20px);
+            height: 3px;
+            border-radius: 2px;
+            background: ${(props) => props.theme.colors.blueish};
+        }
+    }
+
     &:hover {
-        background: ${(props) => props.theme.colors.gradient};
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        color: ${(props) => props.theme.colors.inputBorderColor};
+        color: ${(props) => props.theme.colors.blueish};
         svg {
-            color: ${(props) => props.theme.colors.secondary};
+            color: ${(props) => props.theme.colors.customSecondary};
         }
     }
     ${({ theme }) => theme.mediaWidth.upToSmall`
@@ -291,27 +311,25 @@ const LinkItem = styled.div`
 const MenuBox = styled.div`
     display: none;
     position: absolute;
-    top: 28px;
-    z-index: 99;
+    top: 30px;
     border-radius: 4px;
-    background: ${(props) => props.theme.colors.background};
+    background: ${(props) => props.theme.colors.foreground};
+    z-index: 4;
     padding: 20px;
-
     min-width: 200px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.06);
     ${({ theme }) => theme.mediaWidth.upToSmall`
-        display:block;
-        position:static;
-        box-shadow:none;
-        padding:0;
-        margin-bottom:20px;
-        padding-left:28px;
-        margin-top:15px;
-    `}
+  display:block;
+  position:static;
+  box-shadow:none;
+  padding:0;
+  margin-bottom:20px;
+  background: ${(props) => props.theme.colors.background};
+  `}
 `
 
 const ExtLink = styled.a`
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.secondary};
     font-size: 15px;
     line-height: 24px;
     letter-spacing: -0.18px;
@@ -326,14 +344,14 @@ const ExtLink = styled.a`
     &:hover {
         text-decoration: none;
         transform: translateX(5px);
-        color: ${(props) => props.theme.colors.secondary};
+        color: ${(props) => props.theme.colors.neutral};
     }
 
     img {
         display: none;
     }
     ${({ theme }) => theme.mediaWidth.upToSmall`
-        color: ${(props) => props.theme.colors.secondary};
+        color: ${(props) => props.theme.colors.neutral};
         transform: translateX(0px) !important;
         img {
             display:inline;
@@ -345,7 +363,7 @@ const ExtLink = styled.a`
 `
 
 const IntLink = styled(NavLink)`
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.secondary};
     font-size: 15px;
     line-height: 24px;
     letter-spacing: -0.18px;
@@ -360,14 +378,14 @@ const IntLink = styled(NavLink)`
     &:hover {
         text-decoration: none;
         transform: translateX(5px);
-        color: ${(props) => props.theme.colors.secondary};
+        color: ${(props) => props.theme.colors.neutral};
     }
 
     img {
         display: none;
     }
     ${({ theme }) => theme.mediaWidth.upToSmall`
-        color: ${(props) => props.theme.colors.secondary};
+        color: ${(props) => props.theme.colors.customSecondary};
         transform: translateX(0px) !important;
         img {
             display:inline;
@@ -377,46 +395,3 @@ const IntLink = styled(NavLink)`
 
     `}
 `
-
-// const NavBarBtn = styled.div`
-//   background: none;
-//   box-shadow: none;
-//   font-weight: 600;
-//   outline: none;
-//   cursor: pointer;
-
-//   border: 0;
-//   color: ${(props) => props.theme.colors.secondary};
-//   padding: 9px 10px;
-//   margin: 0;
-//   line-height: normal;
-//   text-align: left;
-//   transition: all 0.3s ease;
-//   &:hover {
-//     background: ${(props) => props.theme.colors.gradient};
-//     background-clip: text;
-//     -webkit-background-clip: text;
-//     -webkit-text-fill-color: transparent;
-//     color: ${(props) => props.theme.colors.inputBorderColor};
-//   }
-// `;
-
-// const SepBlock = styled.div`
-//   border-top: 1px solid ${(props) => props.theme.colors.border};
-//   display: flex;
-//   flex-direction: column;
-//   padding: 10px 0 0 !important;
-//   margin-top: 15px !important;
-//   > div,
-//   a {
-//     padding-top: 10px;
-//     padding-bottom: 10px;
-//     color: ${(props) => props.theme.colors.secondary} !important;
-//   }
-
-//   @media (min-width: 768px) {
-//     &.disableDesktop {
-//       display: none;
-//     }
-//   }
-// `;

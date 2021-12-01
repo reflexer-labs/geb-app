@@ -23,15 +23,11 @@ const DistributionsModal = () => {
     const { account, library } = useActiveWeb3React()
     const { t } = useTranslation()
     const hasClaim = useHasClaimableDistributions()
-    const {
-        checkClaimsCB,
-        claimableDistributions,
-    } = useClaimableDistributions()
+    const { checkClaimsCB, claimableDistributions } =
+        useClaimableDistributions()
     const { claimCallBack } = useClaimDistribution()
-    const {
-        popupsModel: popupsState,
-        connectWalletModel: connectWalletState,
-    } = useStoreState((state) => state)
+    const { popupsModel: popupsState, connectWalletModel: connectWalletState } =
+        useStoreState((state) => state)
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
 
     const [isClaiming, setIsClaiming] = useState(false)
@@ -193,7 +189,7 @@ const DistributionsModal = () => {
 export default DistributionsModal
 
 const Container = styled.div`
-    background: #34496c;
+    background: ${(props) => props.theme.colors.foreground};
     padding: 25px;
     border-radius: 25px;
 `

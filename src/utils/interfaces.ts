@@ -40,12 +40,18 @@ interface IColors {
     warningColor: string
     warningBackground: string
     warningBorder: string
-    dimmedColor: string
-    dimmedBackground: string
-    dimmedBorder: string
     placeholder: string
     inputBorderColor: string
     boxShadow: string
+    customSecondary: string
+    greenish: string
+    blueish: string
+    yellowish: string
+    dimmedColor: string
+    dimmedBackground: string
+    dimmedBorder: string
+    colorPrimary: string
+    colorSecondary: string
 }
 
 interface IFonts {

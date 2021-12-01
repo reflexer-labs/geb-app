@@ -191,6 +191,17 @@ const INIT_VALUES = {
     diffPercentage: 0,
 }
 
+export const TOKENS = {
+    eth: {
+        name: 'ETH',
+        icon: require('../assets/eth-img.svg'),
+    },
+    rai: {
+        name: 'RAI',
+        icon: require('../assets/rai-logo.svg'),
+    },
+}
+
 export const INITIAL_INCENTIVE_ASSETS_STATE = {
     eth: INIT_VALUES,
     rai: INIT_VALUES,

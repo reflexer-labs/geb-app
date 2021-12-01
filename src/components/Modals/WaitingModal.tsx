@@ -100,7 +100,7 @@ const WaitingModal = () => {
 export default WaitingModal
 
 const InnerContainer = styled.div`
-    background: ${(props) => props.theme.colors.neutral};
+    background: ${(props) => props.theme.colors.foreground};
     text-align: center;
     border-radius: 20px;
     padding: 20px 20px 35px 20px;
@@ -122,7 +122,7 @@ const InnerContainer = styled.div`
 
 const Title = styled.div`
     font-size: ${(props) => props.theme.font.medium};
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.neutral};
     font-weight: 600;
     &.error {
         color: rgb(255, 104, 113);
@@ -132,7 +132,7 @@ const Title = styled.div`
 
 const Text = styled.div`
     font-size: ${(props) => props.theme.font.small};
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.neutral};
     margin: 10px 0;
     a {
         ${ExternalLinkArrow}
@@ -146,7 +146,7 @@ const Hint = styled.div`
 
 const BtnContainer = styled.div`
     padding: 20px;
-    margin: 20px -20px -35px;
+    margin: 20px -20px -38px;
     background-color: ${(props) => props.theme.colors.border};
     border-radius: 0 0 20px 20px;
     text-align: center;

@@ -177,7 +177,7 @@ const Header = styled.div`
     padding: 20px;
     font-size: ${(props) => props.theme.font.large};
     font-weight: 600;
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.neutral};
     letter-spacing: -0.47px;
 `
 
