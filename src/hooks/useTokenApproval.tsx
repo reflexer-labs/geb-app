@@ -39,11 +39,13 @@ export function useTokenAllowance(
         if (
             !geb ||
             !token ||
+            !holder ||
             !spender ||
             holder === EMPTY_ADDRESS ||
             spender === EMPTY_ADDRESS
         )
             return
+
         geb.contracts[token]
             .allowance(spender, holder)
             .then((allowance) => setState(allowance))

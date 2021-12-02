@@ -5,8 +5,9 @@ import Modal from '../../components/Modals/Modal'
 import TokenInput from '../../components/TokenInput'
 import { useActiveWeb3React } from '../../hooks'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
-import { useTokenBalanceInUSD } from '../../hooks/useGeb'
+import { useProxyAddress, useTokenBalanceInUSD } from '../../hooks/useGeb'
 import { useSafeInfo, useInputsHandlers } from '../../hooks/useSafe'
+import { ApprovalState, useTokenApproval } from '../../hooks/useTokenApproval'
 import { useStoreActions, useStoreState } from '../../store'
 import { DEFAULT_SAFE_STATE, TOKENS } from '../../utils/constants'
 import { formatNumber } from '../../utils/helper'
@@ -14,6 +15,7 @@ import Review from './Review'
 
 const ModifySafe = ({ isDeposit }: { isDeposit: boolean }) => {
     const { library, account } = useActiveWeb3React()
+    const proxyAddress = useProxyAddress()
     const [showPreview, setShowPreview] = useState(false)
     const { safeModel: safeState } = useStoreState((state) => state)
     const {
@@ -32,6 +34,14 @@ const ModifySafe = ({ isDeposit }: { isDeposit: boolean }) => {
         collateralRatio,
         liquidationPrice,
     } = useSafeInfo(isDeposit ? 'deposit_borrow' : 'repay_withdraw')
+
+    const [unlockState, approveUnlock] = useTokenApproval(
+        parsedAmounts.rightInput,
+        'coin',
+        proxyAddress,
+        account as string
+    )
+
     const { leftInput, rightInput } = parsedAmounts
     const { onLeftInput, onRightInput } = useInputsHandlers()
     const isValid = !error
@@ -215,9 +225,26 @@ const ModifySafe = ({ isDeposit }: { isDeposit: boolean }) => {
                 </InputBlock>
             </Inner>
             <ButtonContainer>
-                <Button onClick={handleSubmit} disabled={!isValid}>
-                    {error ?? 'Review Transaction'}
-                </Button>
+                {isValid &&
+                !isDeposit &&
+                (unlockState === ApprovalState.PENDING ||
+                    unlockState === ApprovalState.NOT_APPROVED) ? (
+                    <Button
+                        disabled={
+                            !isValid || unlockState === ApprovalState.PENDING
+                        }
+                        text={
+                            unlockState === ApprovalState.PENDING
+                                ? 'Pending Approval..'
+                                : 'Unlock RAI'
+                        }
+                        onClick={approveUnlock}
+                    />
+                ) : (
+                    <Button onClick={handleSubmit} disabled={!isValid}>
+                        {error ?? 'Review Transaction'}
+                    </Button>
+                )}
             </ButtonContainer>
         </Container>
     )
