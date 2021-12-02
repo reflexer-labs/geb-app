@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
+import numeral from 'numeral'
 import Button from '../../../components/Button'
 import { useActiveWeb3React } from '../../../hooks'
 import { useClaimReward, useStakingInfo } from '../../../hooks/useStaking'
@@ -16,6 +17,15 @@ const returnImg = (type = 'flx', width = '20px', height = '20px') => {
             alt=""
         />
     )
+}
+
+type StatsType = 'data' | 'info'
+type Stats = {
+    [K in StatsType]: Array<{
+        label: string
+        value: string | number
+        img?: string
+    }>
 }
 const Statistics = () => {
     const { account } = useActiveWeb3React()
@@ -52,27 +62,81 @@ const Statistics = () => {
         }
     }
 
+    const stats: Stats = {
+        data: [
+            {
+                label: 'Total Pool Balance',
+                value: `${numeral(formatNumber(poolAmounts.poolBalance)).format(
+                    '0.0'
+                )} FLX/ETH LP`,
+            },
+            {
+                label: 'APR',
+                value: `${
+                    Number(poolAmounts.apr) > 0
+                        ? numeral(
+                              formatNumber(poolAmounts.apr.toString(), 2)
+                          ).format('0.0')
+                        : '0'
+                }%`,
+            },
+            {
+                label: 'Weekly Rewards',
+                value: formatNumber(poolAmounts.weeklyReward.toString(), 2),
+                img: 'flx',
+            },
+        ],
+
+        info: [
+            {
+                label: 'My stFLX',
+                value: mystFLXBalance,
+                img: 'stFLX',
+            },
+            {
+                label: 'My Weekly Reward',
+                value:
+                    Number(myCurrentReward) === 0 || !account
+                        ? '0'
+                        : formatNumber(myWeeklyReward.toString()),
+                img: 'flx',
+            },
+        ],
+    }
+
     return (
         <Container>
             <Content>
-                <Blocks>
-                    <Block>
-                        <Label>My stFLX</Label>
-                        <Value>
-                            {mystFLXBalance} {returnImg('stFLX')}
-                        </Value>
-                    </Block>
-
-                    <Block>
-                        <Label>My Weekly Reward</Label>
-                        <Value>
-                            {Number(myCurrentReward) === 0 || !account
-                                ? '0'
-                                : formatNumber(myWeeklyReward.toString())}{' '}
-                            {returnImg('flx')}
-                        </Value>
-                    </Block>
-                </Blocks>
+                <Stats>
+                    {Object.keys(stats).map((key) => {
+                        const isPrimary = key === 'data'
+                        return (
+                            <div key={key} className="blockie">
+                                {stats[key as StatsType].map((item) => {
+                                    return (
+                                        <Flex key={item.label}>
+                                            <Label
+                                                color={
+                                                    isPrimary
+                                                        ? 'primary'
+                                                        : 'secondary'
+                                                }
+                                            >
+                                                {item.label}
+                                            </Label>
+                                            <Value>
+                                                {item.img
+                                                    ? returnImg(item.img)
+                                                    : null}{' '}
+                                                {item.value}
+                                            </Value>
+                                        </Flex>
+                                    )
+                                })}
+                            </div>
+                        )
+                    })}
+                </Stats>
                 <StatsFooter>
                     <RewardBox>
                         <RewardLabel>My Current Reward</RewardLabel>
@@ -107,47 +171,32 @@ const Statistics = () => {
 
 export default Statistics
 
+const Flex = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 13px 0;
+`
+
+const Stats = styled.div`
+    padding: 20px;
+    border-radius: 10px;
+    background: ${(props) => props.theme.colors.placeholder};
+    .blockie {
+        border-bottom: 1px solid ${(props) => props.theme.colors.border};
+        &:last-child {
+            border: 0;
+        }
+    }
+    @media (max-width: 767px) {
+        margin-top: 20px;
+    }
+`
 const Container = styled.div`
     flex: 3;
     ${({ theme }) => theme.mediaWidth.upToSmall`
    margin-bottom:20px;
  `}
-`
-
-const Blocks = styled.div`
-    flex-grow: 1;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-`
-
-const Block = styled.div`
-    position: relative;
-    margin-bottom: 20px;
-    flex: 0 0 100%;
-    border: 1px solid ${(props) => props.theme.colors.border};
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    background: ${(props) => props.theme.colors.background};
-    padding: 20px;
-    ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-         flex: 0 0 100%;  
-    `}
-`
-
-const Label = styled.div`
-    color: ${(props) => props.theme.colors.secondary};
-    font-size: 14px;
-`
-
-const Value = styled.div`
-    color: ${(props) => props.theme.colors.primary};
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
-    img {
-        margin-left: 5px;
-    }
 `
 
 const Content = styled.div`
@@ -158,12 +207,8 @@ const Content = styled.div`
 `
 
 const StatsFooter = styled.div`
-    /* display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    flex-wrap: wrap; */
     padding: 20px;
-    border: 1px solid ${(props) => props.theme.colors.border};
+    border-radius: 0 0 15px 15px;
     background: ${(props) => props.theme.colors.background};
     button {
         margin-top: 15px;
@@ -197,4 +242,27 @@ const RewardLabel = styled.div`
         font-size: 14px;
         margin-top:0;
     `}
+`
+
+const Label = styled.div<{ color?: 'primary' | 'secondary' }>`
+    font-size: ${(props) => props.theme.font.small};
+    color: ${({ theme, color }) =>
+        color ? theme.colors[color] : theme.colors.primary};
+    display: flex;
+    align-items: center;
+    svg {
+        margin-right: 5px;
+    }
+`
+
+const Value = styled.div`
+    font-size: ${(props) => props.theme.font.small};
+    color: ${(props) => props.theme.colors.primary};
+    display: flex;
+    align-items: center;
+    img {
+        opacity: 0.8;
+        margin-right: 5px;
+        max-width: 20px;
+    }
 `

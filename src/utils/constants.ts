@@ -200,6 +200,14 @@ export const TOKENS = {
         name: 'RAI',
         icon: require('../assets/rai-logo.svg'),
     },
+    stake: {
+        name: 'FLX/ETH',
+        icon: require('../assets/flx_uni_eth.svg'),
+    },
+    unstake: {
+        name: 'FLX/ETH',
+        icon: require('../assets/stFLX.svg'),
+    },
 }
 
 export const INITIAL_INCENTIVE_ASSETS_STATE = {

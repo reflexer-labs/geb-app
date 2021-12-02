@@ -43,9 +43,8 @@ const StakingManager = () => {
 export default StakingManager
 
 const StakingPayment = styled.div`
-    background: ${(props) => props.theme.colors.background};
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    border: 1px solid ${(props) => props.theme.colors.border};
+    background: ${(props) => props.theme.colors.placeholder};
+    border-radius: 15px;
     flex: 4;
     margin-right: 20px;
     ${({ theme }) => theme.mediaWidth.upToSmall`

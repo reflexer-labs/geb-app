@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
-import DecimalInput from '../../../components/DecimalInput'
+import TokenInput from '../../../components/TokenInput'
 import { useActiveWeb3React } from '../../../hooks'
 import useGeb from '../../../hooks/useGeb'
 import {
@@ -13,6 +13,7 @@ import {
     ApprovalState,
     useTokenApproval,
 } from '../../../hooks/useTokenApproval'
+import { TOKENS } from '../../../utils/constants'
 import { formatNumber } from '../../../utils/helper'
 
 const Stake = () => {
@@ -53,15 +54,16 @@ const Stake = () => {
     return (
         <>
             <Body>
-                <DecimalInput
-                    icon={require('../../../assets/flx_uni_eth.svg')}
-                    iconSize={'30px'}
+                <SideLabel>Stake FLX/ETH</SideLabel>
+                <TokenInput
+                    token={TOKENS.stake}
+                    label={`Balance: ${formatNumber(balances.stakingBalance)} ${
+                        TOKENS.stake.name
+                    }`}
+                    rightLabel={``}
                     onChange={onStakingInput}
                     value={stakingValue}
                     handleMaxClick={handleMaxInput}
-                    label={`FLX/ETH (Available: ${formatNumber(
-                        balances.stakingBalance
-                    )})`}
                 />
             </Body>
 
@@ -113,6 +115,11 @@ export default Stake
 
 const Body = styled.div`
     padding: 30px 20px 20px;
+`
+const SideLabel = styled.div`
+    font-weight: 600;
+    font-size: ${(props) => props.theme.font.default};
+    margin-bottom: 10px;
 `
 
 const Footer = styled.div`

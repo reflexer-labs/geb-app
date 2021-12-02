@@ -1,14 +1,10 @@
 import Axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import GridContainer from '../../../components/GridContainer'
-import PageHeader from '../../../components/PageHeader'
 import { Round } from '../../../utils/interfaces'
 import IncentiveRound from './IncentiveRound'
 
 const Incentives = () => {
-    const { t } = useTranslation()
     const [incentives, setIncentives] = useState<Array<Round>>([])
 
     useEffect(() => {
@@ -26,12 +22,8 @@ const Incentives = () => {
     }, [])
 
     return (
-        <GridContainer>
-            <PageHeader
-                breadcrumbs={{ '/': t('incentives_header_title') }}
-                text={t('incentives_header_desc')}
-            />
-            <Container>
+        <Container>
+            <Inner>
                 {incentives.length > 0
                     ? incentives.map((round, index: number) => {
                           return (
@@ -43,11 +35,23 @@ const Incentives = () => {
                           )
                       })
                     : null}
-            </Container>
-        </GridContainer>
+            </Inner>
+        </Container>
     )
 }
 
 export default Incentives
 
-const Container = styled.div``
+const Container = styled.div`
+    max-width: 1024px;
+    margin: 80px auto;
+    padding: 0 15px;
+    @media (max-width: 767px) {
+        margin: 50px auto;
+    }
+`
+const Inner = styled.div`
+    padding: 15px;
+    border-radius: 15px;
+    background: ${(props) => props.theme.colors.colorSecondary};
+`

@@ -9,7 +9,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import AlertLabel from '../../../components/AlertLabel'
 import Button from '../../../components/Button'
-import DecimalInput from '../../../components/DecimalInput'
+import TokenInput from '../../../components/TokenInput'
 import { useActiveWeb3React } from '../../../hooks'
 import useGeb from '../../../hooks/useGeb'
 import {
@@ -22,6 +22,7 @@ import {
     ApprovalState,
     useTokenApproval,
 } from '../../../hooks/useTokenApproval'
+import { TOKENS } from '../../../utils/constants'
 import { formatNumber } from '../../../utils/helper'
 
 dayjs.extend(duration)
@@ -108,21 +109,23 @@ const UnStake = () => {
     return (
         <>
             <Body>
-                <DecimalInput
-                    icon={require('../../../assets/stFLX.svg')}
-                    iconSize={'30px'}
+                <SideLabel>Unstake FLX/ETH</SideLabel>
+                <TokenInput
+                    token={TOKENS.unstake}
+                    label={`Balance: ${formatNumber(balances.stFlxBalance)} ${
+                        TOKENS.unstake.name
+                    }`}
+                    rightLabel={``}
                     onChange={onUnStakingInput}
                     value={stFlxAmountValue}
                     handleMaxClick={handleMaxInput}
-                    label={`stFLX (Available: ${formatNumber(
-                        balances.stFlxBalance
-                    )})`}
                 />
             </Body>
 
             {hasPendingExitRequests && !allowExit ? (
                 <AlertBox>
                     <AlertLabel
+                        isBlock={false}
                         type="alert"
                         text={`You will be able to unstake approx ${formatNumber(
                             exitRequests.lockedAmount,
@@ -232,6 +235,11 @@ const AlertBox = styled.div`
             padding: 8px 16% !important;
         }
     }
+`
+const SideLabel = styled.div`
+    font-weight: 600;
+    font-size: ${(props) => props.theme.font.default};
+    margin-bottom: 10px;
 `
 
 const Body = styled.div`
