@@ -47,38 +47,43 @@ const Container = styled.div<{ isBlock?: boolean }>`
     letter-spacing: -0.09px;
     &.alert {
         border: 1px solid ${(props) => props.theme.colors.alertBorder};
+        border-width: ${({ theme, isBlock }) => (isBlock ? '0' : '1px')};
         background: ${({ theme, isBlock }) =>
             isBlock ? 'transparent' : theme.colors.alertBackground};
         color: ${(props) => props.theme.colors.alertColor};
         ${Circle} {
-            background: ${(props) => props.theme.colors.alertBackground};
+            background: ${(props) => props.theme.colors.alertColor};
         }
     }
     &.success {
         border: 1px solid ${(props) => props.theme.colors.successBorder};
+        border-width: ${({ theme, isBlock }) => (isBlock ? '0' : '1px')};
         background: ${({ theme, isBlock }) =>
             isBlock ? 'transparent' : theme.colors.successBackground};
-        color: ${(props) => props.theme.colors.successColor};
+        color: ${({ theme, isBlock }) =>
+            isBlock ? theme.colors.customSecondary : theme.colors.successColor};
         ${Circle} {
-            background: ${(props) => props.theme.colors.successBackground};
+            background: ${(props) => props.theme.colors.successColor};
         }
     }
     &.danger {
         border: 1px solid ${(props) => props.theme.colors.dangerColor};
+        border-width: ${({ theme, isBlock }) => (isBlock ? '0' : '1px')};
         background: ${({ theme, isBlock }) =>
             isBlock ? 'transparent' : theme.colors.dangerBackground};
         color: ${(props) => props.theme.colors.dangerColor};
         ${Circle} {
-            background: ${(props) => props.theme.colors.dangerBackground};
+            background: ${(props) => props.theme.colors.dangerColor};
         }
     }
     &.warning {
         border: 1px solid ${(props) => props.theme.colors.warningBorder};
+        border-width: ${({ theme, isBlock }) => (isBlock ? '0' : '1px')};
         background: ${({ theme, isBlock }) =>
             isBlock ? 'transparent' : theme.colors.warningBackground};
         color: ${(props) => props.theme.colors.warningColor};
         ${Circle} {
-            background: ${(props) => props.theme.colors.warningBackground};
+            background: ${(props) => props.theme.colors.warningColor};
         }
     }
 

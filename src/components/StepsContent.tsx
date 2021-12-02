@@ -155,6 +155,9 @@ const List = styled.ul`
     margin: 0;
     padding-left: 20px;
     list-style: none;
+    @media (max-width: 767px) {
+        padding-left: 0;
+    }
 `
 
 const Item = styled.li`
@@ -162,6 +165,9 @@ const Item = styled.li`
     text-align: left;
     color: ${(props) => props.theme.colors.neutral};
     margin-top: 5px;
+    @media (max-width: 767px) {
+        font-size: 13px;
+    }
     span > div {
         margin: 0;
     }

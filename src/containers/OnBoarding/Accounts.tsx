@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import Lottie from 'react-lottie-player'
+import { isMobile } from 'react-device-detect'
 import Steps from '../../components/Steps'
 import { useStoreState } from '../../store'
 import LottieWallet from '../../utils/Lotties/wallet.json'
@@ -17,7 +18,9 @@ const Accounts = () => {
     const returnLottie = () => {
         switch (step) {
             case 1:
-                return (
+                return isMobile ? (
+                    <img src={require('../../assets/account-img.png')} alt="" />
+                ) : (
                     <Lottie
                         loop
                         animationData={LottieRegister}
@@ -26,7 +29,9 @@ const Accounts = () => {
                     />
                 )
             case 2:
-                return (
+                return isMobile ? (
+                    <img src={require('../../assets/safe-img.png')} alt="" />
+                ) : (
                     <Lottie
                         loop
                         animationData={LottieSafe}
@@ -35,7 +40,9 @@ const Accounts = () => {
                     />
                 )
             default:
-                return (
+                return isMobile ? (
+                    <img src={require('../../assets/wallet-img.png')} alt="" />
+                ) : (
                     <Lottie
                         loop
                         animationData={LottieWallet}
@@ -67,6 +74,14 @@ const Content = styled.div`
 `
 
 const LottieContainer = styled.div`
+    @media (max-width: 767px) {
+        text-align: center;
+    }
+    img {
+        border-radius: 20px;
+        max-width: 250px;
+        margin: 0 auto;
+    }
     > div {
         margin: 0 auto;
     }

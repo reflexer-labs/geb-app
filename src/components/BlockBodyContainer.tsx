@@ -14,6 +14,6 @@ const Container = styled.div`
     height: 100%;
     width: 100%;
     z-index: 1000;
-    background-color: rgba(228, 232, 241, 0.75);
+    background-color: rgba(35, 37, 39, 0.75);
     -webkit-tap-highlight-color: transparent;
 `

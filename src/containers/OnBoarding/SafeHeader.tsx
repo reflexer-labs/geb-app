@@ -8,6 +8,7 @@ import LinkButton from '../../components/LinkButton'
 import { useActiveWeb3React } from '../../hooks'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
 import { useIsOwner } from '../../hooks/useGeb'
+import { useSafeInfo } from '../../hooks/useSafe'
 import {
     useHasLeftOver,
     useHasSaviour,
@@ -30,7 +31,13 @@ const SafeHeader = ({
 
     const [loading, setIsLoading] = useState(false)
     const { account, library } = useActiveWeb3React()
-
+    const { totalDebt, totalCollateral } = useSafeInfo(
+        isModifying
+            ? isDeposit
+                ? 'deposit_borrow'
+                : 'repay_withdraw'
+            : 'create'
+    )
     const { safeModel: safeState } = useStoreState((state) => state)
     const saviourData = useSaviourData()
 
@@ -86,13 +93,15 @@ const SafeHeader = ({
     } => {
         if (!saviourData) return { status: 'none', color: 'dimmedColor' }
         const minimumBalance = getMinSaviourBalance(
-            saviourData.saviourRescueRatio
+            saviourData.saviourRescueRatio,
+            totalDebt,
+            totalCollateral
         ) as number
         if (Number(saviourData.saviourBalance) >= minimumBalance) {
             return { status: 'Protected', color: 'successColor' }
         }
         return { status: 'Unprotected', color: 'dangerColor' }
-    }, [getMinSaviourBalance, saviourData])
+    }, [getMinSaviourBalance, saviourData, totalCollateral, totalDebt])
 
     const returnSaviourBtnText = () => {
         if (leftOver && leftOver.status) {

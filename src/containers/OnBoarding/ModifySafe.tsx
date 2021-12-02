@@ -166,6 +166,10 @@ const ModifySafe = ({ isDeposit }: { isDeposit: boolean }) => {
             </Modal>
             <Inner>
                 <InputBlock>
+                    <SideLabel>
+                        {isDeposit ? `Deposit ETH` : 'Withdraw ETH'}
+                    </SideLabel>
+
                     <TokenInput
                         token={TOKENS.eth}
                         label={
@@ -180,6 +184,9 @@ const ModifySafe = ({ isDeposit }: { isDeposit: boolean }) => {
                     />
                 </InputBlock>
                 <InputBlock>
+                    <SideLabel>
+                        {isDeposit ? `Borrow RAI` : 'Repay RAI'}
+                    </SideLabel>
                     <TokenInput
                         token={TOKENS.rai}
                         label={
@@ -247,6 +254,7 @@ const InputBlock = styled.div`
     @media (max-width: 767px) {
         flex: 0 0 100%;
         margin-top: 20px;
+        min-width: 100%;
     }
 `
 
@@ -259,4 +267,10 @@ const ReviewContainer = styled.div`
 const BtnContainer = styled.div`
     padding-top: 20px;
     text-align: center;
+`
+
+const SideLabel = styled.div`
+    font-weight: 600;
+    font-size: ${(props) => props.theme.font.default};
+    margin-bottom: 10px;
 `
