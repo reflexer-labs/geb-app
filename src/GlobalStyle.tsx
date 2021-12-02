@@ -89,11 +89,7 @@ export const ExternalLinkArrow = css`
     outline: none;
     padding: 0;
     margin: 0;
-    background: ${(props) => props.theme.colors.gradient};
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: ${(props) => props.theme.colors.inputBorderColor};
+    color: ${(props) => props.theme.colors.blueish};
     font-size: ${(props) => props.theme.font.small};
     font-weight: 600;
     line-height: 24px;

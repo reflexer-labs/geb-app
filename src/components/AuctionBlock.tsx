@@ -379,14 +379,13 @@ const AuctionBlock = (auction: Props) => {
 export default AuctionBlock
 
 const Container = styled.div`
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    border: 1px solid ${(props) => props.theme.colors.border};
+    border-radius: 15px;
     margin-bottom: 15px;
-    background: ${(props) => props.theme.colors.background};
+    background: #05284c;
 `
 const Header = styled.div`
-    font-size: ${(props) => props.theme.font.medium};
-    font-weight: 900;
+    font-size: ${(props) => props.theme.font.small};
+    font-weight: 600;
     padding: 20px;
     display: flex;
     align-items: center;
@@ -409,10 +408,10 @@ const Info = styled.div`
 
 const InfoCol = styled.div`
     font-size: ${(props) => props.theme.font.small};
-    min-width: 110px;
+    min-width: 100px;
     @media (min-width: 991px) {
         &.staked_token {
-            min-width: 180px;
+            min-width: 170px;
         }
     }
 
@@ -442,6 +441,8 @@ const InfoValue = styled.div`
 const Content = styled.div`
     padding: 20px 20px 20px 20px;
     border-top: 1px solid ${(props) => props.theme.colors.border};
+    background: #031f3a;
+    border-radius: 0 0 15px 15px;
 `
 
 const SectionContent = styled.div`
@@ -464,9 +465,8 @@ const LeftAucInfo = styled.div<{ type?: string }>`
     display: flex;
     align-items: center;
     img {
-        margin-right: 20px;
-        width: ${({ type }) =>
-            type === 'surplus' || type === 'staked_token' ? '40px' : 'auto'};
+        margin-right: 10px;
+        width: 25px;
     }
 `
 
@@ -481,7 +481,7 @@ const RightAucInfo = styled.div`
 `
 
 const AlertContainer = styled.div`
-    width: 240px;
+    width: 200px;
     text-align: right;
     > div {
         display: inline-block;
@@ -527,7 +527,17 @@ const Head = styled.div`
     font-weight: bold;
     text-transform: uppercase;
     color: ${(props) => props.theme.colors.secondary};
-    padding-left: 20px;
+    padding-left: 10px;
+`
+
+const ListItemLabel = styled.div`
+    display: none;
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+    display:block;
+    margin-bottom:5px;
+    font-weight:normal;
+   color: ${(props) => props.theme.colors.customSecondary};
+  `}
 `
 
 const List = styled.div`
@@ -535,16 +545,16 @@ const List = styled.div`
     align-items: center;
     border-radius: 10px;
     &:nth-child(even) {
-        background: ${(props) => props.theme.colors.foreground};
+        background: #12385e;
     }
     &.winner {
-        background: ${(props) => props.theme.colors.gradient};
-
+        background: ${(props) => props.theme.colors.greenish};
         a,
         div {
             color: ${(props) => props.theme.colors.neutral} !important;
-            background: transparent;
-            -webkit-text-fill-color: ${(props) => props.theme.colors.neutral};
+        }
+        ${ListItemLabel} {
+            color: ${(props) => props.theme.colors.background} !important;
         }
     }
 
@@ -559,21 +569,11 @@ const List = styled.div`
   `}
 `
 
-const ListItemLabel = styled.div`
-    display: none;
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-    display:block;
-    margin-bottom:5px;
-    font-weight:normal;
-   color: ${(props) => props.theme.colors.secondary};
-  `}
-`
-
 const ListItem = styled.div`
     flex: 0 0 16.6%;
-    color: #272727;
-    font-size: ${(props) => props.theme.font.small};
-    padding: 15px 20px;
+    color: ${(props) => props.theme.colors.customSecondary};
+    font-size: ${(props) => props.theme.font.extraSmall};
+    padding: 15px 10px;
 
     ${({ theme }) => theme.mediaWidth.upToSmall`
     flex: 0 0 50%;

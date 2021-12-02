@@ -1,10 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import Button from './Button'
 
 interface Props {
-    hideFAQ: () => void
     type: 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
 }
 
@@ -19,8 +17,10 @@ interface FAQS {
     staked_token: Array<FAQ>
 }
 
-const AuctionsFAQ = ({ hideFAQ, type }: Props) => {
+const AuctionsFAQ = ({ type }: Props) => {
     const { t } = useTranslation()
+
+    const [collapseIndex, setCollapseIndex] = useState(0)
 
     const faqs: FAQS = {
         debt: [
@@ -81,17 +81,23 @@ const AuctionsFAQ = ({ hideFAQ, type }: Props) => {
             <Header>
                 How do {type === 'STAKED_TOKEN' ? '' : 'RAI'}{' '}
                 {type === 'STAKED_TOKEN' ? 'staked token' : type.toLowerCase()}{' '}
-                auctions work? <Button text={t('hide_faq')} onClick={hideFAQ} />
+                auctions work?
             </Header>
             <Content>
                 {faqs[
                     type.toLowerCase() as 'debt' | 'surplus' | 'staked_token'
-                ].map((faq: FAQ) => (
+                ].map((faq: FAQ, index) => (
                     <Col key={faq.title}>
                         <InnerCol>
-                            <img src={faq.image} alt={faq.title} />
-                            <SectionHeading>{faq.title}</SectionHeading>
-                            <SectionContent>{faq.desc}</SectionContent>
+                            <HeaderSection
+                                onClick={() => setCollapseIndex(index)}
+                            >
+                                <img src={faq.image} alt={faq.title} />
+                                <SectionHeading>{faq.title}</SectionHeading>
+                            </HeaderSection>
+                            {collapseIndex === index ? (
+                                <SectionContent>{faq.desc}</SectionContent>
+                            ) : null}
                         </InnerCol>
                     </Col>
                 ))}
@@ -133,10 +139,6 @@ const Header = styled.div`
   `}
 `
 const Content = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    margin: 0 -10px;
-
     ${({ theme }) => theme.mediaWidth.upToSmall`
     flex-direction:column;
   `}
@@ -154,23 +156,25 @@ const SectionContent = styled.div`
 `
 
 const Col = styled.div`
-    flex: 0 0 33.3%;
-    padding: 0 10px;
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-    flex: 0 0 100%;
-    margin-top:20px;
-  `}
+    margin-bottom: 10px;
+    &:last-child {
+        margin-bottom: 0;
+    }
 `
 
 const InnerCol = styled.div`
-    border: 1px solid ${(props) => props.theme.colors.border};
     background: ${(props) => props.theme.colors.background};
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    height: 100%;
+    border-radius: 20px;
     padding: 20px;
     text-align: center;
+`
+
+const HeaderSection = styled.div`
+    display: flex;
+    align-items: center;
+    cursor: pointer;
     img {
-        width: 40px;
-        margin-bottom: 20px;
+        width: 20px;
+        margin-right: 10px;
     }
 `
