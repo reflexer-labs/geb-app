@@ -117,7 +117,12 @@ export const ExternalLinkArrow = css`
 
 export const BtnStyle = css<{
     disabled?: boolean
-    color?: 'blueish' | 'greenish' | 'yellowish'
+    color?:
+        | 'blueish'
+        | 'greenish'
+        | 'yellowish'
+        | 'colorPrimary'
+        | 'colorSecondary'
 }>`
     pointer-events: ${({ theme, disabled }) => (disabled ? 'none' : 'inherit')};
     outline: none;

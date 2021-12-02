@@ -21,7 +21,7 @@ const darkTheme: Theme = {
         alertColor: '#316398',
         alertBackground: '#CCE5FF',
         alertBorder: '#B8DAFF',
-        successColor: '#155724',
+        successColor: '#217435',
         successBackground: '#D4EDDA',
         successBorder: '#C3E6CB',
         warningColor: '#856404',

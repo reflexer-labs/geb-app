@@ -87,6 +87,18 @@ const App = () => {
                                         <Route
                                             exact
                                             strict
+                                            component={SafeDetails}
+                                            path={'/safes/:id/deposit'}
+                                        />
+                                        <Route
+                                            exact
+                                            strict
+                                            component={SafeDetails}
+                                            path={'/safes/:id/withdraw'}
+                                        />
+                                        <Route
+                                            exact
+                                            strict
                                             component={SafeSaviour}
                                             path={'/safes/:id/saviour'}
                                         />

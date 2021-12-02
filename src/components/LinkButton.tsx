@@ -4,14 +4,19 @@ import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { BtnStyle } from '../GlobalStyle'
 interface Props {
-    id: string
     url: string
+    id?: string
     disabled?: boolean
     text?: string
     isExternal?: boolean
     withArrow?: boolean
     children?: ReactNode
-    color?: 'blueish' | 'greenish'
+    color?:
+        | 'blueish'
+        | 'greenish'
+        | 'yellowish'
+        | 'colorPrimary'
+        | 'colorSecondary'
 }
 const LinkButton = ({
     id,

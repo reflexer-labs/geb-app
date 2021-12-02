@@ -1,29 +1,20 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { Link2 } from 'react-feather'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 import AlertLabel from '../../components/AlertLabel'
-import Button from '../../components/Button'
-import GridContainer from '../../components/GridContainer'
-import PageHeader from '../../components/PageHeader'
 import SafeHistory from '../../components/SafeHistory'
 import SafeStats from '../../components/SafeStats'
 import { useActiveWeb3React } from '../../hooks'
-import { handleTransactionError } from '../../hooks/TransactionHooks'
 import useGeb, { useIsOwner } from '../../hooks/useGeb'
-import {
-    useHasLeftOver,
-    useHasSaviour,
-    useSaviourGetReserves,
-} from '../../hooks/useSaviour'
 import { useStoreActions, useStoreState } from '../../store'
 import { isNumeric } from '../../utils/validations'
+import ModifySafe from './ModifySafe'
+import SafeHeader from './SafeHeader'
 
 const SafeDetails = ({ ...props }) => {
     const { t } = useTranslation()
     const { account, library } = useActiveWeb3React()
-    const [loading, setIsLoading] = useState(false)
+
     const geb = useGeb()
     const { safeModel: safeActions, popupsModel: popupsActions } =
         useStoreActions((state) => state)
@@ -34,14 +25,19 @@ const SafeDetails = ({ ...props }) => {
 
     const safeId = props.match.params.id as string
 
-    const hasSaviour = useHasSaviour(
-        safeState.singleSafe?.safeHandler as string
-    )
-    const leftOver = useHasLeftOver(safeState.singleSafe?.safeHandler as string)
+    const isDeposit = useMemo(() => {
+        if (props.location) {
+            return props.location.pathname.includes('deposit')
+        }
+        return false
+    }, [props])
 
-    const { getReservesCallback } = useSaviourGetReserves()
-
-    const history = useHistory()
+    const isWithdraw = useMemo(() => {
+        if (props.location) {
+            return props.location.pathname.includes('withdraw')
+        }
+        return false
+    }, [props])
 
     const isOwner = useIsOwner(safeId)
 
@@ -122,52 +118,8 @@ const SafeDetails = ({ ...props }) => {
         fetchSaviourDataCallback()
     }, [fetchSaviourDataCallback])
 
-    const handleSaviourBtnClick = async (data: {
-        status: boolean
-        saviourAddress: string
-    }) => {
-        const { status, saviourAddress } = data
-        if (status) {
-            if (!library || !account) throw new Error('No library or account')
-            setIsLoading(true)
-            try {
-                popupsActions.setIsWaitingModalOpen(true)
-                popupsActions.setWaitingPayload({
-                    title: 'Waiting For Confirmation',
-                    hint: 'Confirm this transaction in your wallet',
-                    status: 'loading',
-                })
-                const signer = library.getSigner(account)
-
-                await getReservesCallback(signer, {
-                    safeId: Number(safeId),
-                    saviourAddress,
-                })
-            } catch (e) {
-                handleTransactionError(e)
-            } finally {
-                setIsLoading(false)
-            }
-        } else {
-            history.push(`/safes/${safeId}/saviour`)
-        }
-    }
-
-    const returnSaviourBtnText = () => {
-        if (leftOver && leftOver.status) {
-            return t('Collect Saviour Balance')
-        } else {
-            return (
-                <BtnInner>
-                    <Link2 size={18} />
-                    {t(hasSaviour ? 'Saviour Configuration' : 'add_savoiur')}
-                </BtnInner>
-            )
-        }
-    }
-
     return (
-        <>
+        <Container>
             {!isOwner ? (
                 <LabelContainer>
                     <AlertLabel
@@ -176,68 +128,39 @@ const SafeDetails = ({ ...props }) => {
                     />
                 </LabelContainer>
             ) : null}
-            <GridContainer>
-                <HeaderContainer>
-                    <PageHeader
-                        breadcrumbs={{ '/': t('accounts'), '': `#${safeId}` }}
-                        text={t('accounts_header_text')}
-                    />
+            <SafeHeader
+                safeId={safeId}
+                isModifying={isDeposit || isWithdraw}
+                isDeposit={isDeposit}
+            />
 
-                    {isOwner ? (
-                        <BtnContainer>
-                            <Button
-                                onClick={() => handleSaviourBtnClick(leftOver)}
-                                isLoading={loading}
-                                disabled={loading}
-                            >
-                                {returnSaviourBtnText()}
-                            </Button>
-                        </BtnContainer>
-                    ) : null}
-                </HeaderContainer>
+            <SafeStats
+                isModifying={isDeposit || isWithdraw}
+                isDeposit={isDeposit}
+            />
 
-                <>
-                    <SafeStats />
-                    {safeState.historyList.length ? (
-                        <SafeHistory
-                            hideHistory={!safeState.historyList.length}
-                        />
-                    ) : null}
-                </>
-            </GridContainer>
-        </>
+            {isDeposit || isWithdraw ? (
+                <ModifySafe isDeposit={isDeposit} />
+            ) : null}
+            {safeState.historyList.length && !isDeposit && !isWithdraw ? (
+                <SafeHistory hideHistory={!safeState.historyList.length} />
+            ) : null}
+        </Container>
     )
 }
 
 export default SafeDetails
 
+const Container = styled.div`
+    max-width: 880px;
+    margin: 80px auto;
+    padding: 0 15px;
+    @media (max-width: 767px) {
+        margin: 50px auto;
+    }
+`
+
 const LabelContainer = styled.div`
     max-width: ${(props) => props.theme.global.gridMaxWidth};
     margin: 0 auto;
-`
-
-const BtnContainer = styled.div`
-    position: absolute;
-    top: 25px;
-    right: 0px;
-    button {
-        min-width: 100px;
-        padding: 4px 12px;
-    }
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-      position: static;
-      margin-bottom:20px;
-      &.top-up {
-         display:none;
-        }
-    `}
-`
-
-const BtnInner = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 5px;
-`
-const HeaderContainer = styled.div`
-    position: relative;
 `

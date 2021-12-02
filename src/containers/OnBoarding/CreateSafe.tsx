@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { ArrowLeft, Info } from 'react-feather'
 import { useTranslation } from 'react-i18next'
-import { useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import Button from '../../components/Button'
@@ -10,7 +10,7 @@ import Modal from '../../components/Modals/Modal'
 import TokenInput from '../../components/TokenInput'
 import { useActiveWeb3React } from '../../hooks'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
-import { useTokeBalanceInUSD } from '../../hooks/useGeb'
+import { useTokenBalanceInUSD } from '../../hooks/useGeb'
 import { useSafeInfo, StatsType, useInputsHandlers } from '../../hooks/useSafe'
 import { useStoreActions, useStoreState } from '../../store'
 import { DEFAULT_SAFE_STATE, TOKENS } from '../../utils/constants'
@@ -25,6 +25,7 @@ const CreateSafe = () => {
     const { library, account } = useActiveWeb3React()
     const [showPreview, setShowPreview] = useState(false)
     const { safeModel: safeState } = useStoreState((state) => state)
+    const history = useHistory()
     const {
         safeModel: safeActions,
         connectWalletModel: connectWalletActions,
@@ -37,15 +38,18 @@ const CreateSafe = () => {
         balances,
         availableRai,
         parsedAmounts,
+        totalCollateral,
+        totalDebt,
+        collateralRatio,
+        liquidationPrice,
     } = useSafeInfo('create')
     const { leftInput, rightInput } = parsedAmounts
     const { onLeftInput, onRightInput } = useInputsHandlers()
     const { t } = useTranslation()
-    const history = useHistory()
     const isValid = !error
 
-    const ethBalanceUSD = useTokeBalanceInUSD('ETH', balances.eth)
-    const raiBalanceUSD = useTokeBalanceInUSD('RAI', availableRai)
+    const ethBalanceUSD = useTokenBalanceInUSD('ETH', balances.eth)
+    const raiBalanceUSD = useTokenBalanceInUSD('RAI', availableRai)
 
     const formattedBalance = useMemo(() => {
         return {
@@ -73,6 +77,21 @@ const CreateSafe = () => {
         return 'Modifying Safe'
     }
 
+    const handleSubmit = () => {
+        safeActions.setSafeData({
+            leftInput: parsedAmounts.leftInput ? parsedAmounts.leftInput : '0',
+            rightInput: parsedAmounts.rightInput
+                ? parsedAmounts.rightInput
+                : '0',
+            totalCollateral,
+            totalDebt,
+            collateralRatio: collateralRatio as number,
+            liquidationPrice: liquidationPrice as number,
+        })
+
+        setShowPreview(true)
+    }
+
     const reset = () => {
         onClearAll()
         safeActions.setSafeData(DEFAULT_SAFE_STATE)
@@ -91,6 +110,13 @@ const CreateSafe = () => {
                 hint: 'Confirm this transaction in your wallet',
                 status: 'loading',
             })
+            safeActions.setSafeData({
+                ...safeState.safeData,
+                leftInput: parsedAmounts.leftInput || '0',
+                rightInput: parsedAmounts.rightInput || '0',
+                totalCollateral,
+                totalDebt,
+            })
             const signer = library.getSigner(account)
             try {
                 connectWalletActions.setIsStepLoading(true)
@@ -100,7 +126,6 @@ const CreateSafe = () => {
                 })
                 safeActions.setIsSuccessfulTx(true)
                 popupsActions.setIsWaitingModalOpen(false)
-                history.push('/')
                 reset()
             } catch (e) {
                 safeActions.setIsSuccessfulTx(false)
@@ -229,10 +254,7 @@ const CreateSafe = () => {
                                 Number(formatNumber(liquidationData.debtFloor))
                             )} RAI`}
                         </Note>
-                        <Button
-                            onClick={() => setShowPreview(true)}
-                            disabled={!isValid}
-                        >
+                        <Button onClick={handleSubmit} disabled={!isValid}>
                             {error ?? 'Review Transaction'}
                         </Button>
                     </Flex>
@@ -252,7 +274,7 @@ const ReviewContainer = styled.div`
 `
 const Container = styled.div`
     max-width: 880px;
-    margin: 100px auto 0;
+    margin: 80px auto;
     padding: 0 15px;
     @media (max-width: 767px) {
         margin: 50px auto;

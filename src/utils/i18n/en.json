@@ -179,5 +179,6 @@
     "swap": "Swap",
     "eth_next_osm_tip": "Next ETH price that will be used by the system. This price is updated once per hour",
     "eth_osm_tip": "Current ETH price used by the system. This price is delayed 1h from the live ETH price feed and it’s only updated once per hour",
-    "stability_fee_tip": " It is the annual interest rate paid by Safe owners on their debt. Proceeds from the borrow rate go to the protocol’s balance sheet"
+    "stability_fee_tip": " It is the annual interest rate paid by Safe owners on their debt. Proceeds from the borrow rate go to the protocol’s balance sheet",
+    "rai_red_price_tip": "RAI’s “moving peg”. It’s the price at which RAI is minted or repaid inside the protocol. The RAI market price is expected to fluctuate around the redemption price"
 }

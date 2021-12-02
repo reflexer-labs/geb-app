@@ -28,6 +28,7 @@ export type Stats = {
         label: string
         value: string | number
         tip?: string
+        plainValue?: string | number
     }>
 }
 
@@ -149,14 +150,17 @@ export function useSafeInfo(type: SafeTypes = 'create') {
                 {
                     label: 'Total ETH Collateral',
                     value: totalCollateral === '0' ? '-' : totalCollateral,
+                    plainValue: totalCollateral,
                 },
                 {
                     label: 'Total RAI Debt',
                     value: totalDebt === '0' ? '-' : totalDebt,
+                    plainValue: totalDebt,
                 },
                 {
                     label: 'Collateral Ratio',
                     value: (collateralRatio > 0 ? collateralRatio : '∞') + '%',
+                    plainValue: collateralRatio,
                 },
                 {
                     label: 'Collateral Type',
@@ -294,7 +298,7 @@ export function useSafeInfo(type: SafeTypes = 'create') {
         if (leftInputBN.isZero() && rightInputBN.isZero()) {
             error =
                 error ??
-                `Please enter the amount of ETH to free or the amount of RAI to be repay`
+                `Please enter the amount of ETH to free or the amount of RAI to repay`
         }
         if (leftInputBN.gt(availableEthBN)) {
             error = error ?? 'ETH to unlock cannot exceed available amount.'

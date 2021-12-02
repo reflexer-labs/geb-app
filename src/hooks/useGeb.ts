@@ -136,7 +136,7 @@ export function useTokenBalance(token: TokenType) {
     return state
 }
 
-export function useTokeBalanceInUSD(token: TokenType, balance: string) {
+export function useTokenBalanceInUSD(token: TokenType, balance: string) {
     const ethPrice = store.getState().connectWalletModel.fiatPrice
     const raiPrice =
         store.getState().safeModel.liquidationData.currentRedemptionPrice

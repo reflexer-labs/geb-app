@@ -185,7 +185,7 @@ describe('App Page - Safe Details', () => {
         cy.get('[data-test-id="repay_withdraw_right"]').type('0')
         cy.contains('Review Transaction').click()
         cy.contains(
-            'Please enter the amount of ETH to free or the amount of RAI to be repay'
+            'Please enter the amount of ETH to free or the amount of RAI to repay'
         )
     })
 
