@@ -18,7 +18,7 @@ import { useStoreActions, useStoreState } from '../../store'
 import { formatNumber } from '../../utils/helper'
 import { isNumeric } from '../../utils/validations'
 import AlertLabel from '../../components/AlertLabel'
-import { Info } from 'react-feather'
+import { ArrowLeft, Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
 import useInterval from '../../hooks/useInterval'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
@@ -141,6 +141,9 @@ const SafeSaviour = ({ ...props }) => {
 
     return (
         <ContentContainer>
+            <BackBtn onClick={() => history.goBack()}>
+                <ArrowLeft size="16" /> Back
+            </BackBtn>
             <Container>
                 {loaded ? (
                     saviourData && saviourData.hasSaviour ? null : (
@@ -460,4 +463,15 @@ const InfoIcon = styled.div`
 
 const Link = styled.a`
     ${ExternalLinkArrow}
+`
+
+const BackBtn = styled.div`
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    color: ${(props) => props.theme.colors.secondary};
+    cursor: pointer;
+    svg {
+        margin-right: 5px;
+    }
 `

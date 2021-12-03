@@ -272,6 +272,7 @@ const Heading = styled.div`
     color: ${(props) => props.theme.colors.customSecondary};
     margin-bottom: 15px;
     button {
+        color: ${(props) => props.theme.colors.blueish};
         img {
             display: none;
         }

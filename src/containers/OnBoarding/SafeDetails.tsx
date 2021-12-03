@@ -18,8 +18,9 @@ const SafeDetails = ({ ...props }) => {
     const geb = useGeb()
     const { safeModel: safeActions, popupsModel: popupsActions } =
         useStoreActions((state) => state)
-    const { safeModel: safeState, connectWalletModel: connectWalletState } =
-        useStoreState((state) => state)
+    const { connectWalletModel: connectWalletState } = useStoreState(
+        (state) => state
+    )
 
     const { fiatPrice: ethPrice } = connectWalletState
 
@@ -142,8 +143,8 @@ const SafeDetails = ({ ...props }) => {
             {isDeposit || isWithdraw ? (
                 <ModifySafe isDeposit={isDeposit} />
             ) : null}
-            {safeState.historyList.length && !isDeposit && !isWithdraw ? (
-                <SafeHistory hideHistory={!safeState.historyList.length} />
+            {!isDeposit && !isWithdraw ? (
+                <SafeHistory hideHistory={false} />
             ) : null}
         </Container>
     )

@@ -115,9 +115,18 @@ const SafeHeader = ({
             )
         }
     }
+
+    const handleBack = useCallback(() => {
+        if (isModifying && safeId) {
+            history.push(`/safes/${safeId}`)
+        } else {
+            history.push(`/`)
+        }
+    }, [history, isModifying, safeId])
+
     return (
         <Container>
-            <BackBtn onClick={() => history.goBack()}>
+            <BackBtn onClick={handleBack}>
                 <ArrowLeft size="16" /> Back
             </BackBtn>
             <HeaderContainer>

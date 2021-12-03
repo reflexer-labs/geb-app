@@ -326,7 +326,7 @@ const Distro = styled.div`
     border-radius: 15px;
     border: 1px solid ${(props) => props.theme.colors.border};
     margin-bottom: 15px;
-    background: ${(props) => props.theme.colors.foreground};
+    background: ${(props) => props.theme.colors.colorPrimary};
     padding: 15px;
 `
 
