@@ -178,7 +178,7 @@ const HideMobile = styled.div`
 `
 
 const Left = styled.div`
-    min-width: 194px;
+    min-width: 315px;
     display: flex;
     align-items: center;
     ${({ theme }) => theme.mediaWidth.upToSmall`
