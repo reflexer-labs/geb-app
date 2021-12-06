@@ -126,7 +126,7 @@ const SafeHeader = ({
 
     return (
         <Container>
-            <BackBtn onClick={handleBack}>
+            <BackBtn id="back-btn" onClick={handleBack}>
                 <ArrowLeft size="16" /> Back
             </BackBtn>
             <HeaderContainer>
@@ -162,6 +162,7 @@ const SafeHeader = ({
                 <RightSide>
                     {!isModifying || (isModifying && !isDeposit) ? (
                         <LinkButton
+                            id="deposit_borrow"
                             text={'Deposit & Borrow'}
                             url={`/safes/${safeId}/deposit`}
                             color={'colorPrimary'}
@@ -170,6 +171,7 @@ const SafeHeader = ({
 
                     {!isModifying || (isModifying && isDeposit) ? (
                         <LinkButton
+                            id="repay_withdraw"
                             text={'Repay & Withdraw'}
                             url={`/safes/${safeId}/withdraw`}
                             color={'blueish'}

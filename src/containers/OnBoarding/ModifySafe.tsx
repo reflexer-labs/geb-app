@@ -13,7 +13,13 @@ import { DEFAULT_SAFE_STATE, TOKENS } from '../../utils/constants'
 import { formatNumber } from '../../utils/helper'
 import Review from './Review'
 
-const ModifySafe = ({ isDeposit }: { isDeposit: boolean }) => {
+const ModifySafe = ({
+    isDeposit,
+    isOwner,
+}: {
+    isDeposit: boolean
+    isOwner: boolean
+}) => {
     const { library, account } = useActiveWeb3React()
     const proxyAddress = useProxyAddress()
     const [showPreview, setShowPreview] = useState(false)
@@ -168,7 +174,7 @@ const ModifySafe = ({ isDeposit }: { isDeposit: boolean }) => {
                 <ReviewContainer>
                     <Review type={'create'} />
                     <BtnContainer>
-                        <Button onClick={handleConfirm}>
+                        <Button id="confirm_tx" onClick={handleConfirm}>
                             {'Confirm Transaction'}
                         </Button>{' '}
                     </BtnContainer>
@@ -181,6 +187,9 @@ const ModifySafe = ({ isDeposit }: { isDeposit: boolean }) => {
                     </SideLabel>
 
                     <TokenInput
+                        data_test_id={`${
+                            isDeposit ? 'deposit_borrow' : 'repay_withdraw'
+                        }_left`}
                         token={TOKENS.eth}
                         label={
                             isDeposit
@@ -191,6 +200,7 @@ const ModifySafe = ({ isDeposit }: { isDeposit: boolean }) => {
                         onChange={onLeftInput}
                         value={leftInput}
                         handleMaxClick={onMaxLeftInput}
+                        disabled={!isDeposit && !isOwner}
                     />
                 </InputBlock>
                 <InputBlock>
@@ -198,6 +208,9 @@ const ModifySafe = ({ isDeposit }: { isDeposit: boolean }) => {
                         {isDeposit ? `Borrow RAI` : 'Repay RAI'}
                     </SideLabel>
                     <TokenInput
+                        data_test_id={`${
+                            isDeposit ? 'deposit_borrow' : 'repay_withdraw'
+                        }_right`}
                         token={TOKENS.rai}
                         label={
                             isDeposit
@@ -221,6 +234,7 @@ const ModifySafe = ({ isDeposit }: { isDeposit: boolean }) => {
                         onChange={onRightInput}
                         value={rightInput}
                         handleMaxClick={onMaxRightInput}
+                        disabled={isDeposit && !isOwner}
                     />
                 </InputBlock>
             </Inner>

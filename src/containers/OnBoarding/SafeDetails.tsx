@@ -124,6 +124,7 @@ const SafeDetails = ({ ...props }) => {
             {!isOwner ? (
                 <LabelContainer>
                     <AlertLabel
+                        isBlock={false}
                         text={t('managed_safe_warning')}
                         type="warning"
                     />
@@ -141,7 +142,7 @@ const SafeDetails = ({ ...props }) => {
             />
 
             {isDeposit || isWithdraw ? (
-                <ModifySafe isDeposit={isDeposit} />
+                <ModifySafe isDeposit={isDeposit} isOwner={isOwner} />
             ) : null}
             {!isDeposit && !isWithdraw ? (
                 <SafeHistory hideHistory={false} />
@@ -163,5 +164,5 @@ const Container = styled.div`
 
 const LabelContainer = styled.div`
     max-width: ${(props) => props.theme.global.gridMaxWidth};
-    margin: 0 auto;
+    margin: 0 auto 20px auto;
 `

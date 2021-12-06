@@ -151,7 +151,7 @@ const CreateSafe = () => {
                 <ReviewContainer>
                     <Review type={'create'} />
                     <BtnContainer>
-                        <Button onClick={handleConfirm}>
+                        <Button id="create_confirm" onClick={handleConfirm}>
                             {'Confirm Transaction'}
                         </Button>{' '}
                     </BtnContainer>
@@ -189,6 +189,7 @@ const CreateSafe = () => {
                                     onChange={onLeftInput}
                                     value={leftInput}
                                     handleMaxClick={onMaxLeftInput}
+                                    data_test_id="deposit_borrow"
                                 />
 
                                 <br />
@@ -202,6 +203,7 @@ const CreateSafe = () => {
                                     onChange={onRightInput}
                                     value={rightInput}
                                     handleMaxClick={onMaxRightInput}
+                                    data_test_id="repay_withdraw"
                                 />
                             </Inputs>
                         </Col>

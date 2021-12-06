@@ -11,13 +11,13 @@ const AlertLabel = ({ text, type, padding, isBlock = true }: Props) => {
     return (
         <Container
             className={type ? type : 'alert'}
-            isBlock
+            isBlock={isBlock}
             style={{
                 padding: isBlock ? '0' : padding || '8px',
             }}
         >
             <Flex>
-                <Circle />
+                {isBlock ? <Circle /> : null}
                 {text}
             </Flex>
         </Container>
@@ -96,7 +96,6 @@ const Container = styled.div<{ isBlock?: boolean }>`
             isBlock ? 'transparent' : theme.colors.secondary};
         color: #fff;
         ${Circle} {
-            background: ${(props) => props.theme.colors.secondary};
         }
     }
 

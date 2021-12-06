@@ -233,14 +233,52 @@ export function useSafeInfo(type: SafeTypes = 'create') {
         error = error ?? 'Create a Reflexer Account to continue'
     }
 
-    if (type !== 'create') {
-        const perSafeDebtCeilingBN = BigNumber.from(
-            toFixedString(liquidationData.perSafeDebtCeiling, 'WAD')
-        )
-        if (totalDebtBN.gte(perSafeDebtCeilingBN)) {
+    if (type === 'deposit_borrow') {
+        if (leftInputBN.gt(availableEthBN)) {
+            error = error ?? 'Insufficient balance.'
+        }
+        if (rightInputBN.gt(availableRaiBN)) {
+            error = error ?? `RAI borrowed cannot exceed available amount.`
+        }
+        if (leftInputBN.isZero() && rightInputBN.isZero()) {
             error =
                 error ??
-                `Individual safe can't have more than ${liquidationData.perSafeDebtCeiling} RAI of debt.`
+                `Please enter the amount of ETH to be deposited or amount of RAI to be borrowed`
+        }
+    }
+
+    if (type === 'repay_withdraw') {
+        if (leftInputBN.isZero() && rightInputBN.isZero()) {
+            error =
+                error ??
+                `Please enter the amount of ETH to free or the amount of RAI to repay`
+        }
+        if (leftInputBN.gt(availableEthBN)) {
+            error = error ?? 'ETH to unlock cannot exceed available amount.'
+        }
+
+        if (rightInputBN.gt(availableRaiBN)) {
+            error = error ?? `RAI to repay cannot exceed owed amount.`
+        }
+
+        if (!rightInputBN.isZero()) {
+            const repayPercent = returnPercentAmount(
+                rightInput,
+                availableRai as string
+            )
+
+            if (
+                rightInputBN.lt(BigNumber.from(availableRaiBN)) &&
+                repayPercent > 95
+            ) {
+                error =
+                    error ??
+                    `You can only repay a minimum of ${availableRai} RAI to avoid leaving residual values`
+            }
+        }
+
+        if (!rightInputBN.isZero() && rightInputBN.gt(raiBalanceBN)) {
+            error = error ?? `balance_issue`
         }
     }
 
@@ -280,51 +318,14 @@ export function useSafeInfo(type: SafeTypes = 'create') {
         }
     }
 
-    if (type === 'deposit_borrow') {
-        if (leftInputBN.gt(availableEthBN)) {
-            error = error ?? 'Insufficient balance.'
-        }
-        if (rightInputBN.gt(availableRaiBN)) {
-            error = error ?? `RAI borrowed cannot exceed available amount.`
-        }
-        if (leftInputBN.isZero() && rightInputBN.isZero()) {
+    if (type !== 'create') {
+        const perSafeDebtCeilingBN = BigNumber.from(
+            toFixedString(liquidationData.perSafeDebtCeiling, 'WAD')
+        )
+        if (totalDebtBN.gte(perSafeDebtCeilingBN)) {
             error =
                 error ??
-                `Please enter the amount of ETH to be deposited or amount of RAI to be borrowed`
-        }
-    }
-
-    if (type === 'repay_withdraw') {
-        if (leftInputBN.isZero() && rightInputBN.isZero()) {
-            error =
-                error ??
-                `Please enter the amount of ETH to free or the amount of RAI to repay`
-        }
-        if (leftInputBN.gt(availableEthBN)) {
-            error = error ?? 'ETH to unlock cannot exceed available amount.'
-        }
-        if (rightInputBN.gt(availableRaiBN)) {
-            error = error ?? `RAI to repay cannot exceed owed amount.`
-        }
-
-        if (!rightInputBN.isZero()) {
-            const repayPercent = returnPercentAmount(
-                rightInput,
-                availableRai as string
-            )
-
-            if (
-                rightInputBN.lt(BigNumber.from(availableRaiBN)) &&
-                repayPercent > 95
-            ) {
-                error =
-                    error ??
-                    `You can only repay a minimum of ${availableRai} RAI to avoid leaving residual values`
-            }
-        }
-
-        if (!rightInputBN.isZero() && rightInputBN.gt(raiBalanceBN)) {
-            error = error ?? `balance_issue`
+                `Individual safe can't have more than ${liquidationData.perSafeDebtCeiling} RAI of debt.`
         }
     }
 
