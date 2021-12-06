@@ -44,4 +44,4 @@ jobs:
                   REACT_APP_NETWORK_URL: 'https://kovan.infura.io/v3/645c2c65dd8f4be18a50a0bf011bab85'
                   REACT_APP_NETWORK_ID: ${{ secrets.REACT_APP_NETWORK_ID_STAGING }}
 
-            - run: yarn cypress-test
+            - run: yarn test:e2e
