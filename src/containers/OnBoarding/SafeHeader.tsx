@@ -191,6 +191,7 @@ const BackBtn = styled.div`
     align-items: center;
     color: ${(props) => props.theme.colors.secondary};
     cursor: pointer;
+    max-width: fit-content;
     svg {
         margin-right: 5px;
     }

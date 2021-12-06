@@ -50,7 +50,8 @@ const Container = styled.div<{ isBlock?: boolean }>`
         border-width: ${({ theme, isBlock }) => (isBlock ? '0' : '1px')};
         background: ${({ theme, isBlock }) =>
             isBlock ? 'transparent' : theme.colors.alertBackground};
-        color: ${(props) => props.theme.colors.alertColor};
+        color: ${({ theme, isBlock }) =>
+            isBlock ? theme.colors.customSecondary : theme.colors.alertColor};
         ${Circle} {
             background: ${(props) => props.theme.colors.alertColor};
         }
@@ -71,7 +72,8 @@ const Container = styled.div<{ isBlock?: boolean }>`
         border-width: ${({ theme, isBlock }) => (isBlock ? '0' : '1px')};
         background: ${({ theme, isBlock }) =>
             isBlock ? 'transparent' : theme.colors.dangerBackground};
-        color: ${(props) => props.theme.colors.dangerColor};
+        color: ${({ theme, isBlock }) =>
+            isBlock ? theme.colors.customSecondary : theme.colors.dangerColor};
         ${Circle} {
             background: ${(props) => props.theme.colors.dangerColor};
         }
@@ -81,7 +83,8 @@ const Container = styled.div<{ isBlock?: boolean }>`
         border-width: ${({ theme, isBlock }) => (isBlock ? '0' : '1px')};
         background: ${({ theme, isBlock }) =>
             isBlock ? 'transparent' : theme.colors.warningBackground};
-        color: ${(props) => props.theme.colors.warningColor};
+        color: ${({ theme, isBlock }) =>
+            isBlock ? theme.colors.customSecondary : theme.colors.warningColor};
         ${Circle} {
             background: ${(props) => props.theme.colors.warningColor};
         }
