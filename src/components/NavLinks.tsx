@@ -101,14 +101,20 @@ const NavLinks = () => {
                     <DollarSign /> {t('earn')}
                 </LinkItem>
                 <MenuBox className="menu-box">
-                    <IntLink to="/earn/staking">
+                    <IntLink
+                        to="/earn/staking"
+                        onClick={() => popupsActions.setShowSideMenu(false)}
+                    >
                         Staking{' '}
                         <img
                             src={require('../assets/dark-arrow.svg')}
                             alt="arrow"
                         />
                     </IntLink>
-                    <IntLink to="/earn/incentives">
+                    <IntLink
+                        to="/earn/incentives"
+                        onClick={() => popupsActions.setShowSideMenu(false)}
+                    >
                         Incentives{' '}
                         <img
                             src={require('../assets/dark-arrow.svg')}
@@ -244,6 +250,11 @@ const NavBarLink = styled(NavLink)`
             border-radius: 2px;
             background: ${(props) => props.theme.colors.blueish};
         }
+        ${({ theme }) => theme.mediaWidth.upToSmall`
+        &:before {
+            display:none;
+        }
+        `}
     }
 `
 
@@ -295,6 +306,11 @@ const LinkItem = styled.div`
             border-radius: 2px;
             background: ${(props) => props.theme.colors.blueish};
         }
+        ${({ theme }) => theme.mediaWidth.upToSmall`
+        &:before {
+            display:none;
+        }
+        `}
     }
 
     &:hover {

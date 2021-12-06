@@ -165,9 +165,7 @@ const Item = styled.li`
     text-align: left;
     color: ${(props) => props.theme.colors.neutral};
     margin-top: 5px;
-    @media (max-width: 767px) {
-        font-size: 13px;
-    }
+
     span > div {
         margin: 0;
     }
@@ -179,6 +177,14 @@ const Item = styled.li`
         margin-right: 5px;
         stroke-width: 0;
         fill: #d09e41;
+    }
+
+    @media (max-width: 767px) {
+        font-size: 13px;
+        svg {
+            width: 8px !important;
+            height: 8px !important;
+        }
     }
 `
 
