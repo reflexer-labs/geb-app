@@ -307,9 +307,7 @@ const ImageContainer = styled.div`
     `}
 `
 
-const Container = styled.div`
-    padding: 30px;
-`
+const Container = styled.div``
 
 const Title = styled.div`
     font-size: 18px;
