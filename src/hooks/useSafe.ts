@@ -235,10 +235,10 @@ export function useSafeInfo(type: SafeTypes = 'create') {
 
     if (type === 'deposit_borrow') {
         if (leftInputBN.gt(availableEthBN)) {
-            error = error ?? 'Insufficient balance.'
+            error = error ?? 'Insufficient balance'
         }
         if (rightInputBN.gt(availableRaiBN)) {
-            error = error ?? `RAI borrowed cannot exceed available amount.`
+            error = error ?? `RAI borrowed cannot exceed available amount`
         }
         if (leftInputBN.isZero() && rightInputBN.isZero()) {
             error =
@@ -254,11 +254,11 @@ export function useSafeInfo(type: SafeTypes = 'create') {
                 `Please enter the amount of ETH to free or the amount of RAI to repay`
         }
         if (leftInputBN.gt(availableEthBN)) {
-            error = error ?? 'ETH to unlock cannot exceed available amount.'
+            error = error ?? 'ETH to unlock cannot exceed available amount'
         }
 
         if (rightInputBN.gt(availableRaiBN)) {
-            error = error ?? `RAI to repay cannot exceed owed amount.`
+            error = error ?? `RAI to repay cannot exceed owed amount`
         }
 
         if (!rightInputBN.isZero()) {
@@ -287,7 +287,7 @@ export function useSafeInfo(type: SafeTypes = 'create') {
             error ??
             `The resulting debt should be at least ${Math.ceil(
                 Number(formatNumber(liquidationData.debtFloor))
-            )} RAI or zero.`
+            )} RAI or zero`
     }
 
     if (!isSafe && (collateralRatio as number) >= 0) {
@@ -302,14 +302,14 @@ export function useSafeInfo(type: SafeTypes = 'create') {
         numeral(totalDebt).value() >
         numeral(liquidationData.globalDebtCeiling).value()
     ) {
-        error = error ?? 'Cannot exceed global debt ceiling.'
+        error = error ?? 'Cannot exceed global debt ceiling'
     }
 
     if (
         numeral(totalDebt).value() >
         numeral(liquidationData.debtCeiling).value()
     ) {
-        error = error ?? `Cannot exceed RAI debt ceiling.`
+        error = error ?? `Cannot exceed RAI debt ceiling`
     }
 
     if (type === 'create') {
@@ -325,7 +325,7 @@ export function useSafeInfo(type: SafeTypes = 'create') {
         if (totalDebtBN.gte(perSafeDebtCeilingBN)) {
             error =
                 error ??
-                `Individual safe can't have more than ${liquidationData.perSafeDebtCeiling} RAI of debt.`
+                `Individual safe can't have more than ${liquidationData.perSafeDebtCeiling} RAI of debt`
         }
     }
 

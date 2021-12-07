@@ -42,7 +42,7 @@ const Navbar = () => {
     const hasPendingTransactions = !!pending.length
     return (
         <Container>
-            <Left>
+            <Left isBigWidth={active && account ? true : false}>
                 <Brand />
             </Left>
             <HideMobile>
@@ -123,7 +123,6 @@ const MenuBtn = styled.div`
     align-items: center;
     justify-content: center;
     display: none;
-    border-left: 1px solid ${(props) => props.theme.colors.border};
     cursor: pointer;
     &:hover {
         div {
@@ -177,8 +176,8 @@ const HideMobile = styled.div`
   `}
 `
 
-const Left = styled.div`
-    min-width: 315px;
+const Left = styled.div<{ isBigWidth?: boolean }>`
+    min-width: ${({ theme, isBigWidth }) => (isBigWidth ? '315px' : '171px')};
     display: flex;
     align-items: center;
     ${({ theme }) => theme.mediaWidth.upToSmall`

@@ -78,11 +78,11 @@ const StepsContent = ({
                     </Heading>
                     <List>
                         <Item>
-                            <Circle className="bullet" size="13" />
+                            <Circle className="bullet" size="10" />
                             {`You do not need to create a new account if you already have a MakerDAO or Balancer proxy`}
                         </Item>
                         <Item>
-                            <Circle className="bullet" size="13" />
+                            <Circle className="bullet" size="10" />
                             The minimum amount to mint per safe is{' '}
                             <span>
                                 {!debtFloor ? (

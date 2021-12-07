@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import React, { useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import Button from '../../components/Button'
@@ -83,7 +84,17 @@ const ModifySafe = ({
         if (isDeposit) {
             onRightInput(availableRai.toString())
         } else {
-            onRightInput(balances.rai.toString())
+            const availableRaiBN = ethers.utils.parseEther(availableRai)
+
+            const raiBalanceBN = ethers.utils.parseEther(
+                balances.rai.toString()
+            )
+
+            const isMore = raiBalanceBN.gt(availableRaiBN)
+
+            onRightInput(
+                isMore ? availableRai.toString() : balances.rai.toString()
+            )
         }
     }
 

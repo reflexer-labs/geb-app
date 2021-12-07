@@ -160,23 +160,18 @@ const SafeHeader = ({
                     ) : null}
                 </LeftSide>
                 <RightSide>
-                    {!isModifying || (isModifying && !isDeposit) ? (
-                        <LinkButton
-                            id="deposit_borrow"
-                            text={'Deposit & Borrow'}
-                            url={`/safes/${safeId}/deposit`}
-                            color={'colorPrimary'}
-                        />
-                    ) : null}
-
-                    {!isModifying || (isModifying && isDeposit) ? (
-                        <LinkButton
-                            id="repay_withdraw"
-                            text={'Repay & Withdraw'}
-                            url={`/safes/${safeId}/withdraw`}
-                            color={'blueish'}
-                        />
-                    ) : null}
+                    <LinkButton
+                        id="deposit_borrow"
+                        text={'Deposit & Borrow'}
+                        url={`/safes/${safeId}/deposit`}
+                        color={'colorPrimary'}
+                    />
+                    <LinkButton
+                        id="repay_withdraw"
+                        text={'Repay & Withdraw'}
+                        url={`/safes/${safeId}/withdraw`}
+                        color={'blueish'}
+                    />
                 </RightSide>
             </HeaderContainer>
         </Container>
