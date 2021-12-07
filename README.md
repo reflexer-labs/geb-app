@@ -53,7 +53,7 @@ To have the app default to a different network when a wallet is not connected:
 ### Cypress integration test
 
 ```bash
-yarn cypress-test
+yarn test:e2e
 ```
 
 ### Jest test

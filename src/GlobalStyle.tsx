@@ -7,9 +7,13 @@ interface Props {
 const GlobalStyle = createGlobalStyle`
         body {
           color: ${(props) => props.theme.colors.primary};
-          background:${(props) => props.theme.colors.foreground};
-            overflow: ${(props: Props) =>
-                props.bodyOverflow ? 'hidden' : 'visible'};
+          background-color:${(props) => props.theme.colors.background};
+          background-image: url(${require('./assets/boxes.svg')});
+          background-size: contain;
+          background-position: center 100px;
+          background-repeat: no-repeat;
+          overflow: ${(props: Props) =>
+              props.bodyOverflow ? 'hidden' : 'visible'};
 
 .web3modal-modal-lightbox {
   z-index: 999;
@@ -42,6 +46,27 @@ const GlobalStyle = createGlobalStyle`
    
   }
 }
+.place-left {
+    &:after{
+      border-left-color:${(props) => props.theme.colors.foreground} !important
+    }
+  }
+
+  .place-top {
+    &:after{
+      border-top-color:${(props) => props.theme.colors.foreground} !important
+    }
+  }
+  .place-bottom {
+    &:after{
+      border-bottom-color:${(props) => props.theme.colors.foreground} !important
+    }
+  }
+  .place-right {
+    &:after{
+      border-right-color:${(props) => props.theme.colors.foreground} !important
+    }
+  }
 .__react_component_tooltip {
     max-width: 250px;
     padding-top: 20px;
@@ -49,12 +74,10 @@ const GlobalStyle = createGlobalStyle`
     border-radius: 5px;
     color:${(props) => props.theme.colors.primary};
     opacity: 1 !important;
-    background: ${(props) => props.theme.colors.background};
+    background: ${(props) => props.theme.colors.foreground};
     border: ${(props) => props.theme.colors.border} !important;
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.16);
-    &:after {
-      border-top-color: ${(props) => props.theme.colors.background} !important;
-    }
+   
   }
         }
 `
@@ -66,11 +89,7 @@ export const ExternalLinkArrow = css`
     outline: none;
     padding: 0;
     margin: 0;
-    background: ${(props) => props.theme.colors.gradient};
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: ${(props) => props.theme.colors.inputBorderColor};
+    color: ${(props) => props.theme.colors.blueish};
     font-size: ${(props) => props.theme.font.small};
     font-weight: 600;
     line-height: 24px;
@@ -90,6 +109,38 @@ export const ExternalLinkArrow = css`
         position: relative;
         top: 1px;
     }
+`
+
+export const BtnStyle = css<{
+    disabled?: boolean
+    color?:
+        | 'blueish'
+        | 'greenish'
+        | 'yellowish'
+        | 'colorPrimary'
+        | 'colorSecondary'
+}>`
+    pointer-events: ${({ theme, disabled }) => (disabled ? 'none' : 'inherit')};
+    outline: none;
+    cursor: ${({ theme, disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+    min-width: 134px;
+    border: none;
+    box-shadow: none;
+    line-height: 24px;
+    font-size: ${(props) => props.theme.font.small};
+    font-weight: 600;
+    padding: 8px 30px;
+    color: ${(props) => props.theme.colors.neutral};
+    background: ${({ theme, disabled, color }) =>
+        disabled
+            ? theme.colors.dimmedBackground
+            : theme.colors[color ?? 'blueish']};
+    border-radius: ${(props) => props.theme.global.borderRadius};
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    border-radius: 50px;
+    justify-content: space-between;
 `
 
 export default GlobalStyle

@@ -43,6 +43,7 @@ expect.extend({
             0,
             gqlMaxMantissaSize
         )
+
         // Compare the mantissa and the decimal place
         if (
             truncatedMantissaReceived === truncatedMantissaOther &&

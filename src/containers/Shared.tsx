@@ -257,14 +257,13 @@ const Container = styled.div`
         right: 0;
         border-radius: ${(props) => props.theme.global.borderRadius};
         padding: 10px 20px;
-
+        background: ${(props) => props.theme.colors.foreground} !important;
         button {
-            background: ${(props) => props.theme.colors.gradient} !important;
+            background: ${(props) => props.theme.colors.blueish} !important;
             color: ${(props) => props.theme.colors.neutral} !important;
             padding: 8px 15px !important;
             background: ${(props) => props.theme.colors.gradient};
-            border-radius: ${(props) =>
-                props.theme.global.borderRadius} !important;
+            border-radius: 25px !important;
             font-size: ${(props) => props.theme.font.small};
             font-weight: 600;
             cursor: pointer;

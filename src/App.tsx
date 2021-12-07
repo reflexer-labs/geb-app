@@ -6,7 +6,6 @@ import { I18nextProvider } from 'react-i18next'
 import ErrorBoundary from './ErrorBoundary'
 import { useStoreState } from './store'
 import { darkTheme } from './utils/themes/dark'
-import { lightTheme } from './utils/themes/light'
 import { Theme } from './utils/interfaces'
 import OnBoarding from './containers/OnBoarding'
 import { initI18n } from './utils/i18n'
@@ -23,6 +22,7 @@ import { SHOW_AUCTIONS } from './utils/constants'
 import SafeSaviour from './containers/OnBoarding/SafeSaviour'
 import Staking from './containers/Earn/Staking'
 import Incentives from './containers/Earn/Incentives'
+import CreateSafe from './containers/OnBoarding/CreateSafe'
 
 // Toast css
 
@@ -33,7 +33,7 @@ declare module 'styled-components' {
 const App = () => {
     const { settingsModel: settingsState } = useStoreState((state) => state)
 
-    const { isLightTheme, lang, bodyOverflow } = settingsState
+    const { lang, bodyOverflow } = settingsState
 
     useEffect(() => {
         initI18n(lang)
@@ -41,7 +41,7 @@ const App = () => {
 
     return (
         <I18nextProvider i18n={i18next}>
-            <ThemeProvider theme={isLightTheme ? lightTheme : darkTheme}>
+            <ThemeProvider theme={darkTheme}>
                 <GlobalStyle bodyOverflow={bodyOverflow} />
                 <CustomToast />
                 <ErrorBoundary>
@@ -77,6 +77,24 @@ const App = () => {
                                             strict
                                             component={Incentives}
                                             path={'/earn/incentives'}
+                                        />
+                                        <Route
+                                            exact
+                                            strict
+                                            component={CreateSafe}
+                                            path={'/safes/create'}
+                                        />
+                                        <Route
+                                            exact
+                                            strict
+                                            component={SafeDetails}
+                                            path={'/safes/:id/deposit'}
+                                        />
+                                        <Route
+                                            exact
+                                            strict
+                                            component={SafeDetails}
+                                            path={'/safes/:id/withdraw'}
                                         />
                                         <Route
                                             exact

@@ -80,14 +80,13 @@ const InfoCard = styled.button<{ active?: boolean }>`
     background-color: ${(props) => props.theme.colors.background};
     padding: 1rem;
     outline: none;
-    border: 1px solid;
+    border: 1px solid ${(props) => props.theme.colors.border};
     border-radius: 12px;
     width: 100% !important;
     &:focus {
         box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
         background: ${(props) => props.theme.colors.placeholder};
     }
-    border-color: ${(props) => props.theme.colors.border};
 `
 
 const OptionCard = styled(InfoCard as any)`
@@ -101,7 +100,6 @@ const OptionCard = styled(InfoCard as any)`
 
 const OptionCardLeft = styled.div`
     justify-content: center;
-    height: 100%;
 `
 
 const OptionCardClickable = styled(OptionCard as any)<{ clickable?: boolean }>`
@@ -138,7 +136,7 @@ const CircleWrapper = styled.div`
 `
 
 const HeaderText = styled.div`
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.neutral};
     font-size: 1rem;
     font-weight: 500;
     display: flex;
@@ -146,7 +144,7 @@ const HeaderText = styled.div`
 `
 
 const SubHeader = styled.div`
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.secondary};
     margin-top: 10px;
     font-size: 12px;
 `

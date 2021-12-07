@@ -520,3 +520,16 @@ export const returnTimeOffset = () => {
     const res = -Math.round(a / 60)
     return res < 0 ? res : '+' + res
 }
+
+export const returnState = (state: number) => {
+    switch (state) {
+        case 1:
+            return 'Low'
+        case 2:
+            return 'Medium'
+        case 3:
+            return 'High'
+        default:
+            return ''
+    }
+}

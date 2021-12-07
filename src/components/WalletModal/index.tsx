@@ -250,7 +250,7 @@ export default function WalletModal() {
                     </HeaderRow>
                 ) : (
                     <HeaderRow>
-                        <HoverText>Connect to a wallet</HoverText>
+                        <HoverText>{t('connect_wallet_title')}</HoverText>
                     </HeaderRow>
                 )}
                 <ContentWrapper>
@@ -288,7 +288,7 @@ const CloseIcon = styled.div`
     top: 14px;
     font-size: 30px;
     z-index: 2;
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.neutral};
     &:hover {
         cursor: pointer;
         opacity: 0.6;
@@ -341,7 +341,7 @@ const OptionGrid = styled.div`
 `
 
 const HoverText = styled.div`
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.neutral};
     position: relative;
     top: 10px;
     :hover {

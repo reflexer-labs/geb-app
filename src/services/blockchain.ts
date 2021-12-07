@@ -16,8 +16,12 @@ export const handleDepositAndBorrow = async (
         return false
     }
 
-    const collateralBN = ethersUtils.parseEther(safeData.leftInput)
-    const debtBN = ethersUtils.parseEther(safeData.rightInput)
+    const collateralBN = safeData.leftInput
+        ? ethersUtils.parseEther(safeData.leftInput)
+        : ethersUtils.parseEther('0')
+    const debtBN = safeData.rightInput
+        ? ethersUtils.parseEther(safeData.rightInput)
+        : ethersUtils.parseEther('0')
 
     const geb = new Geb(ETH_NETWORK, signer.provider)
 

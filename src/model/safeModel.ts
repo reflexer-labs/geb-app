@@ -120,7 +120,7 @@ const safeModel: SafeModel = {
         liquidationPenalty: '1', // Rate percentage
         safetyCRatio: '0',
         currentRedemptionPrice: '0',
-        totalAnnualizedStabilityFee: '0',
+        totalAnnualizedStabilityFee: '',
         currentRedemptionRate: '0',
         perSafeDebtCeiling: '0',
         globalDebtCeiling: '0',

@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import React, { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -7,6 +8,8 @@ import Loader from './Loader'
 interface Props extends React.HTMLAttributes<HTMLButtonElement> {
     text?: string
     onClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void
+    primary?: boolean
+    secondary?: boolean
     dimmed?: boolean
     dimmedNormal?: boolean
     withArrow?: boolean
@@ -23,6 +26,8 @@ const Button = ({
     onClick,
     dimmed,
     dimmedNormal,
+    primary,
+    secondary,
     withArrow,
     disabled,
     isLoading,
@@ -33,6 +38,12 @@ const Button = ({
     ...rest
 }: Props) => {
     const { t } = useTranslation()
+
+    const classes = classNames({
+        primary,
+        secondary,
+        dimmedNormal,
+    })
 
     const returnType = () => {
         if (dimmed) {
@@ -78,7 +89,7 @@ const Button = ({
             return (
                 <Container
                     {...rest}
-                    className={dimmedNormal ? 'dimmedNormal' : ''}
+                    className={classes}
                     disabled={disabled}
                     isLoading={isLoading}
                     onClick={onClick}
@@ -101,16 +112,22 @@ const Container = styled.button<{ isLoading?: boolean }>`
     min-width: 134px;
     border: none;
     box-shadow: none;
-    padding: ${(props) => props.theme.global.buttonPadding};
+    padding: 8px 30px;
     line-height: 24px;
     font-size: ${(props) => props.theme.font.small};
     font-weight: 600;
     color: ${(props) => props.theme.colors.neutral};
-    background: ${(props) => props.theme.colors.gradient};
-    border-radius: ${(props) => props.theme.global.borderRadius};
+    background: ${(props) => props.theme.colors.blueish};
+    border-radius: 50px;
     transition: all 0.3s ease;
     &.dimmedNormal {
         background: ${(props) => props.theme.colors.secondary};
+    }
+    &.primary {
+        background: ${(props) => props.theme.colors.colorPrimary};
+    }
+    &.secondary {
+        background: ${(props) => props.theme.colors.colorSecondary};
     }
     &:hover {
         opacity: 0.8;

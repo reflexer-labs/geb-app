@@ -4,8 +4,6 @@ import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 import Button from '../../components/Button'
 import numeral from 'numeral'
-import GridContainer from '../../components/GridContainer'
-import PageHeader from '../../components/PageHeader'
 import { useActiveWeb3React } from '../../hooks'
 import useGeb, { useSafeHandler } from '../../hooks/useGeb'
 import {
@@ -20,7 +18,7 @@ import { useStoreActions, useStoreState } from '../../store'
 import { formatNumber } from '../../utils/helper'
 import { isNumeric } from '../../utils/validations'
 import AlertLabel from '../../components/AlertLabel'
-import { Info } from 'react-feather'
+import { ArrowLeft, Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
 import useInterval from '../../hooks/useInterval'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
@@ -142,14 +140,10 @@ const SafeSaviour = ({ ...props }) => {
     }
 
     return (
-        <GridContainer>
-            <HeaderContainer>
-                <PageHeader
-                    breadcrumbs={{ '/': t('accounts'), '': `#${safeId}` }}
-                    text={t('accounts_header_text')}
-                />
-            </HeaderContainer>
-
+        <ContentContainer>
+            <BackBtn onClick={() => history.goBack()}>
+                <ArrowLeft size="16" /> Back
+            </BackBtn>
             <Container>
                 {loaded ? (
                     saviourData && saviourData.hasSaviour ? null : (
@@ -162,10 +156,18 @@ const SafeSaviour = ({ ...props }) => {
                     )
                 ) : null}
 
-                <SaviourHeading>
+                <SaviourHeading
+                    style={{
+                        justifyContent:
+                            saviourData && saviourData.hasSaviour
+                                ? 'space-between'
+                                : 'center',
+                    }}
+                >
                     <Title>{t('safe_saviour_title')}</Title>
                     {saviourData && saviourData.hasSaviour ? (
                         <AlertLabel
+                            isBlock={true}
                             text={`Status: ${returnStatus()}`}
                             type={
                                 returnStatus() === 'Protected'
@@ -260,16 +262,10 @@ const SafeSaviour = ({ ...props }) => {
                         />
                     </StatsGrid>
                 ) : null}
-                <BtnContainer
-                    style={{
-                        justifyContent: saviourData?.hasSaviour
-                            ? 'space-between'
-                            : 'flex-end',
-                    }}
-                >
+                <BtnContainer>
                     {saviourData?.hasSaviour ? (
                         <Button
-                            dimmed
+                            primary
                             text={'disconnect_saviour'}
                             isLoading={isLoading}
                             disabled={isLoading}
@@ -277,21 +273,25 @@ const SafeSaviour = ({ ...props }) => {
                         />
                     ) : null}
                     <Button
-                        withArrow
                         disabled={isLoading}
                         text={'configure'}
                         onClick={handleOpenModal}
                     />
                 </BtnContainer>
             </Container>
-        </GridContainer>
+        </ContentContainer>
     )
 }
 
 export default SafeSaviour
 
-const HeaderContainer = styled.div`
-    position: relative;
+const ContentContainer = styled.div`
+    max-width: 880px;
+    margin: 80px auto;
+    padding: 0 15px;
+    @media (max-width: 767px) {
+        margin: 50px auto;
+    }
 `
 
 const ImageContainer = styled.div`
@@ -307,12 +307,7 @@ const ImageContainer = styled.div`
     `}
 `
 
-const Container = styled.div`
-    background: ${(props) => props.theme.colors.neutral};
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    border: 1px solid ${(props) => props.theme.colors.border};
-    padding: 30px;
-`
+const Container = styled.div``
 
 const Title = styled.div`
     font-size: 18px;
@@ -322,9 +317,14 @@ const Title = styled.div`
     font-weight: bold;
 `
 const Description = styled.div`
+    background: rgba(65, 193, 208, 0.4);
+    border-radius: 25px;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
     margin-top: 10px;
     font-size: 14px;
-    color: ${(props) => props.theme.colors.secondary};
+    color: ${(props) => props.theme.colors.primary};
     line-height: 22px;
     a {
         ${ExternalLinkArrow}
@@ -335,6 +335,10 @@ const BtnContainer = styled.div`
     display: flex;
     align-items: center;
     margin-top: 10px;
+    justify-content: center;
+    button {
+        margin: 0 10px;
+    }
 `
 
 const StatsGrid = styled.div`
@@ -441,7 +445,7 @@ const Label = styled.div`
 const SaviourHeading = styled.div`
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
 `
 
 const InfoIcon = styled.div`
@@ -457,4 +461,16 @@ const InfoIcon = styled.div`
 
 const Link = styled.a`
     ${ExternalLinkArrow}
+`
+
+const BackBtn = styled.div`
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    color: ${(props) => props.theme.colors.secondary};
+    cursor: pointer;
+    max-width: fit-content;
+    svg {
+        margin-right: 5px;
+    }
 `

@@ -105,9 +105,10 @@ const LoadingMessage = styled.div<{ error?: boolean }>`
     align-items: center;
     border-radius: 12px;
     margin-bottom: 20px;
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.neutral};
     border: 1px solid
-        ${({ theme, error }) => (error ? 'red' : theme.colors.border)};
+        ${({ theme, error }) =>
+            error ? theme.colors.dangerColor : theme.colors.border};
 
     & > * {
         padding: 1rem;
@@ -123,7 +124,7 @@ const ErrorGroup = styled.div`
 const ErrorButton = styled.div`
     border-radius: 8px;
     font-size: 12px;
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.neutral};
     background-color: ${(props) => props.theme.colors.placeholder};
     margin-left: 1rem;
     padding: 0.5rem;

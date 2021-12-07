@@ -1,12 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
 import CookieConsent from 'react-cookie-consent'
-import { ExternalLinkArrow } from '../GlobalStyle'
 import { Link } from 'react-router-dom'
-import { useStoreState } from '../store'
 
 const CookieBanner = () => {
-    const { settingsModel: settingsState } = useStoreState((state) => state)
     return (
         <div id="cookies-consent">
             <CookieConsent
@@ -14,7 +11,7 @@ const CookieBanner = () => {
                 buttonText="✓ Accept"
                 cookieName="cookiesAccepted"
                 style={{
-                    background: settingsState.isLightTheme ? '#fff' : '#191b1f',
+                    background: '#191b1f',
                     boxShadow: '0 0 6px rgba(0,0,0,0.16)',
                 }}
             >
@@ -59,10 +56,8 @@ const CustomLink = styled(Link)`
         font-size: 16px;
         margin-left: 4px !important;
     }
-
+    color: ${(props) => props.theme.colors.blueish};
     @media (max-width: 991px) {
         font-size: 14px;
     }
-
-    ${ExternalLinkArrow}
 `

@@ -40,6 +40,10 @@ const IconsHolder = styled.div`
     .sep {
         margin: 0 33px;
     }
+    svg {
+        width: 50px;
+        height: 50px;
+    }
 `
 
 const Title = styled.div`
@@ -47,13 +51,14 @@ const Title = styled.div`
     font-weight: 600;
     text-align: center;
     color: ${(props) => props.theme.colors.primary};
+    font-size: 14px;
     letter-spacing: -0.18px;
     margin-top: 20px;
 `
 const Description = styled.div`
     line-height: 21px;
     letter-spacing: -0.09px;
-    font-size: ${(props) => props.theme.font.small};
+    font-size: ${(props) => props.theme.font.extraSmall};
     color: ${(props) => props.theme.colors.secondary};
     text-align: center;
     margin-top: 4px;

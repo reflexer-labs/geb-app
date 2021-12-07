@@ -4,6 +4,7 @@ import ReactTooltip from 'react-tooltip'
 import { useStoreActions, useStoreState } from '../store'
 import StepsContent from './StepsContent'
 import { useActiveWeb3React } from '../hooks'
+import { useHistory } from 'react-router-dom'
 import {
     handleTransactionError,
     useTransactionAdder,
@@ -18,7 +19,7 @@ const Steps = () => {
     const { account, library, chainId } = useActiveWeb3React()
     const geb = useGeb()
     const blocksSinceCheck = use10BlocksConfirmations()
-
+    const history = useHistory()
     const { connectWalletModel: connectWalletState } = useStoreState(
         (state) => state
     )
@@ -69,11 +70,7 @@ const Steps = () => {
     }
 
     const handleCreateSafe = () => {
-        popupsActions.setSafeOperationPayload({
-            isOpen: true,
-            type: 'deposit_borrow',
-            isCreate: true,
-        })
+        history.push('/safes/create')
     }
 
     const returnSteps = (stepNumber: number) => {
@@ -166,7 +163,7 @@ const StepsContainer = styled.div`
         padding-bottom: 20px;
         border-radius: 5px;
         opacity: 1 !important;
-        background: #fff;
+        background: ${(props) => props.theme.colors.background};
         border: ${(props) => props.theme.colors.border};
         box-shadow: 0 0 6px rgba(0, 0, 0, 0.16);
     }
