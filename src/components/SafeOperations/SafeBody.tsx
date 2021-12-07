@@ -263,7 +263,7 @@ const SafeBody = ({ isChecked }: Props) => {
         if (type === 'repay_withdraw') {
             if (leftInputBN.isZero() && rightInputBN.isZero()) {
                 setError(
-                    `Please enter the amount of ETH to free or the amount of ${COIN_TICKER} to be repay`
+                    `Please enter the amount of ETH to free or the amount of ${COIN_TICKER} to repay`
                 )
                 return false
             } else if (leftInputBN.gt(availableEthBN)) {

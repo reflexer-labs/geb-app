@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 import AlertLabel from '../../components/AlertLabel'
 import AuctionsFAQ from '../../components/AuctionsFAQ'
 import Button from '../../components/Button'
-import GridContainer from '../../components/GridContainer'
-import PageHeader from '../../components/PageHeader'
+import Modal from '../../components/Modals/Modal'
 import { useActiveWeb3React } from '../../hooks'
 import { useStoreActions } from '../../store'
 import AuctionsList from './AuctionsList'
@@ -18,15 +16,12 @@ const Auctions = ({
         params: { auctionType },
     },
 }: RouteComponentProps<{ auctionType?: string }>) => {
-    const { t } = useTranslation()
     const { account } = useActiveWeb3React()
     const { auctionsModel: auctionsActions, popupsModel: popupsActions } =
         useStoreActions((state) => state)
-    const [hide, setHide] = useState(false)
+    const [showFaqs, setShowFaqs] = useState(false)
     const [type, setType] = useState<AuctionEventType>('DEBT')
     const [error, setError] = useState('')
-
-    const handleHideFAQ = () => setHide(!hide)
 
     useEffect(() => {
         async function init() {
@@ -54,7 +49,10 @@ const Auctions = ({
                 setError('')
             } catch (error) {
                 console.log(error)
-                if (error.message.includes('failed')) {
+                if (
+                    error instanceof SyntaxError &&
+                    error.message.includes('failed')
+                ) {
                     setError('Failed to fetch auctions from the graph node')
                 }
             }
@@ -70,21 +68,37 @@ const Auctions = ({
 
     return (
         <>
-            <GridContainer>
+            <Container>
+                <Modal
+                    isModalOpen={showFaqs}
+                    closeModal={() => setShowFaqs(false)}
+                    maxWidth={'650px'}
+                    backDropClose
+                    hideHeader
+                    hideFooter
+                    handleModalContent
+                >
+                    <ReviewContainer>
+                        <AuctionsFAQ type={type} />
+                        <BtnContainer>
+                            <Button onClick={() => setShowFaqs(false)}>
+                                {'Close FAQs'}
+                            </Button>{' '}
+                        </BtnContainer>
+                    </ReviewContainer>
+                </Modal>
                 {error ? <AlertLabel type="danger" text={error} /> : null}
                 <Content>
-                    <PageHeader
-                        breadcrumbs={{ '/': t('auctions') }}
-                        text={t('auctions_header_text', {
-                            type:
-                                type === 'STAKED_TOKEN'
-                                    ? 'staked token'
-                                    : type.toLocaleLowerCase(),
-                        })}
+                    <Title>Auctions</Title>
+                    <Button
+                        primary
+                        text={`Show ${
+                            type === 'STAKED_TOKEN'
+                                ? 'Staked Token'
+                                : type.toLowerCase()
+                        } Auctions FAQs`}
+                        onClick={() => setShowFaqs(!showFaqs)}
                     />
-                    {hide ? (
-                        <Button text={t('show_faq')} onClick={handleHideFAQ} />
-                    ) : null}
                 </Content>
 
                 {auctionType &&
@@ -105,38 +119,46 @@ const Auctions = ({
                     </Switcher>
                 )}
 
-                {hide ? null : (
-                    <AuctionsFAQ hideFAQ={handleHideFAQ} type={type} />
-                )}
                 <AuctionsList type={type} />
-            </GridContainer>
+            </Container>
         </>
     )
 }
 
 export default Auctions
+const Container = styled.div`
+    max-width: 880px;
+    margin: 80px auto;
+    padding: 0 15px;
+    @media (max-width: 767px) {
+        margin: 50px auto;
+    }
+`
 
+const Title = styled.div`
+    font-size: ${(props) => props.theme.font.medium};
+    font-weight: 600;
+    min-width: 180px;
+`
 const Content = styled.div`
-    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     button {
-        position: absolute;
-        top: 15px;
-        right: 0px;
-        min-width: auto;
-        padding: 2px 10px;
-        border-radius: 25px;
-        font-size: 14px;
-        background: linear-gradient(225deg, #4ce096 0%, #78d8ff 100%);
+        min-width: 100px;
+        padding: 4px 12px;
+        font-size: 13px;
+        font-weight: normal;
+        text-transform: capitalize;
     }
 `
 
 const Switcher = styled.div`
     display: flex;
     align-items: 'center';
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    border: 1px solid ${(props) => props.theme.colors.border};
-    background: #34496c;
-    max-width: 600px;
+    border-radius: 20px;
+    background: ${(props) => props.theme.colors.colorSecondary};
+    width: fit-content;
     margin: 40px auto;
     padding: 10px;
 `
@@ -145,11 +167,23 @@ const Tab = styled.div`
     background: transparent;
     flex: 1;
     text-align: center;
-    padding: 10px;
+    min-width: fit-content;
     cursor: pointer;
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    color: ${(props) => props.theme.colors.neutral};
+    border-radius: 20px;
+    padding: 10px 20px;
+    color: ${(props) => props.theme.colors.primary};
     &.active {
-        background: ${(props) => props.theme.colors.gradient};
+        background: ${(props) => props.theme.colors.colorPrimary};
     }
+`
+
+const ReviewContainer = styled.div`
+    padding: 20px;
+    border-radius: 10px;
+    background: ${(props) => props.theme.colors.colorSecondary};
+`
+
+const BtnContainer = styled.div`
+    padding-top: 20px;
+    text-align: center;
 `

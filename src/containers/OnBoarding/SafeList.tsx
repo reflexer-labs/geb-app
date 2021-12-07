@@ -1,63 +1,126 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import ReactPaginate from 'react-paginate'
+import React, { useMemo, useState } from 'react'
+import { BarChart2, Plus, Settings } from 'react-feather'
+import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
+import CheckBox from '../../components/CheckBox'
+import LinkButton from '../../components/LinkButton'
 import SafeBlock from '../../components/SafeBlock'
-import { useStoreState } from '../../store'
+import { useActiveWeb3React } from '../../hooks'
+import { useStoreActions, useStoreState } from '../../store'
+import { returnState } from '../../utils/helper'
 import { ISafe } from '../../utils/interfaces'
 
-const SafeList = () => {
-    const [page, setPage] = useState(0)
-    const [perPage] = useState(5)
-    const [total, setTotal] = useState(0)
+const SafeList = ({ address }: { address?: string }) => {
+    const [showEmpty, setShowEmpty] = useState(true)
 
-    const { safeModel: safeState } = useStoreState((state) => state)
+    const { account } = useActiveWeb3React()
 
-    const setPagination = (safes: Array<ISafe>) => {
-        if (!safes.length) return
-        setTotal(Math.ceil(safes.length / perPage))
-    }
+    const { t } = useTranslation()
 
-    const setPaginationCB = useCallback(setPagination, [])
+    const { connectWalletModel: connectWalletState, safeModel: safeState } =
+        useStoreState((state) => state)
 
-    useEffect(() => {
-        setPaginationCB(safeState.list)
-    }, [setPaginationCB, safeState.list])
+    const { popupsModel: popupsActions } = useStoreActions((state) => state)
 
-    const handlePageClick = ({ selected }: any) => {
-        setPage(selected)
+    const safes = useMemo(() => {
+        if (safeState.list.length > 0) {
+            return showEmpty
+                ? safeState.list
+                : safeState.list.filter(
+                      (safe) => returnState(safe.riskState) !== ''
+                  )
+        }
+        return []
+    }, [safeState.list, showEmpty])
+
+    const isOwner = useMemo(
+        () =>
+            address && account
+                ? account.toLowerCase() === address.toLowerCase()
+                : true,
+        [account, address]
+    )
+
+    const handleTopup = () => {
+        if (!connectWalletState.isWrongNetwork) {
+            popupsActions.setIsSafeManagerOpen(true)
+        }
+        return
     }
 
     const returnSafeList = () => {
         if (safeState.list.length > 0) {
             return (
-                <>
-                    {safeState.list
-                        .slice(page * perPage, (page + 1) * perPage)
-                        .map((safe: ISafe) => (
+                <Container>
+                    <Header>
+                        <Col>
+                            <Title>{'Accounts'}</Title>
+                        </Col>
+                        <Col>
+                            {safeState.safeCreated && isOwner ? (
+                                <LinkButton
+                                    id="create-safe"
+                                    disabled={connectWalletState.isWrongNetwork}
+                                    url={'/safes/create'}
+                                >
+                                    <BtnInner>
+                                        <Plus size={18} />
+                                        {t('new_safe')}
+                                    </BtnInner>
+                                </LinkButton>
+                            ) : null}
+                        </Col>
+                    </Header>
+
+                    <InfoBox>
+                        <LeftSide>
+                            <InfoTitle>
+                                <BarChart2 size="16" /> Pools And Incentives
+                            </InfoTitle>
+                            <InfoText>
+                                Check about FLX distribution campaigns from our{' '}
+                                <Link to="/earn/incentives">
+                                    Incentives page
+                                </Link>
+                                , also you can read more about incentives from
+                                our{' '}
+                                <a
+                                    href="https://docs.reflexer.finance/incentives/rai-mint-+-lp-incentives-program"
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                >
+                                    docs
+                                </a>
+                            </InfoText>
+                        </LeftSide>
+                        <RightSide onClick={handleTopup}>
+                            <InfoTitle>
+                                <Settings size="16" /> View / Top-up other Safes
+                            </InfoTitle>
+                            <InfoText className="bigFont">
+                                You can add ETH or repay RAI for any Safe
+                            </InfoText>
+                        </RightSide>
+                    </InfoBox>
+                    <SafeBlocks>
+                        <Header className="safesList">
+                            <Col>Safes({safeState.list.length})</Col>
+                            <Col>Risk</Col>
+                        </Header>
+                        {safes.map((safe: ISafe) => (
                             <SafeBlock
                                 className="safeBlock"
                                 key={safe.id}
                                 {...safe}
                             />
                         ))}
-                    <Sep />
-                    {safeState.list.length > perPage ? (
-                        <PaginationContainer>
-                            <ReactPaginate
-                                previousLabel={'Previous'}
-                                nextLabel={'Next'}
-                                breakLabel={'...'}
-                                breakClassName={'break-me'}
-                                pageCount={total}
-                                marginPagesDisplayed={2}
-                                pageRangeDisplayed={4}
-                                onPageChange={handlePageClick}
-                                containerClassName={'pagination'}
-                                activeClassName={'active'}
-                            />
-                        </PaginationContainer>
-                    ) : null}
-                </>
+                    </SafeBlocks>
+                    <CheckboxContainer>
+                        <CheckBox checked={showEmpty} onChange={setShowEmpty} />
+                        <span>Show empty safes</span>
+                    </CheckboxContainer>
+                </Container>
             )
         }
         return null
@@ -68,89 +131,108 @@ const SafeList = () => {
 
 export default SafeList
 
-const Sep = styled.div`
-    border-top: 1px solid ${(props) => props.theme.colors.border};
-    margin: 10px 0;
+const Container = styled.div`
+    max-width: 880px;
+    margin: 80px auto;
+    padding: 0 15px;
+    @media (max-width: 767px) {
+        margin: 50px auto;
+    }
+`
+const SafeBlocks = styled.div`
+    padding: 15px;
+    border-radius: 15px;
+    background: ${(props) => props.theme.colors.colorSecondary};
 `
 
-const PaginationContainer = styled.div`
-    background: ${(props) => props.theme.colors.neutral};
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    text-align: right;
-    border: 1px solid ${(props) => props.theme.colors.border};
-    margin-top: 0.5rem;
-    padding-right: 0.7rem;
+const Title = styled.div`
+    font-weight: 600;
+    font-size: ${(props) => props.theme.font.large};
+`
 
-    .pagination {
-        padding: 0;
-        list-style: none;
-        display: inline-block;
-        border-radius: ${(props) => props.theme.global.borderRadius};
+const Header = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    &.safesList {
+        padding: 0 20px;
+        margin: 20px 0;
+    }
+`
+const Col = styled.div`
+    a {
+        min-width: 100px;
+        padding: 4px 12px;
+    }
+`
 
-        li {
-            display: inline-block;
-            vertical-align: middle;
-            cursor: pointer;
-            text-align: center;
-            outline: none;
-            box-shadow: none;
-            margin: 0 2px;
-            font-size: ${(props) => props.theme.font.small};
-            &.active {
-                background: ${(props) => props.theme.colors.gradient};
-                color: ${(props) => props.theme.colors.neutral};
-                border-radius: 2px;
-            }
-            a {
-                justify-content: center;
-                display: flex;
-                align-items: center;
-                height: 20px;
-                width: 20px;
-                outline: none;
-                box-shadow: none;
+const BtnInner = styled.div`
+    display: flex;
+    align-items: center;
+    svg {
+        margin-right: 5px;
+    }
+`
 
-                &:hover {
-                    background: rgba(0, 0, 0, 0.08);
-                }
-            }
+const CheckboxContainer = styled.div`
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    justify-content: flex-end;
+    span {
+        margin-left: 10px;
+        position: relative;
+        font-size: 13px;
+        top: -3px;
+    }
+`
 
-            &:first-child {
-                margin-right: 10px;
-            }
+const InfoBox = styled.div`
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    @media (max-width: 767px) {
+        display: none;
+    }
+`
 
-            &:last-child {
-                margin-left: 10px;
-            }
+const LeftSide = styled.div`
+    flex: 0 0 56%;
+    background: url(${require('../../assets/blueish-bg.png')});
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding: 20px;
+    border-radius: 15px;
+`
+const RightSide = styled.div`
+    flex: 0 0 42%;
+    background: url(${require('../../assets/greenish-bg.png')});
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding: 20px;
+    border-radius: 15px;
+    cursor: pointer;
+`
 
-            &:first-child,
-            &:last-child {
-                padding: 0;
-                a {
-                    height: auto;
-                    width: auto;
-                    padding: 3px 8px;
-                    border-radius: 2px;
-                    &:hover {
-                        background: rgba(0, 0, 0, 0.08);
-                    }
-                    text-align: center;
-                }
+const InfoTitle = styled.div`
+    display: flex;
+    align-items: center;
+    font-size: ${(props) => props.theme.font.default};
+    font-weight: 600;
+    svg {
+        margin-right: 5px;
+    }
+`
 
-                &.active {
-                    a {
-                        background: ${(props) => props.theme.colors.gradient};
-                        color: ${(props) => props.theme.colors.neutral};
-                        border-radius: ${(props) =>
-                            props.theme.global.borderRadius};
-                    }
-                }
-
-                &.disabled {
-                    pointer-events: none;
-                    opacity: 0.2;
-                }
-            }
-        }
+const InfoText = styled.div`
+    font-size: ${(props) => props.theme.font.small};
+    margin-top: 10px;
+    a {
+        color: ${(props) => props.theme.colors.blueish};
+        text-decoration: underline;
+    }
+    &.bigFont {
+        font-size: ${(props) => props.theme.font.default};
     }
 `

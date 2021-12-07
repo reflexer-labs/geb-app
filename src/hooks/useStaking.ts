@@ -81,7 +81,7 @@ export function useStakingInfo(isDeposit = true) {
                     )
                 )
         ) {
-            error = 'Insufficient FLX/ETH LP balance'
+            error = error ?? 'Insufficient FLX/ETH LP balance'
         }
     } else {
         if (
@@ -104,7 +104,7 @@ export function useStakingInfo(isDeposit = true) {
                     )
                 )
         ) {
-            error = 'Insufficient stFLX balance'
+            error = error ?? 'Insufficient stFLX balance'
         }
     }
 

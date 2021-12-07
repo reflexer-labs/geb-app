@@ -1,18 +1,45 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { useStoreActions, useStoreState } from '../store'
 import Button from './Button'
 import Numeral from 'numeral'
-import { formatNumber, getRatePercentage, timeout } from '../utils/helper'
-import { COIN_TICKER } from '../utils/constants'
+import {
+    formatNumber,
+    getRatePercentage,
+    ratioChecker,
+    returnState,
+    timeout,
+} from '../utils/helper'
 import { useActiveWeb3React } from '../hooks'
 import { handleTransactionError } from '../hooks/TransactionHooks'
 import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
+import { useTokenBalanceInUSD } from '../hooks/useGeb'
+import { LIQUIDATION_CRATIO } from '../hooks/useSaviour'
+import { useSafeInfo } from '../hooks/useSafe'
 
-const SafeStats = () => {
+const SafeStats = ({
+    isModifying,
+    isDeposit,
+}: {
+    isModifying: boolean
+    isDeposit: boolean
+}) => {
     const { t } = useTranslation()
+    const {
+        totalDebt: newDebt,
+        totalCollateral: newCollateral,
+        collateralRatio: newCollateralRatio,
+        parsedAmounts,
+        liquidationPrice: newLiquidationPrice,
+    } = useSafeInfo(
+        isModifying
+            ? isDeposit
+                ? 'deposit_borrow'
+                : 'repay_withdraw'
+            : 'create'
+    )
     const { library, account } = useActiveWeb3React()
 
     const [isLoading, setIsLoading] = useState(false)
@@ -25,6 +52,9 @@ const SafeStats = () => {
 
     const collateral = formatNumber(singleSafe?.collateral || '0')
     const totalDebt = formatNumber(singleSafe?.totalDebt || '0')
+
+    const collateralInUSD = useTokenBalanceInUSD('ETH', collateral as string)
+    const totalDebtInUSD = useTokenBalanceInUSD('RAI', totalDebt as string)
 
     const liquidationPenalty = getRatePercentage(
         singleSafe?.liquidationPenalty || '1',
@@ -82,210 +112,355 @@ const SafeStats = () => {
         }
     }
 
+    const modified = useMemo(() => {
+        if (isModifying) {
+            return parsedAmounts.rightInput || parsedAmounts.leftInput
+        }
+        return false
+    }, [isModifying, parsedAmounts.leftInput, parsedAmounts.rightInput])
+
     return (
         <>
-            <StatsGrid>
-                <StatItem>
+            {singleSafe && Number(singleSafe.internalCollateralBalance) > 0 ? (
+                <SurplusBlock>
                     <StateInner>
-                        <Value data-test-id="details_col_ratio">{`${singleSafe?.collateralRatio}%`}</Value>
-                        <Label>{'Collateralization Ratio'}</Label>
-                    </StateInner>
-                </StatItem>
-
-                <StatItem>
-                    <StateInner>
-                        <InfoIcon data-tip={t('annual_redemption_tip')}>
-                            <Info size="16" />
-                        </InfoIcon>
-                        <Value>{`${returnRedRate()}%`}</Value>
-                        <Label>{`Annual Redemption Rate`}</Label>
-                    </StateInner>
-                </StatItem>
-
-                <StatItem>
-                    <StateInner>
-                        <InfoIcon data-tip={t('liquidation_price_tip')}>
-                            <Info size="16" />
-                        </InfoIcon>
-                        <Value data-test-id="details_liq_price">{`$${singleSafe?.liquidationPrice}`}</Value>
-                        <Label>{'Liquidation Price'}</Label>
-                    </StateInner>
-                </StatItem>
-
-                <StatItem>
-                    <StateInner>
-                        <InfoIcon data-tip={t('liquidation_penalty_tip')}>
-                            <Info size="16" />
-                        </InfoIcon>
-                        <Value data-test-id="details_liq_penalty">{`${liquidationPenalty}%`}</Value>
-                        <Label>{'Liquidation Penalty'}</Label>
-                    </StateInner>
-                </StatItem>
-
-                <StatItem className="w50">
-                    <StateInner>
-                        <Value data-test-id="details_eth_price">
-                            ${ethPrice}
-                        </Value>
-                        <Label>{'ETH Price (OSM)'}</Label>
-                    </StateInner>
-                </StatItem>
-
-                <StatItem className="w50">
-                    <StateInner>
-                        <Value data-test-id="details_red_price">
-                            ${raiPrice}
-                        </Value>
-                        <Label>{`${COIN_TICKER} Redemption Price`}</Label>
-                    </StateInner>
-                </StatItem>
-
-                <StatItem className="w50">
-                    <StateInner>
-                        <Value data-test-id="details_collateral">{`${collateral} ETH`}</Value>
-                        <Label>{'ETH Collateral'}</Label>
-                        <Actions>
+                        <Inline>
+                            <Text>
+                                {t('liquidation_text', {
+                                    balance: formatNumber(
+                                        singleSafe.internalCollateralBalance
+                                    ),
+                                })}
+                            </Text>
                             <Button
-                                id="deposit_borrow"
-                                withArrow
-                                text={t('deposit_borrow')}
-                                onClick={() =>
-                                    popupsActions.setSafeOperationPayload({
-                                        isOpen: true,
-                                        type: 'deposit_borrow',
-                                        isCreate: false,
-                                    })
-                                }
+                                text={'collect_surplus'}
+                                onClick={handleCollectSurplus}
+                                isLoading={isLoading}
                             />
-                        </Actions>
+                        </Inline>
                     </StateInner>
-                </StatItem>
+                </SurplusBlock>
+            ) : null}
+            <Flex>
+                <Left>
+                    <Inner className="main">
+                        <Main>
+                            <MainLabel>ETH Collateral</MainLabel>
+                            <MainValue>
+                                {collateral} <span>ETH</span>
+                            </MainValue>
+                            <MainChange>
+                                {modified ? (
+                                    <>
+                                        After:{' '}
+                                        <span
+                                            className={
+                                                isDeposit ? 'green' : 'yellow'
+                                            }
+                                        >
+                                            {newCollateral} ETH
+                                        </span>
+                                    </>
+                                ) : (
+                                    `$${collateralInUSD}`
+                                )}
+                            </MainChange>
+                        </Main>
 
-                <StatItem className="w50">
-                    <StateInner>
-                        <Value data-test-id="details_debt">{`${totalDebt} ${COIN_TICKER}`}</Value>
-                        <Label>{`${COIN_TICKER} Debt`}</Label>
-                        <Actions>
-                            <Button
-                                id="repay_withdraw"
-                                withArrow
-                                text={t('repay_withdraw')}
-                                onClick={() =>
-                                    popupsActions.setSafeOperationPayload({
-                                        isOpen: true,
-                                        type: 'repay_withdraw',
-                                        isCreate: false,
-                                    })
-                                }
-                            />
-                        </Actions>
-                    </StateInner>
-                </StatItem>
-                {singleSafe &&
-                Number(singleSafe.internalCollateralBalance) > 0 ? (
-                    <StatItem className="w100">
-                        <StateInner>
-                            <Inline>
-                                <Text>
-                                    {t('liquidation_text', {
-                                        balance: formatNumber(
-                                            singleSafe.internalCollateralBalance
-                                        ),
-                                    })}
-                                </Text>
-                                <Button
-                                    text={'collect_surplus'}
-                                    onClick={handleCollectSurplus}
-                                    isLoading={isLoading}
-                                />
-                            </Inline>
-                        </StateInner>
-                    </StatItem>
-                ) : null}
-                <ReactTooltip multiline type="light" data-effect="solid" />
-            </StatsGrid>
+                        <Main className="mid">
+                            <MainLabel>RAI Debt</MainLabel>
+                            <MainValue>
+                                {totalDebt} <span>RAI</span>
+                            </MainValue>
+                            <MainChange>
+                                {' '}
+                                {modified ? (
+                                    <>
+                                        After:{' '}
+                                        <span
+                                            className={
+                                                isDeposit ? 'green' : 'yellow'
+                                            }
+                                        >
+                                            {newDebt} RAI
+                                        </span>
+                                    </>
+                                ) : (
+                                    `$${totalDebtInUSD}`
+                                )}
+                            </MainChange>
+                        </Main>
+
+                        <Main>
+                            <MainLabel>
+                                <Circle
+                                    data-tip={`${
+                                        singleSafe &&
+                                        returnState(singleSafe.riskState)
+                                            ? returnState(singleSafe.riskState)
+                                            : 'No'
+                                    } Risk`}
+                                    className={
+                                        singleSafe &&
+                                        returnState(singleSafe.riskState)
+                                            ? returnState(
+                                                  singleSafe.riskState
+                                              ).toLowerCase()
+                                            : 'dimmed'
+                                    }
+                                />{' '}
+                                Ratio (min {LIQUIDATION_CRATIO}%)
+                            </MainLabel>
+                            <MainValue>
+                                {singleSafe?.collateralRatio}%
+                            </MainValue>
+                            <MainChange>
+                                {modified ? (
+                                    <>
+                                        After:{' '}
+                                        <span
+                                            className={returnState(
+                                                ratioChecker(
+                                                    Number(newCollateralRatio)
+                                                )
+                                            ).toLowerCase()}
+                                        >
+                                            {newCollateralRatio}%
+                                        </span>
+                                    </>
+                                ) : (
+                                    ''
+                                )}
+                            </MainChange>
+                        </Main>
+                    </Inner>
+                </Left>
+
+                <Right>
+                    <Inner>
+                        <Side>
+                            <InfoIcon data-tip={t('eth_osm_tip')}>
+                                <Info size="16" />
+                            </InfoIcon>
+                            <SideTitle>ETH Price (OSM)</SideTitle>
+                            <SideValue>{ethPrice}</SideValue>
+                        </Side>
+
+                        <Side>
+                            <InfoIcon data-tip={t('rai_red_price_tip')}>
+                                <Info size="16" />
+                            </InfoIcon>
+                            <SideTitle>RAI Redemption Price</SideTitle>
+                            <SideValue>{raiPrice}</SideValue>
+                        </Side>
+
+                        <Side>
+                            <InfoIcon data-tip={t('liquidation_price_tip')}>
+                                <Info size="16" />
+                            </InfoIcon>
+                            <SideTitle>
+                                Liquidation Price
+                                {modified ? (
+                                    <div className="sideNote">
+                                        After:{' '}
+                                        <span
+                                            className={`${
+                                                isDeposit ? 'green' : 'yellow'
+                                            }`}
+                                        >
+                                            ${newLiquidationPrice}
+                                        </span>
+                                    </div>
+                                ) : null}
+                            </SideTitle>
+                            <SideValue>{`$${singleSafe?.liquidationPrice}`}</SideValue>
+                        </Side>
+
+                        <Side>
+                            <InfoIcon data-tip={t('liquidation_penalty_tip')}>
+                                <Info size="16" />
+                            </InfoIcon>
+                            <SideTitle>Liquidation Penalty</SideTitle>
+                            <SideValue>{`${liquidationPenalty}%`}</SideValue>
+                        </Side>
+
+                        <Side>
+                            <InfoIcon data-tip={t('stability_fee_tip')}>
+                                <Info size="16" />
+                            </InfoIcon>
+                            <SideTitle>Stability Fee</SideTitle>
+                            <SideValue>{`${
+                                singleSafe?.totalAnnualizedStabilityFee
+                                    ? getRatePercentage(
+                                          singleSafe?.totalAnnualizedStabilityFee,
+                                          1
+                                      )
+                                    : 0
+                            }%`}</SideValue>
+                        </Side>
+
+                        <Side>
+                            <InfoIcon data-tip={t('annual_redemption_tip')}>
+                                <Info size="16" />
+                            </InfoIcon>
+                            <SideTitle>Annual Redemption Rate</SideTitle>
+                            <SideValue>{`${returnRedRate()}%`}</SideValue>
+                        </Side>
+                    </Inner>
+                </Right>
+            </Flex>
+
+            <ReactTooltip multiline type="light" data-effect="solid" />
         </>
     )
 }
 
 export default SafeStats
 
-const StatsGrid = styled.div`
+const Flex = styled.div`
     display: flex;
-    margin: 0 -7.5px;
-    flex-wrap: wrap;
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-    margin: 0;
-  `}
+    @media (max-width: 767px) {
+        flex-direction: column;
+    }
+`
+const Inner = styled.div`
+    background: ${(props) => props.theme.colors.colorSecondary};
+    padding: 20px;
+    border-radius: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    &.main {
+        padding: 30px;
+    }
 `
 
-const StatItem = styled.div`
-    padding: 0 7.5px;
-    flex: 0 0 25%;
-    margin-bottom: 15px;
-    &.w50 {
-        flex: 0 0 50%;
-    }
-    &.w100 {
+const Left = styled.div`
+    flex: 0 0 55%;
+    padding-right: 10px;
+    margin-top: 20px;
+    @media (max-width: 767px) {
         flex: 0 0 100%;
+        padding-right: 0;
     }
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-    flex: 0 0 50%;
-    padding: 0;
-    &:nth-child(1),
-    &:nth-child(3) {
-      > div {
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-        border-right: 0;
-      }
-    }
-    &:nth-child(2),
-    &:nth-child(4) {
-      > div {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-      }
-    }
-    &.w50 {
-      flex: 0 0 100%;
-    }
-  `}
 `
+const Right = styled.div`
+    flex: 0 0 45%;
+    padding-left: 10px;
+    margin-top: 20px;
+    @media (max-width: 767px) {
+        flex: 0 0 100%;
+        padding-left: 0;
+    }
+`
+
+const Main = styled.div`
+    &.mid {
+        margin: 30px 0;
+    }
+`
+
+const MainLabel = styled.div`
+    font-size: ${(props) => props.theme.font.small};
+    color: ${(props) => props.theme.colors.secondary};
+    display: flex;
+    align-items: center;
+`
+
+const MainValue = styled.div`
+    font-size: 25px;
+    color: ${(props) => props.theme.colors.primary};
+    font-family: 'Montserrat', sans-serif;
+    margin: 2px 0;
+    span {
+        font-size: ${(props) => props.theme.font.small};
+    }
+`
+
+const MainChange = styled.div`
+    font-size: 13px;
+    color: ${(props) => props.theme.colors.customSecondary};
+    span {
+        &.green,
+        &.low {
+            color: ${(props) => props.theme.colors.blueish};
+        }
+        &.yellow {
+            color: ${(props) => props.theme.colors.yellowish};
+        }
+        &.dimmed {
+            color: ${(props) => props.theme.colors.secondary};
+        }
+        &.medium {
+            color: ${(props) => props.theme.colors.yellowish};
+        }
+        &.high {
+            color: ${(props) => props.theme.colors.dangerColor};
+        }
+    }
+`
+const Circle = styled.div`
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: ${(props) => props.theme.colors.successColor};
+    margin-right: 5px;
+    cursor: pointer;
+    &.dimmed {
+        background: ${(props) => props.theme.colors.secondary};
+    }
+    &.medium {
+        background: ${(props) => props.theme.colors.yellowish};
+    }
+    &.high {
+        background: ${(props) => props.theme.colors.dangerColor};
+    }
+`
+
+const Side = styled.div`
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    &:last-child {
+        margin-bottom: 0;
+    }
+`
+
+const SideTitle = styled.div`
+    color: ${(props) => props.theme.colors.secondary};
+    .sideNote {
+        font-size: 12px;
+        span {
+            &.green {
+                color: ${(props) => props.theme.colors.blueish};
+            }
+            &.yellow {
+                color: ${(props) => props.theme.colors.yellowish};
+            }
+        }
+    }
+`
+const SideValue = styled.div`
+    margin-left: auto;
+    color: ${(props) => props.theme.colors.customSecondary};
+    font-family: 'Montserrat', sans-serif;
+`
+
+const SurplusBlock = styled.div``
+
 const StateInner = styled.div`
     border: 1px solid ${(props) => props.theme.colors.border};
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    background: ${(props) => props.theme.colors.background};
+    border-radius: 15px;
+    background: #1e3b58;
     text-align: center;
     padding: 20px;
     position: relative;
-`
-
-const Value = styled.div`
-    color: ${(props) => props.theme.colors.primary};
-    font-size: ${(props) => props.theme.font.large};
-    line-height: 27px;
-    letter-spacing: -0.69px;
-    font-weight: 600;
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-    font-size: ${(props) => props.theme.font.medium};
- `}
-`
-const Label = styled.div`
-    color: ${(props) => props.theme.colors.secondary};
-    font-size: ${(props) => props.theme.font.small};
-    line-height: 21px;
-    letter-spacing: -0.09px;
-    margin-top: 8px;
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-    font-size: ${(props) => props.theme.font.extraSmall};
-  `}
-`
-
-const Actions = styled.div`
-    display: flex;
-    margin-top: 1rem;
-    justify-content: flex-end;
+    margin-top: 20px;
+    button {
+        background: ${(props) => props.theme.colors.greenish};
+        color: ${(props) => props.theme.colors.primary};
+    }
 `
 
 const Text = styled.div`
@@ -299,12 +474,12 @@ const Inline = styled.div`
 `
 
 const InfoIcon = styled.div`
-    position: absolute;
-    top: 10px;
-    right: 10px;
     cursor: pointer;
     svg {
         fill: ${(props) => props.theme.colors.secondary};
-        color: ${(props) => props.theme.colors.neutral};
+        color: ${(props) => props.theme.colors.foreground};
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
     }
 `

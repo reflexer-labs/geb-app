@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { X } from 'react-feather'
+import { AlertCircle, Circle, X } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import _ from '../utils/lodash'
@@ -72,10 +72,17 @@ const StepsContent = ({
                     <CloseBtn onClick={handleOpenState}>
                         <X size="14" />
                     </CloseBtn>
-                    <Heading>Important Notes</Heading>
+                    <Heading>
+                        <AlertCircle color={`#D09E41`} size="22" /> Important
+                        Notes
+                    </Heading>
                     <List>
-                        <Item>{`You do not need to create a new account if you already have a MakerDAO or Balancer proxy`}</Item>
                         <Item>
+                            <Circle className="bullet" size="10" />
+                            {`You do not need to create a new account if you already have a MakerDAO or Balancer proxy`}
+                        </Item>
+                        <Item>
+                            <Circle className="bullet" size="10" />
                             The minimum amount to mint per safe is{' '}
                             <span>
                                 {!debtFloor ? (
@@ -109,9 +116,9 @@ const Container = styled.div`
 `
 
 const Title = styled.div`
-    font-size: ${(props) => props.theme.font.medium};
+    font-size: ${(props) => props.theme.font.large};
     font-weight: 600;
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.neutral};
     margin-bottom: 10px;
 `
 
@@ -123,37 +130,61 @@ const Text = styled.div`
 `
 
 const Notes = styled.div`
-    background: ${(props) => props.theme.colors.foreground};
-    border: 1px solid ${(props) => props.theme.colors.border};
-    border-radius: ${(props) => props.theme.global.borderRadius};
+    background: rgba(65, 193, 208, 0.4);
+    border-radius: 25px;
     padding: 20px;
     margin-bottom: 20px;
     position: relative;
 `
 
 const Heading = styled.div`
-    font-size: 15px;
+    font-size: 18px;
     text-align: center;
     font-weight: bold;
-    color: ${(props) => props.theme.colors.secondary};
+    color: ${(props) => props.theme.colors.neutral};
     margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    svg {
+        margin-right: 5px;
+    }
 `
 
 const List = styled.ul`
     margin: 0;
     padding-left: 20px;
+    list-style: none;
+    @media (max-width: 767px) {
+        padding-left: 0;
+    }
 `
 
 const Item = styled.li`
-    font-size: ${(props) => props.theme.font.small};
+    font-size: 15px;
     text-align: left;
-    color: ${(props) => props.theme.colors.secondary};
+    color: ${(props) => props.theme.colors.neutral};
     margin-top: 5px;
+
     span > div {
         margin: 0;
     }
     svg {
         margin: 0;
+    }
+
+    .bullet {
+        margin-right: 5px;
+        stroke-width: 0;
+        fill: #d09e41;
+    }
+
+    @media (max-width: 767px) {
+        font-size: 13px;
+        svg {
+            width: 8px !important;
+            height: 8px !important;
+        }
     }
 `
 
@@ -168,7 +199,7 @@ const CloseBtn = styled.div`
 `
 
 const ReadLink = styled.span`
-    color: ${(props) => props.theme.colors.inputBorderColor};
+    color: ${(props) => props.theme.colors.blueish};
     text-decoration: underline;
     cursor: pointer;
 `

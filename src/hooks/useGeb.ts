@@ -1,9 +1,13 @@
+import { ethers } from 'ethers'
 import { Geb } from 'geb.js'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useActiveWeb3React } from '.'
 import { NETWORK_ID } from '../connectors'
 import store, { useStoreActions, useStoreState } from '../store'
 import { EMPTY_ADDRESS, network_name } from '../utils/constants'
+import { formatNumber } from '../utils/helper'
+
+type TokenType = 'ETH' | 'RAI'
 
 export default function useGeb(): Geb {
     const { library } = useActiveWeb3React()
@@ -90,4 +94,56 @@ export function useSafeHandler(safeId: string): string {
     }, [geb, safeId])
 
     return state
+}
+
+export function useTokenBalance(token: TokenType) {
+    const [state, setState] = useState('0')
+    const { account, library } = useActiveWeb3React()
+    const geb = useGeb()
+    const ethBalance = store
+        .getState()
+        .connectWalletModel.ethBalance[NETWORK_ID].toString()
+
+    const fetchBalanceCallback = useCallback(
+        (result: any) => {
+            setState(ethers.utils.formatEther(result))
+        },
+        [setState]
+    )
+
+    useEffect(() => {
+        if (!account || !library || !geb) return undefined
+        if (token === 'ETH') {
+            setState(ethBalance)
+        } else {
+            geb.contracts.coin
+                .balanceOf(account)
+                .then(fetchBalanceCallback)
+                .catch((error) =>
+                    console.error(`Failed to fetch balance for ${token}`, error)
+                )
+        }
+    }, [
+        account,
+        ethBalance,
+        fetchBalanceCallback,
+        geb,
+        library,
+        setState,
+        token,
+    ])
+
+    return state
+}
+
+export function useTokenBalanceInUSD(token: TokenType, balance: string) {
+    const ethPrice = store.getState().connectWalletModel.fiatPrice
+    const raiPrice =
+        store.getState().safeModel.liquidationData.currentRedemptionPrice
+
+    return useMemo(() => {
+        const price = token === 'ETH' ? ethPrice : raiPrice
+        if (!balance) return '0'
+        return formatNumber((Number(price) * Number(balance)).toString(), 2)
+    }, [token, ethPrice, raiPrice, balance])
 }

@@ -49,7 +49,6 @@ describe('App Page - Has Safes', () => {
             cy.get($el).contains('RAI Borrowed')
             cy.get($el).contains('Collateralization Ratio')
             cy.get($el).contains('Liquidation Price')
-            cy.get($el).contains('Manage Safe')
         })
     })
 })

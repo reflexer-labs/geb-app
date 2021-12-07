@@ -8,7 +8,6 @@ import {
     returnTotalValue,
     safeIsSafe,
 } from './helper'
-import { ChainId } from './interfaces'
 
 describe('utils', () => {
     describe('#getEtherscanLink', () => {
@@ -35,11 +34,6 @@ describe('utils', () => {
         it('ropsten', () => {
             expect(getEtherscanLink(3, 'abc', 'address')).toEqual(
                 'https://ropsten.etherscan.io/address/abc'
-            )
-        })
-        it('enum', () => {
-            expect(getEtherscanLink(ChainId.RINKEBY, 'abc', 'address')).toEqual(
-                'https://rinkeby.etherscan.io/address/abc'
             )
         })
     })

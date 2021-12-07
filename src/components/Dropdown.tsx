@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Scrollbars from 'react-custom-scrollbars'
-import { ArrowUpRight } from 'react-feather'
+import { ArrowUpRight, ChevronDown } from 'react-feather'
 import styled from 'styled-components'
 
 type Item =
@@ -112,12 +112,7 @@ const Dropdown = (props: Props) => {
                         )}
                     </span>
 
-                    {items.length > 0 ? (
-                        <CaretIcon
-                            src={require('../assets/caret.png')}
-                            className={isOpen ? 'up' : ''}
-                        />
-                    ) : null}
+                    {items.length > 0 ? <ChevronDown size="16" /> : null}
                 </DropdownBtn>
                 {items.length > 0 ? (
                     <DropdownMenu
@@ -178,9 +173,9 @@ const InnerContainer = styled.div`
 const DropdownBtn = styled.button`
     border: 1px solid ${(props) => props.theme.colors.border};
     box-shadow: none;
-    background: ${(props) => props.theme.colors.background};
+    background: ${(props) => props.theme.colors.placeholder};
     color: ${(props) => props.theme.colors.primary};
-    border-radius: ${(props) => props.theme.global.borderRadius};
+    border-radius: 10px;
     outline: none;
     text-align: left;
     cursor: pointer;
@@ -190,21 +185,16 @@ const DropdownBtn = styled.button`
         display: inline-block;
         vertical-align: middle;
     }
-`
-
-const CaretIcon = styled.img`
-    height: 6px;
-    width: 11px;
-    margin-left: auto;
-    display: inline-block;
-    vertical-align: middle;
-    position: relative;
-    top: 7px;
+    svg {
+        position: absolute;
+        top: 36%;
+        right: 20px;
+    }
 `
 
 const DropdownMenu = styled.div`
     position: absolute;
-    top: calc(100% + 10px);
+    top: calc(100%);
     left: 0;
     border-radius: ${(props) => props.theme.global.borderRadius};
     background: ${(props) => props.theme.colors.background};

@@ -70,5 +70,5 @@ const Container = styled.div`
 const Text = styled.div<{ color?: string }>`
     font-size: ${(props) => props.theme.font.small};
     color: ${(props) =>
-        props.color ? props.color : props.theme.colors.primary};
+        props.color ? props.color : props.theme.colors.neutral};
 `

@@ -167,7 +167,7 @@ const Connection = styled.div`
     align-items: center;
     justify-content: space-between;
     font-size: ${(props) => props.theme.font.small};
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.neutral};
     button {
         width: auto;
         min-width: auto;
@@ -181,7 +181,7 @@ const Address = styled.div`
     display: flex;
     margin: 20px 0;
     align-items: center;
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.neutral};
     img {
         width: 20px;
         margin-right: 10px;
@@ -210,9 +210,9 @@ const CopyBtn = styled.div`
     }
     &:hover {
         text-decoration: underline;
-        color: ${(props) => props.theme.colors.primary};
+        color: ${(props) => props.theme.colors.customSecondary};
         svg {
-            color: ${(props) => props.theme.colors.primary};
+            color: ${(props) => props.theme.colors.customSecondary};
         }
     }
 
@@ -242,9 +242,9 @@ const LinkBtn = styled.a`
 
     &:hover {
         text-decoration: underline;
-        color: ${(props) => props.theme.colors.primary};
+        color: ${(props) => props.theme.colors.customSecondary};
         svg {
-            color: ${(props) => props.theme.colors.primary};
+            color: ${(props) => props.theme.colors.customSecondary};
         }
     }
 `
@@ -261,7 +261,7 @@ const TransactionsContainer = styled.div`
     margin: 20px -20px -20px -20px;
     border-radius: 0 0 25px 25px;
     font-size: ${(props) => props.theme.font.small};
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.customSecondary};
 `
 
 const Heading = styled.div`
@@ -269,9 +269,10 @@ const Heading = styled.div`
     align-items: center;
     justify-content: space-between;
     font-size: ${(props) => props.theme.font.default};
-    color: ${(props) => props.theme.colors.primary};
+    color: ${(props) => props.theme.colors.customSecondary};
     margin-bottom: 15px;
     button {
+        color: ${(props) => props.theme.colors.blueish};
         img {
             display: none;
         }

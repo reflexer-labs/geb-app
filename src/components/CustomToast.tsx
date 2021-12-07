@@ -20,7 +20,7 @@ const WrappedToastContainer = styled(ToastContainer)`
         padding: 20px;
         border-radius: 5px;
         align-items: center;
-        color: ${(props) => props.theme.colors.primary};
+        color: ${(props) => props.theme.colors.neutral};
         font-size: 14px;
         line-height: 1.43;
         button {
@@ -29,15 +29,15 @@ const WrappedToastContainer = styled(ToastContainer)`
             svg {
                 width: 18px;
                 height: 20px;
-                color: ${(props) => props.theme.colors.secondary};
+                color: ${(props) => props.theme.colors.neutral};
             }
         }
 
         &.Toastify__toast--success {
-            background: ${(props) => props.theme.colors.neutral}!important;
+            background: ${(props) => props.theme.colors.foreground}!important;
         }
         &.Toastify__toast--default {
-            background: ${(props) => props.theme.colors.neutral}!important;
+            background: ${(props) => props.theme.colors.foreground}!important;
         }
 
         &.Toastify__toast--error {
@@ -49,8 +49,8 @@ const WrappedToastContainer = styled(ToastContainer)`
         }
 
         &.Toastify__toast--info {
-            background: #fff !important;
-            color: #272727 !important;
+            background: ${(props) => props.theme.colors.foreground}!important;
+            color: ${(props) => props.theme.colors.neutral}!important;
         }
     }
 `

@@ -53,22 +53,26 @@ const AuctionsList = ({ type }: Props) => {
     return (
         <Container>
             <InfoBox>
-                <Title>
-                    {type === 'STAKED_TOKEN'
-                        ? 'FLX/ETH LP'
-                        : type.toLowerCase()}{' '}
-                    Auctions
-                </Title>
-                {account &&
-                auctions &&
-                auctions.length &&
-                (Number(internalBalance) > 0 ||
-                    Number(protInternalBalance) > 0) ? (
-                    <Button
-                        text={t('claim_tokens')}
-                        onClick={() => handleClick('claim_tokens')}
-                    />
-                ) : null}
+                <Box>
+                    <Title>
+                        {type === 'STAKED_TOKEN'
+                            ? 'FLX/ETH LP'
+                            : type.toLowerCase()}{' '}
+                        Auctions
+                    </Title>
+                    {account &&
+                    auctions &&
+                    auctions.length &&
+                    (Number(internalBalance) > 0 ||
+                        Number(protInternalBalance) > 0) ? (
+                        <Button
+                            text={t('claim_tokens')}
+                            onClick={() => handleClick('claim_tokens')}
+                        />
+                    ) : null}
+                </Box>
+
+                <span>{`Status`}</span>
             </InfoBox>
             {auctions && auctions.length > 0 ? (
                 <>
@@ -104,12 +108,20 @@ export default AuctionsList
 
 const Container = styled.div`
     margin-top: 40px;
+    padding: 30px 20px;
+    border-radius: 15px;
+    background: ${(props) => props.theme.colors.colorSecondary};
 `
 
 const Title = styled.div`
-    font-size: ${(props) => props.theme.font.large};
+    font-size: ${(props) => props.theme.font.default};
     font-weight: bold;
     text-transform: capitalize !important;
+`
+
+const Box = styled.div`
+    display: flex;
+    align-items: center;
 `
 
 const InfoBox = styled.div`
@@ -120,12 +132,17 @@ const InfoBox = styled.div`
     button {
         min-width: 100px;
         padding: 4px 12px;
+        margin-left: 30px;
+    }
+    margin-bottom: 20px;
+    span {
+        margin-right: 20px;
+        font-size: 12px;
     }
 `
 
 const NoData = styled.div`
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    border: 1px solid ${(props) => props.theme.colors.border};
+    border-radius: 15px;
     margin-bottom: 15px;
     background: ${(props) => props.theme.colors.background};
     padding: 2rem 20px;

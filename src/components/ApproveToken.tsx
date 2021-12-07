@@ -206,13 +206,13 @@ export default ApproveToken
 
 const Container = styled.div`
     max-width: 400px;
-    background: #fff;
+    background: ${(props) => props.theme.colors.foreground};
     border-radius: 25px;
     margin: 0 auto;
 `
 
 const InnerContainer = styled.div`
-    background: #fff;
+    background: ${(props) => props.theme.colors.foreground};
     text-align: center;
     border-radius: 20px;
     padding: 20px 20px 35px 20px;
@@ -260,7 +260,7 @@ const Text = styled.div`
 
 const BtnContainer = styled.div`
     padding: 20px;
-    margin: 20px -20px -35px;
+    margin: 20px -20px -38px;
     background-color: rgb(247, 248, 250);
     border-radius: 0 0 20px 20px;
     text-align: center;

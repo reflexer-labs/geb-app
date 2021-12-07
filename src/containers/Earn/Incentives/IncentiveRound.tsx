@@ -202,10 +202,7 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
 export default IncentiveRound
 
 const IncentiveContainer = styled.div`
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    border: 1px solid ${(props) => props.theme.colors.border};
     margin-bottom: 15px;
-    background: ${(props) => props.theme.colors.background};
 `
 const Header = styled.div`
     font-size: ${(props) => props.theme.font.medium};
@@ -326,10 +323,10 @@ const Distros = styled.div`
     padding: 20px;
 `
 const Distro = styled.div`
-    border-radius: ${(props) => props.theme.global.borderRadius};
+    border-radius: 15px;
     border: 1px solid ${(props) => props.theme.colors.border};
     margin-bottom: 15px;
-    background: ${(props) => props.theme.colors.foreground};
+    background: ${(props) => props.theme.colors.colorPrimary};
     padding: 15px;
 `
 

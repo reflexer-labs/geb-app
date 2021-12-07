@@ -140,6 +140,8 @@ const returnWallet = (type: string) => {
 }
 
 Cypress.Commands.overwrite('visit', (original, url, options) => {
+    console.log(options)
+
     const { privateKey, walletAddress, allowTx } = returnWallet(
         options && options.qs ? options.qs.type : ''
     )

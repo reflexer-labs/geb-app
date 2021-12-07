@@ -177,15 +177,13 @@ export function useInputsHandlers(): {
             }
 
             const { slot0, t1, t2 } = positionAndThreshold
-            const [
-                liqB,
-                token1Amt,
-            ] = TwoTrancheUniV3ManagerMath.getLiquidityAndAmountFromToken0(
-                JSBI.BigInt(ethers.utils.parseEther(typedValue)),
-                JSBI.BigInt(slot0.sqrtPriceX96),
-                t1,
-                t2
-            )
+            const [liqB, token1Amt] =
+                TwoTrancheUniV3ManagerMath.getLiquidityAndAmountFromToken0(
+                    JSBI.BigInt(ethers.utils.parseEther(typedValue)),
+                    JSBI.BigInt(slot0.sqrtPriceX96),
+                    t1,
+                    t2
+                )
             earnActions.setData({
                 totalLiquidity:
                     Number(typedValue) === 0
@@ -207,15 +205,13 @@ export function useInputsHandlers(): {
                 return
             }
             const { slot0, t1, t2 } = positionAndThreshold
-            const [
-                liqB,
-                token0Amt,
-            ] = TwoTrancheUniV3ManagerMath.getLiquidityAndAmountFromToken1(
-                JSBI.BigInt(ethers.utils.parseEther(typedValue)),
-                JSBI.BigInt(slot0.sqrtPriceX96),
-                t1,
-                t2
-            )
+            const [liqB, token0Amt] =
+                TwoTrancheUniV3ManagerMath.getLiquidityAndAmountFromToken1(
+                    JSBI.BigInt(ethers.utils.parseEther(typedValue)),
+                    JSBI.BigInt(slot0.sqrtPriceX96),
+                    t1,
+                    t2
+                )
             const totalLiquidityVal = ethers.utils.formatEther(liqB.toString())
             const raiAmountVal = ethers.utils.formatEther(token0Amt.toString())
 
@@ -249,13 +245,11 @@ export function useTokensFromLiquidity(liquidity: string) {
         async function getSharesFromLiquidity() {
             if (!isCanceled) {
                 const liquidityBN = ethers.utils.parseEther(liquidity)
-                const [sharesToT1, sharesToT2]: [
-                    BigNumber,
-                    BigNumber
-                ] = await geb.multiCall([
-                    getTokenXFromLiquidity(geb, true, liquidityBN),
-                    getTokenXFromLiquidity(geb, false, liquidityBN),
-                ])
+                const [sharesToT1, sharesToT2]: [BigNumber, BigNumber] =
+                    await geb.multiCall([
+                        getTokenXFromLiquidity(geb, true, liquidityBN),
+                        getTokenXFromLiquidity(geb, false, liquidityBN),
+                    ])
 
                 setState({
                     eth: ethers.utils.formatEther(sharesToT1),
@@ -306,13 +300,14 @@ export function useAddLiquidity(): {
             })
             const signer = library.getSigner(account)
 
-            const txData = geb.contracts.uniswapV3TwoTrancheLiquidityManager.deposit(
-                ethAmountBN, // First param is always ETH Amount
-                totalLiquidityBN,
-                account,
-                raiAmountBN.mul(9).div(10), // token0 Slippage safety at 90%
-                ethAmountBN.mul(9).div(10) // token1 Slippage safety at 90%
-            )
+            const txData =
+                geb.contracts.uniswapV3TwoTrancheLiquidityManager.deposit(
+                    ethAmountBN, // First param is always ETH Amount
+                    totalLiquidityBN,
+                    account,
+                    raiAmountBN.mul(9).div(10), // token0 Slippage safety at 90%
+                    ethAmountBN.mul(9).div(10) // token1 Slippage safety at 90%
+                )
 
             if (!txData) throw new Error('No transaction request!')
             const tx = await handlePreTxGasEstimate(signer, txData)
@@ -367,10 +362,11 @@ export function useWithdrawLiquidity(): {
             })
             const signer = library.getSigner(account)
 
-            const txData = geb.contracts.uniswapV3TwoTrancheLiquidityManager.withdraw(
-                totalLiquidityBN,
-                account
-            )
+            const txData =
+                geb.contracts.uniswapV3TwoTrancheLiquidityManager.withdraw(
+                    totalLiquidityBN,
+                    account
+                )
 
             if (!txData) throw new Error('No transaction request!')
             const tx = await handlePreTxGasEstimate(signer, txData)
@@ -422,9 +418,10 @@ function getNextTicksMulticallRequest(geb: Geb, threshold: BigNumberish) {
         type: 'function',
     }
 
-    const tx = geb.contracts.uniswapV3TwoTrancheLiquidityManager.getNextTicks(
-        threshold
-    )
+    const tx =
+        geb.contracts.uniswapV3TwoTrancheLiquidityManager.getNextTicks(
+            threshold
+        )
     return {
         data: tx.data as string,
         to: tx.to as string,
