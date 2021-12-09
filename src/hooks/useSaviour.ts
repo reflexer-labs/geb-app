@@ -1,11 +1,11 @@
 import { Geb, utils as gebUtils } from 'geb.js'
-import { utils as ethersUtils } from 'ethers'
+import { ethers, utils as ethersUtils } from 'ethers'
 import { useCallback, useMemo, useState } from 'react'
 import numeral from 'numeral'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { useStoreActions, useStoreState } from '../store'
 import { EMPTY_ADDRESS, ETH_NETWORK } from '../utils/constants'
-import useGeb from './useGeb'
+import useGeb, { useProxyAddress } from './useGeb'
 import { useActiveWeb3React } from '.'
 import { handlePreTxGasEstimate } from './TransactionHooks'
 import {
@@ -16,6 +16,8 @@ import {
 } from '../utils/interfaces'
 import { BigNumber } from '@ethersproject/bignumber'
 import { formatNumber, toFixedString } from '../utils/helper'
+import { useTranslation } from 'react-i18next'
+import { SaviourType } from 'src/model/safeModel'
 
 export const LIQUIDATION_POINT = 125 // percent
 export const LIQUIDATION_CRATIO = 135 // percent
@@ -44,6 +46,256 @@ export type SaviourData = {
     keeperPayOut: BigNumber
     uniswapV2CoinEthAllowance: string
     uniswapV2CoinEthBalance: string
+}
+
+export type StatsType = 'data' | 'info'
+export type Stats = {
+    [K in StatsType]: Array<{
+        label: string
+        value: string | number
+        tip?: string
+        plainValue?: string | number
+    }>
+}
+
+export function useSaviourInfo() {
+    const { t } = useTranslation()
+    const { account } = useActiveWeb3React()
+    const proxyAddress = useProxyAddress()
+
+    const saviourHook = useSaviourData()
+    const { getMinSaviourBalance } = useMinSaviourBalance()
+
+    const { safeModel: safeState } = useStoreState((state) => state)
+    const {
+        isSaviourDeposit,
+        amount,
+        targetedCRatio,
+        saviourType,
+        isMaxWithdraw,
+    } = safeState
+
+    const saviourData = useMemo(() => {
+        return saviourHook
+    }, [saviourHook])
+
+    const saviourState = useMemo(() => {
+        return {
+            isSaviourDeposit,
+            amount,
+            targetedCRatio,
+            saviourType,
+            isMaxWithdraw,
+        }
+    }, [isSaviourDeposit, amount, targetedCRatio, saviourType, isMaxWithdraw])
+
+    const hasSaviour = saviourData && saviourData.hasSaviour
+
+    const safeId = useMemo(() => {
+        return saviourData ? saviourData.safeId : ''
+    }, [saviourData])
+
+    const availableDepositBalance = useMemo(() => {
+        return saviourData ? saviourData.uniswapV2CoinEthBalance : '0'
+    }, [saviourData])
+
+    const availableWithdrawBalance = useMemo(() => {
+        return saviourData ? saviourData.saviourBalance : '0'
+    }, [saviourData])
+
+    const mySaviourBalance = useMemo(() => {
+        if (!saviourData) return '0'
+        const amountBN = amount
+            ? ethers.utils.parseEther(amount)
+            : BigNumber.from('0')
+        const saviourBalanceBN = saviourData
+            ? ethers.utils.parseEther(saviourData.saviourBalance)
+            : BigNumber.from('0')
+        if (isSaviourDeposit) {
+            return ethers.utils.formatEther(saviourBalanceBN.add(amountBN))
+        }
+        return ethers.utils.formatEther(saviourBalanceBN.sub(amountBN))
+    }, [amount, isSaviourDeposit, saviourData])
+
+    const stats: Stats = useMemo(() => {
+        return {
+            data: [
+                {
+                    label: 'Minimum Saviour Balance',
+                    value:
+                        getMinSaviourBalance({
+                            type: saviourType,
+                            targetedCRatio,
+                        }) + ' UNI-V2',
+                    tip: t('saviour_balance_tip'),
+                },
+                {
+                    label: 'Protected Liquidation Point',
+                    value: LIQUIDATION_POINT + '%',
+                    tip: t('liquidation_point_tip', {
+                        liquidation_ratio: LIQUIDATION_CRATIO,
+                    }),
+                },
+                {
+                    label: 'Rescue Fee',
+                    value: `$${saviourData?.rescueFee}`,
+                    tip: t('rescue_fee_tip'),
+                },
+            ],
+            info: [
+                {
+                    label: 'My Saviour Balance',
+                    value: formatNumber(mySaviourBalance) + ' UNI-V2',
+                    tip: t('saviour_balance_tip'),
+                },
+                {
+                    label: 'My Target Rescue CRatio',
+                    value: formatNumber(mySaviourBalance) + ' UNI-V2',
+                    tip: t('saviour_target_cratio'),
+                },
+                {
+                    label: 'Saviour Type',
+                    value:
+                        saviourType === 'uniswap'
+                            ? 'Uniswap v2 RAI/ETH'
+                            : 'RAI3CRV',
+                },
+            ],
+        }
+    }, [
+        getMinSaviourBalance,
+        mySaviourBalance,
+        saviourData,
+        saviourType,
+        t,
+        targetedCRatio,
+    ])
+
+    let error: string | undefined
+
+    if (!account) {
+        error = 'Connect Wallet'
+    }
+
+    if (!proxyAddress) {
+        error = error ?? 'Create a Reflexer Account to continue'
+    }
+
+    const amountBN = amount
+        ? ethers.utils.parseEther(amount)
+        : BigNumber.from('0')
+
+    const saviourBalanceBN = saviourData
+        ? ethers.utils.parseEther(saviourData.saviourBalance)
+        : BigNumber.from('0')
+    const minBalance = getMinSaviourBalance({
+        type: saviourType,
+        targetedCRatio,
+    })
+    const minBalanceBN = minBalance
+        ? ethers.utils.parseEther(minBalance as string)
+        : BigNumber.from('0')
+
+    const availableDepositBalanceBN = availableDepositBalance
+        ? ethers.utils.parseEther(availableDepositBalance)
+        : BigNumber.from('0')
+
+    const availableWithdrawBalanceBN = availableWithdrawBalance
+        ? ethers.utils.parseEther(availableWithdrawBalance)
+        : BigNumber.from('0')
+
+    if (!targetedCRatio) {
+        error = error ?? 'No min CollateralRatio'
+    }
+
+    if (
+        (!hasSaviour && amountBN.isZero()) ||
+        (hasSaviour &&
+            amountBN.isZero() &&
+            targetedCRatio === saviourData?.saviourRescueRatio)
+    ) {
+        error =
+            error ??
+            `You cannot ${isSaviourDeposit ? 'deposit' : 'withdraw'} nothing`
+    }
+
+    if (
+        !amountBN.isZero() &&
+        isSaviourDeposit &&
+        amountBN.gt(availableDepositBalanceBN)
+    ) {
+        error = error ?? `Cannot deposit more than you have in your wallet`
+    }
+
+    if (
+        !amountBN.isZero() &&
+        !isSaviourDeposit &&
+        amountBN.gt(availableWithdrawBalanceBN)
+    ) {
+        error = error ?? `Cannot withdraw less than minimum saviour balance`
+    }
+
+    if (isSaviourDeposit) {
+        if (!minBalance) {
+            error = error ?? 'Cannot deposit if your Safe does not have debt'
+        }
+        if (amountBN.add(saviourBalanceBN).lt(minBalanceBN)) {
+            error =
+                error ??
+                `Recommended minimal balance is:  ${getMinSaviourBalance({
+                    type: saviourType,
+                    targetedCRatio,
+                })} UNI-V2 and your resulting balance is ${ethers.utils.formatEther(
+                    amountBN.add(saviourBalanceBN)
+                )} UNI-V2`
+        }
+    } else {
+        if (
+            !amountBN.isZero() &&
+            saviourBalanceBN.sub(amountBN).lt(minBalanceBN) &&
+            !saviourBalanceBN.eq(amountBN)
+        ) {
+            error =
+                error ??
+                `Recommended minimal balance is:  ${getMinSaviourBalance({
+                    type: saviourType,
+                    targetedCRatio,
+                })} UNI-V2 and your resulting balance is ${ethers.utils.formatEther(
+                    saviourBalanceBN.sub(amountBN)
+                )} UNI-V2`
+        }
+    }
+
+    return {
+        error,
+        saviourState,
+        saviourData,
+        hasSaviour,
+        safeId,
+        availableDepositBalance,
+        availableWithdrawBalance,
+        stats,
+    }
+}
+
+export function useInputHandler(): {
+    onTypedInput: (typedValue: string) => void
+} {
+    const { safeModel: safeActions } = useStoreActions((state) => state)
+
+    const onTypedInput = useCallback(
+        (typedValue: string) => {
+            if (!typedValue || typedValue === '') {
+                safeActions.setAmount('')
+                return
+            }
+            safeActions.setAmount(typedValue)
+        },
+        [safeActions]
+    )
+    return {
+        onTypedInput,
+    }
 }
 
 export function useSaviourAddress(safeHandler: string) {
@@ -249,13 +501,19 @@ export function useMinSaviourBalance() {
     const HUNDRED = 100
     const saviourData = useSaviourData()
     const getMinSaviourBalance = useCallback(
-        (
-            targetCRatio?: number,
-            totalDebt?: string,
+        ({
+            type = 'uniswap',
+            targetedCRatio,
+            totalDebt,
+            totalCollateral,
+        }: {
+            type: SaviourType
+            targetedCRatio?: number
+            totalDebt?: string
             totalCollateral?: string
-        ) => {
+        }) => {
             const WAD_COMPLEMENT = BigNumber.from(10 ** 9)
-            if (!saviourData || !targetCRatio) return '0'
+            if (!saviourData || !targetedCRatio) return '0'
             const { RAY } = gebUtils
             const {
                 redemptionPrice,
@@ -298,7 +556,7 @@ export function useMinSaviourBalance() {
                 ? redemptionPrice
                       .mul(accumulatedRate)
                       .div(RAY)
-                      .mul(targetCRatio)
+                      .mul(targetedCRatio)
                       .div(HUNDRED)
                       .mul(RAY)
                       .div(liquidationPrice)

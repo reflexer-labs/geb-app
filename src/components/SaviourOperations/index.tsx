@@ -38,7 +38,12 @@ const SaviourOperatrions = () => {
         useStoreActions((state) => state)
 
     const { safeModel: safeState } = useStoreState((state) => state)
-    const { isSaviourDeposit, amount: stateAmount, targetedCRatio } = safeState
+    const {
+        isSaviourDeposit,
+        amount: stateAmount,
+        targetedCRatio,
+        saviourType,
+    } = safeState
 
     const hasSaviour = saviourData && saviourData.hasSaviour
 
@@ -82,7 +87,10 @@ const SaviourOperatrions = () => {
         const saviourBalanceBN = saviourData
             ? ethers.utils.parseEther(saviourData.saviourBalance)
             : BigNumber.from('0')
-        const minBalance = getMinSaviourBalance(sliderVal)
+        const minBalance = getMinSaviourBalance({
+            type: saviourType,
+            targetedCRatio: sliderVal,
+        })
         const minBalanceBN = minBalance
             ? ethers.utils.parseEther(minBalance as string)
             : BigNumber.from('0')
@@ -125,9 +133,10 @@ const SaviourOperatrions = () => {
             }
             if (amountBN.add(saviourBalanceBN).lt(minBalanceBN)) {
                 setError(
-                    `Recommended minimal balance is:  ${getMinSaviourBalance(
-                        sliderVal
-                    )} UNI-V2 and your resulting balance is ${ethers.utils.formatEther(
+                    `Recommended minimal balance is:  ${getMinSaviourBalance({
+                        type: saviourType,
+                        targetedCRatio: sliderVal,
+                    })} UNI-V2 and your resulting balance is ${ethers.utils.formatEther(
                         amountBN.add(saviourBalanceBN)
                     )} UNI-V2`
                 )
@@ -142,9 +151,10 @@ const SaviourOperatrions = () => {
                 !saviourBalanceBN.eq(amountBN)
             ) {
                 setError(
-                    `Recommended minimal balance is:  ${getMinSaviourBalance(
-                        sliderVal
-                    )} UNI-V2 and your resulting balance is ${ethers.utils.formatEther(
+                    `Recommended minimal balance is:  ${getMinSaviourBalance({
+                        type: saviourType,
+                        targetedCRatio: sliderVal,
+                    })} UNI-V2 and your resulting balance is ${ethers.utils.formatEther(
                         saviourBalanceBN.sub(amountBN)
                     )} UNI-V2`
                 )
@@ -279,9 +289,16 @@ const SaviourOperatrions = () => {
 
             <MaxBalance>
                 Recommended minimal balance is:{' '}
-                {getMinSaviourBalance(sliderVal)} UNI-V2 ($
+                {getMinSaviourBalance({
+                    type: saviourType,
+                    targetedCRatio: sliderVal,
+                })}{' '}
+                UNI-V2 ($
                 {returnFiatValue(
-                    getMinSaviourBalance(sliderVal) as string,
+                    getMinSaviourBalance({
+                        type: saviourType,
+                        targetedCRatio: sliderVal,
+                    }) as string,
                     saviourData?.uniPoolPrice as number
                 )}
                 )

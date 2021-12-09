@@ -92,16 +92,23 @@ const SafeHeader = ({
         color: 'dimmedColor' | 'successColor' | 'dangerColor'
     } => {
         if (!saviourData) return { status: 'none', color: 'dimmedColor' }
-        const minimumBalance = getMinSaviourBalance(
-            saviourData.saviourRescueRatio,
+        const minimumBalance = getMinSaviourBalance({
+            type: safeState.saviourType,
+            targetedCRatio: saviourData.saviourRescueRatio,
             totalDebt,
-            totalCollateral
-        ) as number
+            totalCollateral,
+        }) as number
         if (Number(saviourData.saviourBalance) >= minimumBalance) {
             return { status: 'Protected', color: 'successColor' }
         }
         return { status: 'Unprotected', color: 'dangerColor' }
-    }, [getMinSaviourBalance, saviourData, totalCollateral, totalDebt])
+    }, [
+        getMinSaviourBalance,
+        safeState.saviourType,
+        saviourData,
+        totalCollateral,
+        totalDebt,
+    ])
 
     const returnSaviourBtnText = () => {
         if (leftOver && leftOver.status) {

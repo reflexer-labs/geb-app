@@ -206,6 +206,10 @@ export const TOKENS = {
         name: 'FLX/ETH',
         icon: require('../assets/stFLX.svg'),
     },
+    uniswapv2: {
+        name: 'RAI/ETH',
+        icon: require('../assets/uniswap-icon.svg'),
+    },
 }
 
 export const INITIAL_INCENTIVE_ASSETS_STATE = {

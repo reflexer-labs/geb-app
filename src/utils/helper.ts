@@ -533,3 +533,8 @@ export const returnState = (state: number) => {
             return ''
     }
 }
+
+export const returnFiatValue = (value: string, price: number) => {
+    if (!value || !price) return '0.00'
+    return formatNumber(numeral(value).multiply(price).value().toString(), 2)
+}

@@ -17,6 +17,7 @@ type Token =
     | 'uniswapV3TwoTrancheLiquidityManager'
     | 'protocolToken'
     | 'stakingToken'
+    | 'uniswapPairCoinEth'
 
 export enum ApprovalState {
     UNKNOWN,

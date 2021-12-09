@@ -504,16 +504,23 @@ const SafeBody = ({ isChecked }: Props) => {
 
     const returnStatus = useCallback(() => {
         if (!saviourData) return 'none'
-        const minimumBalance = getMinSaviourBalance(
-            saviourData.saviourRescueRatio,
+        const minimumBalance = getMinSaviourBalance({
+            type: safeState.saviourType,
+            targetedCRatio: saviourData.saviourRescueRatio,
             totalDebt,
-            totalCollateral
-        ) as number
+            totalCollateral,
+        }) as number
         if (Number(saviourData.saviourBalance) >= minimumBalance) {
             return 'Protected'
         }
         return 'Unprotected'
-    }, [getMinSaviourBalance, saviourData, totalCollateral, totalDebt])
+    }, [
+        getMinSaviourBalance,
+        safeState.saviourType,
+        saviourData,
+        totalCollateral,
+        totalDebt,
+    ])
 
     return (
         <>

@@ -235,6 +235,9 @@ const Link = styled.a`
     text-decoration: underline;
     display: flex;
     align-items: center;
+    svg {
+        position: static !important;
+    }
     &:hover {
         color: ${(props) => props.theme.colors.inputBorderColor};
     }

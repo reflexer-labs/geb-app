@@ -19,7 +19,7 @@ import CustomToast from './components/CustomToast'
 import Auctions from './containers/Auctions'
 import GoogleTagManager from './components/Analytics/GoogleTagManager'
 import { SHOW_AUCTIONS } from './utils/constants'
-import SafeSaviour from './containers/OnBoarding/SafeSaviour'
+import SafeSaviour from './containers/OnBoarding/Saviour/SafeSaviour'
 import Staking from './containers/Earn/Staking'
 import Incentives from './containers/Earn/Incentives'
 import CreateSafe from './containers/OnBoarding/CreateSafe'
@@ -95,6 +95,12 @@ const App = () => {
                                             strict
                                             component={SafeDetails}
                                             path={'/safes/:id/withdraw'}
+                                        />
+                                        <Route
+                                            exact
+                                            strict
+                                            component={SafeSaviour}
+                                            path={'/safes/:id/saviour'}
                                         />
                                         <Route
                                             exact

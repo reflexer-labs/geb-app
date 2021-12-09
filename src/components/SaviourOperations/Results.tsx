@@ -17,7 +17,7 @@ const Results = () => {
     const saviourData = useSaviourData()
     const { safeModel: safeState } = useStoreState((state) => state)
 
-    const { targetedCRatio, amount, isSaviourDeposit } = safeState
+    const { targetedCRatio, amount, isSaviourDeposit, saviourType } = safeState
 
     const returnFiatValue = (value: string, price: number) => {
         if (!value || !price) return '0.00'
@@ -60,10 +60,14 @@ const Results = () => {
                             <Info size="16" />
                         </InfoIcon>
                     </Label>
-                    <Value>{`${getMinSaviourBalance(
-                        targetedCRatio
-                    )} UNI-V2 ($${returnFiatValue(
-                        getMinSaviourBalance(targetedCRatio) as string,
+                    <Value>{`${getMinSaviourBalance({
+                        type: saviourType,
+                        targetedCRatio: targetedCRatio,
+                    })} UNI-V2 ($${returnFiatValue(
+                        getMinSaviourBalance({
+                            type: saviourType,
+                            targetedCRatio: targetedCRatio,
+                        }) as string,
                         saviourData?.uniPoolPrice as number
                     )})`}</Value>
                 </Item>
