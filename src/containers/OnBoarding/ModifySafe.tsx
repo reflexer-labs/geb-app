@@ -25,6 +25,7 @@ const ModifySafe = ({
     const proxyAddress = useProxyAddress()
     const [showPreview, setShowPreview] = useState(false)
     const { safeModel: safeState } = useStoreState((state) => state)
+    const type = isDeposit ? 'deposit_borrow' : 'repay_withdraw'
     const {
         safeModel: safeActions,
         connectWalletModel: connectWalletActions,
@@ -40,7 +41,7 @@ const ModifySafe = ({
         totalDebt,
         collateralRatio,
         liquidationPrice,
-    } = useSafeInfo(isDeposit ? 'deposit_borrow' : 'repay_withdraw')
+    } = useSafeInfo(type)
 
     const [unlockState, approveUnlock] = useTokenApproval(
         parsedAmounts.rightInput,
@@ -183,7 +184,7 @@ const ModifySafe = ({
                 handleModalContent
             >
                 <ReviewContainer>
-                    <Review type={'create'} />
+                    <Review type={type} />
                     <BtnContainer>
                         <Button id="confirm_tx" onClick={handleConfirm}>
                             {'Confirm Transaction'}

@@ -153,7 +153,6 @@ const SafeSaviour = ({ ...props }) => {
                     isModifying={isModifying}
                     safeId={safeId}
                     saviourData={saviourData}
-                    saviourType={saviourType}
                 />
 
                 {isModifying || hasSaviour ? (
@@ -198,7 +197,7 @@ const SafeSaviour = ({ ...props }) => {
                                     ) : null}
                                 </Flex>
 
-                                <SaviourStats type={SAVIOUR_TYPES[0].item} />
+                                <SaviourStats />
                             </StatsBlock>
 
                             <OpsBlock>

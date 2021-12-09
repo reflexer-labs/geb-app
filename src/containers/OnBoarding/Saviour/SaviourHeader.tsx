@@ -1,28 +1,25 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
-import { SaviourData, useMinSaviourBalance } from '../../../hooks/useSaviour'
+import { SaviourData, useSaviourInfo } from '../../../hooks/useSaviour'
 import AlertLabel from '../../../components/AlertLabel'
 import { ArrowLeft } from 'react-feather'
 import { ExternalLinkArrow } from '../../../GlobalStyle'
-import { SaviourType } from 'src/model/safeModel'
 
 const SafeSaviour = ({
     isModifying,
     safeId,
     saviourData,
-    saviourType,
 }: {
     isModifying: boolean
     safeId: string
     saviourData: SaviourData | undefined
-    saviourType: SaviourType
 }) => {
     const { t } = useTranslation()
     const [loaded, setLoaded] = useState(false)
     const history = useHistory()
-    const { getMinSaviourBalance } = useMinSaviourBalance()
+    const { minSaviourBalance } = useSaviourInfo()
 
     useEffect(() => {
         if (saviourData) {
@@ -32,17 +29,16 @@ const SafeSaviour = ({
         }
     }, [saviourData])
 
-    const returnStatus = () => {
+    const saviourStatus = useMemo(() => {
         if (!saviourData) return 'none'
-        const minimumBalance = getMinSaviourBalance({
-            type: saviourType,
-            targetedCRatio: saviourData.saviourRescueRatio,
-        }) as number
-        if (Number(saviourData.saviourBalance) >= minimumBalance) {
+
+        if (
+            Number(saviourData.saviourBalance) >= (minSaviourBalance as number)
+        ) {
             return 'Protected'
         }
         return 'Unprotected'
-    }
+    }, [saviourData, minSaviourBalance])
 
     return (
         <ContentContainer>
@@ -76,11 +72,11 @@ const SafeSaviour = ({
                     {saviourData && saviourData.hasSaviour ? (
                         <AlertLabel
                             isBlock={true}
-                            text={`Status: ${returnStatus()}`}
+                            text={`Status: ${saviourStatus}`}
                             type={
-                                returnStatus() === 'Protected'
+                                saviourStatus === 'Protected'
                                     ? 'success'
-                                    : returnStatus() === 'none'
+                                    : saviourStatus === 'none'
                                     ? 'dimmed'
                                     : 'danger'
                             }

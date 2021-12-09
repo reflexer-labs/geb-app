@@ -298,6 +298,9 @@ const safeModel: SafeModel = {
     fetchSaviourData: thunk(async (actions, payload) => {
         const res = await fetchSaviourData(payload)
         actions.setSaviourData(res)
+        if (res && res.hasSaviour && res.saviourType) {
+            actions.setSaviourType(res.saviourType as SaviourType)
+        }
         return res
     }),
     setIsSafeCreated: action((state, payload) => {

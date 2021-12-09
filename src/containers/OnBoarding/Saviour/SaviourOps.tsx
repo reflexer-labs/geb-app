@@ -1,14 +1,13 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import {
     useChangeTargetedCRatio,
     useInputHandler,
-    useMinSaviourBalance,
     useSaviourDeposit,
     useSaviourInfo,
     useSaviourWithdraw,
 } from '../../../hooks/useSaviour'
 import styled from 'styled-components'
-import { useStoreState, useStoreActions } from '../../../store'
+import { useStoreActions } from '../../../store'
 import _ from '../../../utils/lodash'
 import { BigNumber, ethers } from 'ethers'
 import TokenInput from '../../../components/TokenInput'
@@ -36,12 +35,12 @@ const SaviourOps = () => {
             isSaviourDeposit,
             targetedCRatio,
             isMaxWithdraw,
-            saviourType,
         },
         availableDepositBalance,
         availableWithdrawBalance,
         safeId,
         error,
+        minSaviourBalance,
     } = useSaviourInfo()
 
     const safeHandler = useSafeHandler(safeId)
@@ -53,12 +52,6 @@ const SaviourOps = () => {
     const isValid = !error
 
     const { onTypedInput } = useInputHandler()
-
-    const { getMinSaviourBalance } = useMinSaviourBalance()
-    const minSaviourBalance = getMinSaviourBalance({
-        type: saviourType,
-        targetedCRatio: targetedCRatio,
-    })
 
     const [showPreview, setShowPreview] = useState(false)
 

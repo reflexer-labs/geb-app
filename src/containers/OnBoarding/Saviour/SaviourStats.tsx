@@ -1,32 +1,25 @@
 import React, { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
-import {
-    LIQUIDATION_POINT,
-    useMinSaviourBalance,
-    useSaviourData,
-    useSaviourInfo,
-} from '../../../hooks/useSaviour'
-import { useStoreActions, useStoreState } from '../../../store'
+import { useSaviourInfo } from '../../../hooks/useSaviour'
+import { useStoreActions } from '../../../store'
 import styled from 'styled-components'
 import { formatNumber } from '../../../utils/helper'
-import { BigNumber, ethers } from 'ethers'
 import numeral from 'numeral'
 import { Info } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
-import { LIQUIDATION_RATIO } from '../../../hooks/useSafe'
 import Slider from '../../../components/Slider'
 
 export const MIN_SAVIOUR_CRATIO = 175
 
-const SaviourStats = ({ type }: { type: string }) => {
-    const { t } = useTranslation()
+const SaviourStats = () => {
     const [showSlider, setShowSlider] = useState(false)
     const [sliderVal, setSliderVal] = useState<number>(0)
 
-    const { getMinSaviourBalance } = useMinSaviourBalance()
     const {
         saviourData,
-        saviourState: { amount, targetedCRatio, isSaviourDeposit, saviourType },
+        saviourState: { targetedCRatio, saviourType },
+        stats,
+        minSaviourBalance,
+        mySaviourBalance,
     } = useSaviourInfo()
     const { safeModel: safeActions } = useStoreActions((state) => state)
 
@@ -36,20 +29,6 @@ const SaviourStats = ({ type }: { type: string }) => {
             numeral(value).multiply(price).value().toString(),
             2
         )
-    }
-
-    const returnNewBalance = () => {
-        if (!saviourData) return '0'
-        const amountBN = amount
-            ? ethers.utils.parseEther(amount)
-            : BigNumber.from('0')
-        const saviourBalanceBN = saviourData
-            ? ethers.utils.parseEther(saviourData.saviourBalance)
-            : BigNumber.from('0')
-        if (isSaviourDeposit) {
-            return ethers.utils.formatEther(saviourBalanceBN.add(amountBN))
-        }
-        return ethers.utils.formatEther(saviourBalanceBN.sub(amountBN))
     }
 
     const handleSliderChange = (value: number | readonly number[]) => {
@@ -81,56 +60,44 @@ const SaviourStats = ({ type }: { type: string }) => {
                     <Inner className="main">
                         <Main>
                             <MainLabel>
-                                <InfoIcon data-tip={t('saviour_balance_tip')}>
+                                <InfoIcon data-tip={stats.data[0].tip}>
                                     <Info size="16" />
                                 </InfoIcon>{' '}
-                                Minimum Saviour Balance
+                                {stats.data[0].label}
                             </MainLabel>
-                            <MainValue>
-                                {`${getMinSaviourBalance({
-                                    type: saviourType,
-                                    targetedCRatio: targetedCRatio,
-                                })}`}{' '}
-                                <span>UNI-V2</span>
-                            </MainValue>
+                            <MainValue>{`${stats.data[0].value}`}</MainValue>
                             <MainChange>
-                                {`$
-                                ${returnFiatValue(
-                                    getMinSaviourBalance({
-                                        type: saviourType,
-                                        targetedCRatio: targetedCRatio,
-                                    }) as string,
-                                    saviourData?.uniPoolPrice as number
-                                )}
+                                {`$${
+                                    saviourType === 'uniswap'
+                                        ? returnFiatValue(
+                                              minSaviourBalance as string,
+                                              saviourData?.uniPoolPrice as number
+                                          )
+                                        : stats.data[0].value
+                                }
                                 `}
                             </MainChange>
                         </Main>
 
                         <Main className="mid">
                             <MainLabel>
-                                <InfoIcon
-                                    data-tip={t('liquidation_point_tip', {
-                                        liquidation_ratio: LIQUIDATION_RATIO,
-                                    })}
-                                >
+                                <InfoIcon data-tip={stats.data[1].tip}>
                                     <Info size="16" />
                                 </InfoIcon>{' '}
-                                Protected Liquidation Point
+                                {stats.data[1].label}
                             </MainLabel>
-                            <MainValue>{LIQUIDATION_POINT + '%'}</MainValue>
+                            <MainValue> {stats.data[1].value}</MainValue>
                             <MainChange></MainChange>
                         </Main>
 
                         <Main>
                             <MainLabel>
-                                <InfoIcon data-tip={t('rescue_fee_tip')}>
+                                <InfoIcon data-tip={stats.data[1].tip}>
                                     <Info size="16" />
                                 </InfoIcon>{' '}
-                                Rescue Fee
+                                {stats.data[2].label}
                             </MainLabel>
-                            <MainValue>
-                                {`$${saviourData?.rescueFee}`}
-                            </MainValue>
+                            <MainValue>{stats.data[2].value}</MainValue>
                             <MainChange></MainChange>
                         </Main>
                     </Inner>
@@ -139,29 +106,30 @@ const SaviourStats = ({ type }: { type: string }) => {
                 <Right>
                     <Inner className="main">
                         <Main>
-                            <MainLabel>My Saviour Balance</MainLabel>
-                            <MainValue>
-                                {`${formatNumber(returnNewBalance())}`}{' '}
-                                <span>UNI-V2</span>
-                            </MainValue>
+                            <MainLabel> {stats.info[0].label}</MainLabel>
+                            <MainValue>{stats.info[0].value}</MainValue>
                             <MainChange>
-                                {`$${returnFiatValue(
-                                    returnNewBalance(),
-                                    saviourData?.uniPoolPrice as number
-                                )}`}
+                                {`$${
+                                    saviourType === 'uniswap'
+                                        ? returnFiatValue(
+                                              mySaviourBalance as string,
+                                              saviourData?.uniPoolPrice as number
+                                          )
+                                        : (stats.info[0].value as string)
+                                }`}
                             </MainChange>
                         </Main>
 
                         <Main className="mids">
                             <MainLabel>
-                                <InfoIcon data-tip={t('saviour_target_cratio')}>
+                                <InfoIcon data-tip={stats.info[1].tip}>
                                     <Info size="16" />
                                 </InfoIcon>
-                                My Target Rescue CRatio
+                                {stats.info[1].label}
                             </MainLabel>
                             <MainValue>
                                 <FlexValue>
-                                    {`${targetedCRatio}%`}
+                                    {stats.info[1].value}
                                     <span
                                         onClick={() =>
                                             setShowSlider(!showSlider)
@@ -188,8 +156,10 @@ const SaviourStats = ({ type }: { type: string }) => {
                         </Main>
 
                         <Main>
-                            <MainLabel>Saviour Type</MainLabel>
-                            <MainValue className="lower-size">{type}</MainValue>
+                            <MainLabel>{stats.info[2].label}</MainLabel>
+                            <MainValue className="lower-size">
+                                {stats.info[2].value}
+                            </MainValue>
                         </Main>
                     </Inner>
                 </Right>
@@ -255,7 +225,7 @@ const MainLabel = styled.div`
 `
 
 const MainValue = styled.div`
-    font-size: 25px;
+    font-size: 23px;
     color: ${(props) => props.theme.colors.primary};
     font-family: 'Montserrat', sans-serif;
     margin: 2px 0;
