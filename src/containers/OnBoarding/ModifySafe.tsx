@@ -30,6 +30,8 @@ const ModifySafe = ({
         connectWalletModel: connectWalletActions,
         popupsModel: popupsActions,
     } = useStoreActions((state) => state)
+
+    const type = isDeposit ? 'deposit_borrow' : 'repay_withdraw'
     const {
         error,
         balances,
@@ -40,7 +42,7 @@ const ModifySafe = ({
         totalDebt,
         collateralRatio,
         liquidationPrice,
-    } = useSafeInfo(isDeposit ? 'deposit_borrow' : 'repay_withdraw')
+    } = useSafeInfo(type)
 
     const [unlockState, approveUnlock] = useTokenApproval(
         parsedAmounts.rightInput,
@@ -183,7 +185,7 @@ const ModifySafe = ({
                 handleModalContent
             >
                 <ReviewContainer>
-                    <Review type={'create'} />
+                    <Review type={type} />
                     <BtnContainer>
                         <Button id="confirm_tx" onClick={handleConfirm}>
                             {'Confirm Transaction'}
