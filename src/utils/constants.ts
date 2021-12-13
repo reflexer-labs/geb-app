@@ -2,7 +2,28 @@ import { ethers } from 'ethers'
 import { Geb } from 'geb.js'
 import { css } from 'styled-components'
 import { injected, walletconnect, walletlink } from '../connectors'
+import { constructSameAddressMap } from './constructSameAddressMap'
 import { ChainId, WalletInfo } from './interfaces'
+
+type AddressMap = { [chainId: number]: string }
+
+export type TokenName =
+    | 'eth'
+    | 'rai'
+    | 'stake'
+    | 'unstake'
+    | 'uniswapv2'
+    | 'curve'
+
+export type Tokens = {
+    [key in TokenName]: {
+        name: string
+        icon: string
+        gebName: string
+        balance: string
+        address: string
+    }
+}
 
 const {
     REACT_APP_GRAPH_API_URLS,
@@ -15,6 +36,13 @@ const {
     REACT_APP_NETWORK_URL,
     REACT_APP_WYRE_WORKER,
 } = process.env
+
+export const MULTICALL2_ADDRESSES: AddressMap = {
+    ...constructSameAddressMap(
+        '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
+        false
+    ),
+}
 
 export enum Network {
     MAINNET = 'mainnet',
@@ -189,26 +217,48 @@ const INIT_VALUES = {
     diffPercentage: 0,
 }
 
-export const TOKENS = {
+export const TOKENS: Tokens = {
     eth: {
         name: 'ETH',
         icon: require('../assets/eth-img.svg'),
+        gebName: '',
+        balance: '',
+        address: '',
     },
     rai: {
         name: 'RAI',
         icon: require('../assets/rai-logo.svg'),
+        gebName: 'coin',
+        balance: '',
+        address: '',
     },
     stake: {
         name: 'FLX/ETH',
         icon: require('../assets/flx_uni_eth.svg'),
+        gebName: 'stakingToken',
+        balance: '',
+        address: '',
     },
     unstake: {
         name: 'FLX/ETH',
         icon: require('../assets/stFLX.svg'),
+        gebName: 'stakingToken',
+        balance: '',
+        address: '',
     },
     uniswapv2: {
         name: 'RAI/ETH',
         icon: require('../assets/uniswap-icon.svg'),
+        gebName: 'uniswapPairCoinEth',
+        balance: '',
+        address: '',
+    },
+    curve: {
+        name: 'RAI3CRV',
+        icon: require('../assets/curve.svg'),
+        gebName: '',
+        balance: '',
+        address: '',
     },
 }
 

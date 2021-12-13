@@ -2,7 +2,6 @@ import React from 'react'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
 import TokenInput from '../../../components/TokenInput'
-import { useActiveWeb3React } from '../../../hooks'
 import useGeb from '../../../hooks/useGeb'
 import {
     useAddStaking,
@@ -17,7 +16,6 @@ import { TOKENS } from '../../../utils/constants'
 import { formatNumber } from '../../../utils/helper'
 
 const Stake = () => {
-    const { account } = useActiveWeb3React()
     const geb = useGeb()
     const { balances, parsedAmounts, error } = useStakingInfo()
     const { onStakingInput } = useInputsHandlers()
@@ -27,9 +25,8 @@ const Stake = () => {
 
     const [depositApprovalState, approveDeposit] = useTokenApproval(
         parsedAmounts.stakingAmount,
-        'stakingToken',
         geb?.contracts.stakingFirstResort.address,
-        account as string
+        geb?.contracts.stakingToken.address
     )
 
     const stakingValue = parsedAmounts.stakingAmount

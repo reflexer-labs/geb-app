@@ -10,7 +10,10 @@ import { StatsType, useSaviourInfo } from '../../../hooks/useSaviour'
 import ReactTooltip from 'react-tooltip'
 
 const ReviewTransaction = () => {
-    const { stats } = useSaviourInfo()
+    const {
+        stats,
+        saviourState: { saviourType },
+    } = useSaviourInfo()
     const { t } = useTranslation()
     const { connector } = useActiveWeb3React()
 
@@ -32,7 +35,10 @@ const ReviewTransaction = () => {
                     return (
                         <div key={key} className="blockie">
                             {stats[key as StatsType].map((item) => {
-                                return (
+                                return saviourType === 'curve' &&
+                                    item.label.includes(
+                                        'Target Rescue'
+                                    ) ? null : (
                                     <Flex key={item.label}>
                                         <Label
                                             color={

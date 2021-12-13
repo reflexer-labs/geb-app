@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useMemo } from 'react'
 import {
     useChangeTargetedCRatio,
     useInputHandler,
@@ -8,8 +8,6 @@ import {
 } from '../../../hooks/useSaviour'
 import styled from 'styled-components'
 import { useStoreActions } from '../../../store'
-import _ from '../../../utils/lodash'
-import { BigNumber, ethers } from 'ethers'
 import TokenInput from '../../../components/TokenInput'
 import { TOKENS } from '../../../utils/constants'
 import { formatNumber } from '../../../utils/helper'
@@ -19,14 +17,16 @@ import {
     useTokenApproval,
 } from '../../../hooks/useTokenApproval'
 import { useActiveWeb3React } from '../../../hooks'
-import { useProxyAddress, useSafeHandler } from '../../../hooks/useGeb'
+import useGeb, { useProxyAddress, useSafeHandler } from '../../../hooks/useGeb'
 import { handleTransactionError } from '../../../hooks/TransactionHooks'
 import Modal from '../../../components/Modals/Modal'
 import Review from './Review'
 import { MIN_SAVIOUR_CRATIO } from './SaviourStats'
+import { SaviourType } from '../../../model/safeModel'
 
 const SaviourOps = () => {
     const { account, library } = useActiveWeb3React()
+    const geb = useGeb()
     const proxyAddress = useProxyAddress()
     const {
         saviourData,
@@ -35,12 +35,15 @@ const SaviourOps = () => {
             isSaviourDeposit,
             targetedCRatio,
             isMaxWithdraw,
+            saviourType,
         },
         availableDepositBalance,
         availableWithdrawBalance,
         safeId,
         error,
         minSaviourBalance,
+        tokenBalances,
+        isCurveSaviour,
     } = useSaviourInfo()
 
     const safeHandler = useSafeHandler(safeId)
@@ -58,26 +61,27 @@ const SaviourOps = () => {
     const { popupsModel: popupsActions, safeModel: safeActions } =
         useStoreActions((state) => state)
 
-    const [unlockState, approveUnlock] = useTokenApproval(
+    const [uniswapUnlockState, approveUniswapUnlockState] = useTokenApproval(
         amount,
-        'uniswapPairCoinEth',
-        proxyAddress,
-        account as string
+        geb?.contracts.uniswapPairCoinEth.address,
+        proxyAddress
     )
 
-    const isSetToMax = () => {
-        const amountBN = amount
-            ? ethers.utils.parseEther(amount)
-            : BigNumber.from('0')
-        const availableBalanceBN = availableWithdrawBalance
-            ? ethers.utils.parseEther(availableWithdrawBalance)
-            : BigNumber.from('0')
-        return amountBN.eq(availableWithdrawBalance)
-    }
+    const [curveUnlockState, approveCurveUnlockState] = useTokenApproval(
+        amount,
+        tokenBalances.curve.address,
+        proxyAddress
+    )
 
-    const handleSliderChange = (value: number | readonly number[]) => {
-        safeActions.setTargetedCRatio(value as number)
-    }
+    const unlockState = useMemo(
+        () => (isCurveSaviour ? curveUnlockState : uniswapUnlockState),
+        [curveUnlockState, isCurveSaviour, uniswapUnlockState]
+    )
+
+    const saviourToken = useMemo(
+        () => (isCurveSaviour ? TOKENS.curve : TOKENS.uniswapv2),
+        [isCurveSaviour]
+    )
 
     const handleChange = (val: string, isDeposit: boolean) => {
         onTypedInput('')
@@ -164,6 +168,8 @@ const SaviourOps = () => {
                 targetedCRatio,
                 isTargetedCRatioChanged:
                     targetedCRatio !== saviourData.saviourRescueRatio,
+                saviourType: saviourType as SaviourType,
+                curvelpTokenAddress: saviourData.curvelpTokenAddress,
             }
             clearAll()
             if (
@@ -215,10 +221,10 @@ const SaviourOps = () => {
                     </SideLabel>
 
                     <TokenInput
-                        token={TOKENS.uniswapv2}
+                        token={saviourToken}
                         label={`Balance: ${formatNumber(
                             availableDepositBalance
-                        )} ${TOKENS.uniswapv2.name}`}
+                        )} ${saviourToken.name}`}
                         rightLabel={``}
                         onChange={(val) => handleChange(val, true)}
                         value={isSaviourDeposit ? amount : ''}
@@ -228,10 +234,10 @@ const SaviourOps = () => {
                 <InputBlock>
                     <SideLabel>{'Withdraw Saviour Balance'}</SideLabel>
                     <TokenInput
-                        token={TOKENS.uniswapv2}
+                        token={saviourToken}
                         label={`Balance: ${formatNumber(
                             availableWithdrawBalance
-                        )} ${TOKENS.uniswapv2.name}`}
+                        )} ${saviourToken.name}`}
                         rightLabel={``}
                         onChange={(val) => handleChange(val, false)}
                         value={!isSaviourDeposit ? amount : ''}
@@ -244,7 +250,7 @@ const SaviourOps = () => {
                     <span onClick={clearAll}>Clear All</span>
                 </TextRight>
                 {isValid &&
-                !isSaviourDeposit &&
+                isSaviourDeposit &&
                 (unlockState === ApprovalState.PENDING ||
                     unlockState === ApprovalState.NOT_APPROVED) ? (
                     <Button
@@ -254,9 +260,17 @@ const SaviourOps = () => {
                         text={
                             unlockState === ApprovalState.PENDING
                                 ? 'Pending Approval..'
-                                : 'Unlock Uniswap V2 RAI/ETH'
+                                : `Unlock ${
+                                      isCurveSaviour
+                                          ? 'Curve RAI3Pool'
+                                          : 'Uniswap V2 RAI/ETH'
+                                  }`
                         }
-                        onClick={approveUnlock}
+                        onClick={
+                            isCurveSaviour
+                                ? approveCurveUnlockState
+                                : approveUniswapUnlockState
+                        }
                     />
                 ) : (
                     <Button

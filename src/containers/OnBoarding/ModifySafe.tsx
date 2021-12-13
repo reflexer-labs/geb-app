@@ -6,7 +6,10 @@ import Modal from '../../components/Modals/Modal'
 import TokenInput from '../../components/TokenInput'
 import { useActiveWeb3React } from '../../hooks'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
-import { useProxyAddress, useTokenBalanceInUSD } from '../../hooks/useGeb'
+import useGeb, {
+    useProxyAddress,
+    useTokenBalanceInUSD,
+} from '../../hooks/useGeb'
 import { useSafeInfo, useInputsHandlers } from '../../hooks/useSafe'
 import { ApprovalState, useTokenApproval } from '../../hooks/useTokenApproval'
 import { useStoreActions, useStoreState } from '../../store'
@@ -22,6 +25,7 @@ const ModifySafe = ({
     isOwner: boolean
 }) => {
     const { library, account } = useActiveWeb3React()
+    const geb = useGeb()
     const proxyAddress = useProxyAddress()
     const [showPreview, setShowPreview] = useState(false)
     const { safeModel: safeState } = useStoreState((state) => state)
@@ -45,9 +49,8 @@ const ModifySafe = ({
 
     const [unlockState, approveUnlock] = useTokenApproval(
         parsedAmounts.rightInput,
-        'coin',
-        proxyAddress,
-        account as string
+        geb?.contracts.coin.address,
+        proxyAddress
     )
 
     const { leftInput, rightInput } = parsedAmounts

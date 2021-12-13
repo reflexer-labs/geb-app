@@ -4,11 +4,7 @@ import { useCallback, useMemo, useState } from 'react'
 import numeral from 'numeral'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { useStoreActions, useStoreState } from '../store'
-import {
-    COLLATERAL_TYPE_ID,
-    EMPTY_ADDRESS,
-    ETH_NETWORK,
-} from '../utils/constants'
+import { EMPTY_ADDRESS, ETH_NETWORK, TOKENS } from '../utils/constants'
 import useGeb, { useProxyAddress } from './useGeb'
 import { useActiveWeb3React } from '.'
 import { handlePreTxGasEstimate } from './TransactionHooks'
@@ -21,8 +17,12 @@ import {
 import { BigNumber } from '@ethersproject/bignumber'
 import { formatNumber, toFixedString } from '../utils/helper'
 import { useTranslation } from 'react-i18next'
-import { SaviourType } from 'src/model/safeModel'
+import { SaviourType } from '../model/safeModel'
+import { ETH_A } from 'geb.js/lib/utils'
+import { useTokenBalances } from './Wallet'
+import { getAddress } from '@ethersproject/address'
 
+export const CURVE_SAVIOUR_LIQUIDATION_POINT = 100 // percent
 export const LIQUIDATION_POINT = 125 // percent
 export const LIQUIDATION_CRATIO = 135 // percent
 
@@ -31,6 +31,7 @@ export type SaviourData = {
     hasSaviour: boolean
     saviourAddress: string
     saviourBalance: string
+    curvelpTokenAddress: string
     saviourType: string
     coinAddress: string
     wethAddress: string
@@ -66,6 +67,7 @@ export type Stats = {
 export function useSaviourInfo() {
     const { t } = useTranslation()
     const { account } = useActiveWeb3React()
+
     const proxyAddress = useProxyAddress()
 
     const saviourHook = useSaviourData()
@@ -84,6 +86,13 @@ export function useSaviourInfo() {
         return saviourHook
     }, [saviourHook])
 
+    const isCurveSaviour = useMemo(() => saviourType === 'curve', [saviourType])
+
+    const tokenLabel = useMemo(
+        () => (isCurveSaviour ? 'RAI3CRV' : 'UNI-V2'),
+        [isCurveSaviour]
+    )
+
     const saviourState = useMemo(() => {
         return {
             isSaviourDeposit,
@@ -96,13 +105,31 @@ export function useSaviourInfo() {
 
     const hasSaviour = saviourData && saviourData.hasSaviour
 
+    const tokens = useMemo(() => {
+        return saviourData
+            ? {
+                  ...TOKENS,
+                  curve: {
+                      ...TOKENS.curve,
+                      address: saviourData.curvelpTokenAddress,
+                  },
+              }
+            : TOKENS
+    }, [saviourData])
+
+    const tokenBalances = useTokenBalances(account as string, tokens)
+
     const safeId = useMemo(() => {
         return saviourData ? saviourData.safeId : ''
     }, [saviourData])
 
     const availableDepositBalance = useMemo(() => {
-        return saviourData ? saviourData.uniswapV2CoinEthBalance : '0'
-    }, [saviourData])
+        return saviourData
+            ? isCurveSaviour
+                ? tokenBalances.curve.balance
+                : saviourData.uniswapV2CoinEthBalance
+            : '0'
+    }, [isCurveSaviour, saviourData, tokenBalances])
 
     const availableWithdrawBalance = useMemo(() => {
         return saviourData ? saviourData.saviourBalance : '0'
@@ -132,9 +159,7 @@ export function useSaviourInfo() {
             data: [
                 {
                     label: 'Minimum Saviour Balance',
-                    value:
-                        minSaviourBalance +
-                        `${saviourType === 'uniswap' ? ' UNI-V2' : ' RAI3CRV'}`,
+                    value: `${minSaviourBalance} ${tokenLabel}`,
                     tip: t('saviour_balance_tip'),
                 },
                 {
@@ -153,9 +178,7 @@ export function useSaviourInfo() {
             info: [
                 {
                     label: 'My Saviour Balance',
-                    value:
-                        formatNumber(mySaviourBalance) +
-                        `${saviourType === 'uniswap' ? ' UNI-V2' : ' RAI3CRV'}`,
+                    value: `${formatNumber(mySaviourBalance)} ${tokenLabel}`,
                     tip: t('saviour_balance_tip'),
                 },
                 {
@@ -165,20 +188,20 @@ export function useSaviourInfo() {
                 },
                 {
                     label: 'Saviour Type',
-                    value:
-                        saviourType === 'uniswap'
-                            ? 'Uniswap v2 RAI/ETH'
-                            : 'Curve RAI/3Pool',
+                    value: !isCurveSaviour
+                        ? 'Uniswap v2 RAI/ETH'
+                        : 'Curve RAI/3Pool',
                 },
             ],
         }
     }, [
+        isCurveSaviour,
         minSaviourBalance,
         mySaviourBalance,
         saviourData,
-        saviourType,
         t,
         targetedCRatio,
+        tokenLabel,
     ])
 
     let error: string | undefined
@@ -211,7 +234,7 @@ export function useSaviourInfo() {
         ? ethers.utils.parseEther(availableWithdrawBalance)
         : BigNumber.from('0')
 
-    if (!targetedCRatio) {
+    if (!isCurveSaviour && !targetedCRatio) {
         error = error ?? 'No min CollateralRatio'
     }
 
@@ -249,9 +272,9 @@ export function useSaviourInfo() {
         if (amountBN.add(saviourBalanceBN).lt(minBalanceBN)) {
             error =
                 error ??
-                `Recommended minimal balance is:  ${minSaviourBalance} UNI-V2 and your resulting balance is ${ethers.utils.formatEther(
+                `Recommended minimal balance is:  ${minSaviourBalance} ${tokenLabel} and your resulting balance is ${ethers.utils.formatEther(
                     amountBN.add(saviourBalanceBN)
-                )} UNI-V2`
+                )} ${tokenLabel}`
         }
     } else {
         if (
@@ -261,9 +284,9 @@ export function useSaviourInfo() {
         ) {
             error =
                 error ??
-                `Recommended minimal balance is:  ${minSaviourBalance} UNI-V2 and your resulting balance is ${ethers.utils.formatEther(
+                `Recommended minimal balance is:  ${minSaviourBalance} ${tokenLabel} and your resulting balance is ${ethers.utils.formatEther(
                     saviourBalanceBN.sub(amountBN)
-                )} UNI-V2`
+                )} ${tokenLabel}`
         }
     }
 
@@ -278,6 +301,9 @@ export function useSaviourInfo() {
         stats,
         minSaviourBalance,
         mySaviourBalance,
+        tokenBalances,
+        isCurveSaviour,
+        tokenLabel,
     }
 }
 
@@ -391,20 +417,19 @@ export async function fetchSaviourData({
 
     const multiCallRequest3 = geb.multiCall([
         geb.contracts.curveV1MaxSafeSaviour.lpTokenCover(
-            COLLATERAL_TYPE_ID,
+            ETH_A,
             safeHandler.toLowerCase(),
             true
         ),
-        geb.contracts.curveV1MaxSafeSaviour.balanceOf(
-            account.toLowerCase(),
-            true
-        ),
+        geb.contracts.curveV1MaxSafeSaviour.lpToken(true),
     ])
 
-    const [muliCallResponse1, multiCallResponse2] = await Promise.all([
-        multiCallRequest,
-        multiCallRequest2,
-    ])
+    const [muliCallResponse1, multiCallResponse2, multiCallResponse3] =
+        await Promise.all([
+            multiCallRequest,
+            multiCallRequest2,
+            multiCallRequest3,
+        ])
 
     const [
         saviourAddress,
@@ -424,6 +449,8 @@ export async function fetchSaviourData({
         { generatedDebt, lockedCollateral },
         keeperPayOut,
     ] = multiCallResponse2
+
+    const [curveSaviourBalance, curvelpTokenAddress] = multiCallResponse3
 
     const wethAddress = geb.contracts.weth.address
     const coinAddress = geb.contracts.coin.address
@@ -450,8 +477,15 @@ export async function fetchSaviourData({
     //                      2 * ethPrice * reserveETH
     // uniPoolPrice = --------------------------------------
     //                            lptotalSupply
+    //@ts-ignore
+    const curveSaviourAddress = geb.addresses.GEB_COIN_CURVE_V1_MAX_SAVIOUR
 
-    const formattedSaviourBalance = ethersUtils.formatEther(saviourBalance)
+    const isCurveSaviour =
+        saviourAddress.toLowerCase() === curveSaviourAddress.toLowerCase()
+
+    const formattedSaviourBalance = ethersUtils.formatEther(
+        isCurveSaviour ? curveSaviourBalance : saviourBalance
+    )
 
     const formattedCoinTotalSupply = ethersUtils.formatEther(coinTotalSupply)
 
@@ -473,12 +507,8 @@ export async function fetchSaviourData({
     return {
         safeId,
         hasSaviour: saviourAddress !== EMPTY_ADDRESS,
-
-        saviourType:
-            //@ts-ignore
-            saviourAddress === geb.addresses.GEB_COIN_CURVE_V1_MAX_SAVIOUR
-                ? 'curve'
-                : 'uniswap',
+        curvelpTokenAddress,
+        saviourType: isCurveSaviour ? 'curve' : 'uniswap',
         coinAddress,
         wethAddress,
         saviourAddress,
@@ -553,7 +583,8 @@ export function useMinSaviourBalance() {
 
             if (type !== 'uniswap') {
                 const Rvar = redemptionPrice.mul(2).mul(generatedDebt)
-                const Tvar = 1 - LIQUIDATION_POINT / LIQUIDATION_CRATIO
+                const Tvar =
+                    1 - CURVE_SAVIOUR_LIQUIDATION_POINT / LIQUIDATION_CRATIO
 
                 const minBalance =
                     Number(ethers.utils.formatEther(Rvar.div(RAY))) * Tvar
@@ -676,17 +707,37 @@ export function useSaviourDeposit() {
         }
         const geb = new Geb(ETH_NETWORK, signer.provider)
         const proxy = await geb.getProxyAction(signer._address)
-        const { safeId, amount, targetedCRatio } = saviourPayload
+        const {
+            safeId,
+            amount,
+            targetedCRatio,
+            saviourType,
+            curvelpTokenAddress,
+        } = saviourPayload
         const tokenAmount = ethersUtils.parseEther(amount)
 
-        const txData = proxy.protectSAFESetDesiredCRatioDeposit(
-            false,
-            geb.contracts.coinNativeUniswapSaviour.address,
-            geb.contracts.uniswapPairCoinEth.address,
-            safeId,
-            tokenAmount,
-            targetedCRatio
-        )
+        let txData
+        if (saviourType === 'uniswap') {
+            txData = proxy.protectSAFESetDesiredCRatioDeposit(
+                false,
+                geb.contracts.coinNativeUniswapSaviour.address,
+                geb.contracts.uniswapPairCoinEth.address,
+                safeId,
+                tokenAmount,
+                targetedCRatio
+            )
+        } else {
+            // @ts-ignore
+            const saviourAddress = geb.addresses.GEB_COIN_CURVE_V1_MAX_SAVIOUR
+            const formattedAddresss = getAddress(saviourAddress)
+            txData = proxy.protectSAFEDeposit(
+                true,
+                formattedAddresss,
+                curvelpTokenAddress,
+                safeId,
+                tokenAmount
+            )
+        }
 
         if (!txData) throw new Error('No transaction request!')
         const tx = await handlePreTxGasEstimate(signer, txData)
@@ -738,21 +789,29 @@ export function useSaviourWithdraw() {
             isMaxWithdraw,
             targetedCRatio,
             isTargetedCRatioChanged,
+            saviourType,
+            curvelpTokenAddress,
         } = saviourPayload
         const tokenAmount = ethersUtils.parseEther(amount)
 
         let txData
 
+        // @ts-ignore
+        const curveSaviourAddress = geb.addresses.GEB_COIN_CURVE_V1_MAX_SAVIOUR
         if (isMaxWithdraw) {
             txData = proxy.withdrawUncoverSAFE(
                 false,
-                geb.contracts.coinNativeUniswapSaviour.address,
-                geb.contracts.uniswapPairCoinEth.address,
+                saviourType === 'uniswap'
+                    ? geb.contracts.coinNativeUniswapSaviour.address
+                    : curveSaviourAddress,
+                saviourType === 'uniswap'
+                    ? geb.contracts.uniswapPairCoinEth.address
+                    : curvelpTokenAddress,
                 safeId,
                 tokenAmount,
                 signer._address
             )
-        } else if (isTargetedCRatioChanged) {
+        } else if (saviourType === 'uniswap' && isTargetedCRatioChanged) {
             txData = proxy.setDesiredCRatioWithdraw(
                 false,
                 geb.contracts.coinNativeUniswapSaviour.address,
@@ -764,7 +823,9 @@ export function useSaviourWithdraw() {
         } else {
             txData = proxy.withdraw(
                 false,
-                geb.contracts.coinNativeUniswapSaviour.address,
+                saviourType === 'uniswap'
+                    ? geb.contracts.coinNativeUniswapSaviour.address
+                    : curveSaviourAddress,
                 safeId,
                 tokenAmount,
                 signer._address

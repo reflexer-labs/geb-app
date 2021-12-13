@@ -73,7 +73,7 @@ const SaviourStats = () => {
                                               minSaviourBalance as string,
                                               saviourData?.uniPoolPrice as number
                                           )
-                                        : stats.data[0].value
+                                        : minSaviourBalance
                                 }
                                 `}
                             </MainChange>
@@ -104,7 +104,11 @@ const SaviourStats = () => {
                 </Left>
 
                 <Right>
-                    <Inner className="main">
+                    <Inner
+                        className={`main ${
+                            saviourType === 'uniswap' ? '' : 'isCurve'
+                        }`}
+                    >
                         <Main>
                             <MainLabel> {stats.info[0].label}</MainLabel>
                             <MainValue>{stats.info[0].value}</MainValue>
@@ -115,47 +119,56 @@ const SaviourStats = () => {
                                               mySaviourBalance as string,
                                               saviourData?.uniPoolPrice as number
                                           )
-                                        : (stats.info[0].value as string)
+                                        : Number(mySaviourBalance) > 0
+                                        ? mySaviourBalance
+                                        : '0'
                                 }`}
                             </MainChange>
                         </Main>
 
-                        <Main className="mids">
-                            <MainLabel>
-                                <InfoIcon data-tip={stats.info[1].tip}>
-                                    <Info size="16" />
-                                </InfoIcon>
-                                {stats.info[1].label}
-                            </MainLabel>
-                            <MainValue>
-                                <FlexValue>
-                                    {stats.info[1].value}
-                                    <span
-                                        onClick={() =>
-                                            setShowSlider(!showSlider)
-                                        }
-                                    >
-                                        {showSlider ? 'Confirm' : 'Edit'}
-                                    </span>
-                                </FlexValue>
-                                {showSlider ? (
-                                    <SliderContainer>
-                                        <Slider
-                                            value={sliderVal}
-                                            onChange={handleSliderChange}
-                                            min={
-                                                saviourData?.minCollateralRatio ||
-                                                MIN_SAVIOUR_CRATIO
+                        {saviourType === 'uniswap' ? (
+                            <Main className="mids">
+                                <MainLabel>
+                                    <InfoIcon data-tip={stats.info[1].tip}>
+                                        <Info size="16" />
+                                    </InfoIcon>
+                                    {stats.info[1].label}
+                                </MainLabel>
+                                <MainValue>
+                                    <FlexValue>
+                                        {stats.info[1].value}
+                                        <span
+                                            onClick={() =>
+                                                setShowSlider(!showSlider)
                                             }
-                                            max={300}
-                                            size={15}
-                                        />
-                                    </SliderContainer>
-                                ) : null}
-                            </MainValue>
-                        </Main>
+                                        >
+                                            {showSlider ? 'Confirm' : 'Edit'}
+                                        </span>
+                                    </FlexValue>
+                                    {showSlider ? (
+                                        <SliderContainer>
+                                            <Slider
+                                                value={sliderVal}
+                                                onChange={handleSliderChange}
+                                                min={
+                                                    saviourData?.minCollateralRatio ||
+                                                    MIN_SAVIOUR_CRATIO
+                                                }
+                                                max={300}
+                                                size={15}
+                                            />
+                                        </SliderContainer>
+                                    ) : null}
+                                </MainValue>
+                            </Main>
+                        ) : null}
 
-                        <Main>
+                        <Main
+                            style={{
+                                marginTop:
+                                    saviourType === 'curve' ? '30px' : '0',
+                            }}
+                        >
                             <MainLabel>{stats.info[2].label}</MainLabel>
                             <MainValue className="lower-size">
                                 {stats.info[2].value}
@@ -189,6 +202,9 @@ const Inner = styled.div`
     justify-content: space-between;
     &.main {
         padding: 30px;
+    }
+    &.isCurve {
+        justify-content: flex-start;
     }
 `
 

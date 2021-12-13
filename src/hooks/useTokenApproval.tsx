@@ -1,23 +1,16 @@
-import { BigNumber, ethers } from 'ethers'
-import { TransactionRequest } from 'geb.js'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useActiveWeb3React } from '.'
+import { ethers } from 'ethers'
+import { MaxUint256 } from '@ethersproject/constants'
+import { TransactionResponse } from '@ethersproject/providers'
+import { useCallback, useMemo } from 'react'
 import store from '../store'
-import { EMPTY_ADDRESS } from '../utils/constants'
+import { useSingleCallResult } from './Multicall'
 import {
-    handlePreTxGasEstimate,
+    calculateGasMargin,
     handleTransactionError,
     useHasPendingApproval,
-    useHasPendingTransactions,
 } from './TransactionHooks'
-import useGeb, { useBlockNumber } from './useGeb'
-
-type Token =
-    | 'coin'
-    | 'uniswapV3TwoTrancheLiquidityManager'
-    | 'protocolToken'
-    | 'stakingToken'
-    | 'uniswapPairCoinEth'
+import { useTokenContract } from './useContract'
+import { useActiveWeb3React } from '.'
 
 export enum ApprovalState {
     UNKNOWN,
@@ -27,49 +20,36 @@ export enum ApprovalState {
 }
 
 export function useTokenAllowance(
-    token: Token,
-    holder: string,
-    spender: string
+    tokenAddress: string,
+    owner?: string,
+    spender?: string
 ) {
-    const [state, setState] = useState<BigNumber>(BigNumber.from('0'))
-    const geb = useGeb()
-    const latestBlockNumber = useBlockNumber()
-    const hasPendingTx = useHasPendingTransactions()
-
-    useEffect(() => {
-        if (
-            !geb ||
-            !token ||
-            !holder ||
-            !spender ||
-            holder === EMPTY_ADDRESS ||
-            spender === EMPTY_ADDRESS
-        )
-            return
-
-        geb.contracts[token]
-            .allowance(spender, holder)
-            .then((allowance) => setState(allowance))
-    }, [geb, holder, spender, token, latestBlockNumber, hasPendingTx])
-
-    return state
+    const contract = useTokenContract(tokenAddress, false)
+    const inputs = useMemo(() => [owner, spender], [owner, spender])
+    const allowance = useSingleCallResult(contract, 'allowance', inputs).result
+    return useMemo(
+        () => (tokenAddress && allowance ? allowance[0] : undefined),
+        [tokenAddress, allowance]
+    )
 }
 
 export function useTokenApproval(
     amount: string,
-    token: Token,
-    holder: string,
+    tokenAddress: string,
     spender: string
 ): [ApprovalState, () => Promise<void>] {
-    const { library, account } = useActiveWeb3React()
-    const geb = useGeb()
+    const { account } = useActiveWeb3React()
 
-    const currentAllowance = useTokenAllowance(token, holder, spender)
-    const pendingApproval = useHasPendingApproval(holder, spender)
+    const currentAllowance = useTokenAllowance(
+        tokenAddress,
+        account ?? undefined,
+        spender
+    )
+    const pendingApproval = useHasPendingApproval(tokenAddress, spender)
 
     // check the current approval status
     const approvalState: ApprovalState = useMemo(() => {
-        if (!geb || !amount || !token || !spender || !holder) {
+        if (!amount || !tokenAddress || !spender) {
             return ApprovalState.UNKNOWN
         }
 
@@ -83,20 +63,22 @@ export function useTokenApproval(
                 ? ApprovalState.PENDING
                 : ApprovalState.NOT_APPROVED
             : ApprovalState.APPROVED
-    }, [amount, currentAllowance, geb, holder, pendingApproval, spender, token])
+    }, [amount, currentAllowance, pendingApproval, spender, tokenAddress])
+
+    const tokenContract = useTokenContract(tokenAddress)
 
     const approve = useCallback(async (): Promise<void> => {
         if (approvalState !== ApprovalState.NOT_APPROVED) {
-            console.error('approve was called multiple times')
+            console.error('approve was called unnecessarily')
             return
         }
-        if (!token) {
+        if (!tokenAddress) {
             console.error('no token')
             return
         }
 
-        if (!holder) {
-            console.error('holder is null')
+        if (!tokenContract) {
+            console.error('tokenContract is null')
             return
         }
 
@@ -105,38 +87,33 @@ export function useTokenApproval(
             return
         }
 
-        try {
-            if (!library || !account) {
-                console.error('no acocunt or library')
-                return
-            }
-            store.dispatch.popupsModel.setIsWaitingModalOpen(true)
-            store.dispatch.popupsModel.setBlockBackdrop(true)
-            store.dispatch.popupsModel.setWaitingPayload({
-                title: 'Waiting for confirmation',
-                text: 'Confirm this transaction in your wallet',
-                status: 'loading',
+        if (!spender) {
+            console.error('no spender')
+            return
+        }
+
+        store.dispatch.popupsModel.setIsWaitingModalOpen(true)
+        store.dispatch.popupsModel.setBlockBackdrop(true)
+        store.dispatch.popupsModel.setWaitingPayload({
+            title: 'Waiting for confirmation',
+            text: 'Confirm this transaction in your wallet',
+            status: 'loading',
+        })
+
+        let useExact = false
+        const estimatedGas = await tokenContract.estimateGas
+            .approve(spender, MaxUint256)
+            .catch(() => {
+                // general fallback for tokens who restrict approval amounts
+                useExact = true
+                return tokenContract.estimateGas.approve(spender, amount)
             })
-            const signer = library.getSigner(account)
 
-            let txData: TransactionRequest
-
-            if (token === 'protocolToken') {
-                txData = geb.contracts.protocolToken.approve__AddressUint256(
-                    holder,
-                    ethers.constants.MaxUint256
-                )
-            } else {
-                txData = geb.contracts[token].approve(
-                    holder,
-                    ethers.constants.MaxUint256
-                )
-            }
-
-            if (!txData) throw new Error('No transaction request!')
-            const tx = await handlePreTxGasEstimate(signer, txData)
-            const txResponse = await signer.sendTransaction(tx)
-            if (txResponse) {
+        return tokenContract
+            .approve(spender, useExact ? amount : MaxUint256, {
+                gasLimit: calculateGasMargin(estimatedGas),
+            })
+            .then((txResponse: TransactionResponse) => {
                 const { hash, chainId } = txResponse
                 store.dispatch.transactionsModel.addTransaction({
                     chainId,
@@ -146,7 +123,7 @@ export function useTokenApproval(
                     addedTime: new Date().getTime(),
                     originalTx: txResponse,
                     approval: {
-                        tokenAddress: holder,
+                        tokenAddress,
                         spender,
                     },
                 })
@@ -155,12 +132,13 @@ export function useTokenApproval(
                     hash: txResponse.hash,
                     status: 'success',
                 })
-                await txResponse.wait()
-            }
-        } catch (error) {
-            handleTransactionError(error)
-        }
-    }, [approvalState, token, holder, amount, library, account, geb, spender])
+            })
+            .catch((error: Error) => {
+                console.debug('Failed to approve token', error)
+                handleTransactionError(error)
+                throw error
+            })
+    }, [approvalState, tokenAddress, tokenContract, amount, spender])
 
     return [approvalState, approve]
 }

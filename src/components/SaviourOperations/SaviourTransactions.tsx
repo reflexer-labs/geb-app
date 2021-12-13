@@ -16,22 +16,17 @@ import TransactionOverview from '../TransactionOverview'
 import Results from './Results'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
 import { useSafeHandler } from '../../hooks/useGeb'
+import { SaviourType } from '../../model/safeModel'
 
 const SaviourTransactions = () => {
     const { connector, account, library } = useActiveWeb3React()
     const { t } = useTranslation()
-    const {
-        safeModel: safeActions,
-        popupsModel: popupsActions,
-    } = useStoreActions((state) => state)
+    const { safeModel: safeActions, popupsModel: popupsActions } =
+        useStoreActions((state) => state)
 
     const { safeModel: safeState } = useStoreState((state) => state)
-    const {
-        amount,
-        targetedCRatio,
-        isSaviourDeposit,
-        isMaxWithdraw,
-    } = safeState
+    const { amount, targetedCRatio, isSaviourDeposit, isMaxWithdraw } =
+        safeState
 
     const saviourData = useSaviourData()
 
@@ -77,6 +72,8 @@ const SaviourTransactions = () => {
                 targetedCRatio,
                 isTargetedCRatioChanged:
                     targetedCRatio !== saviourData.saviourRescueRatio,
+                saviourType: 'uniswap' as SaviourType,
+                curvelpTokenAddress: '',
             }
             if (
                 saviourData.hasSaviour &&

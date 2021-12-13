@@ -77,6 +77,7 @@ const SafeSaviour = ({ ...props }) => {
             //     return
             // }
             const found = SAVIOUR_TYPES.find((item) => item.item === selected)
+
             if (found) {
                 safeActions.setSaviourType(found.shortName as SaviourType)
             }
@@ -137,6 +138,8 @@ const SafeSaviour = ({ ...props }) => {
                     isMaxWithdraw: true,
                     targetedCRatio: saviourData.saviourRescueRatio,
                     isTargetedCRatioChanged: false,
+                    saviourType,
+                    curvelpTokenAddress: saviourData.curvelpTokenAddress,
                 })
             }
         } catch (e) {

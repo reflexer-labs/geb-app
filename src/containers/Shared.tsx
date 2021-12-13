@@ -38,6 +38,7 @@ import DistributionsModal from '../components/Modals/DistributionsModal'
 import SaviourModal from '../components/Modals/SaviourModal'
 import { ChainId } from '../utils/interfaces'
 import { ethers } from 'ethers'
+import MulticallUpdater from '../services/MulticallUpdater'
 
 interface Props {
     children: ReactNode
@@ -214,6 +215,7 @@ const Shared = ({ children, ...rest }: Props) => {
             {settingsState.blockBody ? <BlockBodyContainer /> : null}
             <SideMenu />
             <WalletModal />
+            <MulticallUpdater />
             <ApplicationUpdater />
             <BalanceUpdater />
             <TransactionUpdater />
