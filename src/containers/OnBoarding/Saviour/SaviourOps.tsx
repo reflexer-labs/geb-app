@@ -43,6 +43,7 @@ const SaviourOps = () => {
         error,
         minSaviourBalance,
         isCurveSaviour,
+        tokenBalances,
     } = useSaviourInfo()
 
     const safeHandler = useSafeHandler(safeId)
@@ -68,8 +69,7 @@ const SaviourOps = () => {
 
     const [curveUnlockState, approveCurveUnlockState] = useTokenApproval(
         amount,
-        // @ts-ignore
-        geb?.addresses.GEB_COIN_CURVE_V1_MAX_SAVIOUR,
+        tokenBalances.curve.address ?? undefined,
         proxyAddress
     )
 
