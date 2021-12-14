@@ -59,7 +59,7 @@
         "build": "react-scripts build",
         "prettier": "prettier --write \"{,**/*.{ts,tsx,json,js,md}}\"",
         "test": "react-scripts test",
-        "test:e2e": "start-server-and-test 'serve build -l 3000' http://localhost:3000 'cypress run'",
+        "test:e2e": "start-server-and-test start http://localhost:3000 'cypress run'",
         "eject": "react-scripts eject"
     },
     "eslintConfig": {

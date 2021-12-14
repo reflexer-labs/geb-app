@@ -29,8 +29,9 @@ export function useIsOwner(safeId: string): boolean {
 
     const getIsOwnerCallback = useCallback((res) => {
         if (res) {
-            if (res.proxyAddress && res.safeOwner) {
-                setState(res.proxyAddress === res.safeOwner)
+            const [proxyAddress, safeOwner] = res
+            if (proxyAddress && safeOwner) {
+                setState(proxyAddress === safeOwner)
             }
         }
     }, [])

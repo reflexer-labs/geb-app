@@ -130,7 +130,7 @@ describe('App Page - Safe Details', () => {
                 cy.waitUntil(
                     () => Cypress.$(e).text() === 'Transaction Submitted',
                     {
-                        timeout: 1000000,
+                        timeout: 100000,
                         interval: 2000,
                     }
                 )
@@ -153,7 +153,7 @@ describe('App Page - Safe Details', () => {
                 cy.waitUntil(
                     () => Cypress.$(e).text() === 'Transaction Submitted',
                     {
-                        timeout: 1000000,
+                        timeout: 100000,
                         interval: 2000,
                     }
                 )
