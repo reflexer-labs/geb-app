@@ -1,4 +1,3 @@
-import { ethers } from 'ethers'
 import { Geb } from 'geb.js'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useActiveWeb3React } from '.'
@@ -27,18 +26,27 @@ export function useIsOwner(safeId: string): boolean {
     const [state, setState] = useState(true)
     const geb = useGeb()
     const { account } = useActiveWeb3React()
-    useEffect(() => {
-        if (!geb || !account || !safeId) return
-        async function getSafeData() {
-            const [proxyAddress, safeOwner] = await geb.multiCall([
-                geb.contracts.proxyRegistry.proxies(account as string, true),
-                geb.contracts.safeManager.ownsSAFE(safeId, true),
-            ])
 
-            setState(proxyAddress === safeOwner)
+    const getIsOwnerCallback = useCallback((res) => {
+        if (res) {
+            if (res.proxyAddress && res.safeOwner) {
+                setState(res.proxyAddress === res.safeOwner)
+            }
         }
-        getSafeData()
-    }, [account, geb, safeId])
+    }, [])
+
+    useEffect(() => {
+        if (!geb || !account || !safeId) return undefined
+        setState(true)
+        geb.multiCall([
+            geb.contracts.proxyRegistry.proxies(account as string, true),
+            geb.contracts.safeManager.ownsSAFE(safeId, true),
+        ])
+            .then(getIsOwnerCallback)
+            .catch((error) =>
+                console.error(`Failed to get proxyAddress and SafeOwner`, error)
+            )
+    }, [account, geb, getIsOwnerCallback, safeId])
 
     return state
 }
@@ -92,46 +100,6 @@ export function useSafeHandler(safeId: string): string {
         }
         getSafeData()
     }, [geb, safeId])
-
-    return state
-}
-
-export function useTokenBalance(token: TokenType) {
-    const [state, setState] = useState('0')
-    const { account, library } = useActiveWeb3React()
-    const geb = useGeb()
-    const ethBalance = store
-        .getState()
-        .connectWalletModel.ethBalance[NETWORK_ID].toString()
-
-    const fetchBalanceCallback = useCallback(
-        (result: any) => {
-            setState(ethers.utils.formatEther(result))
-        },
-        [setState]
-    )
-
-    useEffect(() => {
-        if (!account || !library || !geb) return undefined
-        if (token === 'ETH') {
-            setState(ethBalance)
-        } else {
-            geb.contracts.coin
-                .balanceOf(account)
-                .then(fetchBalanceCallback)
-                .catch((error) =>
-                    console.error(`Failed to fetch balance for ${token}`, error)
-                )
-        }
-    }, [
-        account,
-        ethBalance,
-        fetchBalanceCallback,
-        geb,
-        library,
-        setState,
-        token,
-    ])
 
     return state
 }

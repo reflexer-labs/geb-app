@@ -19,7 +19,7 @@ const SafeSaviour = ({
     const { t } = useTranslation()
     const [loaded, setLoaded] = useState(false)
     const history = useHistory()
-    const { minSaviourBalance } = useSaviourInfo()
+    const { minSaviourBalance, isCurveSaviour } = useSaviourInfo()
 
     useEffect(() => {
         if (saviourData) {
@@ -88,7 +88,11 @@ const SafeSaviour = ({
                         __html:
                             isModifying ||
                             (saviourData && saviourData.hasSaviour)
-                                ? t('current_saviour_desc')
+                                ? t(
+                                      isCurveSaviour
+                                          ? 'curve_saviour_desc'
+                                          : 'current_saviour_desc'
+                                  )
                                 : t('saviour_desc'),
                     }}
                 />

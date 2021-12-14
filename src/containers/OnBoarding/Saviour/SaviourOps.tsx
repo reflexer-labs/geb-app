@@ -42,7 +42,6 @@ const SaviourOps = () => {
         safeId,
         error,
         minSaviourBalance,
-        tokenBalances,
         isCurveSaviour,
     } = useSaviourInfo()
 
@@ -69,7 +68,8 @@ const SaviourOps = () => {
 
     const [curveUnlockState, approveCurveUnlockState] = useTokenApproval(
         amount,
-        tokenBalances.curve.address,
+        // @ts-ignore
+        geb?.addresses.GEB_COIN_CURVE_V1_MAX_SAVIOUR,
         proxyAddress
     )
 
@@ -288,12 +288,14 @@ const SaviourOps = () => {
 export default SaviourOps
 
 const SaviourPayment = styled.div`
+    position: relative;
     background: ${(props) => props.theme.colors.colorSecondary};
     border-radius: 15px;
     padding: 30px;
     margin-top: 20px;
     ${({ theme }) => theme.mediaWidth.upToSmall`
-   margin-right:0
+   margin-right:0;
+   padding:20px;
  `}
 `
 
@@ -359,5 +361,9 @@ const TextRight = styled.div`
     span {
         cursor: pointer;
         color: ${(props) => props.theme.colors.blueish};
+    }
+    @media (max-width: 767px) {
+        position: absolute;
+        top: 20px;
     }
 `

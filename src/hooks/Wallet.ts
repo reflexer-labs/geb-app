@@ -5,9 +5,15 @@ import ERC20ABI from '../abis/erc20.json'
 import { Erc20Interface } from '../abis/Erc20'
 import { useMultipleContractSingleData } from './Multicall'
 import { TokenName, TOKENS, Tokens } from '../utils/constants'
-import useGeb, { useTokenBalance } from './useGeb'
+import useGeb from './useGeb'
 import { ethers } from 'ethers'
 import { isAddress } from '../utils/helper'
+import store from '../store'
+import { NETWORK_ID } from '../connectors'
+
+export function useEthBalance() {
+    return store.getState().connectWalletModel.ethBalance[NETWORK_ID].toString()
+}
 
 /**
  * Returns a map of token addresses to their eventually consistent token balances for a single account.
@@ -17,7 +23,7 @@ export function useTokenBalancesWithLoadingIndicator(
     tokens: Tokens | undefined = TOKENS
 ): [Tokens, boolean] {
     const geb = useGeb()
-    const ethBalance = useTokenBalance('ETH')
+    const ethBalance = useEthBalance()
     const validatedTokens: { name: string; address: string }[] | [] = useMemo(
         () =>
             geb

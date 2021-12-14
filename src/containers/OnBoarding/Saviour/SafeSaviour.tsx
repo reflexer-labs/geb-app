@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
@@ -72,17 +71,19 @@ const SafeSaviour = ({ ...props }) => {
 
     const handleSelectedType = useCallback(
         (selected: string) => {
-            // if (hasSaviour) {
-            //     setShowAlert(true)
-            //     return
-            // }
+            if (hasSaviour) {
+                setShowAlert(true)
+                safeActions.setSaviourType(saviourType)
+                setTimeout(() => setShowAlert(false), 3000)
+                return
+            }
             const found = SAVIOUR_TYPES.find((item) => item.item === selected)
 
             if (found) {
                 safeActions.setSaviourType(found.shortName as SaviourType)
             }
         },
-        [SAVIOUR_TYPES, hasSaviour, safeActions]
+        [SAVIOUR_TYPES, hasSaviour, safeActions, saviourType]
     )
 
     useEffect(() => {
@@ -152,6 +153,18 @@ const SafeSaviour = ({ ...props }) => {
     return (
         <ContentContainer>
             <Container>
+                <div className="mobile_disconnect">
+                    {hasSaviour ? (
+                        <Button
+                            className="desktop_saviour_btn"
+                            primary
+                            text={'disconnect_saviour'}
+                            isLoading={isLoading}
+                            disabled={isLoading}
+                            onClick={handleDisconnectSaviour}
+                        />
+                    ) : null}
+                </div>
                 <SaviourHeader
                     isModifying={isModifying}
                     safeId={safeId}
@@ -187,10 +200,12 @@ const SafeSaviour = ({ ...props }) => {
                                             label={''}
                                             padding={'22px 20px'}
                                             imgSize={'28px'}
+                                            dropSelection={showAlert}
                                         />
                                     </DropDownContainer>
                                     {hasSaviour ? (
                                         <Button
+                                            id="desktop_saviour_btn"
                                             primary
                                             text={'disconnect_saviour'}
                                             isLoading={isLoading}
@@ -224,6 +239,9 @@ export default SafeSaviour
 
 const DropDownContainer = styled.div`
     min-width: 412px;
+    @media (max-width: 767px) {
+        min-width: 100%;
+    }
 `
 
 const ContentContainer = styled.div`
@@ -235,7 +253,22 @@ const ContentContainer = styled.div`
     }
 `
 
-const Container = styled.div``
+const Container = styled.div`
+    .mobile_disconnect {
+        display: none;
+        @media (max-width: 767px) {
+            display: inline;
+            position: absolute;
+            margin-top: -10px;
+            right: 15px;
+            button {
+                padding: 4px 12px;
+                font-size: 13px;
+                font-weight: normal;
+            }
+        }
+    }
+`
 
 const Content = styled.div`
     margin-top: 20px;
@@ -250,6 +283,12 @@ const Flex = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+    @media (max-width: 767px) {
+        flex-direction: column;
+        #desktop_saviour_btn {
+            display: none;
+        }
+    }
 `
 
 const LabelContainer = styled.div`

@@ -18,6 +18,7 @@ interface Props {
     label?: string
     itemPadding?: string
     imgSize?: string
+    dropSelection?: boolean
 }
 const Dropdown = (props: Props) => {
     const wrapperRef = useRef(null)
@@ -33,11 +34,16 @@ const Dropdown = (props: Props) => {
         label,
         itemPadding,
         imgSize,
+        dropSelection,
     } = props
     const [isOpen, setIsOpen] = useState(false)
     const [selectedItem, setSelectedItem] = useState<Item>(itemSelected)
+
     const handleItemClick = (selected: Item) => {
         setIsOpen(!isOpen)
+        if (dropSelection) {
+            return
+        }
         setSelectedItem(selected)
         if (typeof selected === 'string') {
             getSelectedItem && getSelectedItem(selected)

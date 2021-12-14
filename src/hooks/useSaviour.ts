@@ -1,6 +1,6 @@
 import { Geb, utils as gebUtils } from 'geb.js'
 import { ethers, utils as ethersUtils } from 'ethers'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, useEffect } from 'react'
 import numeral from 'numeral'
 import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { useStoreActions, useStoreState } from '../store'
@@ -331,19 +331,30 @@ export function useSaviourAddress(safeHandler: string) {
     const [state, setState] = useState(EMPTY_ADDRESS)
     const geb = useGeb()
 
-    if (!geb || !safeHandler) return EMPTY_ADDRESS
+    const getSaviourAddressCallback = useCallback((saviourAddress) => {
+        if (saviourAddress) {
+            setState(saviourAddress)
+        }
+    }, [])
 
-    geb.contracts.liquidationEngine
-        .chosenSAFESaviour(gebUtils.ETH_A, safeHandler.toLowerCase())
-        .then((saviourAddress) => setState(saviourAddress))
+    useEffect(() => {
+        if (!geb || !safeHandler) return
+        setState(EMPTY_ADDRESS)
+        geb.contracts.liquidationEngine
+            .chosenSAFESaviour(gebUtils.ETH_A, safeHandler.toLowerCase())
+            .then(getSaviourAddressCallback)
+            .catch((error) =>
+                console.error(`Failed to get saviour address from gebjs`, error)
+            )
+    }, [geb, getSaviourAddressCallback, safeHandler])
 
-    return state
+    return useMemo(() => state, [state])
 }
 
 export function useHasSaviour(safeHandler: string) {
     const saviourAddress = useSaviourAddress(safeHandler)
     return useMemo(() => {
-        return safeHandler ? saviourAddress !== EMPTY_ADDRESS : false
+        return safeHandler && saviourAddress !== EMPTY_ADDRESS ? true : false
     }, [safeHandler, saviourAddress])
 }
 
@@ -351,16 +362,39 @@ export function useHasLeftOver(safeHandler: string) {
     const [state, setState] = useState(false)
     const geb = useGeb()
     const saviourAddress = useSaviourAddress(safeHandler)
-    if (!geb || !safeHandler || saviourAddress === EMPTY_ADDRESS)
-        return { status: state, saviourAddress }
-    geb.contracts.coinNativeUniswapSaviour
-        .underlyingReserves(safeHandler.toLowerCase())
-        .then(({ systemCoins, collateralCoins }) => {
-            const hasLeftOver = systemCoins.gt(0) || collateralCoins.gt(0)
-            setState(hasLeftOver)
-        })
 
-    return { status: state, saviourAddress }
+    // TODO: GET LEFT OVER FOR CURVE SAVIOUR
+    // //@ts-ignore
+    // const curveSaviourAddress = geb.addresses.GEB_COIN_CURVE_V1_MAX_SAVIOUR
+    // const isCurveSaviour =
+    //     saviourAddress.toLowerCase() === curveSaviourAddress.toLowerCase()
+    // const contract = isCurveSaviour ? '' : 'coinNativeUniswapSaviour'
+
+    const getLeftOverCallback = useCallback(
+        ({ systemCoins, collateralCoins }) => {
+            const hasLeftOver = systemCoins.gt(0) || collateralCoins.gt(0)
+            if (hasLeftOver) {
+                setState(hasLeftOver)
+            }
+        },
+        []
+    )
+
+    useEffect(() => {
+        if (!geb || !safeHandler || saviourAddress === EMPTY_ADDRESS) return
+        setState(false)
+        geb.contracts.coinNativeUniswapSaviour
+            .underlyingReserves(safeHandler.toLowerCase())
+            .then(getLeftOverCallback)
+            .catch((error) =>
+                console.error(`Failed to get left over from gebjs`, error)
+            )
+    }, [geb, getLeftOverCallback, safeHandler, saviourAddress])
+
+    return useMemo(
+        () => ({ status: state, saviourAddress }),
+        [saviourAddress, state]
+    )
 }
 
 export async function fetchSaviourData({
@@ -795,23 +829,23 @@ export function useSaviourWithdraw() {
         const tokenAmount = ethersUtils.parseEther(amount)
 
         let txData
-
+        const isCurveSaviour = saviourType === 'curve'
         // @ts-ignore
         const curveSaviourAddress = geb.addresses.GEB_COIN_CURVE_V1_MAX_SAVIOUR
         if (isMaxWithdraw) {
             txData = proxy.withdrawUncoverSAFE(
-                false,
-                saviourType === 'uniswap'
+                !isCurveSaviour ? false : true,
+                !isCurveSaviour
                     ? geb.contracts.coinNativeUniswapSaviour.address
                     : curveSaviourAddress,
-                saviourType === 'uniswap'
+                !isCurveSaviour
                     ? geb.contracts.uniswapPairCoinEth.address
                     : curvelpTokenAddress,
                 safeId,
                 tokenAmount,
                 signer._address
             )
-        } else if (saviourType === 'uniswap' && isTargetedCRatioChanged) {
+        } else if (!isCurveSaviour && isTargetedCRatioChanged) {
             txData = proxy.setDesiredCRatioWithdraw(
                 false,
                 geb.contracts.coinNativeUniswapSaviour.address,
@@ -821,9 +855,20 @@ export function useSaviourWithdraw() {
                 signer._address
             )
         } else {
-            txData = proxy.withdraw(
+            console.log('here')
+            console.log(
                 false,
-                saviourType === 'uniswap'
+                !isCurveSaviour
+                    ? geb.contracts.coinNativeUniswapSaviour.address
+                    : curveSaviourAddress,
+                safeId,
+                tokenAmount,
+                signer._address
+            )
+
+            txData = proxy.withdraw(
+                !isCurveSaviour ? false : true,
+                !isCurveSaviour
                     ? geb.contracts.coinNativeUniswapSaviour.address
                     : curveSaviourAddress,
                 safeId,
@@ -835,6 +880,8 @@ export function useSaviourWithdraw() {
         const tx = await handlePreTxGasEstimate(signer, txData)
         const txResponse = await signer.sendTransaction(tx)
         if (txResponse) {
+            console.log(txResponse)
+
             const { hash, chainId } = txResponse
             transactionsActions.addTransaction({
                 chainId,

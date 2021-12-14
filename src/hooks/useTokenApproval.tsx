@@ -11,6 +11,7 @@ import {
 } from './TransactionHooks'
 import { useTokenContract } from './useContract'
 import { useActiveWeb3React } from '.'
+import useGeb from './useGeb'
 
 export enum ApprovalState {
     UNKNOWN,
@@ -20,12 +21,15 @@ export enum ApprovalState {
 }
 
 export function useTokenAllowance(
-    tokenAddress: string,
+    tokenAddress?: string,
     owner?: string,
     spender?: string
 ) {
     const contract = useTokenContract(tokenAddress, false)
-    const inputs = useMemo(() => [owner, spender], [owner, spender])
+    const inputs = useMemo(
+        () => (owner && spender ? [owner, spender] : [undefined, undefined]),
+        [owner, spender]
+    )
     const allowance = useSingleCallResult(contract, 'allowance', inputs).result
     return useMemo(
         () => (tokenAddress && allowance ? allowance[0] : undefined),
@@ -35,11 +39,11 @@ export function useTokenAllowance(
 
 export function useTokenApproval(
     amount: string,
-    tokenAddress: string,
-    spender: string
+    tokenAddress?: string,
+    spender?: string
 ): [ApprovalState, () => Promise<void>] {
     const { account } = useActiveWeb3React()
-
+    const geb = useGeb()
     const currentAllowance = useTokenAllowance(
         tokenAddress,
         account ?? undefined,
@@ -49,7 +53,7 @@ export function useTokenApproval(
 
     // check the current approval status
     const approvalState: ApprovalState = useMemo(() => {
-        if (!amount || !tokenAddress || !spender) {
+        if (!amount || !tokenAddress || !spender || !geb) {
             return ApprovalState.UNKNOWN
         }
 
@@ -63,7 +67,7 @@ export function useTokenApproval(
                 ? ApprovalState.PENDING
                 : ApprovalState.NOT_APPROVED
             : ApprovalState.APPROVED
-    }, [amount, currentAllowance, pendingApproval, spender, tokenAddress])
+    }, [amount, currentAllowance, geb, pendingApproval, spender, tokenAddress])
 
     const tokenContract = useTokenContract(tokenAddress)
 
