@@ -2,6 +2,7 @@ import React, { ReactNode, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import ConnectedWalletModal from '../components/Modals/ConnectedWalletModal'
 import ScreenLoader from '../components/Modals/ScreenLoader'
+import TopUpModal from '../components/Modals/SafeManagerModal'
 import Navbar from '../components/Navbar'
 import SideMenu from '../components/SideMenu'
 import { useStoreState, useStoreActions } from '../store'
@@ -218,6 +219,7 @@ const Shared = ({ children, ...rest }: Props) => {
             <ConnectedWalletModal />
             <ScreenLoader />
             <WaitingModal />
+            <TopUpModal />
             <EmptyDiv>
                 <Navbar />
             </EmptyDiv>
