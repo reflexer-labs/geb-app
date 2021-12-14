@@ -32,6 +32,7 @@ export type SaviourData = {
     saviourAddress: string
     saviourBalance: string
     curvelpTokenAddress: string
+    curvePoolTokenAddress: string
     saviourType: string
     coinAddress: string
     wethAddress: string
@@ -361,35 +362,69 @@ export function useHasSaviour(safeHandler: string) {
 export function useHasLeftOver(safeHandler: string) {
     const [state, setState] = useState(false)
     const geb = useGeb()
+    const { saviourData } = useSaviourInfo()
     const saviourAddress = useSaviourAddress(safeHandler)
 
-    // TODO: GET LEFT OVER FOR CURVE SAVIOUR
-    // //@ts-ignore
-    // const curveSaviourAddress = geb.addresses.GEB_COIN_CURVE_V1_MAX_SAVIOUR
-    // const isCurveSaviour =
-    //     saviourAddress.toLowerCase() === curveSaviourAddress.toLowerCase()
-    // const contract = isCurveSaviour ? '' : 'coinNativeUniswapSaviour'
-
-    const getLeftOverCallback = useCallback(
-        ({ systemCoins, collateralCoins }) => {
-            const hasLeftOver = systemCoins.gt(0) || collateralCoins.gt(0)
+    const getLeftOverCallback = useCallback((res) => {
+        if (res) {
+            let hasLeftOver
+            if (res.systemCoins && res.collateralCoins) {
+                hasLeftOver = res.systemCoins.gt(0) || res.collateralCoins.gt(0)
+            } else {
+                const [systemCoins, curvePoolCoins] = res
+                hasLeftOver = systemCoins.gt(0) || curvePoolCoins.gt(0)
+            }
             if (hasLeftOver) {
                 setState(hasLeftOver)
             }
-        },
-        []
-    )
+        }
+    }, [])
 
     useEffect(() => {
-        if (!geb || !safeHandler || saviourAddress === EMPTY_ADDRESS) return
+        if (
+            !geb ||
+            !safeHandler ||
+            !saviourData ||
+            saviourData.saviourAddress === EMPTY_ADDRESS
+        )
+            return
         setState(false)
-        geb.contracts.coinNativeUniswapSaviour
-            .underlyingReserves(safeHandler.toLowerCase())
-            .then(getLeftOverCallback)
-            .catch((error) =>
-                console.error(`Failed to get left over from gebjs`, error)
-            )
-    }, [geb, getLeftOverCallback, safeHandler, saviourAddress])
+        const { saviourType, curvePoolTokenAddress } = saviourData
+
+        const isCurveSaviour = saviourType === 'curve'
+
+        if (isCurveSaviour) {
+            geb.multiCall([
+                geb.contracts.curveV1MaxSafeSaviour.underlyingReserves(
+                    safeHandler.toLowerCase(),
+                    curvePoolTokenAddress,
+                    true
+                ),
+                geb.contracts.curveV1MaxSafeSaviour.underlyingReserves(
+                    safeHandler.toLowerCase(),
+                    geb.contracts.coin.address,
+                    true
+                ),
+            ])
+                .then(getLeftOverCallback)
+                .catch((error) =>
+                    console.error(
+                        `Failed to get left over for curve saviour from gebjs`,
+                        error
+                    )
+                )
+        } else {
+            geb.contracts.coinNativeUniswapSaviour
+                .underlyingReserves(safeHandler.toLowerCase())
+                .then(getLeftOverCallback)
+                .catch((error) =>
+                    console.error(
+                        `Failed to get left over for uniswapv2 from gebjs`,
+                        error
+                    )
+                )
+        }
+    }, [geb, getLeftOverCallback, safeHandler, saviourData])
 
     return useMemo(
         () => ({ status: state, saviourAddress }),
@@ -456,6 +491,7 @@ export async function fetchSaviourData({
             true
         ),
         geb.contracts.curveV1MaxSafeSaviour.lpToken(true),
+        geb.contracts.curveV1MaxSafeSaviour.poolTokens(1, true),
     ])
 
     const [muliCallResponse1, multiCallResponse2, multiCallResponse3] =
@@ -484,7 +520,8 @@ export async function fetchSaviourData({
         keeperPayOut,
     ] = multiCallResponse2
 
-    const [curveSaviourBalance, curvelpTokenAddress] = multiCallResponse3
+    const [curveSaviourBalance, curvelpTokenAddress, curvePoolTokenAddress] =
+        multiCallResponse3
 
     const wethAddress = geb.contracts.weth.address
     const coinAddress = geb.contracts.coin.address
@@ -542,6 +579,7 @@ export async function fetchSaviourData({
         safeId,
         hasSaviour: saviourAddress !== EMPTY_ADDRESS,
         curvelpTokenAddress,
+        curvePoolTokenAddress,
         saviourType: isCurveSaviour ? 'curve' : 'uniswap',
         coinAddress,
         wethAddress,
@@ -855,17 +893,6 @@ export function useSaviourWithdraw() {
                 signer._address
             )
         } else {
-            console.log('here')
-            console.log(
-                false,
-                !isCurveSaviour
-                    ? geb.contracts.coinNativeUniswapSaviour.address
-                    : curveSaviourAddress,
-                safeId,
-                tokenAmount,
-                signer._address
-            )
-
             txData = proxy.withdraw(
                 !isCurveSaviour ? false : true,
                 !isCurveSaviour
@@ -880,8 +907,6 @@ export function useSaviourWithdraw() {
         const tx = await handlePreTxGasEstimate(signer, txData)
         const txResponse = await signer.sendTransaction(tx)
         if (txResponse) {
-            console.log(txResponse)
-
             const { hash, chainId } = txResponse
             transactionsActions.addTransaction({
                 chainId,
