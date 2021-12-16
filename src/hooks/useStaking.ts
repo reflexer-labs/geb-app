@@ -43,6 +43,8 @@ export function useStakingInfo(isDeposit = true) {
         )
     }, [exitRequests])
 
+    const exitDelay = useGetExitDelay()
+
     const allowExit = useMemo(() => {
         return (
             Number(exitRequests.lockedAmount) > 0 &&
@@ -117,6 +119,7 @@ export function useStakingInfo(isDeposit = true) {
         hasPendingExitRequests,
         allowExit,
         escrowData,
+        exitDelay,
     }
 }
 
@@ -317,6 +320,29 @@ export function usePoolData() {
     }, [state])
 }
 
+export function useGetExitDelay() {
+    const geb = useGeb()
+    const [state, setState] = useState(0)
+
+    const getExitDelayCallback = useCallback((exitDelay) => {
+        if (exitDelay) {
+            setState(exitDelay.toNumber())
+        }
+    }, [])
+
+    useEffect(() => {
+        if (!geb) return
+        geb.contracts.stakingFirstResort
+            .exitDelay()
+            .then(getExitDelayCallback)
+            .catch((error) => {
+                console.log('error fetching exit delay', error)
+            })
+    }, [geb, getExitDelayCallback])
+
+    return useMemo(() => state, [state])
+}
+
 export function useGetExitRequests() {
     const geb = useGeb()
     const { account } = useActiveWeb3React()
@@ -325,27 +351,22 @@ export function useGetExitRequests() {
     const [state, setState] = useState<{
         deadline: number
         lockedAmount: string
-        exitDelay: number
-    }>({ deadline: 0, lockedAmount: '', exitDelay: 0 })
+    }>({ deadline: 0, lockedAmount: '' })
 
     useEffect(() => {
         let isCanceled = false
         if (!geb || !account) return
         async function getExitRequest() {
-            const [requests, exitDelayVal] = await geb.multiCall([
-                geb.contracts.stakingFirstResort.exitRequests(
-                    account as string,
-                    true
-                ),
-                geb.contracts.stakingFirstResort.exitDelay(true),
-            ])
+            const requests =
+                await geb.contracts.stakingFirstResort.exitRequests(
+                    account as string
+                )
             if (!isCanceled) {
                 setState({
                     deadline: requests.deadline.toNumber(),
                     lockedAmount: ethers.utils.formatEther(
                         requests.lockedAmount
                     ),
-                    exitDelay: exitDelayVal.toNumber(),
                 })
             }
         }

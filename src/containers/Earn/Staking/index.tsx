@@ -15,7 +15,7 @@ dayjs.extend(relativeTime)
 
 const Staking = () => {
     const { t } = useTranslation()
-    const { exitRequests } = useStakingInfo()
+    const { exitDelay } = useStakingInfo()
     return (
         <Container>
             <Header>
@@ -50,9 +50,13 @@ const Staking = () => {
                         <AlertCircle size="16" /> Important Note
                     </InfoTitle>
                     <InfoText className="bigFont">
-                        {`Unstaking is subject to a thawing period of ${dayjs
-                            .duration(exitRequests.exitDelay, 'seconds')
-                            .humanize()}`}
+                        {`Unstaking is subject to a thawing period of ${
+                            exitDelay
+                                ? dayjs
+                                      .duration(exitDelay, 'seconds')
+                                      .humanize()
+                                : '-'
+                        }`}
                     </InfoText>
                 </RightSide>
             </InfoBox>
