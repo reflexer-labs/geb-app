@@ -165,9 +165,13 @@ export function useSaviourInfo() {
                 },
                 {
                     label: 'Protected Liquidation Point',
-                    value: LIQUIDATION_POINT + '%',
+                    value: isCurveSaviour
+                        ? CURVE_SAVIOUR_LIQUIDATION_POINT + '%'
+                        : LIQUIDATION_POINT + '%',
                     tip: t('liquidation_point_tip', {
-                        liquidation_ratio: LIQUIDATION_CRATIO,
+                        liquidation_ratio: isCurveSaviour
+                            ? CURVE_SAVIOUR_LIQUIDATION_POINT
+                            : LIQUIDATION_POINT,
                     }),
                 },
                 {
