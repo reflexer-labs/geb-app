@@ -44,14 +44,15 @@ const ModifySafe = ({
         liquidationPrice,
     } = useSafeInfo(type)
 
+    const { leftInput, rightInput } = parsedAmounts
+
     const [unlockState, approveUnlock] = useTokenApproval(
-        parsedAmounts.rightInput,
+        rightInput,
         'coin',
         proxyAddress,
         account as string
     )
 
-    const { leftInput, rightInput } = parsedAmounts
     const { onLeftInput, onRightInput } = useInputsHandlers()
     const isValid = !error
 
@@ -59,7 +60,10 @@ const ModifySafe = ({
         'ETH',
         isDeposit ? balances.eth : (availableEth as string)
     )
-    const raiBalanceUSD = useTokenBalanceInUSD('RAI', availableRai)
+    const raiBalanceUSD = useTokenBalanceInUSD(
+        'RAI',
+        rightInput ? rightInput : availableRai
+    )
 
     const formattedBalance = useMemo(() => {
         return {
