@@ -47,7 +47,7 @@ const Escrow = () => {
         <>
             <Body>
                 <Box>
-                    <Label>Amount to Vest</Label>
+                    <Label>Amount to Unlock</Label>
                     <Value>
                         {total}{' '}
                         <img
@@ -58,12 +58,12 @@ const Escrow = () => {
                 </Box>
 
                 <Box>
-                    <Label>Vesting End Date</Label>
+                    <Label>Unlocking End Date</Label>
                     <Value>{date}</Value>
                 </Box>
 
                 <Box>
-                    <Label>Claimable</Label>
+                    <Label>Claimable from Escrow</Label>
                     <Value>
                         {tokens}{' '}
                         <img

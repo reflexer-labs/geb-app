@@ -49,7 +49,10 @@ const CreateSafe = () => {
     const isValid = !error
 
     const ethBalanceUSD = useTokenBalanceInUSD('ETH', balances.eth)
-    const raiBalanceUSD = useTokenBalanceInUSD('RAI', availableRai)
+    const raiBalanceUSD = useTokenBalanceInUSD(
+        'RAI',
+        rightInput ? rightInput : availableRai
+    )
 
     const formattedBalance = useMemo(() => {
         return {
