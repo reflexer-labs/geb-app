@@ -433,7 +433,6 @@ export function useSafeIsSafe(totalCollateral: string, totalDebt: string) {
     const {
         liquidationData: { currentPrice },
     } = useSafeState()
-
     return useMemo(() => {
         if (!currentPrice.safetyPrice) return true
         return safeIsSafe(totalCollateral, totalDebt, currentPrice.safetyPrice)
