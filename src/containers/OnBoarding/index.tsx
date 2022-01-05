@@ -55,10 +55,6 @@ const OnBoarding = ({ ...props }) => {
         }
     }, [address, account])
 
-    console.log('testing IPFS')
-
-    console.log('testing IPFS 2')
-
     return (
         <Container id="app-page">
             <Content>
