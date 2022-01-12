@@ -29,7 +29,9 @@ export function useEagerConnect() {
         if (!triedSafe) {
             gnosisSafe.isSafeApp().then((loadedInSafe) => {
                 if (loadedInSafe) {
-                    activate(gnosisSafe, undefined, true).catch(() => {
+                    activate(gnosisSafe, undefined, true).catch((e) => {
+                        console.log(e, 'e')
+
                         setTriedSafe(true)
                     })
                 } else {
