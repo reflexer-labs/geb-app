@@ -27,6 +27,7 @@ export const NETWORK_ID = parseInt(REACT_APP_NETWORK_ID ?? '1')
 
 export const network = new NetworkConnector({
     urls: { [NETWORK_ID]: NETWORK_URL },
+    defaultChainId: NETWORK_ID,
 })
 
 export const injected = new InjectedConnector({
