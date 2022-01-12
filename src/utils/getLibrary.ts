@@ -13,7 +13,6 @@ export default function getLibrary(provider: any): Web3Provider {
             : 'any'
     )
     library.detectNetwork().then((network) => {
-        console.log('Connected to ', network)
         library.pollingInterval = 15_000
     })
     return library
