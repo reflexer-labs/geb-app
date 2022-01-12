@@ -13,6 +13,7 @@
 
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import { SafeAppConnector } from '@gnosis.pm/safe-apps-web3-react'
 import { InjectedConnector } from '@web3-react/injected-connector'
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
 import { WalletLinkConnector } from '@web3-react/walletlink-connector'
@@ -31,6 +32,8 @@ export const network = new NetworkConnector({
 export const injected = new InjectedConnector({
     supportedChainIds: [1, 3, 4, 5, 42],
 })
+
+export const gnosisSafe = new SafeAppConnector()
 
 // mainnet only
 export const walletconnect = new WalletConnectConnector({
