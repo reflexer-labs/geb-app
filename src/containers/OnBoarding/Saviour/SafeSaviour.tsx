@@ -172,7 +172,7 @@ const SafeSaviour = ({ ...props }) => {
                 />
 
                 {isModifying || hasSaviour ? (
-                    <Content>
+                    <Content >
                         {showAlert ? (
                             <LabelContainer>
                                 <AlertLabel
@@ -184,9 +184,9 @@ const SafeSaviour = ({ ...props }) => {
                         ) : null}
                         <Inner>
                             <StatsBlock>
-                                <Label>Select Saviour</Label>
+                                <Label style={{display:"none"}}>Select Saviour</Label>
                                 <Flex>
-                                    <DropDownContainer>
+                                    <DropDownContainer style={{display:"none"}}>
                                         <Dropdown
                                             items={SAVIOUR_TYPES}
                                             itemSelected={
@@ -283,6 +283,9 @@ const Flex = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+    #desktop_saviour_btn {
+        margin-left:auto;
+    }
     @media (max-width: 767px) {
         flex-direction: column;
         #desktop_saviour_btn {

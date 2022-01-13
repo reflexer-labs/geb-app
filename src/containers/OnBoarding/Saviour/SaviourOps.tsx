@@ -21,7 +21,6 @@ import useGeb, { useProxyAddress, useSafeHandler } from '../../../hooks/useGeb'
 import { handleTransactionError } from '../../../hooks/TransactionHooks'
 import Modal from '../../../components/Modals/Modal'
 import Review from './Review'
-import { MIN_SAVIOUR_CRATIO } from './SaviourStats'
 import { SaviourType } from '../../../model/safeModel'
 
 const SaviourOps = () => {
@@ -132,13 +131,8 @@ const SaviourOps = () => {
     }
 
     const clearAll = () => {
-        const CRatio = saviourData
-            ? saviourData.hasSaviour
-                ? saviourData.saviourRescueRatio
-                : saviourData.minCollateralRatio
-            : MIN_SAVIOUR_CRATIO
         safeActions.setAmount('')
-        safeActions.setTargetedCRatio(CRatio)
+        safeActions.setTargetedCRatio(targetedCRatio)
         safeActions.setIsMaxWithdraw(false)
         safeActions.setIsSaviourDeposit(true)
     }
