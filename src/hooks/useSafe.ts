@@ -434,7 +434,6 @@ export function useSafeIsSafe(totalCollateral: string, totalDebt: string) {
     const {
         liquidationData: { currentPrice },
     } = useSafeState()
-
     return useMemo(() => {
         if (!currentPrice.safetyPrice) return true
         return safeIsSafe(totalCollateral, totalDebt, currentPrice.safetyPrice)
@@ -451,7 +450,7 @@ export function useInputsHandlers(): {
 
     const onLeftInput = useCallback(
         (typedValue: string) => {
-            if (!typedValue || typedValue === '') {
+            if (!typedValue || typedValue === '' || Number(typedValue) < 0) {
                 safeActions.setSafeData(DEFAULT_SAFE_STATE)
                 return
             }
@@ -464,7 +463,7 @@ export function useInputsHandlers(): {
     )
     const onRightInput = useCallback(
         (typedValue: string) => {
-            if (!typedValue || typedValue === '') {
+            if (!typedValue || typedValue === '' || Number(typedValue) < 0) {
                 safeActions.setSafeData(DEFAULT_SAFE_STATE)
                 return
             }

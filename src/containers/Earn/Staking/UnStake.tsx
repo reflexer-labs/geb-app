@@ -37,6 +37,7 @@ const UnStake = () => {
         hasPendingExitRequests,
         allowExit,
         exitRequests,
+        exitDelay,
     } = useStakingInfo(false)
     const { onUnStakingInput } = useInputsHandlers()
     const { requestExitCallback } = useRequestExit()
@@ -185,12 +186,14 @@ const UnStake = () => {
                                 {hasPendingExitRequests || allowExit ? (
                                     <InfoIcon
                                         data-tip={t('unstake_request_pending', {
-                                            exitDelay: dayjs
-                                                .duration(
-                                                    exitRequests.exitDelay,
-                                                    'seconds'
-                                                )
-                                                .humanize(),
+                                            exitDelay: exitDelay
+                                                ? dayjs
+                                                      .duration(
+                                                          exitDelay,
+                                                          'seconds'
+                                                      )
+                                                      .humanize()
+                                                : '-',
                                         })}
                                     >
                                         <Info size="16" />

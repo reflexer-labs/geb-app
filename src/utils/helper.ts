@@ -67,7 +67,7 @@ export const formatNumber = (value: string, digits = 4, round = false) => {
         return '0'
     }
     const n = Number(value)
-
+    if (n < 0) return value
     if (Number.isInteger(n) || value.length < 5) {
         return n
     }
@@ -238,6 +238,7 @@ export const safeIsSafe = (
     totalDebt: string,
     safetyPrice: string
 ): Boolean => {
+    if (isNaN(Number(totalDebt))) return true
     const totalDebtBN = BigNumber.from(toFixedString(totalDebt, 'WAD'))
     const totalCollateralBN = BigNumber.from(
         toFixedString(totalCollateral, 'WAD')
@@ -277,7 +278,7 @@ export const returnTotalValue = (
     type: keyof typeof floatsTypes = 'WAD'
 ) => {
     const firstBN = first
-        ? BigNumber.from(toFixedString(first, type))
+        ? BigNumber.from(toFixedString(Number(first).toString(), type))
         : BigNumber.from('0')
     const secondBN = second
         ? BigNumber.from(toFixedString(second, type))

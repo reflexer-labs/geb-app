@@ -36,6 +36,7 @@ const ModifySafe = ({
         connectWalletModel: connectWalletActions,
         popupsModel: popupsActions,
     } = useStoreActions((state) => state)
+
     const {
         error,
         balances,
@@ -51,10 +52,10 @@ const ModifySafe = ({
     const [unlockState, approveUnlock] = useTokenApproval(
         parsedAmounts.rightInput,
         geb?.contracts.coin.address,
-        proxyAddress
-    )
-
+        proxyAddress)
+    
     const { leftInput, rightInput } = parsedAmounts
+
     const { onLeftInput, onRightInput } = useInputsHandlers()
     const isValid = !error
 
@@ -62,7 +63,10 @@ const ModifySafe = ({
         'ETH',
         isDeposit ? balances.eth : (availableEth as string)
     )
-    const raiBalanceUSD = useTokenBalanceInUSD('RAI', availableRai)
+    const raiBalanceUSD = useTokenBalanceInUSD(
+        'RAI',
+        rightInput ? rightInput : availableRai
+    )
 
     const formattedBalance = useMemo(() => {
         return {

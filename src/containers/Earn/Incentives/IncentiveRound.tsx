@@ -86,7 +86,7 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                                         </LeftBlock>
                                         <RightBlock>
                                             <Info>
-                                                <InfoCol>
+                                                {/* <InfoCol>
                                                     <InfoLabel>
                                                         Start Date
                                                     </InfoLabel>
@@ -95,7 +95,7 @@ const IncentiveRound = ({ round, collapsed }: Props) => {
                                                             distro.from
                                                         )}
                                                     </InfoValue>
-                                                </InfoCol>
+                                                </InfoCol> */}
                                                 <InfoCol>
                                                     <InfoLabel>
                                                         End Date
