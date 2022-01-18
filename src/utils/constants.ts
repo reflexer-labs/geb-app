@@ -7,24 +7,6 @@ import { ChainId, WalletInfo } from './interfaces'
 
 type AddressMap = { [chainId: number]: string }
 
-export type TokenName =
-    | 'eth'
-    | 'rai'
-    | 'stake'
-    | 'unstake'
-    | 'uniswapv2'
-    | 'curve'
-
-export type Tokens = {
-    [key in TokenName]: {
-        name: string
-        icon: string
-        gebName: string
-        balance: string
-        address: string
-    }
-}
-
 const {
     REACT_APP_GRAPH_API_URLS,
     REACT_APP_NETWORK_ID,
@@ -215,51 +197,6 @@ const INIT_VALUES = {
     diff: 0,
     value: 0,
     diffPercentage: 0,
-}
-
-export const TOKENS: Tokens = {
-    eth: {
-        name: 'ETH',
-        icon: require('../assets/eth-img.svg'),
-        gebName: '',
-        balance: '',
-        address: '',
-    },
-    rai: {
-        name: 'RAI',
-        icon: require('../assets/rai-logo.svg'),
-        gebName: 'coin',
-        balance: '',
-        address: '',
-    },
-    stake: {
-        name: 'FLX/ETH',
-        icon: require('../assets/flx_uni_eth.svg'),
-        gebName: 'stakingToken',
-        balance: '',
-        address: '',
-    },
-    unstake: {
-        name: 'FLX/ETH',
-        icon: require('../assets/stFLX.svg'),
-        gebName: 'stakingToken',
-        balance: '',
-        address: '',
-    },
-    uniswapv2: {
-        name: 'RAI/ETH',
-        icon: require('../assets/uniswap-icon.svg'),
-        gebName: 'uniswapPairCoinEth',
-        balance: '',
-        address: '',
-    },
-    curve: {
-        name: 'RAI3CRV',
-        icon: require('../assets/curve.svg'),
-        gebName: '',
-        balance: '',
-        address: '',
-    },
 }
 
 export const INITIAL_INCENTIVE_ASSETS_STATE = {

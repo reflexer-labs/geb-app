@@ -2,47 +2,44 @@ import React from 'react'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
 import TokenInput from '../../../components/TokenInput'
-import useGeb from '../../../hooks/useGeb'
 import {
-    useAddStaking,
+    useFarmingInfo,
     useInputsHandlers,
-    useStakingInfo,
-} from '../../../hooks/useStaking'
+    useAddStaking,
+} from '../../../hooks/useFarming'
 import {
     ApprovalState,
     useTokenApproval,
 } from '../../../hooks/useTokenApproval'
-import { TOKENS } from '../../../utils/tokens'
 import { formatNumber } from '../../../utils/helper'
 
 const Stake = () => {
-    const geb = useGeb()
-    const { balances, parsedAmounts, error } = useStakingInfo()
-    const { onStakingInput } = useInputsHandlers()
+    const { stakingToken, farmerData, parsedAmount, error } = useFarmingInfo()
+    const { onTypedValue } = useInputsHandlers()
     const { addStakingCallback } = useAddStaking()
 
     const isValid = !error
 
     const [depositApprovalState, approveDeposit] = useTokenApproval(
-        parsedAmounts.stakingAmount,
-        geb?.contracts.stakingFirstResort.address,
-        geb?.contracts.stakingToken.address
+        parsedAmount,
+        stakingToken?.address ?? undefined,
+        farmerData.contractAddress ?? undefined
     )
 
-    const stakingValue = parsedAmounts.stakingAmount
-        ? Number(parsedAmounts.stakingAmount) > 0 &&
-          parsedAmounts.stakingAmount.includes('.') &&
-          parsedAmounts.stakingAmount.split('.')[1].length > 5
-            ? (formatNumber(parsedAmounts.stakingAmount) as string)
-            : parsedAmounts.stakingAmount
+    const stakingValue = parsedAmount
+        ? Number(parsedAmount) > 0 &&
+          parsedAmount.includes('.') &&
+          parsedAmount.split('.')[1].length > 5
+            ? (formatNumber(parsedAmount) as string)
+            : parsedAmount
         : ''
 
-    const handleMaxInput = () => onStakingInput(balances.stakingBalance)
+    const handleMaxInput = () => onTypedValue(stakingToken?.balance ?? '')
 
     const handleAddStaking = async () => {
         try {
             await addStakingCallback()
-            onStakingInput('')
+            onTypedValue('')
         } catch (error) {
             console.log(error)
         }
@@ -51,14 +48,14 @@ const Stake = () => {
     return (
         <>
             <Body>
-                <SideLabel>Stake FLX/ETH</SideLabel>
+                <SideLabel>Deposit {stakingToken?.name}</SideLabel>
                 <TokenInput
-                    token={TOKENS.stake}
-                    label={`Balance: ${formatNumber(balances.stakingBalance)} ${
-                        TOKENS.stake.name
+                    token={stakingToken}
+                    label={`Balance: ${formatNumber(stakingToken?.balance)} ${
+                        stakingToken?.name
                     }`}
                     rightLabel={``}
-                    onChange={onStakingInput}
+                    onChange={onTypedValue}
                     value={stakingValue}
                     handleMaxClick={handleMaxInput}
                 />

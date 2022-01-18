@@ -5,7 +5,7 @@ import styled from 'styled-components'
 interface Props {
     label: string
     rightLabel?: string
-    token: { icon: string; name: string }
+    token: { icon: string; name: string } | undefined
     iconSize?: string
     placeholder?: string
     value: string
@@ -60,11 +60,11 @@ const TokenInput = ({
                 <Flex>
                     <TokenBox>
                         <Icon
-                            src={token.icon}
+                            src={token?.icon}
                             width={iconSize || '24px'}
                             height={iconSize || '24px'}
                         />
-                        {token.name}
+                        {token?.name}
                     </TokenBox>
                     <CustomInput
                         placeholder={placeholder || '0.00'}

@@ -13,7 +13,8 @@ import useGeb, {
 import { useSafeInfo, useInputsHandlers } from '../../hooks/useSafe'
 import { ApprovalState, useTokenApproval } from '../../hooks/useTokenApproval'
 import { useStoreActions, useStoreState } from '../../store'
-import { DEFAULT_SAFE_STATE, TOKENS } from '../../utils/constants'
+import { DEFAULT_SAFE_STATE } from '../../utils/constants'
+import { TOKENS } from '../../utils/tokens'
 import { formatNumber } from '../../utils/helper'
 import Review from './Review'
 

@@ -135,10 +135,6 @@ describe('App Page - Safe Details', () => {
                     }
                 )
             )
-
-        cy.contains('Close').click()
-        cy.get('#web3-status-connected').click()
-        cy.contains('Clear All').click()
     })
 
     it('should perform a successful repay and withdraw transaction', () => {
@@ -158,9 +154,5 @@ describe('App Page - Safe Details', () => {
                     }
                 )
             )
-
-        cy.contains('Close').click()
-        cy.get('#web3-status-connected').click()
-        cy.contains('Clear All').click()
     })
 })

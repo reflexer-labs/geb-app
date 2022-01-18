@@ -5,7 +5,13 @@ import styled from 'styled-components'
 
 type Item =
     | string
-    | { item: string; img: string; href?: string; isExternal?: boolean }
+    | {
+          item: string
+          img: string
+          href?: string
+          isExternal?: boolean
+          [U: string]: boolean | number | string | undefined
+      }
 interface Props {
     itemSelected: Item
     items: Array<Item>

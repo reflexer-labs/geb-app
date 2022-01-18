@@ -23,6 +23,7 @@ import SafeSaviour from './containers/OnBoarding/Saviour/SafeSaviour'
 import Staking from './containers/Earn/Staking'
 import Incentives from './containers/Earn/Incentives'
 import CreateSafe from './containers/OnBoarding/CreateSafe'
+import MoneyGodLeague from './containers/Earn/MoneyGodLeague'
 
 // Toast css
 
@@ -65,6 +66,12 @@ const App = () => {
                                             strict
                                             component={Staking}
                                             path={'/earn/staking'}
+                                        />
+                                        <Route
+                                            exact
+                                            strict
+                                            component={MoneyGodLeague}
+                                            path={'/earn/moneygod'}
                                         />
                                         <Route
                                             exact

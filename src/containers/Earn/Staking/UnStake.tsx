@@ -21,7 +21,7 @@ import {
     ApprovalState,
     useTokenApproval,
 } from '../../../hooks/useTokenApproval'
-import { TOKENS } from '../../../utils/constants'
+import { TOKENS } from '../../../utils/tokens'
 import { formatNumber } from '../../../utils/helper'
 
 dayjs.extend(duration)

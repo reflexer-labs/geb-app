@@ -9,7 +9,7 @@ import {
 import styled from 'styled-components'
 import { useStoreActions } from '../../../store'
 import TokenInput from '../../../components/TokenInput'
-import { TOKENS } from '../../../utils/constants'
+import { TOKENS } from '../../../utils/tokens'
 import { formatNumber } from '../../../utils/helper'
 import Button from '../../../components/Button'
 import {
