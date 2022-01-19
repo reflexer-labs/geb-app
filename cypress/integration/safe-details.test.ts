@@ -135,9 +135,13 @@ describe('App Page - Safe Details', () => {
                     }
                 )
             )
+
+        cy.contains('Close').click()
+        cy.get('#web3-status-connected').click()
+        cy.contains('Clear All').click()
     })
 
-    it('should perform a successful repay and withdraw transaction', () => {
+    it.only('should perform a successful repay and withdraw transaction', () => {
         cy.get('#repay_withdraw').click()
         cy.get('[data-test-id="repay_withdraw_left"]').type('0.001')
         cy.get('[data-test-id="repay_withdraw_right"]').type('0.001')
@@ -154,5 +158,9 @@ describe('App Page - Safe Details', () => {
                     }
                 )
             )
+
+        cy.contains('Close').click()
+        cy.get('#web3-status-connected').click()
+        cy.contains('Clear All').click()
     })
 })

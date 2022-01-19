@@ -52,8 +52,9 @@ const ModifySafe = ({
     const [unlockState, approveUnlock] = useTokenApproval(
         parsedAmounts.rightInput,
         geb?.contracts.coin.address,
-        proxyAddress)
-    
+        proxyAddress
+    )
+
     const { leftInput, rightInput } = parsedAmounts
 
     const { onLeftInput, onRightInput } = useInputsHandlers()
