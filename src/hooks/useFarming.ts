@@ -78,6 +78,7 @@ export function useFarmingInfo(isDeposit = true) {
     if (isDeposit) {
         if (
             stakingToken &&
+            stakingToken.balance &&
             parsedAmount &&
             ethers.utils
                 .parseEther(stakingToken.balance.toString())
@@ -163,7 +164,7 @@ export function usePoolData() {
     )
 
     const totalSupplyResponse = useSingleCallResult(
-        StakingTokenContract,
+        StakingContract,
         'totalSupply'
     )
 
