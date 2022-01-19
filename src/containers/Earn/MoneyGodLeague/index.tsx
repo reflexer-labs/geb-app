@@ -13,6 +13,7 @@ import {
 } from '../../../model/earnModel'
 import { TokenName, TOKENS } from '../../../utils/tokens'
 import { useStoreActions } from '../../../store'
+import { useTranslation } from 'react-i18next'
 
 const projectImgs = {
     volt: require('../../../assets/vcon.svg'),
@@ -20,6 +21,7 @@ const projectImgs = {
 }
 
 const MoneyGodLeague = () => {
+    const { t } = useTranslation()
     const { earnModel: earnActions } = useStoreActions((state) => state)
     const { farmerName, contractName } = useFarmingInfo()
 
@@ -71,23 +73,7 @@ const MoneyGodLeague = () => {
                     <InfoTitle>
                         <BarChart2 size="16" /> What is Money God League?
                     </InfoTitle>
-                    <InfoText>
-                        It is a long established fact that a reader will be
-                        distracted by the readable content of a page when
-                        looking at its layout. The point of using Lorem Ipsum is
-                        that it has a more-or-less normal distribution of
-                        letters
-                        {/* {t('staking_description')}{' '}
-                        {
-                            <a
-                                rel="noopener noreferrer"
-                                href="https://docs.reflexer.finance/incentives/flx-staking"
-                                target="_blank"
-                            >
-                                Read More
-                            </a>
-                        } */}
-                    </InfoText>
+                    <InfoText>{t('moneygod_desc')} </InfoText>
                 </LeftSide>
             </InfoBox>
 

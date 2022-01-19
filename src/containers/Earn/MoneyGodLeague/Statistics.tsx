@@ -5,6 +5,7 @@ import Button from '../../../components/Button'
 import { useActiveWeb3React } from '../../../hooks'
 import { formatNumber } from '../../../utils/helper'
 import { useFarmingInfo, useClaimReward } from '../../../hooks/useFarming'
+import commaNumber from 'comma-number'
 
 const returnImg = (img: string, width = '20px', height = '20px') => {
     return <img src={img} width={width} height={height} alt="" />
@@ -55,7 +56,11 @@ const Statistics = () => {
                 label: 'APR',
                 value: `${
                     Number(apr) > 0
-                        ? numeral(formatNumber(apr.toString(), 2)).format('0.0')
+                        ? commaNumber(
+                              numeral(formatNumber(apr.toString(), 2)).format(
+                                  '0.0'
+                              )
+                          )
                         : '0'
                 }%`,
             },
