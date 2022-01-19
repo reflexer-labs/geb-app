@@ -6,6 +6,7 @@ import { IconName } from '../components/FeatherIconWrapper'
 import { ApproveMethod } from '../components/ApproveToken'
 import { Geb } from 'geb.js'
 import { BigNumber } from 'ethers'
+import { SaviourType } from 'src/model/safeModel'
 
 export declare enum ChainId {
     MAINNET = 1,
@@ -431,6 +432,8 @@ export interface SaviourDepositPayload {
     safeId: number
     amount: string
     isTargetedCRatioChanged: boolean
+    saviourType: SaviourType
+    curvelpTokenAddress: string
 }
 export interface SaviourWithdrawPayload extends SaviourDepositPayload {
     isMaxWithdraw: boolean
@@ -517,4 +520,32 @@ export interface IStakedLP {
 export interface IStakingData {
     stFlxAmount: string
     stakingAmount: string
+}
+
+export interface Call {
+    address: string
+    callData: string
+    gasRequired?: number
+}
+
+export interface CallListeners {
+    // on a per-chain basis
+    [chainId: number]: {
+        // stores for each call key the listeners' preferences
+        [callKey: string]: {
+            // stores how many listeners there are per each blocks per fetch preference
+            [blocksPerFetch: number]: number
+        }
+    }
+}
+
+export interface CallResults {
+    // on a per-chain basis
+    [chainId: number]: {
+        [callKey: string]: {
+            data?: string | null
+            blockNumber?: number
+            fetchingBlockNumber?: number
+        }
+    }
 }

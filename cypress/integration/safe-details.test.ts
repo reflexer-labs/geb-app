@@ -130,7 +130,7 @@ describe('App Page - Safe Details', () => {
                 cy.waitUntil(
                     () => Cypress.$(e).text() === 'Transaction Submitted',
                     {
-                        timeout: 1000000,
+                        timeout: 100000,
                         interval: 2000,
                     }
                 )
@@ -141,7 +141,7 @@ describe('App Page - Safe Details', () => {
         cy.contains('Clear All').click()
     })
 
-    it('should perform a successful repay and withdraw transaction', () => {
+    it.only('should perform a successful repay and withdraw transaction', () => {
         cy.get('#repay_withdraw').click()
         cy.get('[data-test-id="repay_withdraw_left"]').type('0.001')
         cy.get('[data-test-id="repay_withdraw_right"]').type('0.001')
@@ -153,7 +153,7 @@ describe('App Page - Safe Details', () => {
                 cy.waitUntil(
                     () => Cypress.$(e).text() === 'Transaction Submitted',
                     {
-                        timeout: 1000000,
+                        timeout: 100000,
                         interval: 2000,
                     }
                 )

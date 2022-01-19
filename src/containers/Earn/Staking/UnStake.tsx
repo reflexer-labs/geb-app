@@ -10,7 +10,6 @@ import styled from 'styled-components'
 import AlertLabel from '../../../components/AlertLabel'
 import Button from '../../../components/Button'
 import TokenInput from '../../../components/TokenInput'
-import { useActiveWeb3React } from '../../../hooks'
 import useGeb from '../../../hooks/useGeb'
 import {
     useInputsHandlers,
@@ -22,7 +21,7 @@ import {
     ApprovalState,
     useTokenApproval,
 } from '../../../hooks/useTokenApproval'
-import { TOKENS } from '../../../utils/constants'
+import { TOKENS } from '../../../utils/tokens'
 import { formatNumber } from '../../../utils/helper'
 
 dayjs.extend(duration)
@@ -30,7 +29,6 @@ dayjs.extend(relativeTime)
 const UnStake = () => {
     const { t } = useTranslation()
     const [isPending, setIsPending] = useState(false)
-    const { account } = useActiveWeb3React()
     const geb = useGeb()
     const {
         balances,
@@ -73,9 +71,8 @@ const UnStake = () => {
 
     const [unStakeApprovalState, approveUnStake] = useTokenApproval(
         totalUnlockedAmount,
-        'stakingToken',
-        geb?.contracts.stakingFirstResort.address,
-        account as string
+        geb?.contracts.stakingToken.address,
+        geb?.contracts.stakingFirstResort.address
     )
 
     const stFlxAmountValue = parsedAmounts.stFlxAmount

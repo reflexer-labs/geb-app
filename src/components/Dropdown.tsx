@@ -5,7 +5,13 @@ import styled from 'styled-components'
 
 type Item =
     | string
-    | { item: string; img: string; href?: string; isExternal?: boolean }
+    | {
+          item: string
+          img: string
+          href?: string
+          isExternal?: boolean
+          [U: string]: boolean | number | string | undefined
+      }
 interface Props {
     itemSelected: Item
     items: Array<Item>
@@ -18,6 +24,7 @@ interface Props {
     label?: string
     itemPadding?: string
     imgSize?: string
+    dropSelection?: boolean
 }
 const Dropdown = (props: Props) => {
     const wrapperRef = useRef(null)
@@ -33,11 +40,16 @@ const Dropdown = (props: Props) => {
         label,
         itemPadding,
         imgSize,
+        dropSelection,
     } = props
     const [isOpen, setIsOpen] = useState(false)
     const [selectedItem, setSelectedItem] = useState<Item>(itemSelected)
+
     const handleItemClick = (selected: Item) => {
         setIsOpen(!isOpen)
+        if (dropSelection) {
+            return
+        }
         setSelectedItem(selected)
         if (typeof selected === 'string') {
             getSelectedItem && getSelectedItem(selected)
@@ -235,6 +247,9 @@ const Link = styled.a`
     text-decoration: underline;
     display: flex;
     align-items: center;
+    svg {
+        position: static !important;
+    }
     &:hover {
         color: ${(props) => props.theme.colors.inputBorderColor};
     }

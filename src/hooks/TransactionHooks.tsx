@@ -47,6 +47,11 @@ export function useTransactionAdder(): (
     )
 }
 
+// add 20%
+export function calculateGasMargin(value: BigNumber): BigNumber {
+    return value.mul(BigNumber.from(10000 + 2000)).div(BigNumber.from(10000))
+}
+
 export function isTransactionRecent(tx: ITransaction): boolean {
     return new Date().getTime() - tx.addedTime < 86_400_000
 }

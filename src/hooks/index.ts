@@ -6,14 +6,11 @@ import { isMobile } from 'react-device-detect'
 import { injected } from '../connectors'
 import { NetworkContextName } from '../utils/constants'
 import { SafeAppConnector } from '@gnosis.pm/safe-apps-web3-react'
-import { ChainId } from '../utils/interfaces'
 
 const safeAppConnector = new SafeAppConnector({
     supportedChainIds: [1, 4],
 })
-export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> & {
-    chainId?: ChainId
-} {
+export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> {
     const context = useWeb3ReactCore<Web3Provider>()
     const contextNetwork = useWeb3ReactCore<Web3Provider>(NetworkContextName)
     return context.active ? context : contextNetwork

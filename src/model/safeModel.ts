@@ -26,6 +26,7 @@ import { StoreModel } from '.'
 import { NETWORK_ID } from '../connectors'
 import { fetchSaviourData, SaviourData } from '../hooks/useSaviour'
 
+export type SaviourType = 'uniswap' | 'curve'
 export interface SafeModel {
     list: Array<ISafe>
     saviourData: SaviourData | undefined
@@ -42,6 +43,7 @@ export interface SafeModel {
     stage: number
     isSaviourDeposit: boolean
     isSuccessfulTx: boolean
+    saviourType: SaviourType
     safeData: ISafeData
     liquidationData: ILiquidationData
     uniSwapPool: ISafeData
@@ -87,6 +89,7 @@ export interface SafeModel {
     setTargetedCRatio: Action<SafeModel, number>
     setIsMaxWithdraw: Action<SafeModel, boolean>
     setSaviourData: Action<SafeModel, SaviourData | undefined>
+    setSaviourType: Action<SafeModel, SaviourType>
 }
 
 const safeModel: SafeModel = {
@@ -105,6 +108,7 @@ const safeModel: SafeModel = {
     isUniSwapPoolChecked: true,
     stage: 0,
     isSaviourDeposit: true,
+    saviourType: 'uniswap',
     safeData: DEFAULT_SAFE_STATE,
     liquidationData: {
         accumulatedRate: '0',
@@ -294,6 +298,9 @@ const safeModel: SafeModel = {
     fetchSaviourData: thunk(async (actions, payload) => {
         const res = await fetchSaviourData(payload)
         actions.setSaviourData(res)
+        if (res && res.hasSaviour && res.saviourType) {
+            actions.setSaviourType(res.saviourType as SaviourType)
+        }
         return res
     }),
     setIsSafeCreated: action((state, payload) => {
@@ -354,6 +361,9 @@ const safeModel: SafeModel = {
     }),
     setSaviourData: action((state, payload) => {
         state.saviourData = payload
+    }),
+    setSaviourType: action((state, payload) => {
+        state.saviourType = payload
     }),
 }
 

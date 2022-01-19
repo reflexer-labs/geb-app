@@ -2,7 +2,10 @@ import { ethers } from 'ethers'
 import { Geb } from 'geb.js'
 import { css } from 'styled-components'
 import { injected, walletconnect, walletlink } from '../connectors'
+import { constructSameAddressMap } from './constructSameAddressMap'
 import { ChainId, WalletInfo } from './interfaces'
+
+type AddressMap = { [chainId: number]: string }
 
 const {
     REACT_APP_GRAPH_API_URLS,
@@ -15,6 +18,13 @@ const {
     REACT_APP_NETWORK_URL,
     REACT_APP_WYRE_WORKER,
 } = process.env
+
+export const MULTICALL2_ADDRESSES: AddressMap = {
+    ...constructSameAddressMap(
+        '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
+        false
+    ),
+}
 
 export enum Network {
     MAINNET = 'mainnet',
@@ -187,25 +197,6 @@ const INIT_VALUES = {
     diff: 0,
     value: 0,
     diffPercentage: 0,
-}
-
-export const TOKENS = {
-    eth: {
-        name: 'ETH',
-        icon: require('../assets/eth-img.svg'),
-    },
-    rai: {
-        name: 'RAI',
-        icon: require('../assets/rai-logo.svg'),
-    },
-    stake: {
-        name: 'FLX/ETH',
-        icon: require('../assets/flx_uni_eth.svg'),
-    },
-    unstake: {
-        name: 'FLX/ETH',
-        icon: require('../assets/stFLX.svg'),
-    },
 }
 
 export const INITIAL_INCENTIVE_ASSETS_STATE = {

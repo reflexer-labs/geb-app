@@ -3,7 +3,6 @@ import { PlusCircle } from 'react-feather'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
 import DecimalInput from '../../../components/DecimalInput'
-import { useActiveWeb3React } from '../../../hooks'
 import useGeb from '../../../hooks/useGeb'
 import {
     useAddLiquidity,
@@ -17,7 +16,6 @@ import {
 import { formatNumber } from '../../../utils/helper'
 
 const AddLiquidity = () => {
-    const { account } = useActiveWeb3React()
     const {
         error,
         balances: currencyBalances,
@@ -34,8 +32,7 @@ const AddLiquidity = () => {
     const [depositApprovalState, approveDeposit] = useTokenApproval(
         parsedAmounts.raiAmount,
         'coin',
-        geb?.contracts.uniswapV3TwoTrancheLiquidityManager.address,
-        account as string
+        geb?.contracts.uniswapV3TwoTrancheLiquidityManager.address
     )
 
     const ethValue = parsedAmounts.ethAmount

@@ -13,8 +13,8 @@ import {
     useHasLeftOver,
     useHasSaviour,
     useMinSaviourBalance,
-    useSaviourData,
     useSaviourGetReserves,
+    useSaviourInfo,
 } from '../../hooks/useSaviour'
 import { useStoreActions, useStoreState } from '../../store'
 
@@ -38,8 +38,9 @@ const SafeHeader = ({
                 : 'repay_withdraw'
             : 'create'
     )
+
+    const { saviourData } = useSaviourInfo()
     const { safeModel: safeState } = useStoreState((state) => state)
-    const saviourData = useSaviourData()
 
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
 
@@ -48,6 +49,7 @@ const SafeHeader = ({
     const hasSaviour = useHasSaviour(
         safeState.singleSafe?.safeHandler as string
     )
+
     const leftOver = useHasLeftOver(safeState.singleSafe?.safeHandler as string)
 
     const { getReservesCallback } = useSaviourGetReserves()
@@ -92,16 +94,23 @@ const SafeHeader = ({
         color: 'dimmedColor' | 'successColor' | 'dangerColor'
     } => {
         if (!saviourData) return { status: 'none', color: 'dimmedColor' }
-        const minimumBalance = getMinSaviourBalance(
-            saviourData.saviourRescueRatio,
+        const minimumBalance = getMinSaviourBalance({
+            type: safeState.saviourType,
+            targetedCRatio: saviourData.saviourRescueRatio,
             totalDebt,
-            totalCollateral
-        ) as number
+            totalCollateral,
+        }) as number
         if (Number(saviourData.saviourBalance) >= minimumBalance) {
             return { status: 'Protected', color: 'successColor' }
         }
         return { status: 'Unprotected', color: 'dangerColor' }
-    }, [getMinSaviourBalance, saviourData, totalCollateral, totalDebt])
+    }, [
+        getMinSaviourBalance,
+        safeState.saviourType,
+        saviourData,
+        totalCollateral,
+        totalDebt,
+    ])
 
     const returnSaviourBtnText = () => {
         if (leftOver && leftOver.status) {

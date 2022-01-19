@@ -2,7 +2,6 @@ import React from 'react'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
 import DecimalInput from '../../../components/DecimalInput'
-import { useActiveWeb3React } from '../../../hooks'
 import useGeb from '../../../hooks/useGeb'
 import {
     useInputsHandlers,
@@ -16,7 +15,6 @@ import {
 import { formatNumber } from '../../../utils/helper'
 
 const WithdrawLiquidity = () => {
-    const { account } = useActiveWeb3React()
     const {
         balances: currencyBalances,
         error,
@@ -34,8 +32,7 @@ const WithdrawLiquidity = () => {
     const [withdrawApprovalState, approve] = useTokenApproval(
         parsedAmounts.totalLiquidity,
         'uniswapV3TwoTrancheLiquidityManager',
-        geb?.contracts.uniswapV3TwoTrancheLiquidityManager.address,
-        account as string
+        geb?.contracts.uniswapV3TwoTrancheLiquidityManager.address
     )
 
     const onLiquidityMaxInput = () =>

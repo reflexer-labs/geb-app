@@ -3,12 +3,12 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
-import { useActiveWeb3React } from '../../hooks'
-import useGeb from '../../hooks/useGeb'
-import { fetchUserSafes } from '../../services/graphql'
-import { useStoreActions, useStoreState } from '../../store'
-import { timeout } from '../../utils/helper'
-import Button from '../Button'
+import { useActiveWeb3React } from '../hooks'
+import useGeb from '../hooks/useGeb'
+import { fetchUserSafes } from '../services/graphql'
+import { useStoreActions, useStoreState } from '../store'
+import { timeout } from '../utils/helper'
+import Button from './Button'
 
 const SafeManager = () => {
     const { t } = useTranslation()
