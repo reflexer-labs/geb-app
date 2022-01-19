@@ -224,7 +224,7 @@ export function usePoolData() {
         ((Number(rewardRate) * Number(rewardsDuration)) / BLOCK_INTERVAL) *
         Number(totalSupply)
 
-    const apr = Number(poolBalance) > 0 ? (rw / REWARD_TOKEN_PRICE) * 100 : '0'
+    const apr = (rw / REWARD_TOKEN_PRICE) * 100
 
     return useMemo(() => {
         return {
