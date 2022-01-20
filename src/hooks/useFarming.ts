@@ -1,7 +1,7 @@
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 import { getAddress } from '@ethersproject/address'
 import SimpleStakingContract from '../abis/SimpleStakingContract.json'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useActiveWeb3React } from '.'
 import store, { useStoreActions, useStoreState } from '../store'
 import {
@@ -116,8 +116,10 @@ export function useFarmingInfo(isDeposit = true) {
 
 export function useFarmerData() {
     const { account } = useActiveWeb3React()
-    const { earnModel: earnState } = useStoreState((state) => state)
+    const { earnModel: earnState, connectWalletModel: connectWalletState } =
+        useStoreState((state) => state)
     const { farmerName, contractName } = earnState
+    const { flxPrice } = connectWalletState
     const tokensList = useTokenBalances(account as string)
     const tokens = useMemo(() => tokensList, [tokensList])
     const farmer = useMemo(() => FARMERS[farmerName], [farmerName])
@@ -130,8 +132,46 @@ export function useFarmerData() {
             stakingToken: tokens[contractName as TokenName],
             tokens,
             contractName,
+            flxPrice,
         }
-    }, [contractName, farmer, tokens])
+    }, [contractName, farmer, tokens, flxPrice])
+}
+
+export function useUniswapPairCoinEthPrice() {
+    const geb = useGeb()
+    const [state, setState] = useState(0)
+
+    const resevesCallback = useCallback(
+        ([reserves]) => {
+            if (!reserves) return
+            let flxReserve
+            if (
+                BigNumber.from(geb.contracts.protocolToken.address).gt(
+                    BigNumber.from(geb.contracts.weth.address)
+                )
+            ) {
+                // FLX is token 1
+                flxReserve = ethers.utils.formatEther(reserves._reserve1)
+            } else {
+                // FLX is token 0
+                flxReserve = ethers.utils.formatEther(reserves._reserve0)
+            }
+            setState(Number(flxReserve) * 2)
+        },
+        [geb]
+    )
+
+    // attach/detach listeners
+    useEffect(() => {
+        if (!geb) return
+        const reservesCall = geb.contracts.uniswapPairCoinEth.getReserves(true)
+        reservesCall.to = geb.contracts.stakingToken.address
+        geb.multiCall([reservesCall])
+            .then(resevesCallback)
+            .catch((e) => console.log(e))
+    }, [geb, resevesCallback])
+
+    return useMemo(() => state, [state])
 }
 
 export function usePoolData() {
@@ -139,8 +179,8 @@ export function usePoolData() {
     const farmerData = useFarmerData()
     const StakingContractInterface = new Interface(SimpleStakingContract)
     const ERC20Interface = new Interface(ERC20ABI)
-    const { contractAddress, tokens, contractName } = farmerData
-
+    const { contractAddress, tokens, contractName, flxPrice } = farmerData
+    const uniswapV2LpSharePrice = useUniswapPairCoinEthPrice()
     const stakingToken = tokens[contractName as TokenName]
     const stakingTokenAddress = isAddress(stakingToken?.address)
         ? getAddress(stakingToken?.address)
@@ -161,11 +201,6 @@ export function usePoolData() {
         StakingTokenContract,
         'balanceOf',
         [contractAddress]
-    )
-
-    const totalSupplyResponse = useSingleCallResult(
-        StakingContract,
-        'totalSupply'
     )
 
     const rewardRateResponse = useSingleCallResult(
@@ -193,11 +228,6 @@ export function usePoolData() {
             ? ethers.utils.formatEther(myRewardResponse?.result?.[0])
             : '0'
 
-    const totalSupply =
-        totalSupplyResponse.result?.[0] > 0
-            ? ethers.utils.formatEther(totalSupplyResponse?.result?.[0])
-            : '0'
-
     const poolBalance =
         poolBalanceRes.result?.[0] > 0
             ? ethers.utils.formatEther(poolBalanceRes?.result?.[0])
@@ -220,11 +250,18 @@ export function usePoolData() {
         (Number(rewardRate) * Number(poolBalance) * 7 * 3600 * 24) /
         BLOCK_INTERVAL
 
-    const rw =
-        ((Number(rewardRate) * Number(rewardsDuration)) / BLOCK_INTERVAL) *
-        Number(totalSupply)
+    const stakedTokenPrice =
+        stakingToken?.name.toLowerCase() === 'flx'
+            ? flxPrice
+            : uniswapV2LpSharePrice
 
-    const apr = (rw / REWARD_TOKEN_PRICE) * 100
+    // rewardRate * secondPerYear * reward token price
+    const numerator =
+        Number(rewardRate) * Number(rewardsDuration) * REWARD_TOKEN_PRICE
+    // stakedTokenPrice * stakedTokenAmt
+    const denominator = Number(poolBalance) * stakedTokenPrice
+
+    const apr = (numerator / denominator) * 100
 
     return useMemo(() => {
         return {
