@@ -400,12 +400,12 @@ export function useHasLeftOver(safeHandler: string) {
 
         if (isCurveSaviour) {
             geb.multiCall([
-                geb.contracts.curveV1MaxSafeSaviour.underlyingReserves(
+                geb.contracts.yearnCurveMaxSafeSaviour.underlyingReserves(
                     safeHandler.toLowerCase(),
                     curvePoolTokenAddress,
                     true
                 ),
-                geb.contracts.curveV1MaxSafeSaviour.underlyingReserves(
+                geb.contracts.yearnCurveMaxSafeSaviour.underlyingReserves(
                     safeHandler.toLowerCase(),
                     geb.contracts.coin.address,
                     true
@@ -414,7 +414,7 @@ export function useHasLeftOver(safeHandler: string) {
                 .then(getLeftOverCallback)
                 .catch((error) =>
                     console.error(
-                        `Failed to get left over for curve saviour from gebjs`,
+                        `Failed to get left over for yearn curve saviour from gebjs`,
                         error
                     )
                 )
@@ -490,13 +490,13 @@ export async function fetchSaviourData({
     ])
 
     const multiCallRequest3 = geb.multiCall([
-        geb.contracts.curveV1MaxSafeSaviour.lpTokenCover(
+        geb.contracts.yearnCurveMaxSafeSaviour.yvTokenCover(
             ETH_A,
             safeHandler.toLowerCase(),
             true
         ),
-        geb.contracts.curveV1MaxSafeSaviour.lpToken(true),
-        geb.contracts.curveV1MaxSafeSaviour.poolTokens(1, true),
+        geb.contracts.yearnCurveMaxSafeSaviour.curveLpToken(true),
+        geb.contracts.yearnCurveMaxSafeSaviour.curvePoolTokens(1, true),
     ])
 
     const [muliCallResponse1, multiCallResponse2, multiCallResponse3] =
@@ -554,7 +554,7 @@ export async function fetchSaviourData({
     // uniPoolPrice = --------------------------------------
     //                            lptotalSupply
     //@ts-ignore
-    const curveSaviourAddress = geb.addresses.GEB_COIN_CURVE_V1_MAX_SAVIOUR
+    const curveSaviourAddress = geb.addresses.GEB_YEARN_CURVE_MAX_SAVIOUR
 
     const isCurveSaviour =
         saviourAddress.toLowerCase() === curveSaviourAddress.toLowerCase()
@@ -805,7 +805,9 @@ export function useSaviourDeposit() {
             )
         } else {
             // @ts-ignore
-            const saviourAddress = geb.addresses.GEB_COIN_CURVE_V1_MAX_SAVIOUR
+            const saviourAddress = geb.addresses.GEB_YEARN_CURVE_MAX_SAVIOUR
+            console.log(saviourAddress)
+
             const formattedAddresss = getAddress(saviourAddress)
             txData = proxy.protectSAFEDeposit(
                 true,
@@ -815,7 +817,6 @@ export function useSaviourDeposit() {
                 tokenAmount
             )
         }
-
         if (!txData) throw new Error('No transaction request!')
         const tx = await handlePreTxGasEstimate(signer, txData)
         const txResponse = await signer.sendTransaction(tx)
@@ -874,7 +875,7 @@ export function useSaviourWithdraw() {
         let txData
         const isCurveSaviour = saviourType === 'curve'
         // @ts-ignore
-        const curveSaviourAddress = geb.addresses.GEB_COIN_CURVE_V1_MAX_SAVIOUR
+        const curveSaviourAddress = geb.addresses.GEB_YEARN_CURVE_MAX_SAVIOUR
         if (isMaxWithdraw) {
             txData = proxy.withdrawUncoverSAFE(
                 !isCurveSaviour ? false : true,
