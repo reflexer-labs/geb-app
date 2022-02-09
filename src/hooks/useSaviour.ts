@@ -806,7 +806,6 @@ export function useSaviourDeposit() {
         } else {
             // @ts-ignore
             const saviourAddress = geb.addresses.GEB_YEARN_CURVE_MAX_SAVIOUR
-            console.log(saviourAddress)
 
             const formattedAddresss = getAddress(saviourAddress)
             txData = proxy.protectSAFEDeposit(
