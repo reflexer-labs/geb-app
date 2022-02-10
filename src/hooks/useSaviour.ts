@@ -170,9 +170,7 @@ export function useSaviourInfo() {
                         ? CURVE_SAVIOUR_LIQUIDATION_POINT + '%'
                         : LIQUIDATION_POINT + '%',
                     tip: t('liquidation_point_tip', {
-                        liquidation_ratio: isCurveSaviour
-                            ? CURVE_SAVIOUR_LIQUIDATION_POINT
-                            : LIQUIDATION_POINT,
+                        liquidation_ratio: LIQUIDATION_CRATIO,
                     }),
                 },
                 {

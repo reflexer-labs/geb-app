@@ -92,7 +92,7 @@ const SaviourStats = () => {
 
                         <Main>
                             <MainLabel>
-                                <InfoIcon data-tip={stats.data[1].tip}>
+                                <InfoIcon data-tip={stats.data[2].tip}>
                                     <Info size="16" />
                                 </InfoIcon>{' '}
                                 {stats.data[2].label}
