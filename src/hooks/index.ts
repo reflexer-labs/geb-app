@@ -3,13 +3,10 @@ import { Web3Provider } from '@ethersproject/providers'
 import { useWeb3React as useWeb3ReactCore } from '@web3-react/core'
 import { Web3ReactContextInterface } from '@web3-react/core/dist/types'
 import { isMobile } from 'react-device-detect'
-import { injected } from '../connectors'
+import { gnosisSafe, injected } from '../connectors'
 import { NetworkContextName } from '../utils/constants'
-import { SafeAppConnector } from '@gnosis.pm/safe-apps-web3-react'
+import { IS_IN_IFRAME } from '../utils/helper'
 
-const safeAppConnector = new SafeAppConnector({
-    supportedChainIds: [1, 4],
-})
 export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> {
     const context = useWeb3ReactCore<Web3Provider>()
     const contextNetwork = useWeb3ReactCore<Web3Provider>(NetworkContextName)
@@ -19,32 +16,47 @@ export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> {
 export function useEagerConnect() {
     const { activate, active } = useWeb3ReactCore() // specifically using useWeb3ReactCore because of what this hook does
     const [tried, setTried] = useState(false)
+
+    // gnosisSafe.isSafeApp() races a timeout against postMessage, so it delays pageload if we are not in a safe app;
+    // if we are not embedded in an iframe, it is not worth checking
+    const [triedSafe, setTriedSafe] = useState(!IS_IN_IFRAME)
+
+    // first, try connecting to a gnosis safe
     useEffect(() => {
-        safeAppConnector.isSafeApp().then((loadedInSafe) => {
-            if (loadedInSafe) {
-                // On success active flag will change and in that case we'll set tried to true, check the hook below
-                activate(safeAppConnector, undefined, true).catch((e) => {
-                    setTried(true)
-                })
-            } else {
-                injected.isAuthorized().then((isAuthorized) => {
-                    if (isAuthorized) {
+        if (!triedSafe) {
+            gnosisSafe.isSafeApp().then((loadedInSafe) => {
+                if (loadedInSafe) {
+                    activate(gnosisSafe, undefined, true).catch((e) => {
+                        console.log(e, 'e')
+
+                        setTriedSafe(true)
+                    })
+                } else {
+                    setTriedSafe(true)
+                }
+            })
+        }
+    }, [activate, setTriedSafe, triedSafe])
+
+    useEffect(() => {
+        if (!active && triedSafe) {
+            injected.isAuthorized().then((isAuthorized) => {
+                if (isAuthorized) {
+                    activate(injected, undefined, true).catch(() => {
+                        setTried(true)
+                    })
+                } else {
+                    if (isMobile && window.ethereum) {
                         activate(injected, undefined, true).catch(() => {
                             setTried(true)
                         })
                     } else {
-                        if (isMobile && window.ethereum) {
-                            activate(injected, undefined, true).catch(() => {
-                                setTried(true)
-                            })
-                        } else {
-                            setTried(true)
-                        }
+                        setTried(true)
                     }
-                })
-            }
-        })
-    }, [activate]) // intentionally only running on mount (make sure it's only mounted once :))
+                }
+            })
+        }
+    }, [activate, active, triedSafe])
 
     // if the connection worked, wait until we get confirmation of that to flip the flag
     useEffect(() => {

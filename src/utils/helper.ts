@@ -18,6 +18,8 @@ import {
 import { injected, NETWORK_ID } from '../connectors'
 import { getAddress } from '@ethersproject/address'
 
+export const IS_IN_IFRAME = window.parent !== window
+
 export const returnWalletAddress = (walletAddress: string) =>
     `${walletAddress.slice(0, 4 + 2)}...${walletAddress.slice(-4)}`
 
