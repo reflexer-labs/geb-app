@@ -43,7 +43,10 @@ const SafeHistory = ({ hideHistory }: Props) => {
                 <Col>
                     <ExternalLink href={link} target="_blank">
                         {returnWalletAddress(txHash)}{' '}
-                        <img src={require('../assets/arrow-up.svg')} alt="" />
+                        <img
+                            src={require('../assets/arrow-up.svg').default}
+                            alt=""
+                        />
                     </ExternalLink>
                 </Col>
             </Row>
@@ -59,7 +62,7 @@ const SafeHistory = ({ hideHistory }: Props) => {
         setTotal(Math.ceil(history.length / perPage))
     }
 
-    const setPaginationCB = useCallback(setPagination, [])
+    const setPaginationCB = useCallback(setPagination, [perPage])
 
     useEffect(() => {
         setPaginationCB(safeState.historyList)

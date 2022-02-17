@@ -151,7 +151,10 @@ export default function WalletModal() {
                             link={option.href}
                             header={option.name}
                             subheader={null}
-                            icon={require(`../../assets/connectors/${option.iconName}`)}
+                            icon={
+                                require(`../../assets/connectors/${option.iconName}`)
+                                    .default
+                            }
                         />
                     )
                 }
@@ -171,7 +174,10 @@ export default function WalletModal() {
                                 header={'Install Metamask'}
                                 subheader={null}
                                 link={'https://metamask.io/'}
-                                icon={require('../../assets/connectors/metamask.png')}
+                                icon={
+                                    require('../../assets/connectors/metamask.png')
+                                        .default
+                                }
                             />
                         )
                     } else {
@@ -206,7 +212,10 @@ export default function WalletModal() {
                         link={option.href}
                         header={option.name}
                         subheader={null} //use option.descriptio to bring back multi-line
-                        icon={require(`../../assets/connectors/${option.iconName}`)}
+                        icon={
+                            require(`../../assets/connectors/${option.iconName}`)
+                                .default
+                        }
                     />
                 )
             )

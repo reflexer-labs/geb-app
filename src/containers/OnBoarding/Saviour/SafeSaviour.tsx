@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
@@ -40,22 +40,25 @@ const SafeSaviour = ({ ...props }) => {
     const { withdrawCallback } = useSaviourWithdraw()
     const { getReservesCallback } = useSaviourGetReserves()
 
-    const SAVIOUR_TYPES = [
-        {
-            item: 'Uniswap v2 RAI/ETH',
-            img: require('../../../assets/uniswap-icon.svg'),
-            href: `https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`,
-            isExternal: true,
-            shortName: 'uniswap',
-        },
-        {
-            item: 'Yearn Curve RAI/3Pool',
-            img: require('../../../assets/curve.svg'),
-            href: `https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`,
-            isExternal: true,
-            shortName: 'curve',
-        },
-    ]
+    const SAVIOUR_TYPES = useMemo(
+        () => [
+            {
+                item: 'Uniswap v2 RAI/ETH',
+                img: require('../../../assets/uniswap-icon.svg').default,
+                href: `https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`,
+                isExternal: true,
+                shortName: 'uniswap',
+            },
+            {
+                item: 'Yearn Curve RAI/3Pool',
+                img: require('../../../assets/curve.svg').default,
+                href: `https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`,
+                isExternal: true,
+                shortName: 'curve',
+            },
+        ],
+        [saviourData]
+    )
 
     const { popupsModel: popupsActions, safeModel: safeActions } =
         useStoreActions((state) => state)

@@ -213,11 +213,13 @@ const AuctionBlock = (auction: Props) => {
             <Header onClick={() => setCollapse(!collapse)}>
                 <LeftAucInfo type={eventType.toLowerCase()}>
                     <img
-                        src={require(`../assets/${
-                            eventType === 'STAKED_TOKEN'
-                                ? 'flx_uni_eth'
-                                : eventType.toLowerCase()
-                        }.svg`)}
+                        src={
+                            require(`../assets/${
+                                eventType === 'STAKED_TOKEN'
+                                    ? 'flx_uni_eth'
+                                    : eventType.toLowerCase()
+                            }.svg`).default
+                        }
                         alt="debt type auction"
                     />
 

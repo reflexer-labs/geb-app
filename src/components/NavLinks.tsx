@@ -107,7 +107,7 @@ const NavLinks = () => {
                     >
                         Staking{' '}
                         <img
-                            src={require('../assets/dark-arrow.svg')}
+                            src={require('../assets/dark-arrow.svg').default}
                             alt="arrow"
                         />
                     </IntLink>
@@ -117,7 +117,7 @@ const NavLinks = () => {
                     >
                         Money God League{' '}
                         <img
-                            src={require('../assets/dark-arrow.svg')}
+                            src={require('../assets/dark-arrow.svg').default}
                             alt="arrow"
                         />
                     </IntLink>
@@ -127,7 +127,7 @@ const NavLinks = () => {
                     >
                         Incentives{' '}
                         <img
-                            src={require('../assets/dark-arrow.svg')}
+                            src={require('../assets/dark-arrow.svg').default}
                             alt="arrow"
                         />
                     </IntLink>
@@ -147,7 +147,7 @@ const NavLinks = () => {
                     >
                         Nexus Mutual{' '}
                         <img
-                            src={require('../assets/dark-arrow.svg')}
+                            src={require('../assets/dark-arrow.svg').default}
                             alt="arrow"
                         />
                     </ExtLink>
@@ -157,7 +157,7 @@ const NavLinks = () => {
                     >
                         InsurAce{' '}
                         <img
-                            src={require('../assets/dark-arrow.svg')}
+                            src={require('../assets/dark-arrow.svg').default}
                             alt="arrow"
                         />
                     </ExtLink>

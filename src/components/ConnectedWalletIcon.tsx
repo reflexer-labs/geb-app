@@ -21,7 +21,10 @@ const ConnectedWalletIcon = ({ size }: Props) => {
             return (
                 <IconWrapper size={size || 16}>
                     <img
-                        src={require('../assets/connectors/walletConnectIcon.svg')}
+                        src={
+                            require('../assets/connectors/walletConnectIcon.svg')
+                                .default
+                        }
                         alt={'wallet connect logo'}
                     />
                 </IconWrapper>
@@ -30,7 +33,10 @@ const ConnectedWalletIcon = ({ size }: Props) => {
             return (
                 <IconWrapper size={size || 16}>
                     <img
-                        src={require('../assets/connectors/coinbaseWalletIcon.svg')}
+                        src={
+                            require('../assets/connectors/coinbaseWalletIcon.svg')
+                                .default
+                        }
                         alt={'coinbase wallet logo'}
                     />
                 </IconWrapper>

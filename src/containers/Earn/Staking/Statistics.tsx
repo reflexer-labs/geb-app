@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import styled from 'styled-components'
 import numeral from 'numeral'
 import Button from '../../../components/Button'
@@ -9,9 +9,11 @@ import { formatNumber } from '../../../utils/helper'
 const returnImg = (type = 'flx', width = '20px', height = '20px') => {
     return (
         <img
-            src={require(`../../../assets/${
-                type === 'flx' ? 'flx-logo.svg' : 'stFLX.svg'
-            }`)}
+            src={
+                require(`../../../assets/${
+                    type === 'flx' ? 'flx-logo.svg' : 'stFLX.svg'
+                }`).default
+            }
             width={width}
             height={height}
             alt=""
@@ -107,7 +109,7 @@ const Statistics = () => {
     return (
         <Container>
             <Content>
-                <Stats>
+                <StatsContainer>
                     {Object.keys(stats).map((key) => {
                         const isPrimary = key === 'data'
                         return (
@@ -136,7 +138,7 @@ const Statistics = () => {
                             </div>
                         )
                     })}
-                </Stats>
+                </StatsContainer>
                 <StatsFooter>
                     <RewardBox>
                         <RewardLabel>My Current Reward</RewardLabel>
@@ -178,7 +180,7 @@ const Flex = styled.div`
     margin: 13px 0;
 `
 
-const Stats = styled.div`
+const StatsContainer = styled.div`
     padding: 20px;
     border-radius: 10px;
     background: ${(props) => props.theme.colors.placeholder};

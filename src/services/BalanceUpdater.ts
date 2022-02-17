@@ -36,7 +36,7 @@ export default function ApplicationUpdater(): null {
 
     // attach/detach listeners
     useEffect(() => {
-        if (!library || !chainId || !account) return undefined
+        if (!library || !chainId || !account) return
         setState({ chainId, balance: 0 })
         library
             .getBalance(account)

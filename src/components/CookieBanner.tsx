@@ -16,7 +16,7 @@ const CookieBanner = () => {
                 }}
             >
                 <CookiesText>
-                    <img src={require('../assets/cookie.svg')} alt="" />
+                    <img src={require('../assets/cookie.svg').default} alt="" />
                     This website uses cookies to enhance the user experience. By
                     continuing to browse the site you're agreeing to our
                     <CustomLink

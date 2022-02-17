@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { toast } from 'react-toastify'
 import ToastPayload from '../components/ToastPayload'
 import { useActiveWeb3React } from '../hooks'
@@ -37,7 +37,10 @@ export default function TransactionUpdater(): null {
         ? connectedWalletState.blockNumber[chainId]
         : null
 
-    const transactions = chainId ? state.transactions ?? {} : {}
+    const transactions = useMemo(
+        () => (chainId ? state.transactions ?? {} : {}),
+        [chainId, state]
+    )
 
     useEffect(() => {
         if (!chainId || !library || !lastBlockNumber) return

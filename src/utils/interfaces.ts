@@ -6,7 +6,7 @@ import { IconName } from '../components/FeatherIconWrapper'
 import { ApproveMethod } from '../components/ApproveToken'
 import { Geb } from 'geb.js'
 import { BigNumber } from 'ethers'
-import { SaviourType } from 'src/model/safeModel'
+import { SaviourType } from '../model/safeModel'
 
 export declare enum ChainId {
     MAINNET = 1,

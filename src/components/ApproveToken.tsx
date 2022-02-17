@@ -1,6 +1,6 @@
 import { ethers, utils as ethersUtils } from 'ethers'
 import { Geb, utils as gebUtils } from 'geb.js'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { AlertTriangle, ArrowUpCircle, CheckCircle } from 'react-feather'
 import styled from 'styled-components'
 import { useActiveWeb3React } from '../hooks'
@@ -34,11 +34,13 @@ const ApproveToken = ({
     methodName,
     coinName,
 }: Props) => {
-    const TEXT_PAYLOAD_DEFAULT_STATE = {
-        title: `${coinName} Allowance`,
-        text: `Allow your account to manage your ${coinName}`,
-        status: '',
-    }
+    const TEXT_PAYLOAD_DEFAULT_STATE = useMemo(() => {
+        return {
+            title: `${coinName} Allowance`,
+            text: `Allow your account to manage your ${coinName}`,
+            status: '',
+        }
+    }, [coinName])
 
     const [textPayload, setTextPayload] = useState(TEXT_PAYLOAD_DEFAULT_STATE)
     const [isPaid, setIsPaid] = useState(false)
@@ -93,9 +95,10 @@ const ApproveToken = ({
     }
 
     const passedCheckCB = useCallback(passedCheckForAllowance, [
-        allowance,
-        amount,
-        isPaid,
+        TEXT_PAYLOAD_DEFAULT_STATE,
+        coinName,
+        handleSuccess,
+        popupsActions,
     ])
 
     useEffect(() => {

@@ -16,8 +16,8 @@ import { useStoreActions } from '../../../store'
 import { useTranslation } from 'react-i18next'
 
 const projectImgs = {
-    volt: require('../../../assets/vcon.svg'),
-    h2o: require('../../../assets/aqua.svg'),
+    volt: require('../../../assets/vcon.svg').default,
+    h2o: require('../../../assets/aqua.svg').default,
 }
 
 const MoneyGodLeague = () => {
@@ -166,7 +166,7 @@ const InfoBox = styled.div`
 
 const LeftSide = styled.div`
     flex: 0 0 100%;
-    background: url(${require('../../../assets/blueish-bg.png')});
+    background: url(${require('../../../assets/blueish-bg.png').default});
     background-repeat: no-repeat;
     background-size: cover;
     padding: 20px;

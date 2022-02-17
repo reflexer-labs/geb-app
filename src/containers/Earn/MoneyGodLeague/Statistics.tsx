@@ -93,7 +93,7 @@ const Statistics = () => {
     return (
         <Container>
             <Content>
-                <Stats>
+                <StatsContainer>
                     {Object.keys(stats).map((key) => {
                         const isPrimary = key === 'data'
                         return (
@@ -122,7 +122,7 @@ const Statistics = () => {
                             </div>
                         )
                     })}
-                </Stats>
+                </StatsContainer>
                 <StatsFooter>
                     <RewardBox>
                         <RewardLabel>Claimable Rewards</RewardLabel>
@@ -156,7 +156,7 @@ const Flex = styled.div`
     margin: 13px 0;
 `
 
-const Stats = styled.div`
+const StatsContainer = styled.div`
     padding: 20px;
     border-radius: 10px;
     background: ${(props) => props.theme.colors.placeholder};

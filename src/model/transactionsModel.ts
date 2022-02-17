@@ -1,5 +1,5 @@
 import { action, Action } from 'easy-peasy'
-import { NETWORK_ID } from 'src/connectors'
+import { NETWORK_ID } from '../connectors'
 import { ITransaction } from '../utils/interfaces'
 
 export interface TransactionsModel {

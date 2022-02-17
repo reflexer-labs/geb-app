@@ -69,7 +69,7 @@ describe('App Page - No Proxy', () => {
         cy.get('[data-test-id="topup-btn"]').click()
         cy.get('#topup_input').type('0x0')
         cy.get('[data-test-id="topup-manage"]').click()
-        cy.contains('Enter a valid ETH address')
+        cy.contains('Error fetching Address from ENS name or invalid address')
     })
 
     it('shows error if same address', () => {

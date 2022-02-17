@@ -67,7 +67,10 @@ const AddLiquidity = () => {
         <Container>
             <InputContainer>
                 <InputLabel>
-                    <img src={require('../../../assets/rai-logo.svg')} alt="" />
+                    <img
+                        src={require('../../../assets/rai-logo.svg').default}
+                        alt=""
+                    />
                     {`RAI (Available: ${formatNumber(
                         currencyBalances.rai.toString()
                     )})`}
@@ -84,7 +87,10 @@ const AddLiquidity = () => {
             </SeparatorIcon>
             <InputContainer>
                 <InputLabel>
-                    <img src={require('../../../assets/eth-logo.png')} alt="" />
+                    <img
+                        src={require('../../../assets/eth-logo.png').default}
+                        alt=""
+                    />
                     {`ETH (Available: ${formatNumber(
                         currencyBalances.eth.toString()
                     )})`}

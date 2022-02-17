@@ -192,7 +192,7 @@ const Shared = ({ children, ...rest }: Props) => {
             }
         }
     }
-
+    // eslint-disable-next-line
     const networkCheckerCallBack = useCallback(networkChecker, [
         account,
         chainId,

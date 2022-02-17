@@ -16,6 +16,5 @@ const get = (obj: any, path: string, defaultValue: any = undefined) => {
     return result === undefined || result === obj ? defaultValue : result
 }
 
-export default {
-    get,
-}
+const lodash = { get }
+export default lodash

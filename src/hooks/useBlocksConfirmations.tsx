@@ -51,7 +51,7 @@ export function use10BlocksConfirmations() {
             return null
         }
     }
-
+    // eslint-disable-next-line
     const returnConfCallback = useCallback(returnConfirmations, [
         chainId,
         blockNumber,
