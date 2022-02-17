@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+// @ts-ignore
 import type { Listener } from '@ethersproject/providers'
 import type { Event, EventFilter } from 'ethers'
 

@@ -2,6 +2,7 @@ import { ethers } from 'ethers'
 import { Geb } from 'geb.js'
 import { css } from 'styled-components'
 import { injected, walletconnect, walletlink } from '../connectors'
+import { SupportedChainId } from './chains'
 import { constructSameAddressMap } from './constructSameAddressMap'
 import { ChainId, WalletInfo } from './interfaces'
 
@@ -18,6 +19,14 @@ const {
     REACT_APP_NETWORK_URL,
     REACT_APP_WYRE_WORKER,
 } = process.env
+
+export const ENS_REGISTRAR_ADDRESSES: AddressMap = {
+    [SupportedChainId.MAINNET]: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    [SupportedChainId.ROPSTEN]: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    [SupportedChainId.GOERLI]: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    [SupportedChainId.RINKEBY]: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    [SupportedChainId.KOVAN]: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+}
 
 export const MULTICALL2_ADDRESSES: AddressMap = {
     ...constructSameAddressMap(

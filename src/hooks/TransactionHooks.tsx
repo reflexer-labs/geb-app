@@ -72,7 +72,7 @@ export async function handlePreTxGasEstimate(
     let gasLimit: BigNumber
     try {
         gasLimit = await signer.estimateGas(tx)
-    } catch (err) {
+    } catch (err: any) {
         let gebError: string | null
         try {
             const res = await signer.call(tx)

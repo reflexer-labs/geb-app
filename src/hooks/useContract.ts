@@ -6,9 +6,16 @@ import { Erc20 } from '../abis/Erc20'
 import ERC20_ABI from '../abis/erc20.json'
 import ERC20_BYTES32_ABI from '../abis/erc20_bytes32.json'
 import MULTICALL_ABI from '../abis/multicall2.json'
-import { EMPTY_ADDRESS, MULTICALL2_ADDRESSES } from '../utils/constants'
+import {
+    EMPTY_ADDRESS,
+    ENS_REGISTRAR_ADDRESSES,
+    MULTICALL2_ADDRESSES,
+} from '../utils/constants'
 import { isAddress } from '../utils/helper'
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
+import ENS_PUBLIC_RESOLVER_ABI from '../abis/ens-public-resolver.json'
+import ENS_ABI from '../abis/ens-registrar.json'
+import { EnsPublicResolver, EnsRegistrar } from '../abis/types'
 
 // account is not optional
 export function getSigner(
@@ -100,4 +107,23 @@ export function useMulticall2Contract() {
         MULTICALL_ABI,
         false
     ) as Multicall2
+}
+
+export function useENSRegistrarContract(withSignerIfPossible?: boolean) {
+    return useContract<EnsRegistrar>(
+        ENS_REGISTRAR_ADDRESSES,
+        ENS_ABI,
+        withSignerIfPossible
+    )
+}
+
+export function useENSResolverContract(
+    address: string | undefined,
+    withSignerIfPossible?: boolean
+) {
+    return useContract<EnsPublicResolver>(
+        address,
+        ENS_PUBLIC_RESOLVER_ABI,
+        withSignerIfPossible
+    )
 }
