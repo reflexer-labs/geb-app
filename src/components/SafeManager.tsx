@@ -1,7 +1,7 @@
-import { isAddress } from '@ethersproject/address'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
+import useENS from '../hooks/useENS'
 import styled from 'styled-components'
 import { useActiveWeb3React } from '../hooks'
 import useGeb from '../hooks/useGeb'
@@ -18,7 +18,7 @@ const SafeManager = () => {
     const [value, setValue] = useState('')
 
     const history = useHistory()
-
+    const { loading, address, name } = useENS(value)
     const { settingsModel: settingsState } = useStoreState((state) => state)
 
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
@@ -30,19 +30,29 @@ const SafeManager = () => {
     }
 
     const handleSubmit = async () => {
-        if (!value || (value && !isAddress(value))) {
-            setError('Enter a valid ETH address')
+        if (!value) {
+            setError('Enter a valid ETH address or ENS name')
             return
         }
 
-        if (account && value.toLowerCase() === account.toLowerCase()) {
+        if (
+            account &&
+            address &&
+            address.toLowerCase() === account.toLowerCase()
+        ) {
             setError('Cannot use your own address')
             return
         }
-
+        if (!address) {
+            setError('Error fetching Address from ENS name or invalid address')
+            return
+        }
         try {
+            console.table('Topping up...')
+            console.table({ name, address })
+
             const userSafes = await fetchUserSafes(
-                { address: value, geb, isRPCAdapterOn },
+                { address, geb, isRPCAdapterOn },
                 true
             )
 
@@ -51,7 +61,7 @@ const SafeManager = () => {
                 return
             }
             popupsActions.setIsWaitingModalOpen(true)
-            history.push(`/${value}`)
+            history.push(`/${address}`)
             handleCancel()
             await timeout(3000)
             popupsActions.setIsWaitingModalOpen(false)
@@ -66,8 +76,11 @@ const SafeManager = () => {
             <CustomInput
                 id="topup_input"
                 value={value}
-                placeholder={'Enter a valid ETH address'}
-                onChange={(e) => setValue(e.target.value)}
+                placeholder={'Enter a valid ETH address or ENS name'}
+                onChange={(e) => {
+                    setError('')
+                    setValue(e.target.value)
+                }}
             />
 
             {error && <Error>{error}</Error>}
@@ -79,6 +92,7 @@ const SafeManager = () => {
                     withArrow
                     onClick={handleSubmit}
                     text={t('manage_safe')}
+                    disabled={loading}
                 />
             </Footer>
         </Body>
