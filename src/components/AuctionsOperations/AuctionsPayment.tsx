@@ -170,12 +170,14 @@ const AuctionsPayment = () => {
         const flxBalanceBN = flxBalance
             ? BigNumber.from(toFixedString(flxBalance, 'WAD'))
             : BigNumber.from('0')
-        const internalBalanceBN = internalBalance
-            ? BigNumber.from(toFixedString(internalBalance, 'WAD'))
-            : BigNumber.from('internalBalance')
-        const flxInternalBalance = protInternalBalance
-            ? BigNumber.from(toFixedString(protInternalBalance, 'WAD'))
-            : BigNumber.from('protInternalBalance')
+        const internalBalanceBN =
+            internalBalance && Number(internalBalance) > 0.00001
+                ? BigNumber.from(toFixedString(internalBalance, 'WAD'))
+                : BigNumber.from('0')
+        const flxInternalBalance =
+            protInternalBalance && Number(protInternalBalance) > 0.00001
+                ? BigNumber.from(toFixedString(protInternalBalance, 'WAD'))
+                : BigNumber.from('0')
 
         const totalRaiBalance = raiBalanceBN.add(internalBalanceBN)
         const totalFlxBalance = flxBalanceBN.add(flxInternalBalance)
