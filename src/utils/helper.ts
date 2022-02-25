@@ -71,12 +71,14 @@ export const formatNumber = (value: string, digits = 4, round = false) => {
     if (Number.isInteger(n) || value.length < 5) {
         return n
     }
-
+    let val
     if (round) {
-        return numeral(n).format(`0.${nOfDigits}`)
+        val = numeral(n).format(`0.${nOfDigits}`)
+    } else {
+        val = numeral(n).format(`0.${nOfDigits}`, Math.floor)
     }
 
-    return numeral(n).format(`0.${nOfDigits}`, Math.floor)
+    return isNaN(Number(val)) ? value : val
 }
 
 export const getRatePercentage = (

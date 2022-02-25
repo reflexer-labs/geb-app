@@ -22,10 +22,8 @@ const AuctionsPayment = () => {
         popupsModel: popupsState,
         connectWalletModel: connectWalletState,
     } = useStoreState((state) => state)
-    const {
-        auctionsModel: auctionsActions,
-        popupsModel: popupsActions,
-    } = useStoreActions((state) => state)
+    const { auctionsModel: auctionsActions, popupsModel: popupsActions } =
+        useStoreActions((state) => state)
     const {
         selectedAuction,
         amount,
@@ -350,7 +348,13 @@ const AuctionsPayment = () => {
                 <DecimalInput
                     disabled
                     onChange={() => {}}
-                    value={isClaim ? returnClaimValues().amount : sellAmount}
+                    value={
+                        isClaim
+                            ? Number(returnClaimValues().amount) < 0.0001
+                                ? '< 0.0001'
+                                : returnClaimValues().amount
+                            : sellAmount
+                    }
                     label={`Claimable ${
                         isClaim ? returnClaimValues().symbol : sellSymbol
                     }`}
