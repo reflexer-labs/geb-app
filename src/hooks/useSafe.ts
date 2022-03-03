@@ -15,9 +15,10 @@ import {
     safeIsSafe,
     toFixedString,
 } from '../utils/helper'
-import { useProxyAddress, useTokenBalance } from './useGeb'
+import { useProxyAddress } from './useGeb'
 import { useTranslation } from 'react-i18next'
 import { DEFAULT_SAFE_STATE } from '../utils/constants'
+import { useTokenBalances } from './Wallet'
 
 export const LIQUIDATION_RATIO = 135 // percent
 
@@ -51,16 +52,16 @@ export function useSafeInfo(type: SafeTypes = 'create') {
     }, [safeData])
 
     const { leftInput, rightInput } = parsedAmounts
-
-    const ethBalance = useTokenBalance('ETH')
-    const raiBalance = useTokenBalance('RAI')
+    const tokenBalances = useTokenBalances(account as string)
 
     const balances = useMemo(() => {
         return {
-            eth: ethBalance,
-            rai: raiBalance,
+            eth: tokenBalances.eth.balance,
+            rai: tokenBalances.rai.balance,
         }
-    }, [ethBalance, raiBalance])
+    }, [tokenBalances])
+
+    const { eth: ethBalance, rai: raiBalance } = balances
 
     const collateral = useTotalCollateral(leftInput, type)
     const debt = useTotalDebt(rightInput, type)
@@ -433,7 +434,6 @@ export function useSafeIsSafe(totalCollateral: string, totalDebt: string) {
     const {
         liquidationData: { currentPrice },
     } = useSafeState()
-
     return useMemo(() => {
         if (!currentPrice.safetyPrice) return true
         return safeIsSafe(totalCollateral, totalDebt, currentPrice.safetyPrice)

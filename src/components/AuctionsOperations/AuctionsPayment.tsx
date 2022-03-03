@@ -22,10 +22,8 @@ const AuctionsPayment = () => {
         popupsModel: popupsState,
         connectWalletModel: connectWalletState,
     } = useStoreState((state) => state)
-    const {
-        auctionsModel: auctionsActions,
-        popupsModel: popupsActions,
-    } = useStoreActions((state) => state)
+    const { auctionsModel: auctionsActions, popupsModel: popupsActions } =
+        useStoreActions((state) => state)
     const {
         selectedAuction,
         amount,
@@ -100,7 +98,7 @@ const AuctionsPayment = () => {
 
     const maxBid = (): string => {
         const sellAmountBN = sellAmount
-            ? BigNumber.from(toFixedString(sellAmount, 'WAD'))
+            ? BigNumber.from(toFixedString(sellAmount, 'RAD'))
             : BigNumber.from('0')
         const buyAmountBN = buyAmount
             ? auctionType === 'STAKED_TOKEN'
@@ -113,9 +111,7 @@ const AuctionsPayment = () => {
                 if (isOngoingAuction) {
                     // We need to bid 3% less than the current best bid
                     return gebUtils
-                        .wadToFixed(
-                            sellAmountBN.mul(gebUtils.WAD).div(bidIncreaseBN)
-                        )
+                        .wadToFixed(sellAmountBN.div(bidIncreaseBN))
                         .toString()
                 } else {
                     // Auction restart (no bids and passed the dealine)
@@ -132,9 +128,7 @@ const AuctionsPayment = () => {
             } else {
                 // We need to bid 3% less than the current best bid
                 return gebUtils
-                    .wadToFixed(
-                        sellAmountBN.mul(gebUtils.WAD).div(bidIncreaseBN)
-                    )
+                    .wadToFixed(sellAmountBN.div(bidIncreaseBN))
                     .toString()
             }
         }
@@ -172,12 +166,14 @@ const AuctionsPayment = () => {
         const flxBalanceBN = flxBalance
             ? BigNumber.from(toFixedString(flxBalance, 'WAD'))
             : BigNumber.from('0')
-        const internalBalanceBN = internalBalance
-            ? BigNumber.from(toFixedString(internalBalance, 'WAD'))
-            : BigNumber.from('internalBalance')
-        const flxInternalBalance = protInternalBalance
-            ? BigNumber.from(toFixedString(protInternalBalance, 'WAD'))
-            : BigNumber.from('protInternalBalance')
+        const internalBalanceBN =
+            internalBalance && Number(internalBalance) > 0.00001
+                ? BigNumber.from(toFixedString(internalBalance, 'WAD'))
+                : BigNumber.from('0')
+        const flxInternalBalance =
+            protInternalBalance && Number(protInternalBalance) > 0.00001
+                ? BigNumber.from(toFixedString(protInternalBalance, 'WAD'))
+                : BigNumber.from('0')
 
         const totalRaiBalance = raiBalanceBN.add(internalBalanceBN)
         const totalFlxBalance = flxBalanceBN.add(flxInternalBalance)
@@ -350,7 +346,13 @@ const AuctionsPayment = () => {
                 <DecimalInput
                     disabled
                     onChange={() => {}}
-                    value={isClaim ? returnClaimValues().amount : sellAmount}
+                    value={
+                        isClaim
+                            ? Number(returnClaimValues().amount) < 0.0001
+                                ? '< 0.0001'
+                                : returnClaimValues().amount
+                            : sellAmount
+                    }
                     label={`Claimable ${
                         isClaim ? returnClaimValues().symbol : sellSymbol
                     }`}

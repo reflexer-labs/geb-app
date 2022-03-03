@@ -1,8 +1,8 @@
 import React, { ReactNode, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import ConnectedWalletModal from '../components/Modals/ConnectedWalletModal'
-import CreateAccountModal from '../components/Modals/SafeOperationsModel'
 import ScreenLoader from '../components/Modals/ScreenLoader'
+import TopUpModal from '../components/Modals/SafeManagerModal'
 import Navbar from '../components/Navbar'
 import SideMenu from '../components/SideMenu'
 import { useStoreState, useStoreActions } from '../store'
@@ -32,12 +32,11 @@ import ImagePreloader from '../components/ImagePreloader'
 import AuctionsModal from '../components/Modals/AuctionsModal'
 import AlertLabel from '../components/AlertLabel'
 import useGeb from '../hooks/useGeb'
-import SafeManagerModal from '../components/Modals/SafeManagerModal'
 import { isAddress } from '@ethersproject/address'
 import DistributionsModal from '../components/Modals/DistributionsModal'
-import SaviourModal from '../components/Modals/SaviourModal'
 import { ChainId } from '../utils/interfaces'
 import { ethers } from 'ethers'
+import MulticallUpdater from '../services/MulticallUpdater'
 
 interface Props {
     children: ReactNode
@@ -77,11 +76,6 @@ const Shared = ({ children, ...rest }: Props) => {
         popupsActions.setIsVotingModalOpen(false)
         popupsActions.setIsWaitingModalOpen(false)
         popupsActions.setShowSideMenu(false)
-        popupsActions.setSafeOperationPayload({
-            isOpen: false,
-            type: '',
-            isCreate: false,
-        })
     }
 
     async function accountChecker() {
@@ -214,19 +208,18 @@ const Shared = ({ children, ...rest }: Props) => {
             {settingsState.blockBody ? <BlockBodyContainer /> : null}
             <SideMenu />
             <WalletModal />
+            <MulticallUpdater />
             <ApplicationUpdater />
             <BalanceUpdater />
             <TransactionUpdater />
             <DistributionsModal />
-            <SaviourModal />
             <LoadingModal />
             <AuctionsModal />
-            <CreateAccountModal />
             <ProxyModal />
             <ConnectedWalletModal />
-            <SafeManagerModal />
             <ScreenLoader />
             <WaitingModal />
+            <TopUpModal />
             <EmptyDiv>
                 <Navbar />
             </EmptyDiv>

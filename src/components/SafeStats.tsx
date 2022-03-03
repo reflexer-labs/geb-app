@@ -22,9 +22,11 @@ import { useSafeInfo } from '../hooks/useSafe'
 const SafeStats = ({
     isModifying,
     isDeposit,
+    isOwner,
 }: {
     isModifying: boolean
     isDeposit: boolean
+    isOwner: boolean
 }) => {
     const { t } = useTranslation()
     const {
@@ -121,7 +123,9 @@ const SafeStats = ({
 
     return (
         <>
-            {singleSafe && Number(singleSafe.internalCollateralBalance) > 0 ? (
+            {isOwner &&
+            singleSafe &&
+            Number(singleSafe.internalCollateralBalance) > 0 ? (
                 <SurplusBlock>
                     <StateInner>
                         <Inline>

@@ -1,4 +1,5 @@
 import { action, Action } from 'easy-peasy'
+import { NETWORK_ID } from 'src/connectors'
 import { ITransaction } from '../utils/interfaces'
 
 export interface TransactionsModel {
@@ -17,7 +18,7 @@ const transactionsModel: TransactionsModel = {
     addTransaction: action((state, payload) => {
         state.transactions[payload.hash] = payload
         localStorage.setItem(
-            `${payload.from}-${payload.chainId}`,
+            `${payload.from}-${payload.chainId ? payload.chainId : NETWORK_ID}`,
             JSON.stringify(state.transactions)
         )
     }),
@@ -36,14 +37,14 @@ const transactionsModel: TransactionsModel = {
         }
         state.transactions[tx.hash] = tx
         localStorage.setItem(
-            `${tx.from}-${tx.chainId}`,
+            `${tx.from}-${tx.chainId ? tx.chainId : NETWORK_ID}`,
             JSON.stringify(state.transactions)
         )
     }),
     finalizeTransaction: action((state, payload) => {
         state.transactions[payload.hash] = payload
         localStorage.setItem(
-            `${payload.from}-${payload.chainId}`,
+            `${payload.from}-${payload.chainId ? payload.chainId : NETWORK_ID}`,
             JSON.stringify(state.transactions)
         )
     }),

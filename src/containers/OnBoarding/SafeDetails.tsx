@@ -139,6 +139,7 @@ const SafeDetails = ({ ...props }) => {
             <SafeStats
                 isModifying={isDeposit || isWithdraw}
                 isDeposit={isDeposit}
+                isOwner={isOwner}
             />
 
             {isDeposit || isWithdraw ? (

@@ -261,7 +261,7 @@ const Text = styled.div`
 const BtnContainer = styled.div`
     padding: 20px;
     margin: 20px -20px -38px;
-    background-color: rgb(247, 248, 250);
+    background-color: ${(props) => props.theme.colors.background};
     border-radius: 0 0 20px 20px;
     text-align: center;
     svg {

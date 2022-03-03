@@ -112,6 +112,16 @@ const NavLinks = () => {
                         />
                     </IntLink>
                     <IntLink
+                        to="/earn/moneygod"
+                        onClick={() => popupsActions.setShowSideMenu(false)}
+                    >
+                        Money God League{' '}
+                        <img
+                            src={require('../assets/dark-arrow.svg')}
+                            alt="arrow"
+                        />
+                    </IntLink>
+                    <IntLink
                         to="/earn/incentives"
                         onClick={() => popupsActions.setShowSideMenu(false)}
                     >

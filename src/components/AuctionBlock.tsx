@@ -235,18 +235,22 @@ const AuctionBlock = (auction: Props) => {
                                 }
                             >
                                 <InfoLabel>{sellSymbol} OFFERED</InfoLabel>
-                                <InfoValue>{`${sellInititalAmount} ${sellSymbol}`}</InfoValue>
+                                <InfoValue>{`${formatNumber(
+                                    sellInititalAmount,
+                                    2
+                                )} ${sellSymbol}`}</InfoValue>
                             </InfoCol>
 
                             <InfoCol>
                                 <InfoLabel>{buySymbol} BID</InfoLabel>
-                                <InfoValue>{`${
+                                <InfoValue>{`${formatNumber(
                                     eventType === 'STAKED_TOKEN' &&
-                                    Number(buyAmount) !==
-                                        Number(buyInitialAmount)
+                                        Number(buyAmount) !==
+                                            Number(buyInitialAmount)
                                         ? parseRadToWad(buyAmount)
-                                        : buyAmount
-                                } ${buySymbol}`}</InfoValue>
+                                        : buyAmount,
+                                    2
+                                )} ${buySymbol}`}</InfoValue>
                             </InfoCol>
 
                             <InfoCol>

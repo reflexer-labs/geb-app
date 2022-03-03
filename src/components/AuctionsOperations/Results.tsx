@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import { useStoreState } from '../../store'
 import { COIN_TICKER } from '../../utils/constants'
@@ -6,17 +6,11 @@ import { formatNumber } from '../../utils/helper'
 import _ from '../../utils/lodash'
 
 const Results = () => {
-    const {
-        auctionsModel: auctionsState,
-        popupsModel: popupsState,
-    } = useStoreState((state) => state)
+    const { auctionsModel: auctionsState, popupsModel: popupsState } =
+        useStoreState((state) => state)
 
-    const {
-        selectedAuction,
-        amount,
-        internalBalance,
-        protInternalBalance,
-    } = auctionsState
+    const { selectedAuction, amount, internalBalance, protInternalBalance } =
+        auctionsState
     const buyInititalAmount = _.get(selectedAuction, 'buyInitialAmount', '0')
     const sellInitialAmount = _.get(selectedAuction, 'sellInitialAmount', '0')
     const auctionType = _.get(selectedAuction, 'englishAuctionType', 'DEBT')
@@ -41,6 +35,13 @@ const Results = () => {
     const sectionType = popupsState.auctionOperationPayload.auctionType
     const isClaim = popupsState.auctionOperationPayload.type.includes('claim')
     const isSettle = popupsState.auctionOperationPayload.type.includes('settle')
+
+    const leftOverBalance = useMemo(() => {
+        const balance =
+            sectionType === 'SURPLUS' ? protInternalBalance : internalBalance
+
+        return Number(balance) < 0.0001 ? '< 0.0001' : formatNumber(balance)
+    }, [sectionType, internalBalance, protInternalBalance])
     return (
         <Result>
             <Block>
@@ -49,11 +50,7 @@ const Results = () => {
                         <Label>{`${
                             sectionType === 'SURPLUS' ? 'FLX' : 'RAI'
                         } Amount`}</Label>
-                        <Value>{`${formatNumber(
-                            sectionType === 'SURPLUS'
-                                ? protInternalBalance
-                                : internalBalance
-                        )}`}</Value>
+                        <Value>{`${leftOverBalance}`}</Value>
                     </Item>
                 ) : (
                     <>

@@ -6,11 +6,15 @@ import Modal from '../../components/Modals/Modal'
 import TokenInput from '../../components/TokenInput'
 import { useActiveWeb3React } from '../../hooks'
 import { handleTransactionError } from '../../hooks/TransactionHooks'
-import { useProxyAddress, useTokenBalanceInUSD } from '../../hooks/useGeb'
+import useGeb, {
+    useProxyAddress,
+    useTokenBalanceInUSD,
+} from '../../hooks/useGeb'
 import { useSafeInfo, useInputsHandlers } from '../../hooks/useSafe'
 import { ApprovalState, useTokenApproval } from '../../hooks/useTokenApproval'
 import { useStoreActions, useStoreState } from '../../store'
-import { DEFAULT_SAFE_STATE, TOKENS } from '../../utils/constants'
+import { DEFAULT_SAFE_STATE } from '../../utils/constants'
+import { TOKENS } from '../../utils/tokens'
 import { formatNumber } from '../../utils/helper'
 import Review from './Review'
 
@@ -22,16 +26,17 @@ const ModifySafe = ({
     isOwner: boolean
 }) => {
     const { library, account } = useActiveWeb3React()
+    const geb = useGeb()
     const proxyAddress = useProxyAddress()
     const [showPreview, setShowPreview] = useState(false)
     const { safeModel: safeState } = useStoreState((state) => state)
+    const type = isDeposit ? 'deposit_borrow' : 'repay_withdraw'
     const {
         safeModel: safeActions,
         connectWalletModel: connectWalletActions,
         popupsModel: popupsActions,
     } = useStoreActions((state) => state)
 
-    const type = isDeposit ? 'deposit_borrow' : 'repay_withdraw'
     const {
         error,
         balances,
@@ -44,14 +49,13 @@ const ModifySafe = ({
         liquidationPrice,
     } = useSafeInfo(type)
 
-    const { leftInput, rightInput } = parsedAmounts
-
     const [unlockState, approveUnlock] = useTokenApproval(
-        rightInput,
-        'coin',
-        proxyAddress,
-        account as string
+        parsedAmounts.rightInput,
+        geb?.contracts.coin.address,
+        proxyAddress
     )
+
+    const { leftInput, rightInput } = parsedAmounts
 
     const { onLeftInput, onRightInput } = useInputsHandlers()
     const isValid = !error
