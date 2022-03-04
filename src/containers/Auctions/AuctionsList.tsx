@@ -62,18 +62,9 @@ const AuctionsList = ({ type }: Props) => {
                     </Title>
                     {account &&
                     auctions &&
-                    (type === 'DEBT' || type === 'STAKED_TOKEN') &&
-                    Number(internalBalance) > 0 ? (
-                        <Button
-                            text={t('claim_tokens')}
-                            onClick={() => handleClick('claim_tokens')}
-                        />
-                    ) : null}
-
-                    {account &&
-                    auctions &&
-                    type === 'SURPLUS' &&
-                    Number(protInternalBalance) > 0 ? (
+                    auctions.length &&
+                    (Number(internalBalance) > 0 ||
+                        Number(protInternalBalance) > 0) ? (
                         <Button
                             text={t('claim_tokens')}
                             onClick={() => handleClick('claim_tokens')}

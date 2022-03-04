@@ -32,23 +32,27 @@ const Results = () => {
             ? COIN_TICKER
             : 'FLX'
 
-    const sectionType = popupsState.auctionOperationPayload.auctionType
     const isClaim = popupsState.auctionOperationPayload.type.includes('claim')
     const isSettle = popupsState.auctionOperationPayload.type.includes('settle')
 
     const leftOverBalance = useMemo(() => {
         const balance =
-            sectionType === 'SURPLUS' ? protInternalBalance : internalBalance
+            Number(protInternalBalance) > Number(internalBalance)
+                ? protInternalBalance
+                : internalBalance
+        return Number(balance) < 0.0001 ? '< 0.0001' : formatNumber(balance, 2)
+    }, [internalBalance, protInternalBalance])
 
-        return Number(balance) < 0.0001 ? '< 0.0001' : formatNumber(balance)
-    }, [sectionType, internalBalance, protInternalBalance])
     return (
         <Result>
             <Block>
                 {isClaim ? (
                     <Item>
                         <Label>{`${
-                            sectionType === 'SURPLUS' ? 'FLX' : 'RAI'
+                            Number(protInternalBalance) >
+                            Number(internalBalance)
+                                ? 'FLX'
+                                : 'RAI'
                         } Amount`}</Label>
                         <Value>{`${leftOverBalance}`}</Value>
                     </Item>
@@ -61,7 +65,10 @@ const Results = () => {
                         {isSettle ? (
                             <Item>
                                 <Label>{`Claimable ${sellSymbol}`}</Label>
-                                <Value>{`${formatNumber(sellAmount)}`}</Value>
+                                <Value>{`${formatNumber(
+                                    sellAmount,
+                                    2
+                                )}`}</Value>
                             </Item>
                         ) : (
                             <>
@@ -74,7 +81,8 @@ const Results = () => {
                                     <Value>{`${formatNumber(
                                         auctionType === 'DEBT'
                                             ? buyInititalAmount
-                                            : sellInitialAmount
+                                            : sellInitialAmount,
+                                        2
                                     )}`}</Value>
                                 </Item>
                                 <Item>
@@ -83,7 +91,10 @@ const Results = () => {
                                             ? `${sellSymbol} to Receive`
                                             : `${buySymbol} to Bid`}
                                     </Label>
-                                    <Value>{`${formatNumber(amount)}`}</Value>
+                                    <Value>{`${formatNumber(
+                                        amount,
+                                        2
+                                    )}`}</Value>
                                 </Item>
                             </>
                         )}

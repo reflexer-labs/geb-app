@@ -290,10 +290,14 @@ const AuctionsPayment = () => {
     }
 
     const returnClaimValues = () => {
-        if (sectionType === 'DEBT' || sectionType === 'STAKED_TOKEN') {
+        if (Number(internalBalance) > 0) {
             return { amount: internalBalance, symbol: 'RAI' }
         }
-        return { amount: protInternalBalance, symbol: 'FLX' }
+        if (Number(protInternalBalance) > 0) {
+            return { amount: protInternalBalance, symbol: 'FLX' }
+        }
+
+        return { amount: internalBalance, symbol: 'RAI' }
     }
 
     const handleCancel = () => {
@@ -339,6 +343,9 @@ const AuctionsPayment = () => {
                                 : `${buySymbol} to Bid`
                         }
                         maxText={auctionType === 'DEBT' ? 'max' : 'min'}
+                        disableMax={
+                            Number(buyAmount) === 0 || Number(sellAmount) === 0
+                        }
                         handleMaxClick={() => handleAmountChange(maxBid())}
                     />
                 </>

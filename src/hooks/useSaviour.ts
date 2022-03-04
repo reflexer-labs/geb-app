@@ -486,16 +486,29 @@ export async function fetchSaviourData({
         ),
         geb.contracts.coinNativeUniswapSaviour.minKeeperPayoutValue(true),
     ])
+    //@ts-ignore
+    const curveSaviourAddress = geb.addresses.GEB_YEARN_CURVE_MAX_SAVIOUR
+    const emptyRes: [ethers.BigNumber, string, string] = [
+        BigNumber.from('0'),
+        EMPTY_ADDRESS,
+        EMPTY_ADDRESS,
+    ]
+    const multiCallRequest3 =
+        curveSaviourAddress !== EMPTY_ADDRESS
+            ? geb.multiCall([
+                  geb.contracts.yearnCurveMaxSafeSaviour.yvTokenCover(
+                      ETH_A,
+                      safeHandler.toLowerCase(),
+                      true
+                  ),
 
-    const multiCallRequest3 = geb.multiCall([
-        geb.contracts.yearnCurveMaxSafeSaviour.yvTokenCover(
-            ETH_A,
-            safeHandler.toLowerCase(),
-            true
-        ),
-        geb.contracts.yearnCurveMaxSafeSaviour.curveLpToken(true),
-        geb.contracts.yearnCurveMaxSafeSaviour.curvePoolTokens(1, true),
-    ])
+                  geb.contracts.yearnCurveMaxSafeSaviour.curveLpToken(true),
+                  geb.contracts.yearnCurveMaxSafeSaviour.curvePoolTokens(
+                      1,
+                      true
+                  ),
+              ])
+            : emptyRes
 
     const [muliCallResponse1, multiCallResponse2, multiCallResponse3] =
         await Promise.all([
@@ -551,8 +564,6 @@ export async function fetchSaviourData({
     //                      2 * ethPrice * reserveETH
     // uniPoolPrice = --------------------------------------
     //                            lptotalSupply
-    //@ts-ignore
-    const curveSaviourAddress = geb.addresses.GEB_YEARN_CURVE_MAX_SAVIOUR
 
     const isCurveSaviour =
         saviourAddress.toLowerCase() === curveSaviourAddress.toLowerCase()
