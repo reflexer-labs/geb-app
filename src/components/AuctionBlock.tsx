@@ -495,11 +495,11 @@ const AlertContainer = styled.div`
         font-size: 13px;
         ${({ theme }) => theme.mediaWidth.upToSmall`
     margin-left:0;
-    width:100%;
+ 
   `}
     }
     ${({ theme }) => theme.mediaWidth.upToSmall`
-      width:100%;
+   
       margin-top:10px;
       margin-bottom:10px;
   `}

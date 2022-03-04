@@ -194,7 +194,7 @@ const AuctionsPayment = () => {
         }
 
         if (auctionType === 'STAKED_TOKEN') {
-            if (buyAmountBN.gt(totalRaiBalance)) {
+            if (buyAmountBN.gt(totalRaiBalance) || valueBN.gt(raiBalanceBN)) {
                 setError(`Insufficient ${COIN_TICKER} balance.`)
                 return false
             }
@@ -211,7 +211,7 @@ const AuctionsPayment = () => {
         }
 
         if (auctionType === 'SURPLUS') {
-            if (buyAmountBN.gt(totalFlxBalance)) {
+            if (buyAmountBN.gt(totalFlxBalance) || valueBN.gt(flxBalanceBN)) {
                 setError(`Insufficient FLX balance.`)
                 return false
             }
@@ -228,7 +228,7 @@ const AuctionsPayment = () => {
         }
 
         if (auctionType === 'DEBT') {
-            if (buyAmountBN.gt(totalRaiBalance)) {
+            if (buyAmountBN.gt(totalRaiBalance) || valueBN.gt(raiBalanceBN)) {
                 setError(`Insufficient ${COIN_TICKER} balance.`)
                 return false
             }

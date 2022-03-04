@@ -111,7 +111,7 @@ const NavLinks = () => {
                             alt="arrow"
                         />
                     </IntLink>
-                    <IntLink
+                    {/* <IntLink
                         to="/earn/moneygod"
                         onClick={() => popupsActions.setShowSideMenu(false)}
                     >
@@ -120,7 +120,7 @@ const NavLinks = () => {
                             src={require('../assets/dark-arrow.svg')}
                             alt="arrow"
                         />
-                    </IntLink>
+                    </IntLink> */}
                     <IntLink
                         to="/earn/incentives"
                         onClick={() => popupsActions.setShowSideMenu(false)}
