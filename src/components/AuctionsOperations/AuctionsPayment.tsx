@@ -339,6 +339,9 @@ const AuctionsPayment = () => {
                                 : `${buySymbol} to Bid`
                         }
                         maxText={auctionType === 'DEBT' ? 'max' : 'min'}
+                        disableMax={
+                            Number(buyAmount) === 0 || Number(sellAmount) === 0
+                        }
                         handleMaxClick={() => handleAmountChange(maxBid())}
                     />
                 </>

@@ -72,7 +72,7 @@ const AuctionBlock = (auction: Props) => {
 
     const parseRadToWad = (amount: string) => {
         const amountBN = BigNumber.from(amount)
-        return formatNumber(parseWad(gebUtils.decimalShift(amountBN, -9)))
+        return formatNumber(parseWad(gebUtils.decimalShift(amountBN, -9)), 2)
     }
 
     const kickBidder = {
@@ -90,7 +90,7 @@ const AuctionBlock = (auction: Props) => {
         if (eventType === 'STAKED_TOKEN' && i !== biddersList.length - 1) {
             return parseRadToWad(amount)
         }
-        return formatNumber(amount)
+        return formatNumber(amount, 2)
     }
     const returnEventType = (bidder: IAuctionBidder, i: number) => {
         if (
@@ -202,7 +202,7 @@ const AuctionBlock = (auction: Props) => {
             }
         } else {
             return {
-                text: 'Auction Completed / Not Settled',
+                text: 'Auction to Settle',
                 label: 'greenish',
             }
         }
@@ -264,7 +264,7 @@ const AuctionBlock = (auction: Props) => {
 
                     <AlertContainer>
                         <AlertLabel
-                            text={returnLabel().text}
+                            text={returnLabel().text + ' '}
                             type={returnLabel().label}
                         />
                     </AlertContainer>
@@ -338,7 +338,8 @@ const AuctionBlock = (auction: Props) => {
                                                     Sell Amount
                                                 </ListItemLabel>
                                                 {formatNumber(
-                                                    bidder.sellAmount
+                                                    bidder.sellAmount,
+                                                    2
                                                 )}{' '}
                                                 {sellSymbol}
                                             </ListItem>
@@ -490,6 +491,7 @@ const AlertContainer = styled.div`
     > div {
         display: inline-block;
         margin-left: auto;
+        padding-right: 10px !important;
     }
     div {
         font-size: 13px;
@@ -532,6 +534,9 @@ const Head = styled.div`
     text-transform: uppercase;
     color: ${(props) => props.theme.colors.secondary};
     padding-left: 10px;
+    &:first-child {
+        padding-left: 25px;
+    }
 `
 
 const ListItemLabel = styled.div`
@@ -578,8 +583,16 @@ const ListItem = styled.div`
     color: ${(props) => props.theme.colors.customSecondary};
     font-size: ${(props) => props.theme.font.extraSmall};
     padding: 15px 10px;
+    &:first-child {
+        padding-left: 25px;
+    }
 
     ${({ theme }) => theme.mediaWidth.upToSmall`
+      &:first-child {
+        padding: 15px 20px;
+    }
+    padding: 15px 20px;
+
     flex: 0 0 50%;
     min-width:50%;
     font-size: ${(props) => props.theme.font.extraSmall};
