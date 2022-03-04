@@ -290,18 +290,14 @@ const AuctionsPayment = () => {
     }
 
     const returnClaimValues = () => {
-        if (isSettle) {
-            if (sectionType === 'SURPLUS') {
-                return { amount: internalBalance, symbol: 'RAI' }
-            }
-            if (sectionType === 'DEBT' || sectionType === 'STAKED_TOKEN') {
-                return { amount: protInternalBalance, symbol: 'FLX' }
-            }
-        }
-        if (sectionType === 'DEBT' || sectionType === 'STAKED_TOKEN') {
+        if (Number(internalBalance) > 0) {
             return { amount: internalBalance, symbol: 'RAI' }
         }
-        return { amount: protInternalBalance, symbol: 'FLX' }
+        if (Number(protInternalBalance) > 0) {
+            return { amount: protInternalBalance, symbol: 'FLX' }
+        }
+
+        return { amount: internalBalance, symbol: 'RAI' }
     }
 
     const handleCancel = () => {
