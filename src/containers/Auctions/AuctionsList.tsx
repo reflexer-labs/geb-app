@@ -63,16 +63,14 @@ const AuctionsList = ({ type }: Props) => {
                     {account &&
                     auctions &&
                     auctions.length &&
-                    (Number(internalBalance) > 0 ||
-                        Number(protInternalBalance) > 0) ? (
+                    (Number(internalBalance) >= 0.0001 ||
+                        Number(protInternalBalance) >= 0.0001) ? (
                         <Button
                             text={t('claim_tokens')}
                             onClick={() => handleClick('claim_tokens')}
                         />
                     ) : null}
                 </Box>
-
-                <span>{`Status`}</span>
             </InfoBox>
             {auctions && auctions.length > 0 ? (
                 <>
