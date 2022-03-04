@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 import React, { useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import Button from '../../components/Button'
@@ -90,20 +90,25 @@ const ModifySafe = ({
             onLeftInput(availableEth as string)
         }
     }
+
     const onMaxRightInput = () => {
         if (isDeposit) {
             onRightInput(availableRai.toString())
         } else {
             const availableRaiBN = ethers.utils.parseEther(availableRai)
 
-            const raiBalanceBN = ethers.utils.parseEther(
-                balances.rai.toString()
-            )
+            const raiBalanceBN = balances.rai
+                ? ethers.utils.parseEther(balances.rai.toString())
+                : BigNumber.from('0')
 
             const isMore = raiBalanceBN.gt(availableRaiBN)
 
             onRightInput(
-                isMore ? availableRai.toString() : balances.rai.toString()
+                isMore
+                    ? availableRai.toString()
+                    : balances.rai
+                    ? balances.rai.toString()
+                    : '0'
             )
         }
     }

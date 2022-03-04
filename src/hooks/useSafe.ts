@@ -9,6 +9,7 @@ import {
     getLiquidationPrice,
     getRatePercentage,
     returnAvaiableDebt,
+    returnPercentAmount,
     returnTotalDebt,
     returnTotalValue,
     safeIsSafe,
@@ -259,6 +260,22 @@ export function useSafeInfo(type: SafeTypes = 'create') {
 
         if (rightInputBN.gt(availableRaiBN)) {
             error = error ?? `RAI to repay cannot exceed owed amount`
+        }
+
+        if (!rightInputBN.isZero()) {
+            const repayPercent = returnPercentAmount(
+                rightInput,
+                availableRai as string
+            )
+
+            if (
+                rightInputBN.lt(BigNumber.from(availableRaiBN)) &&
+                repayPercent > 95
+            ) {
+                error =
+                    error ??
+                    `You can only repay a minimum of ${availableRai} RAI to avoid leaving residual values`
+            }
         }
 
         if (!rightInputBN.isZero() && rightInputBN.gt(raiBalanceBN)) {
