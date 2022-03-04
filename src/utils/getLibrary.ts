@@ -2,8 +2,6 @@ import { providers } from 'ethers'
 import { Web3Provider } from '@ethersproject/providers'
 
 export default function getLibrary(provider: any): Web3Provider {
-    console.log(provider)
-
     const library = new providers.Web3Provider(
         provider,
         typeof provider.chainId === 'number'
