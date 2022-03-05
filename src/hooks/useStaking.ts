@@ -441,6 +441,7 @@ export function useAddStaking(): {
         if (!library || !stakingAmount || !account || !geb) {
             return
         }
+
         try {
             const stakingAmountBN = ethers.utils.parseEther(stakingAmount)
 

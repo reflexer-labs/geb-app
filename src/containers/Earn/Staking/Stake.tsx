@@ -25,8 +25,8 @@ const Stake = () => {
 
     const [depositApprovalState, approveDeposit] = useTokenApproval(
         parsedAmounts.stakingAmount,
-        geb?.contracts.stakingFirstResort.address,
-        geb?.contracts.stakingToken.address
+        geb?.contracts.stakingToken.address,
+        geb?.contracts.stakingFirstResort.address
     )
 
     const stakingValue = parsedAmounts.stakingAmount
