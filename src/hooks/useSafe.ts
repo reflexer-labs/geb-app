@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 import { useCallback, useMemo } from 'react'
 import { useActiveWeb3React } from '.'
 import numeral from 'numeral'
@@ -21,7 +21,7 @@ import { DEFAULT_SAFE_STATE } from '../utils/constants'
 import { useTokenBalances } from './Wallet'
 
 export const LIQUIDATION_RATIO = 135 // percent
-
+export const ONE_DAY_WORTH_SF = ethers.utils.parseEther('0.00001')
 export type SafeTypes = 'deposit_borrow' | 'repay_withdraw' | 'create'
 export type StatsType = 'data' | 'prices' | 'info'
 export type Stats = {
@@ -269,7 +269,9 @@ export function useSafeInfo(type: SafeTypes = 'create') {
             )
 
             if (
-                rightInputBN.lt(BigNumber.from(availableRaiBN)) &&
+                rightInputBN
+                    .add(ONE_DAY_WORTH_SF)
+                    .lt(BigNumber.from(availableRaiBN)) &&
                 repayPercent > 95
             ) {
                 error =
@@ -323,6 +325,7 @@ export function useSafeInfo(type: SafeTypes = 'create') {
         const perSafeDebtCeilingBN = BigNumber.from(
             toFixedString(liquidationData.perSafeDebtCeiling, 'WAD')
         )
+
         if (totalDebtBN.gte(perSafeDebtCeilingBN)) {
             error =
                 error ??

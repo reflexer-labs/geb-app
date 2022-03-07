@@ -696,7 +696,7 @@ export function useMinSaviourBalance() {
             //                              debt * accumulatedRate * RP * Liq Point
             // liquidationPrice = -----------------------------------------------
             //                                     collateral
-            if (lockedCollateral.isZero()) {
+            if (lockedCollateral.isZero() || generatedDebt.isZero()) {
                 return '0'
             }
             const liquidationPrice = redemptionPrice
