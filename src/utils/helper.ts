@@ -289,7 +289,12 @@ export const returnTotalValue = (
         : BigNumber.from('0')
 
     const totalBN = isRepay ? firstBN.sub(secondBN) : firstBN.add(secondBN)
-
+    if (Number(totalBN) < 0.00001) {
+        if (!beautify) {
+            return BigNumber.from('0')
+        }
+        return '0'
+    }
     if (!beautify) return totalBN
     return formatNumber(gebUtils.wadToFixed(totalBN).toString()).toString()
 }
@@ -335,7 +340,9 @@ export const returnTotalDebt = (
     const accumulatedRateBN = BigNumber.from(
         toFixedString(accumulatedRate, 'RAY')
     )
+
     const totalDebtBN = debtBN.mul(accumulatedRateBN).div(gebUtils.RAY)
+
     if (!beautify) return totalDebtBN
     return gebUtils.wadToFixed(totalDebtBN).toString()
 }
