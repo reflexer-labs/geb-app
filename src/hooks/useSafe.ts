@@ -52,14 +52,14 @@ export function useSafeInfo(type: SafeTypes = 'create') {
     }, [safeData])
 
     const { leftInput, rightInput } = parsedAmounts
-    const tokenBalances = useTokenBalances(account as string)
+    const { eth, rai } = useTokenBalances(account as string)
 
     const balances = useMemo(() => {
         return {
-            eth: tokenBalances.eth.balance,
-            rai: tokenBalances.rai.balance,
+            eth: eth.balance,
+            rai: rai.balance,
         }
-    }, [tokenBalances])
+    }, [eth, rai])
 
     const { eth: ethBalance, rai: raiBalance } = balances
 
