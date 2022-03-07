@@ -263,7 +263,10 @@ export function useSafeInfo(type: SafeTypes = 'create') {
         }
 
         if (!rightInputBN.isZero()) {
-            const repayPercent = returnPercentAmount(rightInput, availableRai)
+            const repayPercent = returnPercentAmount(
+                rightInput,
+                availableRai as string
+            )
 
             if (
                 rightInputBN
