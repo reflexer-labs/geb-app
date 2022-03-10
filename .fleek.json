@@ -1,0 +1,14 @@
+{
+  "site": {
+    "id": "1ae6c2a5-c44d-4fa8-8b0e-0693106dcec9",
+    "team": "d0ee1cef-d1d9-4b9a-bd2f-6be943a8519a",
+    "platform": "ipfs",
+    "source": "ipfs",
+    "name": "wandering-forest-6356"
+  },
+  "build": {
+    "baseDir": "",
+    "publicDir": "build",
+    "rootDir": ""
+  }
+}

@@ -1,7 +1,7 @@
 {
     "name": "geb-app",
     "version": "0.1.0",
-    "homepage": "./",
+    "homepage": ".",
     "private": true,
     "dependencies": {
         "@ethersproject/address": "^5.0.10",
