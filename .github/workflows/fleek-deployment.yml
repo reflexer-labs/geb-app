@@ -1,0 +1,40 @@
+name: Fleek Deployment
+on:
+    push:
+        branches:
+            - fleek-deployment
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        env:
+            SOURCE_DIR: 'build'
+            REACT_APP_GRAPH_API_URLS: ${{ secrets.REACT_APP_GRAPH_API_URLS_PRODUCTION }}
+            REACT_APP_NETWORK_ID: ${{ secrets.REACT_APP_NETWORK_ID_PRODUCTION }}
+            REACT_APP_NETWORK_URL: ${{ secrets.REACT_APP_NETWORK_URL_PRODUCTION }}
+            REACT_APP_GOOGLE_ANALYTICS_ID: ${{ secrets.REACT_APP_GOOGLE_ANALYTICS_ID_PRODUCTION }}
+            REACT_APP_SHOW_AUCTIONS: ${{ secrets.REACT_APP_SHOW_AUCTIONS_PRODUCTION }}
+            REACT_APP_WYRE_WORKER: ${{ secrets.REACT_APP_WYRE_WORKER }}
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Use Node.js 12.18.0
+              uses: actions/setup-node@v1
+              with:
+                  node-version: '12.18.0'
+
+            - name: Install dependencies
+              run: yarn install --frozen-lockfile
+
+            - name: Build static site
+              run: yarn build
+
+            - name: Deploy staging
+              id: deploy
+              uses: fleekhq/action-deploy@v1
+              with:
+                  apiKey: ${{ secrets.FLEEK_API_KEY_PRODUCTION }}
+            - name: Get the output url
+              run: echo "Deploy url is ${{ steps.deploy.outputs.deployUrl }}"
