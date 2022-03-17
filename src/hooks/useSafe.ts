@@ -392,7 +392,7 @@ export function useTotalDebt(rightInput: string, type: SafeTypes) {
         return rightInput
     }, [singleSafe, rightInput, type, accumulatedRate])
 
-    return totalDebt || '0'
+    return totalDebt && Number(totalDebt) > 0.00001 ? totalDebt : '0'
 }
 
 export function useCollateralRatio(totalCollateral: string, totalDebt: string) {
