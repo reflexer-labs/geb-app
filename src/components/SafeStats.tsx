@@ -297,7 +297,7 @@ const SafeStats = ({
                                 singleSafe?.totalAnnualizedStabilityFee
                                     ? getRatePercentage(
                                           singleSafe?.totalAnnualizedStabilityFee,
-                                          1
+                                          2
                                       )
                                     : 0
                             }%`}</SideValue>
