@@ -115,9 +115,10 @@ export function useSafeInfo(type: SafeTypes = 'create') {
     const liquidationPenaltyPercentage = useMemo(() => {
         return getRatePercentage(liquidationData.liquidationPenalty, 0)
     }, [liquidationData])
+
     const stabilityFeePercentage = useMemo(() => {
         return liquidationData.totalAnnualizedStabilityFee
-            ? getRatePercentage(liquidationData.totalAnnualizedStabilityFee, 1)
+            ? getRatePercentage(liquidationData.totalAnnualizedStabilityFee, 2)
             : '-'
     }, [liquidationData])
 
