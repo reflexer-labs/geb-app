@@ -83,6 +83,12 @@ const SaviourOps = () => {
     )
 
     const handleChange = (val: string, isDeposit: boolean) => {
+        if (!isDeposit && val !== availableWithdrawBalance) {
+            safeActions.setIsMaxWithdraw(false)
+        }
+        if (!isDeposit && val === availableWithdrawBalance) {
+            safeActions.setIsMaxWithdraw(true)
+        }
         onTypedInput('')
         safeActions.setIsSaviourDeposit(isDeposit)
         onTypedInput(val)
