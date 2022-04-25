@@ -91,7 +91,7 @@ const ApproveToken = ({
             setIsPaid(false)
         }
     }
-
+    // eslint-disable-next-line
     const passedCheckCB = useCallback(passedCheckForAllowance, [
         allowance,
         amount,

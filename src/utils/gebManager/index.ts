@@ -201,7 +201,7 @@ const getSafeByIdRpc = async (
     }
 }
 
-export default {
+const gebManager = {
     getUserSafesRpc,
     getSafeByIdRpc,
     getLiquidationDataRpc,
@@ -211,3 +211,5 @@ export default {
 export const parseWad = (val: BigNumber) => utils.wadToFixed(val).toString()
 export const parseRay = (val: BigNumber) => utils.rayToFixed(val).toString()
 export const parseRad = (val: BigNumber) => utils.radToFixed(val).toString()
+
+export default gebManager
