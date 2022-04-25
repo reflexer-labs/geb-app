@@ -103,6 +103,7 @@ export interface ISafeData {
     rightInput: string
     collateralRatio: number
     liquidationPrice: number
+    isGnosisSafe?: boolean
 }
 
 export interface IBlockNumber {
