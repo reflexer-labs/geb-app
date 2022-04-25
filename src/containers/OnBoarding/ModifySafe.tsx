@@ -17,6 +17,7 @@ import { DEFAULT_SAFE_STATE } from '../../utils/constants'
 import { TOKENS } from '../../utils/tokens'
 import { formatNumber } from '../../utils/helper'
 import Review from './Review'
+import { gnosisSafe } from 'src/connectors'
 
 const ModifySafe = ({
     isDeposit,
@@ -25,7 +26,7 @@ const ModifySafe = ({
     isDeposit: boolean
     isOwner: boolean
 }) => {
-    const { library, account } = useActiveWeb3React()
+    const { library, account, connector } = useActiveWeb3React()
     const geb = useGeb()
     const proxyAddress = useProxyAddress()
     const [showPreview, setShowPreview] = useState(false)
@@ -168,8 +169,13 @@ const ModifySafe = ({
                 }
 
                 if (safeState.singleSafe && !isDeposit) {
+                    console.log(connector)
+
                     await safeActions.repayAndWithdraw({
-                        safeData: safeState.safeData,
+                        safeData: {
+                            ...safeState.safeData,
+                            isGnosisSafe: connector === gnosisSafe,
+                        },
                         signer,
                         safeId: safeState.singleSafe.id,
                     })

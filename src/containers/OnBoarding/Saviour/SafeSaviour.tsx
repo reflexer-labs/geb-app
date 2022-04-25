@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 import Button from '../../../components/Button'
@@ -40,22 +40,25 @@ const SafeSaviour = ({ ...props }) => {
     const { withdrawCallback } = useSaviourWithdraw()
     const { getReservesCallback } = useSaviourGetReserves()
 
-    const SAVIOUR_TYPES = [
-        {
-            item: 'Uniswap v2 RAI/ETH',
-            img: require('../../../assets/uniswap-icon.svg'),
-            href: `https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`,
-            isExternal: true,
-            shortName: 'uniswap',
-        },
-        {
-            item: 'Curve RAI/3Pool',
-            img: require('../../../assets/curve.svg'),
-            href: `https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`,
-            isExternal: true,
-            shortName: 'curve',
-        },
-    ]
+    const SAVIOUR_TYPES = useMemo(
+        () => [
+            {
+                item: 'Uniswap v2 RAI/ETH',
+                img: require('../../../assets/uniswap-icon.svg'),
+                href: `https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`,
+                isExternal: true,
+                shortName: 'uniswap',
+            },
+            {
+                item: 'Curve RAI/3Pool',
+                img: require('../../../assets/curve.svg'),
+                href: `https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`,
+                isExternal: true,
+                shortName: 'curve',
+            },
+        ],
+        [saviourData]
+    )
 
     const { popupsModel: popupsActions, safeModel: safeActions } =
         useStoreActions((state) => state)
@@ -172,7 +175,7 @@ const SafeSaviour = ({ ...props }) => {
                 />
 
                 {isModifying || hasSaviour ? (
-                    <Content >
+                    <Content>
                         {showAlert ? (
                             <LabelContainer>
                                 <AlertLabel
@@ -184,9 +187,13 @@ const SafeSaviour = ({ ...props }) => {
                         ) : null}
                         <Inner>
                             <StatsBlock>
-                                <Label style={{display:"none"}}>Select Saviour</Label>
+                                <Label style={{ display: 'none' }}>
+                                    Select Saviour
+                                </Label>
                                 <Flex>
-                                    <DropDownContainer style={{display:"none"}}>
+                                    <DropDownContainer
+                                        style={{ display: 'none' }}
+                                    >
                                         <Dropdown
                                             items={SAVIOUR_TYPES}
                                             itemSelected={
@@ -284,7 +291,7 @@ const Flex = styled.div`
     align-items: center;
     justify-content: space-between;
     #desktop_saviour_btn {
-        margin-left:auto;
+        margin-left: auto;
     }
     @media (max-width: 767px) {
         flex-direction: column;

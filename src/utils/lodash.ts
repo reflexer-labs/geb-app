@@ -15,7 +15,6 @@ const get = (obj: any, path: string, defaultValue: any = undefined) => {
     const result = travel(/[,[\]]+?/) || travel(/[,[\].]+?/)
     return result === undefined || result === obj ? defaultValue : result
 }
+const lodash = { get }
 
-export default {
-    get,
-}
+export default lodash

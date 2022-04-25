@@ -7,6 +7,8 @@ const fetchFiatPrice = async (token: string = 'ethereum') => {
     return res.data[token]
 }
 
-export default {
+const api = {
     fetchFiatPrice,
 }
+
+export default api

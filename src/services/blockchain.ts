@@ -99,8 +99,15 @@ export const handleRepayAndWithdraw = async (
     }
 
     if (!txData) throw new Error('No transaction request!')
+    console.log(safeData.isGnosisSafe)
 
-    const tx = await handlePreTxGasEstimate(signer, txData)
+    if (safeData.isGnosisSafe && !ethToFree.isZero()) {
+        txData.gasLimit = BigNumber.from('865000')
+    }
+    const tx =
+        safeData.isGnosisSafe && !ethToFree.isZero()
+            ? txData
+            : await handlePreTxGasEstimate(signer, txData)
 
     const txResponse = await signer.sendTransaction(tx)
     return txResponse
