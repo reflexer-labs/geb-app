@@ -35,7 +35,9 @@ export default function useAuctions() {
                 } = auc
                 const isOngoingAuction =
                     Number(auctionDeadline) * 1000 > Date.now()
-                const bidders = englishAuctionBids
+                const bidders = englishAuctionBids.sort(
+                    (a, b) => Number(a.createdAt) - Number(b.createdAt)
+                )
                 const kickBidder = {
                     bidder: startedBy,
                     buyAmount: buyInitialAmount,
