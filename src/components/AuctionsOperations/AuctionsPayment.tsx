@@ -98,7 +98,7 @@ const AuctionsPayment = () => {
 
     const maxBid = (): string => {
         const sellAmountBN = sellAmount
-            ? BigNumber.from(toFixedString(sellAmount, 'RAD'))
+            ? BigNumber.from(toFixedString(sellAmount, 'WAD'))
             : BigNumber.from('0')
         const buyAmountBN = buyAmount
             ? auctionType === 'STAKED_TOKEN'
@@ -111,7 +111,9 @@ const AuctionsPayment = () => {
                 if (isOngoingAuction) {
                     // We need to bid 3% less than the current best bid
                     return gebUtils
-                        .wadToFixed(sellAmountBN.div(bidIncreaseBN))
+                        .wadToFixed(
+                            sellAmountBN.div(bidIncreaseBN).mul(gebUtils.WAD)
+                        )
                         .toString()
                 } else {
                     // Auction restart (no bids and passed the dealine)
@@ -122,13 +124,17 @@ const AuctionsPayment = () => {
                         )
                     )
                     return gebUtils
-                        .wadToFixed(numerator.div(bidIncreaseBN))
+                        .wadToFixed(
+                            numerator.div(bidIncreaseBN).mul(gebUtils.WAD)
+                        )
                         .toString()
                 }
             } else {
                 // We need to bid 3% less than the current best bid
                 return gebUtils
-                    .wadToFixed(sellAmountBN.div(bidIncreaseBN))
+                    .wadToFixed(
+                        sellAmountBN.div(bidIncreaseBN).mul(gebUtils.WAD)
+                    )
                     .toString()
             }
         }
