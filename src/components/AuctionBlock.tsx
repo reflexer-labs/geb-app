@@ -236,7 +236,11 @@ const AuctionBlock = (auction: Props) => {
                             >
                                 <InfoLabel>{sellSymbol} OFFERED</InfoLabel>
                                 <InfoValue>{`${formatNumber(
-                                    sellInititalAmount,
+                                    eventType === 'DEBT' &&
+                                        Number(sellAmount) !==
+                                            Number(sellInititalAmount)
+                                        ? sellAmount
+                                        : sellInititalAmount,
                                     2
                                 )} ${sellSymbol}`}</InfoValue>
                             </InfoCol>
