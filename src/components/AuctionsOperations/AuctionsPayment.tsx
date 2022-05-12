@@ -98,7 +98,7 @@ const AuctionsPayment = () => {
 
     const maxBid = (): string => {
         const sellAmountBN = sellAmount
-            ? BigNumber.from(toFixedString(sellAmount, 'WAD'))
+            ? BigNumber.from(toFixedString(sellAmount, 'RAD'))
             : BigNumber.from('0')
         const buyAmountBN = buyAmount
             ? auctionType === 'STAKED_TOKEN'
