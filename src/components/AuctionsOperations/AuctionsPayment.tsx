@@ -97,9 +97,6 @@ const AuctionsPayment = () => {
     }
 
     const maxBid = (): string => {
-        const sellAmountBN = sellAmount
-            ? BigNumber.from(toFixedString(sellAmount, 'RAD'))
-            : BigNumber.from('0')
         const buyAmountBN = buyAmount
             ? auctionType === 'STAKED_TOKEN'
                 ? parseRadToWad(buyAmount)
@@ -107,6 +104,9 @@ const AuctionsPayment = () => {
             : BigNumber.from('0')
         const bidIncreaseBN = BigNumber.from(toFixedString(bidIncrease, 'WAD'))
         if (auctionType === 'DEBT') {
+            const sellAmountBN = sellAmount
+                ? BigNumber.from(toFixedString(sellAmount, 'WAD'))
+                : BigNumber.from('0')
             if (bids.length === 0) {
                 if (isOngoingAuction) {
                     // We need to bid 3% less than the current best bid
