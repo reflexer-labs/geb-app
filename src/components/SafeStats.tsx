@@ -58,10 +58,7 @@ const SafeStats = ({
     const collateralInUSD = useTokenBalanceInUSD('ETH', collateral as string)
     const totalDebtInUSD = useTokenBalanceInUSD('RAI', totalDebt as string)
 
-    const liquidationPenalty = getRatePercentage(
-        singleSafe?.liquidationPenalty || '1',
-        0
-    )
+    const liquidationPenalty = '18-20'
 
     const raiPrice = singleSafe
         ? formatNumber(singleSafe.currentRedemptionPrice, 3)
@@ -284,7 +281,7 @@ const SafeStats = ({
                             <InfoIcon data-tip={t('liquidation_penalty_tip')}>
                                 <Info size="16" />
                             </InfoIcon>
-                            <SideTitle>Liquidation Penalty</SideTitle>
+                            <SideTitle>Total Liquidation Penalty</SideTitle>
                             <SideValue>{`${liquidationPenalty}%`}</SideValue>
                         </Side>
 
