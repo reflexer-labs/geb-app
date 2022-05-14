@@ -103,7 +103,7 @@
     "my_stake_tip": "This is the percentage of the earned rewards which can be claimed immediately. The remainder is locked until the end of the campaign. Once the campaign ends, the remained will be unlocked linearly until {{date}}",
     "annual_redemption_tip": "Rate at which RAI is devalued or revalued over 1 year.",
     "liquidation_price_tip": "ETH price under which this Safe can get liquidated ( Liquidation Ratio: {{lr}} ). ⚠️ The liquidation price varies with the redemption price.",
-    "liquidation_penalty_tip": "This is a fee you pay in case your Safe gets liquidated. The fee is added on top of your Safe's debt during liquidation, resulting in more Safe collateral being sold.",
+    "liquidation_penalty_tip": "Liquidations ask for 10% more RAI than you have minted in your Safe and apply a 8-10% discount on the latest ETH oracle price in order to incentivize bidding.",
     "app": "App",
     "fullyUnlocked": "You can claim all your FLX rewards right after you earn them.",
     "proxy_wallet_text": "Your wallet is connected! Now, let's create your Reflexer Account",
