@@ -105,7 +105,7 @@ jobs:
 
                       You can also access the Reflexer app directly from an IPFS gateway.
                       **BEWARE**: The Reflexer app uses [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) to remember your settings, such as transactions hashes.
-                      **You should always use an IPFS gateway that enforces origin separation**, or our alias to the latest release at [app.reflexer.finance](https://app.reflexer.finance).
+                      **You should always use an IPFS gateway that enforces origin separation**, or our alias to the latest release at [ipfs.reflexer.finance](https://ipfs.reflexer.finance).
 
                       IPFS gateways:
                       - https://${{ steps.convert_cidv0.outputs.cidv1 }}.ipfs.dweb.link/

@@ -99,7 +99,6 @@ export const handleRepayAndWithdraw = async (
     }
 
     if (!txData) throw new Error('No transaction request!')
-    console.log(safeData.isGnosisSafe)
 
     if (safeData.isGnosisSafe && !ethToFree.isZero()) {
         txData.gasLimit = BigNumber.from('865000')
