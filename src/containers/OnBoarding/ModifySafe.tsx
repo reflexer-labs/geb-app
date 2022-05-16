@@ -169,8 +169,6 @@ const ModifySafe = ({
                 }
 
                 if (safeState.singleSafe && !isDeposit) {
-                    console.log(connector)
-
                     await safeActions.repayAndWithdraw({
                         safeData: {
                             ...safeState.safeData,
