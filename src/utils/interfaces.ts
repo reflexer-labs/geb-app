@@ -550,3 +550,9 @@ export interface CallResults {
         }
     }
 }
+
+export enum VoteOption {
+    Against,
+    For,
+    Abstain,
+}

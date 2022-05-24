@@ -116,3 +116,11 @@ export function useTokenBalanceInUSD(token: TokenType, balance: string) {
         return formatNumber((Number(price) * Number(balance)).toString(), 2)
     }, [token, ethPrice, raiPrice, balance])
 }
+
+export function useFLXContract() {
+    const geb = useGeb()
+    return useMemo(() => {
+        if (!geb) return ''
+        return geb.contracts.protocolToken.address
+    }, [geb])
+}

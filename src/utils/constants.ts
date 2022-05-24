@@ -2,6 +2,7 @@ import { ethers } from 'ethers'
 import { Geb } from 'geb.js'
 import { css } from 'styled-components'
 import { injected, walletconnect, walletlink } from '../connectors'
+import { SupportedChainId } from './chains'
 import { constructSameAddressMap } from './constructSameAddressMap'
 import { ChainId, WalletInfo } from './interfaces'
 
@@ -96,6 +97,11 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
         mobile: true,
         mobileOnly: true,
     },
+}
+
+export const GOVERNANCE_BRAVO_ADDRESSES: AddressMap = {
+    [SupportedChainId.MAINNET]: '0x408ED6354d4973f66138C91495F2f2FCbd8724C3',
+    [SupportedChainId.KOVAN]: '0xb35816011D589E9ee5e6769F38d173DE94570f1b',
 }
 
 export const ETHERSCAN_PREFIXES: { [chainId in ChainId]: string } = {

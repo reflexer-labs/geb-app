@@ -7,14 +7,45 @@ import { JsonRpcSigner } from '@ethersproject/providers/lib/json-rpc-provider'
 import { useCallback, useMemo } from 'react'
 import { useActiveWeb3React } from '.'
 import store from '../store'
-import { ITransaction } from '../utils/interfaces'
+import { ITransaction, VoteOption } from '../utils/interfaces'
 import { BigNumber } from 'ethers'
 import { newTransactionsFirst } from '../utils/helper'
+
+export enum TransactionType {
+    APPROVAL = 0,
+    VOTE = 5,
+    DELEGATE = 6,
+    SUBMIT_PROPOSAL = 14,
+}
+
+interface BaseTransactionInfo {
+    type: TransactionType
+}
+
+export interface VoteTransactionInfo extends BaseTransactionInfo {
+    type: TransactionType.VOTE
+    governorAddress: string
+    proposalId: number
+    decision: VoteOption
+    reason: string
+}
+
+export interface DelegateTransactionInfo extends BaseTransactionInfo {
+    type: TransactionType.DELEGATE
+    delegatee: string
+}
+export interface SubmitProposalTransactionInfo {
+    type: TransactionType.SUBMIT_PROPOSAL
+}
 
 export function useTransactionAdder(): (
     response: TransactionResponse,
     summary?: string,
-    approval?: { tokenAddress: string; spender: string }
+    approval?: { tokenAddress: string; spender: string },
+    info?:
+        | VoteTransactionInfo
+        | DelegateTransactionInfo
+        | SubmitProposalTransactionInfo
 ) => void {
     const { chainId, account } = useActiveWeb3React()
     return useCallback(
