@@ -58,7 +58,6 @@
         "walletlink": "^2.1.0"
     },
     "scripts": {
-        "install": "yarn install",
         "start": "react-scripts start",
         "build": "react-scripts build",
         "prettier": "prettier --write \"{,**/*.{ts,tsx,json,js,md}}\"",
