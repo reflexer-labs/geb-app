@@ -7,6 +7,7 @@ import Navbar from '../components/Navbar'
 import SideMenu from '../components/SideMenu'
 import { useStoreState, useStoreActions } from '../store'
 import ApplicationUpdater from '../services/ApplicationUpdater'
+import LogsUpdater from '../hooks/logs/updater'
 import BalanceUpdater from '../services/BalanceUpdater'
 import { capitalizeName, timeout } from '../utils/helper'
 import WalletModal from '../components/WalletModal'
@@ -212,6 +213,7 @@ const Shared = ({ children, ...rest }: Props) => {
             <ApplicationUpdater />
             <BalanceUpdater />
             <TransactionUpdater />
+            <LogsUpdater />
             <DistributionsModal />
             <LoadingModal />
             <AuctionsModal />

@@ -3,7 +3,6 @@ import { Geb } from 'geb.js'
 import { css } from 'styled-components'
 import { injected, walletconnect, walletlink } from '../connectors'
 import { SupportedChainId } from './chains'
-import { constructSameAddressMap } from './constructSameAddressMap'
 import { ChainId, WalletInfo } from './interfaces'
 
 type AddressMap = { [chainId: number]: string }
@@ -17,13 +16,6 @@ const {
     REACT_APP_NETWORK_URL,
     REACT_APP_WYRE_WORKER,
 } = process.env
-
-export const MULTICALL2_ADDRESSES: AddressMap = {
-    ...constructSameAddressMap(
-        '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
-        false
-    ),
-}
 
 export enum Network {
     MAINNET = 'mainnet',
@@ -104,6 +96,27 @@ export const GOVERNANCE_BRAVO_ADDRESSES: AddressMap = {
     [SupportedChainId.KOVAN]: '0xb35816011D589E9ee5e6769F38d173DE94570f1b',
 }
 
+export const MULTICALL2_ADDRESSES: AddressMap = {
+    [SupportedChainId.MAINNET]: '0x51812e07497586ce025D798Bb44b6d11bBEe3a01',
+    [SupportedChainId.KOVAN]: '0x551283ecB1257B5aE0A4b2DFe42e06E5F29b8068',
+}
+
+export const COMMON_CONTRACT_NAMES: Record<
+    number,
+    { [address: string]: string }
+> = {
+    [SupportedChainId.MAINNET]: {
+        '0x6243d8CEA23066d098a15582d81a598b4e8391F4': 'FLX',
+        '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e': 'ENS Registry',
+        '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41': 'ENS Public Resolver',
+        '0x408ED6354d4973f66138C91495F2f2FCbd8724C3': 'Governance',
+    },
+    [SupportedChainId.KOVAN]: {
+        '0x6e6eA84bb2fcE17AfCE8e1117DdC708142ef51c9': 'FLX',
+        '0xb35816011D589E9ee5e6769F38d173DE94570f1b': 'Governance',
+    },
+}
+
 export const ETHERSCAN_PREFIXES: { [chainId in ChainId]: string } = {
     1: '',
     3: 'ropsten.',
@@ -156,6 +169,13 @@ export const jdenticonConfig = {
         grayscale: 0.48,
     },
     backColor: '#50ccd5',
+}
+
+export const DEFAULT_AVERAGE_BLOCK_TIME_IN_SECS = 13
+
+// Block time here is slightly higher (~1s) than average in order to avoid ongoing proposals past the displayed time
+export const AVERAGE_BLOCK_TIME_IN_SECS: { [chainId: number]: number } = {
+    1: DEFAULT_AVERAGE_BLOCK_TIME_IN_SECS,
 }
 
 export const INITIAL_INCENTIVE_STATE = [

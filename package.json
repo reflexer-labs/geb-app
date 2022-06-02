@@ -14,7 +14,6 @@
         "@types/node": "^12.0.0",
         "@types/react": "^17.0.2",
         "@types/react-dom": "^17.0.1",
-        "@uniswap/sdk-core": "^3.0.1",
         "@walletconnect/web3-provider": "1.1.1-alpha.0",
         "@web3-react/core": "^6.0.9",
         "@web3-react/injected-connector": "^6.0.7",
@@ -47,6 +46,7 @@
         "react-helmet-async": "^1.0.7",
         "react-i18next": "^11.7.2",
         "react-lottie-player": "^1.4.1",
+        "react-markdown": "^4.3.1",
         "react-paginate": "^6.5.0",
         "react-router-dom": "^5.2.0",
         "react-scripts": "3.4.3",
@@ -109,7 +109,8 @@
     },
     "resolutions": {
         "@types/react": "17.0.2",
-        "@types/react-dom": "17.0.2"
+        "@types/react-dom": "17.0.2",
+        "react-error-overlay": "6.0.9"
     },
     "husky": {
         "hooks": {

@@ -9,7 +9,7 @@ import useGeb from '../../hooks/useGeb'
 import { useActiveWeb3React } from '../../hooks'
 import { isAddress } from '@ethersproject/address'
 
-const OnBoarding = ({ ...props }) => {
+const Safes = ({ ...props }) => {
     const { t } = useTranslation()
     const [isOwner, setIsOwner] = useState(true)
     const { account, library } = useActiveWeb3React()
@@ -82,7 +82,7 @@ const OnBoarding = ({ ...props }) => {
     )
 }
 
-export default OnBoarding
+export default Safes
 
 const Container = styled.div``
 

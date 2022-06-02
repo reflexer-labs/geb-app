@@ -1,6 +1,6 @@
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useContext, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { ThemeContext } from 'styled-components'
 
 interface Props {
     label: string
@@ -15,6 +15,7 @@ interface Props {
     disabled?: boolean
     maxText?: 'max' | 'min'
     data_test_id?: string
+    bgColor?: string
 }
 
 const TokenInput = ({
@@ -30,8 +31,10 @@ const TokenInput = ({
     disabled,
     maxText = 'max',
     data_test_id,
+    bgColor,
 }: Props) => {
     const { t } = useTranslation()
+    const theme = useContext(ThemeContext)
 
     const [length, setLength] = useState(16)
 
@@ -56,7 +59,12 @@ const TokenInput = ({
 
     return (
         <Container>
-            <Content className={disabled ? 'disabled' : ''}>
+            <Content
+                className={disabled ? 'disabled' : ''}
+                style={{
+                    background: bgColor ? bgColor : theme.colors.placeholder,
+                }}
+            >
                 <Flex>
                     <TokenBox>
                         <Icon
@@ -67,6 +75,11 @@ const TokenInput = ({
                         {token?.name}
                     </TokenBox>
                     <CustomInput
+                        style={{
+                            background: bgColor
+                                ? bgColor
+                                : theme.colors.placeholder,
+                        }}
                         placeholder={placeholder || '0.00'}
                         type={'text'}
                         inputMode="decimal"

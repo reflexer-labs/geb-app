@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react'
+import React, { lazy, Suspense, useEffect } from 'react'
 import i18next from 'i18next'
 import { HashRouter as Router, Redirect, Route, Switch } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
@@ -7,29 +7,30 @@ import ErrorBoundary from './ErrorBoundary'
 import { useStoreState } from './store'
 import { darkTheme } from './utils/themes/dark'
 import { Theme } from './utils/interfaces'
-import OnBoarding from './containers/OnBoarding'
+import Safes from './containers/Safes'
 import { initI18n } from './utils/i18n'
 import GlobalStyle from './GlobalStyle'
 import Shared from './containers/Shared'
 import Web3ReactManager from './components/Web3ReactManager'
-import SafeDetails from './containers/OnBoarding/SafeDetails'
+import SafeDetails from './containers/Safes/SafeDetails'
 
 import Privacy from './containers/Privacy'
 import CustomToast from './components/CustomToast'
 import Auctions from './containers/Auctions'
 import GoogleTagManager from './components/Analytics/GoogleTagManager'
 import { SHOW_AUCTIONS } from './utils/constants'
-import SafeSaviour from './containers/OnBoarding/Saviour/SafeSaviour'
+import SafeSaviour from './containers/Safes/Saviour/SafeSaviour'
 import Staking from './containers/Earn/Staking'
 import Incentives from './containers/Earn/Incentives'
-import CreateSafe from './containers/OnBoarding/CreateSafe'
-// import MoneyGodLeague from './containers/Earn/MoneyGodLeague'
+import CreateSafe from './containers/Safes/CreateSafe'
 
 // Toast css
 
 declare module 'styled-components' {
     export interface DefaultTheme extends Theme {}
 }
+
+const Governance = lazy(() => import('./containers/Governance'))
 
 const App = () => {
     const { settingsModel: settingsState } = useStoreState((state) => state)
@@ -52,6 +53,18 @@ const App = () => {
                                 <Route component={GoogleTagManager} />
                                 <Web3ReactManager>
                                     <Switch>
+                                        <Route
+                                            strict
+                                            component={Governance}
+                                            path={'/governance'}
+                                        />
+                                        <Route
+                                            exact
+                                            strict
+                                            path="/create-proposal"
+                                        >
+                                            <Redirect to="/governance/create-proposal" />
+                                        </Route>
                                         {SHOW_AUCTIONS &&
                                         SHOW_AUCTIONS === '1' ? (
                                             <Route
@@ -67,12 +80,6 @@ const App = () => {
                                             component={Staking}
                                             path={'/earn/staking'}
                                         />
-                                        {/* <Route
-                                            exact
-                                            strict
-                                            component={MoneyGodLeague}
-                                            path={'/earn/moneygod'}
-                                        /> */}
                                         <Route
                                             exact
                                             strict
@@ -85,6 +92,7 @@ const App = () => {
                                             component={Incentives}
                                             path={'/earn/incentives'}
                                         />
+
                                         <Route
                                             exact
                                             strict
@@ -123,13 +131,13 @@ const App = () => {
                                         <Route
                                             exact
                                             strict
-                                            component={OnBoarding}
+                                            component={Safes}
                                             path={'/:address'}
                                         />
                                         <Route
                                             exact
                                             strict
-                                            component={OnBoarding}
+                                            component={Safes}
                                             path={'/'}
                                         />
                                         <Redirect from="*" to="/" />

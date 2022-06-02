@@ -11,6 +11,7 @@ interface Props {
     isExternal?: boolean
     withArrow?: boolean
     children?: ReactNode
+    onClick?: () => void
     color?:
         | 'blueish'
         | 'greenish'

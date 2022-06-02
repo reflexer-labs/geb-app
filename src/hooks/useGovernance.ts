@@ -1,6 +1,5 @@
 // eslint-disable-next-line no-restricted-imports
-import { CurrencyAmount, Token } from '@uniswap/sdk-core'
-import type { providers } from 'ethers'
+import { BigNumber, ethers, providers } from 'ethers'
 import { Contract } from 'ethers'
 import {
     defaultAbiCoder,
@@ -45,6 +44,8 @@ export interface ProposalData {
     forCount: number
     againstCount: number
     startBlock: number
+    forCountBN: BigNumber
+    againstCountBN: BigNumber
     endBlock: number
     details: ProposalDetail[]
     governorIndex: number // index in the governance address array for which this proposal pertains
@@ -69,7 +70,7 @@ export enum ProposalState {
     EXPIRED,
     EXECUTED,
 }
-
+export const LATEST_GOVERNOR_INDEX = 0
 export const BRAVO_START_BLOCK = 13059344
 
 export function useGovernanceBravoContract(): Contract | null {
@@ -94,25 +95,15 @@ export function useFLXAddress() {
     }, [geb])
 }
 
-export function useFLXToken() {
-    const flxAddress = useFLXAddress()
-    const { chainId } = useActiveWeb3React()
-    return useMemo(() => {
-        return flxAddress && chainId
-            ? new Token(
-                  chainId,
-                  flxAddress,
-                  18,
-                  'FLX',
-                  'Flex Ungovernance Token'
-              )
-            : undefined
-    }, [chainId, flxAddress])
-}
-
 export function useFlxContract() {
     const flxAddress = useFLXAddress()
     return useContract(flxAddress, FLX_ABI, true)
+}
+
+const FOUR_BYTES_DIR: { [sig: string]: string } = {
+    '0x5ef2c7f0': 'setSubnodeRecord(bytes32,bytes32,address,address,uint64)',
+    '0x10f13a8c': 'setText(bytes32,string,string)',
+    '0xb4720477': 'sendMessageToChild(address,bytes)',
 }
 
 interface FormattedProposalLog {
@@ -123,34 +114,42 @@ interface FormattedProposalLog {
  * Need proposal events to get description data emitted from
  * new proposal event.
  */
+
 function useFormattedProposalCreatedLogs(
     contract: Contract | null,
-    indices: number[][]
+    indices: number[][],
+    fromBlock?: number,
+    toBlock?: number
 ): FormattedProposalLog[] | undefined {
     // create filters for ProposalCreated events
-    const filter = useMemo(
-        () => contract?.filters?.ProposalCreated(),
-        [contract]
-    )
+    const filter = useMemo(() => {
+        const filter = contract?.filters?.ProposalCreated()
+        if (!filter) return undefined
+        return {
+            ...filter,
+            fromBlock,
+            toBlock,
+        }
+    }, [contract, fromBlock, toBlock])
 
     const useLogsResult = useLogs(filter)
 
     return useMemo(() => {
         return useLogsResult?.logs
-            ?.map((log: any) => {
+            ?.map((log) => {
                 const parsed = GovernanceInterface.parseLog(log).args
                 return parsed
             })
-            ?.filter((parsed: any) =>
+            ?.filter((parsed) =>
                 indices.flat().some((i) => i === parsed.id.toNumber())
             )
-            ?.map((parsed: any) => {
+            ?.map((parsed) => {
                 let description!: string
 
                 const startBlock = parseInt(parsed.startBlock?.toString())
                 try {
                     description = parsed.description
-                } catch (error: any) {
+                } catch (error) {
                     // replace invalid UTF-8 in the description with replacement characters
                     let onError = Utf8ErrorFuncs.replace
 
@@ -191,7 +190,7 @@ function useFormattedProposalCreatedLogs(
                         ''
                 }
 
-                // Bravo and one bip proposals omit newlines
+                // some proposals omit newlines
                 if (startBlock === BRAVO_START_BLOCK) {
                     description = description
                         .replace(/ {2}/g, '\n')
@@ -202,10 +201,22 @@ function useFormattedProposalCreatedLogs(
                     description,
                     details: parsed.targets.map((target: string, i: number) => {
                         const signature = parsed.signatures[i]
-                        const [name, types] = signature
-                            .substr(0, signature.length - 1)
-                            .split('(')
-                        const calldata = parsed.calldatas[i]
+                        let calldata = parsed.calldatas[i]
+                        let name: string
+                        let types: string
+                        if (signature === '') {
+                            const fourbyte = calldata.slice(0, 10)
+                            const sig = FOUR_BYTES_DIR[fourbyte] ?? 'UNKNOWN()'
+                            if (!sig) throw new Error('Missing four byte sig')
+                            ;[name, types] = sig
+                                .substring(0, sig.length - 1)
+                                .split('(')
+                            calldata = `0x${calldata.slice(10)}`
+                        } else {
+                            ;[name, types] = signature
+                                .substring(0, signature.length - 1)
+                                .split('(')
+                        }
                         const decoded = defaultAbiCoder.decode(
                             types.split(','),
                             calldata
@@ -222,7 +233,7 @@ function useFormattedProposalCreatedLogs(
 }
 
 function countToIndices(count: number | undefined, skip = 0) {
-    return typeof count === 'number'
+    return typeof count === 'number' && count > 0
         ? new Array(count - skip).fill(0).map((_, i) => [i + 1 + skip])
         : []
 }
@@ -305,16 +316,16 @@ export function useAllProposalData(): {
                             18
                         )
                     ),
-                    abstainCount: parseFloat(
-                        formatUnits(
-                            proposal?.result?.abstainVotes?.toString() ?? 0,
-                            18
-                        )
-                    ),
+
+                    forCountBN:
+                        proposal?.result?.forVotes ?? BigNumber.from('0'),
+                    againstCountBN:
+                        proposal?.result?.againstVotes ?? BigNumber.from('0'),
+
                     startBlock,
                     endBlock: parseInt(proposal?.result?.endBlock?.toString()),
                     details: formattedLogs[i]?.details,
-                    governorIndex: 2,
+                    governorIndex: 0,
                 }
             }),
             loading: false,
@@ -345,10 +356,10 @@ export function useUserDelegatee(): string {
 // gets the users current votes
 export function useUserVotes(): {
     loading: boolean
-    votes: CurrencyAmount<Token> | undefined
+    votes: string | undefined
 } {
     const { account } = useActiveWeb3React()
-    const flxToken = useFLXToken()
+    const flxAddress = useFLXAddress()
     const flxContract = useFlxContract()
 
     // check for available votes
@@ -361,19 +372,19 @@ export function useUserVotes(): {
         return {
             loading,
             votes:
-                flxToken && result
-                    ? CurrencyAmount.fromRawAmount(flxToken, result?.[0])
+                flxAddress && result
+                    ? ethers.utils.formatEther(result[0])
                     : undefined,
         }
-    }, [flxToken, loading, result])
+    }, [flxAddress, loading, result])
 }
 
 // fetch available votes as of block (usually proposal start block)
 export function useUserVotesAsOfBlock(
     block: number | undefined
-): CurrencyAmount<Token> | undefined {
+): string | undefined {
     const { account } = useActiveWeb3React()
-    const flxToken = useFLXToken()
+    const flxAddress = useFLXAddress()
     const flxContract = useFlxContract()
 
     // check for available votes
@@ -381,9 +392,7 @@ export function useUserVotesAsOfBlock(
         account ?? undefined,
         block ?? undefined,
     ])?.result?.[0]
-    return votes && flxToken
-        ? CurrencyAmount.fromRawAmount(flxToken, votes)
-        : undefined
+    return votes && flxAddress ? ethers.utils.formatEther(votes) : undefined
 }
 
 export function useDelegateCallback(): (
@@ -538,17 +547,34 @@ export function useLatestProposalId(
     return res?.result?.[0]?.toString()
 }
 
-export function useProposalThreshold(): CurrencyAmount<Token> | undefined {
-    const flxToken = useFLXToken()
+export function useProposalThreshold(): string | undefined {
+    const flxAddress = useFLXAddress()
     const latestGovernanceContract = useLatestGovernanceContract()
     const res = useSingleCallResult(
         latestGovernanceContract,
         'proposalThreshold'
     )
 
-    if (res?.result?.[0] && flxToken) {
-        return CurrencyAmount.fromRawAmount(flxToken, res.result[0])
+    if (res?.result?.[0] && flxAddress) {
+        return ethers.utils.formatEther(res.result[0])
     }
 
     return undefined
+}
+
+export function useQuorum(governorIndex: number): string | undefined {
+    const latestGovernanceContract = useLatestGovernanceContract()
+    const quorumVotes = useSingleCallResult(
+        latestGovernanceContract,
+        'quorumVotes'
+    )?.result?.[0]
+
+    if (
+        !latestGovernanceContract ||
+        !quorumVotes ||
+        governorIndex !== LATEST_GOVERNOR_INDEX
+    )
+        return '0'
+
+    return ethers.utils.formatEther(quorumVotes)
 }

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Call, CallListeners, CallResults } from '../utils/interfaces'
-import { Multicall2 } from '../abis/Multicall2'
+import { Multicall } from '../abis/Multicall'
 import { retry, RetryableError } from '../utils/retry'
 import store from '../store'
 import useDebounce from '../hooks/useDebounce'
@@ -17,7 +17,7 @@ import chunkArray from '../utils/chunkArray'
  * @param minBlockNumber minimum block number of the result set
  */
 async function fetchChunk(
-    multicall2Contract: Multicall2,
+    multicall2Contract: Multicall,
     chunk: Call[],
     minBlockNumber: number
 ): Promise<{
@@ -29,15 +29,14 @@ async function fetchChunk(
     let results: { success: boolean; returnData: string }[]
     try {
         const { blockNumber, returnData } =
-            await multicall2Contract.callStatic.tryBlockAndAggregate(
-                false,
+            await multicall2Contract.callStatic.aggregate(
                 chunk.map((obj) => ({
                     target: obj.address,
                     callData: obj.callData,
                 }))
             )
         resultsBlockNumber = blockNumber.toNumber()
-        results = returnData
+        results = returnData.map((x) => ({ success: true, returnData: x }))
     } catch (error) {
         console.debug('Failed to fetch chunk', error)
         throw error
@@ -235,7 +234,7 @@ export default function Updater(): null {
                             )
 
                             // dispatch any new results
-                            if (Object.keys(results).length > 0)
+                            if (Object.keys(results).length > 0) {
                                 store.dispatch.multicallModel.updateMulticallResults(
                                     {
                                         chainId,
@@ -243,7 +242,7 @@ export default function Updater(): null {
                                         blockNumber: fetchBlockNumber,
                                     }
                                 )
-
+                            }
                             // dispatch any errored calls
                             if (erroredCalls.length > 0) {
                                 console.debug(

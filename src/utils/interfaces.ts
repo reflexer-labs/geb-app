@@ -20,7 +20,7 @@ export interface DynamicObject {
     [key: string]: any
 }
 
-interface IColors {
+export interface IColors {
     primary: string
     secondary: string
     gradient: string
