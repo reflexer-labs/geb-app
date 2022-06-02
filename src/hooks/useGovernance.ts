@@ -200,7 +200,10 @@ function useFormattedProposalCreatedLogs(
                 return {
                     description,
                     details: parsed.targets.map((target: string, i: number) => {
-                        const signature = parsed.signatures[i]
+                        const signature =
+                            parsed && parsed.signatures[i]
+                                ? parsed.signatures[i]
+                                : ''
                         let calldata = parsed.calldatas[i]
                         let name: string
                         let types: string
@@ -232,9 +235,9 @@ function useFormattedProposalCreatedLogs(
     }, [indices, useLogsResult])
 }
 
-function countToIndices(count: number | undefined, skip = 0) {
-    return typeof count === 'number' && count > 0
-        ? new Array(count - skip).fill(0).map((_, i) => [i + 1 + skip])
+function countToIndices(count: number | undefined) {
+    return typeof count === 'number'
+        ? new Array(count).fill(0).map((_, i) => [i + 1])
         : []
 }
 
@@ -248,7 +251,7 @@ export function useAllProposalData(): {
     const proposalCount = useProposalCount(gov)
 
     const govProposalIndexes = useMemo(() => {
-        return countToIndices(proposalCount, 8)
+        return countToIndices(proposalCount)
     }, [proposalCount])
 
     const proposals = useSingleContractMultipleData(

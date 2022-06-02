@@ -221,5 +221,9 @@
     "voting_started": "Voting starts approximately",
     "voting_ending_approx": "Voting ends approximately",
     "showVoting_desc": "Only FLX votes that were self delegated or delegated to another address before block {{startBlock}} are eligible for voting.",
-    "prepare_next_proposal": "to prepare for the next proposal."
+    "prepare_next_proposal": "to prepare for the next proposal.",
+    "self": "Self",
+    "return": "Return",
+    "proposal_submitted": "Proposal Submitted",
+    "submitting_proposal": "Submitting Proposal"
 }

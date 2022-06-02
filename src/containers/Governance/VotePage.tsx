@@ -218,7 +218,7 @@ export default function VotePage({
                                 </>
                             ) : (
                                 <>
-                                    {t('voting_ending_approxy')}
+                                    {t('voting_ending_approx')}{' '}
                                     {dayjs(endDate).format(
                                         'MMM D, YYYY h:mm A'
                                     )}
@@ -228,26 +228,26 @@ export default function VotePage({
                     </Text>
 
                     {proposalData &&
-                        proposalData.status === ProposalState.ACTIVE &&
-                        showVotingButtons && (
-                            <InfoBox>
-                                <>
-                                    {t('showVoting_desc', {
-                                        startBlock: proposalData.startBlock,
-                                    })}
-                                </>
-                                {showLinkForUnlock && (
-                                    <span>
-                                        <>
-                                            <StyledInternalLink to="/vote">
-                                                {t('unlock_voting')}
-                                            </StyledInternalLink>{' '}
-                                            {t('prepare_next_proposal')}
-                                        </>
-                                    </span>
-                                )}
-                            </InfoBox>
-                        )}
+                    proposalData.status === ProposalState.ACTIVE &&
+                    !showVotingButtons ? (
+                        <InfoBox>
+                            <>
+                                {t('showVoting_desc', {
+                                    startBlock: proposalData.startBlock,
+                                })}
+                            </>
+                            {showLinkForUnlock && (
+                                <span>
+                                    <>
+                                        <StyledInternalLink to="/vote">
+                                            {t('unlock_voting')}
+                                        </StyledInternalLink>{' '}
+                                        {t('prepare_next_proposal')}
+                                    </>
+                                </span>
+                            )}
+                        </InfoBox>
+                    ) : null}
 
                     {showVotingButtons ? (
                         <VoteButtons>

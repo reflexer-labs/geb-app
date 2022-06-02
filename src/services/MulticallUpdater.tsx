@@ -234,7 +234,7 @@ export default function Updater(): null {
                             )
 
                             // dispatch any new results
-                            if (Object.keys(results).length > 0) {
+                            if (results && Object.keys(results).length > 0) {
                                 store.dispatch.multicallModel.updateMulticallResults(
                                     {
                                         chainId,

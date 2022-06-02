@@ -120,18 +120,23 @@ const Landing = () => {
                         <Loader />
                     ) : null}
                     <Right>
-                        {availableVotes &&
-                        !ethers.utils.parseEther(availableVotes).isZero() ? (
-                            <>
-                                {formatNumber(availableVotes, 4)} {t('votes')}
-                            </>
-                        ) : flxBalance &&
-                          userDelegatee !== EMPTY_ADDRESS &&
-                          !ethers.utils.parseEther('0').isZero() ? (
-                            <>
-                                {formatNumber(flxBalance, 4)} {t('votes')}
-                            </>
-                        ) : null}
+                        <span className="blueish">
+                            {availableVotes &&
+                            !ethers.utils
+                                .parseEther(availableVotes)
+                                .isZero() ? (
+                                <>
+                                    ({formatNumber(availableVotes, 4)}{' '}
+                                    {t('votes')})
+                                </>
+                            ) : flxBalance &&
+                              userDelegatee !== EMPTY_ADDRESS &&
+                              !ethers.utils.parseEther('0').isZero() ? (
+                                <>
+                                    ({formatNumber(flxBalance, 4)} {t('votes')})
+                                </>
+                            ) : null}
+                        </span>
 
                         <DelegateBox>
                             {!showUnlockVoting ? (
@@ -279,6 +284,11 @@ const Right = styled.div`
     margin-left: auto;
     display: flex;
     align-items: center;
+    span {
+        &.blueish {
+            color: ${(props) => props.theme.colors.blueish};
+        }
+    }
 `
 
 const Col = styled.div`

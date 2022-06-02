@@ -28,16 +28,18 @@ export const ProposalSubmissionModal = ({
             {!hash ? (
                 <LoadingView onDismiss={onDismiss}>
                     <Center>
-                        <LargeHeader>Submitting Proposal</LargeHeader>
+                        <LargeHeader style={{ marginBottom: '20px' }}>
+                            {t('submitting_proposal')}
+                        </LargeHeader>
                     </Center>
                 </LoadingView>
             ) : (
                 <SubmittedView onDismiss={onDismiss} hash={hash}>
                     <Center>
-                        <LargeHeader>Proposal Submitted</LargeHeader>
+                        <LargeHeader>{t('proposal_submitted')}</LargeHeader>
 
                         <LinkButton url="/vote" onClick={onDismiss}>
-                            {t('Return')}
+                            {t('return')}
                         </LinkButton>
                     </Center>
                 </SubmittedView>
@@ -48,6 +50,10 @@ export const ProposalSubmissionModal = ({
 
 const Center = styled.div`
     text-align: center;
+    a {
+        padding: 10px;
+        width: 'fit-content';
+    }
 `
 
 const LargeHeader = styled.div`
