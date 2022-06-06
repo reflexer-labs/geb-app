@@ -226,5 +226,11 @@
     "return": "Return",
     "proposal_submitted": "Proposal Submitted",
     "submitting_proposal": "Submitting Proposal",
-    "governance": "Governance"
+    "governance": "Governance",
+    "for": "For",
+    "against": "Against",
+    "proposal_title": "Proposal Title",
+    "enter_valid_eth_address": "Enter a valid ETH address",
+    "enter_proposal_title": "Enter proposal title",
+    "proposal_description": "Proposal Description"
 }

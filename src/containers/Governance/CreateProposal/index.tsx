@@ -15,11 +15,7 @@ import {
 } from '../../../hooks/useGovernance'
 import styled, { ThemeContext } from 'styled-components'
 
-import {
-    ProposalAction,
-    ProposalActionSelector,
-    ProposalActionSelectorModal,
-} from './ProposalActionSelector'
+import { ProposalAction } from './ProposalActionSelector'
 import { ProposalEditor } from './ProposalEditor'
 import { ProposalSubmissionModal } from './ProposalSubmissionModal'
 import { ArrowLeft } from 'react-feather'
@@ -94,32 +90,14 @@ export default function CreateProposal() {
     const { votes: availableVotes } = useUserVotes()
     const proposalThreshold: string | undefined = useProposalThreshold()
 
-    const [modalOpen, setModalOpen] = useState(false)
     const [hash, setHash] = useState<string | undefined>()
     const [attempting, setAttempting] = useState(false)
-    const [proposalAction, setProposalAction] = useState(
-        ProposalAction.TRANSFER_TOKEN
-    )
+    const [proposalAction] = useState(ProposalAction.APPROVE_TOKEN)
     const [toAddressValue, setToAddressValue] = useState('')
 
     const [amountValue, setAmountValue] = useState('')
     const [titleValue, setTitleValue] = useState('')
     const [bodyValue, setBodyValue] = useState('')
-
-    const handleActionSelectorClick = useCallback(() => {
-        setModalOpen(true)
-    }, [setModalOpen])
-
-    const handleActionChange = useCallback(
-        (proposalAction: ProposalAction) => {
-            setProposalAction(proposalAction)
-        },
-        [setProposalAction]
-    )
-
-    const handleDismissActionSelector = useCallback(() => {
-        setModalOpen(false)
-    }, [setModalOpen])
 
     const handleDismissSubmissionModal = useCallback(() => {
         setHash(undefined)
@@ -166,6 +144,12 @@ export default function CreateProposal() {
                 .parseEther(availableVotes)
                 .gte(ethers.utils.parseEther(proposalThreshold))
     )
+
+    const handleMaxClick = useCallback(() => {
+        if (proposalThreshold && hasEnoughVote) {
+            setAmountValue(formatNumber(proposalThreshold, 0).toString())
+        }
+    }, [hasEnoughVote, proposalThreshold])
 
     const createProposalCallback = useCreateProposalCallback()
 
@@ -246,25 +230,24 @@ ${bodyValue}
                             }}
                         />
                     </InfoBox>
-
-                    <ProposalActionSelector
-                        onClick={handleActionSelectorClick}
-                        proposalAction={proposalAction}
-                    />
+                    <SubHeader>{t('Proposer Address')}</SubHeader>
                     <CustomInput
                         id="topup_input"
                         value={toAddressValue}
-                        placeholder={'Enter a valid ETH address'}
+                        placeholder={t('enter_valid_eth_address')}
                         onChange={(e) => setToAddressValue(e.target.value)}
                     />
+                    <SubHeader>{t('Voting balance')}</SubHeader>
                     <TokenInput
                         bgColor={theme.colors.background}
                         token={TOKENS.flx}
                         label={`Balance: ${formatNumber(
                             TOKENS.flx.balance,
                             4
-                        )} ${TOKENS.eth.name}`}
+                        )} ${TOKENS.flx.name}`}
+                        handleMaxClick={handleMaxClick}
                         onChange={handleAmountInput}
+                        maxText="min"
                         value={amountValue}
                     />
 
@@ -286,13 +269,6 @@ ${bodyValue}
                         handleCreateProposal={handleCreateProposal}
                     />
                 </CreateProposalWrapper>
-                <ProposalActionSelectorModal
-                    isOpen={modalOpen}
-                    onDismiss={handleDismissActionSelector}
-                    onProposalActionSelect={(proposalAction: ProposalAction) =>
-                        handleActionChange(proposalAction)
-                    }
-                />
                 <ProposalSubmissionModal
                     isOpen={attempting}
                     hash={hash}
@@ -309,7 +285,7 @@ const InfoBox = styled.div`
     background-size: cover;
     padding: 20px;
     border-radius: 15px;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
 `
 const Container = styled.div`
     max-width: 880px;
@@ -368,8 +344,14 @@ const CustomInput = styled.input`
     line-height: 24px;
     outline: none;
     border: 1px solid ${(props) => props.theme.colors.border};
-    border-radius: 8px;
+    border-radius: 10px;
     transition: all 0.3s ease;
-    margin-top: 10px;
+`
+
+const SubHeader = styled.div`
+    font-size: 16px;
+    font-weight: 500;
+    color: ${({ theme }) => theme.colors.secondary};
     margin-bottom: 10px;
+    margin-top: 20px;
 `

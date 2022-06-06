@@ -324,45 +324,42 @@ export default function VotePage({
                     </Cards>
 
                     <Details>
-                        <DetailsHeader>{t('details')}</DetailsHeader>
-                        {proposalData?.details?.map((d, i) => {
-                            return (
-                                <DetailText key={i}>
-                                    {i + 1}: {linkIfAddress(d.target)}.
-                                    {d.functionSig}(
-                                    {d.callData.split(',').map((content, i) => {
-                                        return (
-                                            <span key={i}>
-                                                {linkIfAddress(content)}
-                                                {d.callData.split(',').length -
-                                                    1 ===
-                                                i
-                                                    ? ''
-                                                    : ','}
-                                            </span>
+                        <DetailsHeader style={{ marginTop: '10px' }}>
+                            {t('details')}
+                        </DetailsHeader>
+                        <MDWrapper style={{ paddingTop: '0' }}>
+                            {proposalData?.details?.map((d, i) => {
+                                return (
+                                    <DetailText key={i}>
+                                        {i + 1}: {linkIfAddress(d.target)}.
+                                        {d.functionSig}(
+                                        {d.callData
+                                            .split(',')
+                                            .map((content, i) => {
+                                                return (
+                                                    <span key={i}>
+                                                        {linkIfAddress(content)}
+                                                        {d.callData.split(',')
+                                                            .length -
+                                                            1 ===
+                                                        i
+                                                            ? ''
+                                                            : ','}
+                                                    </span>
+                                                )
+                                            })}
                                         )
-                                    })}
-                                    )
-                                </DetailText>
-                            )
-                        })}
-                    </Details>
-
-                    <Details style={{ marginTop: '30px' }}>
-                        <DetailsHeader>{t('description')}</DetailsHeader>
-                        <MDWrapper>
-                            {proposalData ? (
-                                <ReactMarkdown
-                                    source={proposalData?.description}
-                                />
-                            ) : null}
+                                    </DetailText>
+                                )
+                            })}
                         </MDWrapper>
                     </Details>
-
                     <Details>
                         <DetailsHeader>{t('proposer')}</DetailsHeader>
 
-                        <MDWrapper>
+                        <MDWrapper
+                            style={{ paddingTop: '0', paddingBottom: '0' }}
+                        >
                             <ProposerAddressLink
                                 href={
                                     proposalData?.proposer && chainId
@@ -378,6 +375,16 @@ export default function VotePage({
                                     source={proposalData?.proposer}
                                 />
                             </ProposerAddressLink>
+                        </MDWrapper>
+                    </Details>
+                    <Details>
+                        <DetailsHeader>{t('description')}</DetailsHeader>
+                        <MDWrapper>
+                            {proposalData ? (
+                                <ReactMarkdown
+                                    source={proposalData?.description}
+                                />
+                            ) : null}
                         </MDWrapper>
                     </Details>
                 </Wrapper>
@@ -528,12 +535,20 @@ const DetailsHeader = styled.div`
 const MDWrapper = styled.div`
     overflow: hidden;
     margin-top: 20px;
+    padding: 1.2rem;
+    border-radius: 10px;
+    border: 1px solid ${({ theme }) => theme.colors.border};
+    background-color: ${({ theme }) => theme.colors.background};
     h1 {
-        font-size: 22px;
-    }
-    h2 {
         font-size: 20px;
     }
+    h2 {
+        font-size: 18px;
+    }
+    h3 {
+        font-size: 16px;
+    }
+    line-height: 24px;
     a {
         color: ${({ theme }) => theme.colors.blueish};
     }

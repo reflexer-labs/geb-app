@@ -1,24 +1,35 @@
 // eslint-disable-next-line no-restricted-imports
-import React, { memo } from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components/macro'
-import { ResizingTextArea, TextInput } from './TextAreaInput'
+import { ResizingTextArea } from './TextAreaInput'
 
-const ProposalEditorHeader = styled.div`
-    font-size: 14px;
+const SubHeader = styled.div`
+    font-size: 16px;
     font-weight: 500;
     color: ${({ theme }) => theme.colors.secondary};
+    margin-bottom: 10px;
+    margin-top: 20px;
+`
+const CustomInput = styled.input`
+    font-size: ${(props) => props.theme.font.default};
+    transition: all 0.3s ease;
+    width: 100%;
+    padding: 20px;
+    background: ${(props) => props.theme.colors.background};
+    color: ${(props) => props.theme.colors.primary};
+    line-height: 24px;
+    outline: none;
+    border: 1px solid ${(props) => props.theme.colors.border};
+    border-radius: 10px;
+    transition: all 0.3s ease;
 `
 
-const ProposalTitle = memo(styled(TextInput)`
-    margin-top: 10.5px;
-    margin-bottom: 7.5px;
-`)
+const ProposalEditorContainer = styled.div``
 
-const ProposalEditorContainer = styled.div`
-    margin-top: 10px;
-    padding: 0.75rem 1rem 0.75rem 1rem;
-    border-radius: 20px;
+const AreaContainer = styled.div`
+    padding: 1.2rem;
+    border-radius: 10px;
     border: 1px solid ${({ theme }) => theme.colors.border};
     background-color: ${({ theme }) => theme.colors.background};
 `
@@ -53,20 +64,22 @@ Insert your conclusion here
 
     return (
         <ProposalEditorContainer className={className}>
-            <ProposalEditorHeader>{t('Proposal')}</ProposalEditorHeader>
-            <ProposalTitle
+            <SubHeader>{t('proposal_title')}</SubHeader>
+            <CustomInput
+                id="topup_input"
                 value={title}
-                onUserInput={onTitleInput}
-                placeholder={t(`Proposal Title`)}
-                fontSize="1.25rem"
+                placeholder={t(`enter_proposal_title`)}
+                onChange={(e) => onTitleInput(e.target.value)}
             />
-            <hr />
-            <ResizingTextArea
-                value={body}
-                onUserInput={onBodyInput}
-                placeholder={bodyPlaceholder}
-                fontSize="1rem"
-            />
+            <SubHeader>{t('proposal_description')}</SubHeader>
+            <AreaContainer>
+                <ResizingTextArea
+                    value={body}
+                    onUserInput={onBodyInput}
+                    placeholder={bodyPlaceholder}
+                    fontSize="1rem"
+                />
+            </AreaContainer>
         </ProposalEditorContainer>
     )
 }
