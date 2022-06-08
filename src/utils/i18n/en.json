@@ -212,7 +212,7 @@
     "proposal_amount": "You must have {{amount}} votes to submit a proposal",
     "already_active_proposal": "You already have an active or pending proposal",
     "not_enough_proposal_amount": "You don&apos;t have enough votes to submit a proposal",
-    "create_proposal_desc": "<strong>Tip:</strong> Select an action and describe your proposal for the community.The proposal cannot be modified after submission, so please verify all information before submitting. The voting period will begin immediately and last for 7 days.",
+    "create_proposal_desc": "<strong>Tip:</strong> The proposal cannot be modified after submission, so please verify all information before submitting. The voting period will begin immediately and last for 7 days.",
     "proposal": "Proposal",
     "proposer": "Proposer",
     "all_proposals": "All Proposals",
@@ -232,5 +232,6 @@
     "proposal_title": "Proposal Title",
     "enter_valid_eth_address": "Enter a valid ETH address",
     "enter_proposal_title": "Enter proposal title",
-    "proposal_description": "Proposal Description"
+    "proposal_description": "Proposal Description",
+    "unlock_voting_continue": "You need to unlock voting to continue"
 }

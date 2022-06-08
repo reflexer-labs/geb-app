@@ -2,7 +2,7 @@ import { defaultAbiCoder } from '@ethersproject/abi'
 import commaNumber from 'comma-number'
 
 import { getAddress, isAddress } from '@ethersproject/address'
-import React, { useCallback, useContext, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import {
     CreateProposalData,
     ProposalState,
@@ -12,8 +12,9 @@ import {
     useProposalThreshold,
     useUserVotes,
     LATEST_GOVERNOR_INDEX,
+    useUserDelegatee,
 } from '../../../hooks/useGovernance'
-import styled, { ThemeContext } from 'styled-components'
+import styled from 'styled-components'
 
 import { ProposalAction } from './ProposalActionSelector'
 import { ProposalEditor } from './ProposalEditor'
@@ -22,12 +23,12 @@ import { ArrowLeft } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { TOKENS } from 'src/utils/tokens'
 import { formatNumber } from 'src/utils/helper'
-import TokenInput from 'src/components/TokenInput'
 import Button from 'src/components/Button'
 import { BigNumber, ethers } from 'ethers'
 import { useActiveWeb3React } from 'src/hooks'
 import { useTokenBalances } from 'src/hooks/Wallet'
 import { Link } from 'react-router-dom'
+import { EMPTY_ADDRESS } from 'src/utils/constants'
 
 const CreateProposalButton = ({
     proposalThreshold,
@@ -78,7 +79,6 @@ const CreateProposalButton = ({
 
 export default function CreateProposal() {
     const { t } = useTranslation()
-    const theme = useContext(ThemeContext)
     const { account } = useActiveWeb3React()
     const tokensList = useTokenBalances(account ?? undefined, TOKENS)
     const flxToken = tokensList.flx
@@ -87,29 +87,24 @@ export default function CreateProposal() {
         LATEST_GOVERNOR_INDEX,
         latestProposalId
     )
+    const userDelegatee: string | undefined = useUserDelegatee()
+
     const { votes: availableVotes } = useUserVotes()
     const proposalThreshold: string | undefined = useProposalThreshold()
 
     const [hash, setHash] = useState<string | undefined>()
     const [attempting, setAttempting] = useState(false)
     const [proposalAction] = useState(ProposalAction.APPROVE_TOKEN)
-    const [toAddressValue, setToAddressValue] = useState('')
-
-    const [amountValue, setAmountValue] = useState('')
     const [titleValue, setTitleValue] = useState('')
     const [bodyValue, setBodyValue] = useState('')
 
+    const formattedAbailableVotes = availableVotes
+        ? commaNumber(formatNumber(availableVotes, 0))
+        : undefined
     const handleDismissSubmissionModal = useCallback(() => {
         setHash(undefined)
         setAttempting(false)
     }, [setHash, setAttempting])
-
-    const handleAmountInput = useCallback(
-        (amount: string) => {
-            setAmountValue(amount)
-        },
-        [setAmountValue]
-    )
 
     const handleTitleInput = useCallback(
         (title: string) => {
@@ -125,6 +120,22 @@ export default function CreateProposal() {
         [setBodyValue]
     )
 
+    const toAddressValue =
+        userDelegatee && userDelegatee !== EMPTY_ADDRESS ? userDelegatee : ''
+
+    const hasEnoughVote = Boolean(
+        availableVotes &&
+            proposalThreshold &&
+            ethers.utils
+                .parseEther(availableVotes)
+                .gte(ethers.utils.parseEther(proposalThreshold))
+    )
+
+    const amountValue =
+        hasEnoughVote && proposalThreshold
+            ? formatNumber(proposalThreshold, 0).toString()
+            : ''
+
     const isFormInvalid = useMemo(
         () =>
             Boolean(
@@ -136,20 +147,6 @@ export default function CreateProposal() {
             ),
         [proposalAction, toAddressValue, amountValue, titleValue, bodyValue]
     )
-
-    const hasEnoughVote = Boolean(
-        availableVotes &&
-            proposalThreshold &&
-            ethers.utils
-                .parseEther(availableVotes)
-                .gte(ethers.utils.parseEther(proposalThreshold))
-    )
-
-    const handleMaxClick = useCallback(() => {
-        if (proposalThreshold && hasEnoughVote) {
-            setAmountValue(formatNumber(proposalThreshold, 0).toString())
-        }
-    }, [hasEnoughVote, proposalThreshold])
 
     const createProposalCallback = useCreateProposalCallback()
 
@@ -234,21 +231,27 @@ ${bodyValue}
                     <CustomInput
                         id="topup_input"
                         value={toAddressValue}
-                        placeholder={t('enter_valid_eth_address')}
-                        onChange={(e) => setToAddressValue(e.target.value)}
+                        placeholder={
+                            userDelegatee && userDelegatee === EMPTY_ADDRESS
+                                ? t('unlock_voting_continue')
+                                : ''
+                        }
+                        onChange={() => {}}
+                        disabled
                     />
-                    <SubHeader>{t('Voting balance')}</SubHeader>
-                    <TokenInput
-                        bgColor={theme.colors.background}
-                        token={TOKENS.flx}
-                        label={`Balance: ${formatNumber(
-                            TOKENS.flx.balance,
-                            4
-                        )} ${TOKENS.flx.name}`}
-                        handleMaxClick={handleMaxClick}
-                        onChange={handleAmountInput}
-                        maxText="min"
-                        value={amountValue}
+                    <SubHeader>{t('Available Votes')}</SubHeader>
+                    <CustomInput
+                        id="topup_input"
+                        value={formattedAbailableVotes}
+                        placeholder={
+                            hasEnoughVote
+                                ? availableVotes
+                                : t('proposal_amount', {
+                                      amount: formattedAbailableVotes,
+                                  })
+                        }
+                        onChange={() => {}}
+                        disabled
                     />
 
                     <ProposalEditor
@@ -344,7 +347,7 @@ const CustomInput = styled.input`
     line-height: 24px;
     outline: none;
     border: 1px solid ${(props) => props.theme.colors.border};
-    border-radius: 10px;
+    border-radius: 8px;
     transition: all 0.3s ease;
 `
 
