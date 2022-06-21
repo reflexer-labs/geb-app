@@ -19,7 +19,7 @@ export enum ApprovalState {
     PENDING,
     APPROVED,
 }
-
+// checks for token allowance
 export function useTokenAllowance(
     tokenAddress?: string,
     owner?: string,

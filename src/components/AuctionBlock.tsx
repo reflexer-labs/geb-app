@@ -74,7 +74,7 @@ const AuctionBlock = (auction: Props) => {
         const amountBN = BigNumber.from(amount)
         return formatNumber(parseWad(gebUtils.decimalShift(amountBN, -9)), 2)
     }
-
+    // kickstart bid as in first bid when auction started
     const kickBidder = {
         bidder: _.get(auction, 'startedBy', ''),
         buyAmount: _.get(auction, 'buyInitialAmount', ''),

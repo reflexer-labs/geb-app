@@ -1,12 +1,5 @@
-import { action, Action, thunk, Thunk } from 'easy-peasy'
-import { Geb } from 'geb.js'
-import { fetchPositions } from '../hooks/useLiquidityPool'
-import {
-    ILiquidityData,
-    IStakedLP,
-    PositionsAndThreshold,
-    IStakingData,
-} from '../utils/interfaces'
+import { action, Action } from 'easy-peasy'
+import { ILiquidityData, IStakedLP, IStakingData } from '../utils/interfaces'
 
 export const farmersArray = ['volt', 'h2o'] as const
 export const contractsArray = ['flx', 'flx_lp'] as const
@@ -20,9 +13,6 @@ export interface EarnModel {
     amount: string
     farmerName: FARMER_NAME
     contractName: CONTRACT_NAME
-    positionAndThreshold: PositionsAndThreshold | null
-    fetchPositionsAndThreshold: Thunk<EarnModel, Geb>
-    setPositionAndThreshold: Action<EarnModel, PositionsAndThreshold>
     setData: Action<EarnModel, ILiquidityData>
     setStakedLP: Action<EarnModel, IStakedLP>
     setStakingData: Action<EarnModel, IStakingData>
@@ -32,7 +22,6 @@ export interface EarnModel {
 }
 
 const earnModel: EarnModel = {
-    positionAndThreshold: null,
     amount: '',
     farmerName: 'volt',
     contractName: 'flx',
@@ -49,15 +38,6 @@ const earnModel: EarnModel = {
         eth: '',
         rai: '',
     },
-    fetchPositionsAndThreshold: thunk(async (actions, payload) => {
-        const res = await fetchPositions(payload)
-        if (res) {
-            actions.setPositionAndThreshold(res)
-        }
-    }),
-    setPositionAndThreshold: action((state, payload) => {
-        state.positionAndThreshold = payload
-    }),
     setData: action((state, payload) => {
         state.data = payload
     }),

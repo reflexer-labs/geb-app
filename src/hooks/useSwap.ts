@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { WYRE_WORKER } from '../utils/constants'
 
+// geberates swap url for Wyre so it user can swap fiat to RAI
 export default function useSwap() {
     const generateSwap = useCallback(async () => {
         const res = await generateSwapUrl()

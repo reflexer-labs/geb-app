@@ -33,11 +33,13 @@ export type Stats = {
     }>
 }
 
+// returns safe model state from store
 export function useSafeState() {
     const { safeModel: safeState } = useStoreState((state) => state)
     return useMemo(() => safeState, [safeState])
 }
 
+// returns all safe info from amounts, debt, collateral and other helper attributes
 export function useSafeInfo(type: SafeTypes = 'create') {
     const { account } = useActiveWeb3React()
     const proxyAddress = useProxyAddress()
@@ -46,12 +48,15 @@ export function useSafeInfo(type: SafeTypes = 'create') {
         safeModel: { safeData, singleSafe, liquidationData },
     } = useStoreState((state) => state)
 
+    // parsed amounts of deposit/repay withdraw/borrow as in left input and right input, they get switched based on if its Deposit & Borrow or Repay & Withdraw
     const parsedAmounts = useMemo(() => {
         const { leftInput, rightInput } = safeData
         return { leftInput, rightInput }
     }, [safeData])
 
     const { leftInput, rightInput } = parsedAmounts
+
+    // get eth and rai balances
     const { eth, rai } = useTokenBalances(account as string)
 
     const balances = useMemo(() => {
@@ -63,16 +68,23 @@ export function useSafeInfo(type: SafeTypes = 'create') {
 
     const { eth: ethBalance, rai: raiBalance } = balances
 
+    // returns collateral amount and takes into consideration if its a new safe or not
     const collateral = useTotalCollateral(leftInput, type)
+    // returns debt amount and takes into consideration if its a new safe or not
     const debt = useTotalDebt(rightInput, type)
 
     const totalCollateral = useMemo(() => collateral, [collateral])
     const totalDebt = useMemo(() => debt, [debt])
 
+    // Checks if for collateralRatio safety if its safe or not
     const isSafe = useSafeIsSafe(totalCollateral, totalDebt)
+    // returns collateral ratio
     const collateralRatio = useCollateralRatio(totalCollateral, totalDebt)
+    // returns liquidation price
     const liquidationPrice = useLiquidationPrice(totalCollateral, totalDebt)
 
+    // returns available ETH (collateral)
+    // singleSafe means already a deployed safe
     const availableEth = useMemo(() => {
         if (type === 'deposit_borrow') {
             return formatNumber(ethBalance)
@@ -84,6 +96,8 @@ export function useSafeInfo(type: SafeTypes = 'create') {
         return '0.00'
     }, [ethBalance, singleSafe, type])
 
+    // returns available RAI (debt)
+    // singleSafe means already a deployed safe
     const availableRai = useMemo(() => {
         if (type === 'create') {
             return returnAvaiableDebt(
@@ -126,7 +140,7 @@ export function useSafeInfo(type: SafeTypes = 'create') {
     const availableRaiBN = BigNumber.from(
         toFixedString(availableRai.toString(), 'WAD')
     )
-
+    // account's RAI balance into BigNumber
     const raiBalanceBN = raiBalance
         ? BigNumber.from(toFixedString(raiBalance.toString(), 'WAD'))
         : BigNumber.from('0')
@@ -138,12 +152,13 @@ export function useSafeInfo(type: SafeTypes = 'create') {
     const rightInputBN = rightInput
         ? BigNumber.from(toFixedString(rightInput, 'WAD'))
         : BigNumber.from('0')
-
+    // returns debtFloor from liquidation data from store
     const debtFloorBN = BigNumber.from(
         toFixedString(liquidationData.debtFloor, 'WAD')
     )
     const totalDebtBN = BigNumber.from(toFixedString(totalDebt, 'WAD'))
 
+    // returns stats data used into stats display of the safe
     const stats: Stats = useMemo(() => {
         return {
             data: [
@@ -347,7 +362,7 @@ export function useSafeInfo(type: SafeTypes = 'create') {
         balances,
     }
 }
-
+// returns totalCollateral
 export function useTotalCollateral(leftInput: string, type: SafeTypes) {
     const { singleSafe } = useSafeState()
     const totalCollateral = useMemo(() => {
@@ -367,7 +382,7 @@ export function useTotalCollateral(leftInput: string, type: SafeTypes) {
 
     return totalCollateral || '0'
 }
-
+// returns total debt
 export function useTotalDebt(rightInput: string, type: SafeTypes) {
     const {
         singleSafe,
@@ -393,7 +408,7 @@ export function useTotalDebt(rightInput: string, type: SafeTypes) {
 
     return totalDebt && Number(totalDebt) > 0.00001 ? totalDebt : '0'
 }
-
+// returns collateral Ratio
 export function useCollateralRatio(totalCollateral: string, totalDebt: string) {
     const {
         liquidationData: { currentPrice, liquidationCRatio },
@@ -413,7 +428,7 @@ export function useCollateralRatio(totalCollateral: string, totalDebt: string) {
         totalDebt,
     ])
 }
-
+// returns liquidation price
 export function useLiquidationPrice(
     totalCollateral: string,
     totalDebt: string
@@ -431,7 +446,7 @@ export function useLiquidationPrice(
         )
     }, [currentRedemptionPrice, liquidationCRatio, totalCollateral, totalDebt])
 }
-
+// checks for safe safety of collateral ratio
 export function useSafeIsSafe(totalCollateral: string, totalDebt: string) {
     const {
         liquidationData: { currentPrice },
@@ -441,7 +456,7 @@ export function useSafeIsSafe(totalCollateral: string, totalDebt: string) {
         return safeIsSafe(totalCollateral, totalDebt, currentPrice.safetyPrice)
     }, [currentPrice.safetyPrice, totalCollateral, totalDebt])
 }
-
+// handles input data validation and storing them into store
 export function useInputsHandlers(): {
     onLeftInput: (typedValue: string) => void
     onRightInput: (typedValue: string) => void

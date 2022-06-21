@@ -7,23 +7,22 @@ import ErrorBoundary from './ErrorBoundary'
 import { useStoreState } from './store'
 import { darkTheme } from './utils/themes/dark'
 import { Theme } from './utils/interfaces'
-import OnBoarding from './containers/OnBoarding'
+import OnBoarding from './containers/Safes'
 import { initI18n } from './utils/i18n'
 import GlobalStyle from './GlobalStyle'
 import Shared from './containers/Shared'
 import Web3ReactManager from './components/Web3ReactManager'
-import SafeDetails from './containers/OnBoarding/SafeDetails'
+import SafeDetails from './containers/Safes/SafeDetails'
 
 import Privacy from './containers/Privacy'
 import CustomToast from './components/CustomToast'
 import Auctions from './containers/Auctions'
 import GoogleTagManager from './components/Analytics/GoogleTagManager'
 import { SHOW_AUCTIONS } from './utils/constants'
-import SafeSaviour from './containers/OnBoarding/Saviour/SafeSaviour'
+import SafeSaviour from './containers/Safes/Saviour/SafeSaviour'
 import Staking from './containers/Earn/Staking'
 import Incentives from './containers/Earn/Incentives'
-import CreateSafe from './containers/OnBoarding/CreateSafe'
-// import MoneyGodLeague from './containers/Earn/MoneyGodLeague'
+import CreateSafe from './containers/Safes/CreateSafe'
 
 // Toast css
 
@@ -67,12 +66,6 @@ const App = () => {
                                             component={Staking}
                                             path={'/earn/staking'}
                                         />
-                                        {/* <Route
-                                            exact
-                                            strict
-                                            component={MoneyGodLeague}
-                                            path={'/earn/moneygod'}
-                                        /> */}
                                         <Route
                                             exact
                                             strict

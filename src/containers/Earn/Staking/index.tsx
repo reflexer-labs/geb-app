@@ -15,6 +15,8 @@ dayjs.extend(relativeTime)
 
 const Staking = () => {
     const { t } = useTranslation()
+
+    // how long before user can withdraw staking balance
     const { exitDelay } = useStakingInfo()
     return (
         <Container>
