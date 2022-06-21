@@ -8,7 +8,7 @@ import {
 describe('App Page - Has Safes', () => {
     beforeEach(() => {
         cy.visit('/')
-        cy.wait(2000)
+        cy.wait(5000)
         cy.get('body').then((body) => {
             if (body.find('[data-test-id="waiting-modal"]').length > 0) {
                 cy.get('[data-test-id="waiting-modal"]').then((e) => {
