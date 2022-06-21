@@ -227,7 +227,11 @@ const Shared = ({ children, ...rest }: Props) => {
             </EmptyDiv>
             {SYSTEM_STATUS && SYSTEM_STATUS.toLowerCase() === 'shutdown' ? (
                 <AlertContainer>
-                    <AlertLabel type="danger" text={t('shutdown_text')} />
+                    <AlertLabel
+                        isBlock={false}
+                        type="warning"
+                        text={t('shutdown_text')}
+                    />
                 </AlertContainer>
             ) : null}
             {account && blockedAddresses.includes(account.toLowerCase()) ? (
@@ -287,5 +291,6 @@ const Content = styled.div``
 const EmptyDiv = styled.div``
 
 const AlertContainer = styled.div`
-    padding: 0 20px;
+    max-width: 880px;
+    margin: 40px auto 0px auto;
 `

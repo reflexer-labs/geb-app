@@ -22,6 +22,7 @@ import SafeSaviour from './containers/Safes/Saviour/SafeSaviour'
 import Staking from './containers/Earn/Staking'
 import Incentives from './containers/Earn/Incentives'
 import CreateSafe from './containers/Safes/CreateSafe'
+import GlobalSettlement from './containers/GlobalSettlement'
 
 // Toast css
 
@@ -56,6 +57,12 @@ const App = () => {
                                             path={'/auctions/:auctionType?'}
                                         />
                                     ) : null}
+                                    <Route
+                                        exact
+                                        strict
+                                        component={GlobalSettlement}
+                                        path={'/global-settlement'}
+                                    />
                                     <Route
                                         exact
                                         strict
