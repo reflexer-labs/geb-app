@@ -23,6 +23,7 @@ export default function ApplicationUpdater(): null {
         (result: any) => {
             setState((state) => {
                 if (chainId === state.chainId) {
+                    store.dispatch.connectWalletModel.fetchFiatPrice()
                     return {
                         chainId,
                         balance: Number(ethers.utils.formatEther(result)),
@@ -57,8 +58,6 @@ export default function ApplicationUpdater(): null {
             chainId: debouncedState.chainId,
             balance: debouncedState.balance,
         })
-
-        store.dispatch.connectWalletModel.fetchFiatPrice()
     }, [debouncedState.balance, debouncedState.chainId])
 
     return null

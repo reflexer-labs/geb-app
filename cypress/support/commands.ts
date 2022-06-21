@@ -139,6 +139,12 @@ const returnWallet = (type: string) => {
     }
 }
 
+Cypress.on('uncaught:exception', (err, runnable) => {
+    // returning false here prevents Cypress from
+    // failing the test
+    return false
+})
+
 Cypress.Commands.overwrite('visit', (original, url, options) => {
     const { privateKey, walletAddress, allowTx } = returnWallet(
         options && options.qs ? options.qs.type : ''
