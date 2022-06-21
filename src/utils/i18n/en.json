@@ -107,7 +107,7 @@
     "app": "App",
     "fullyUnlocked": "You can claim all your FLX rewards right after you earn them.",
     "proxy_wallet_text": "Your wallet is connected! Now, let's create your Reflexer Account",
-    "shutdown_text": "The global settlement procedure was triggered for this system. You can't manage your Safes from this application anymore. To redeem your RAI for ETH you first need to withdraw your ETH",
+    "shutdown_text": "The Global Settlement procedure was triggered for this system. You can't manage your Safes from this application anymore. To redeem your RAI for ETH you first need to withdraw your ETH from your Safes.",
     "block_connection": "Blockchain Connection",
     "insurance": "Insurance",
     "redemption_price_tip": "The 'moving peg' that the RAI market price should return to",
