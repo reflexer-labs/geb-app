@@ -1,7 +1,8 @@
 name: Staging Deployment
 on:
-    # manual trigger
-    workflow_dispatch:
+    push:
+        branches:
+            - develop
 
 jobs:
     deploy:
