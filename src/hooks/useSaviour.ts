@@ -66,15 +66,17 @@ export type Stats = {
     }>
 }
 
+// returns saviour data
 export function useSaviourInfo() {
     const { t } = useTranslation()
     const { account } = useActiveWeb3React()
-
+    // get account proxy address
     const proxyAddress = useProxyAddress()
-
+    // get saviour data
     const saviourHook = useSaviourData()
+    // get min saviour balance
     const { getMinSaviourBalance } = useMinSaviourBalance()
-
+    // safe data from store
     const { safeModel: safeState } = useStoreState((state) => state)
     const {
         isSaviourDeposit,
@@ -88,13 +90,16 @@ export function useSaviourInfo() {
         return saviourHook
     }, [saviourHook])
 
+    // checks if its curve saviour or Uniswap
     const isCurveSaviour = useMemo(() => saviourType === 'curve', [saviourType])
 
+    // token label based on saviour type
     const tokenLabel = useMemo(
         () => (isCurveSaviour ? 'RAI3CRV' : 'UNI-V2'),
         [isCurveSaviour]
     )
 
+    // saviour states
     const saviourState = useMemo(() => {
         return {
             isSaviourDeposit,
@@ -105,8 +110,10 @@ export function useSaviourInfo() {
         }
     }, [isSaviourDeposit, amount, targetedCRatio, saviourType, isMaxWithdraw])
 
+    // checks if safe has a saviour
     const hasSaviour = saviourData && saviourData.hasSaviour
 
+    // return saviour tokens
     const tokens = useMemo(() => {
         return saviourData
             ? {
@@ -119,12 +126,15 @@ export function useSaviourInfo() {
             : TOKENS
     }, [saviourData])
 
+    // return token balances
     const tokenBalances = useTokenBalances(account as string, tokens)
 
+    // returns safeId of the saviour data from store
     const safeId = useMemo(() => {
         return saviourData ? saviourData.safeId : ''
     }, [saviourData])
 
+    // available balance to deposit
     const availableDepositBalance = useMemo(() => {
         return saviourData
             ? isCurveSaviour
@@ -133,10 +143,12 @@ export function useSaviourInfo() {
             : '0'
     }, [isCurveSaviour, saviourData, tokenBalances])
 
+    // available saviour balance to withdraw
     const availableWithdrawBalance = useMemo(() => {
         return saviourData ? saviourData.saviourBalance : '0'
     }, [saviourData])
 
+    // account saviour balance
     const mySaviourBalance = useMemo(() => {
         if (!saviourData) return '0'
         const amountBN = amount
@@ -151,11 +163,12 @@ export function useSaviourInfo() {
         return ethers.utils.formatEther(saviourBalanceBN.sub(amountBN))
     }, [amount, isSaviourDeposit, saviourData])
 
+    // min saviour balance to deposit or to save your safe
     const minSaviourBalance = getMinSaviourBalance({
         type: saviourType,
         targetedCRatio,
     })
-
+    // saviour stats used to for display
     const stats: Stats = useMemo(() => {
         return {
             data: [
@@ -311,6 +324,7 @@ export function useSaviourInfo() {
     }
 }
 
+// handles input handling input amount
 export function useInputHandler(): {
     onTypedInput: (typedValue: string) => void
 } {
@@ -331,6 +345,7 @@ export function useInputHandler(): {
     }
 }
 
+// returns saviour address if exists or 0X00000 address
 export function useSaviourAddress(safeHandler: string) {
     const [state, setState] = useState(EMPTY_ADDRESS)
     const geb = useGeb()
@@ -355,6 +370,7 @@ export function useSaviourAddress(safeHandler: string) {
     return useMemo(() => state, [state])
 }
 
+// Checks if safe has a saviour
 export function useHasSaviour(safeHandler: string) {
     const saviourAddress = useSaviourAddress(safeHandler)
     return useMemo(() => {
@@ -362,6 +378,7 @@ export function useHasSaviour(safeHandler: string) {
     }, [safeHandler, saviourAddress])
 }
 
+// Checks if safe has Left over after saving the safe has been successful
 export function useHasLeftOver(safeHandler: string) {
     const [state, setState] = useState(false)
     const geb = useGeb()
@@ -434,7 +451,7 @@ export function useHasLeftOver(safeHandler: string) {
         [saviourAddress, state]
     )
 }
-
+// Feching saviour data and saving it into store
 export async function fetchSaviourData({
     account,
     safeId,

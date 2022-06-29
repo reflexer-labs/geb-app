@@ -22,7 +22,7 @@ const Stake = () => {
     const { addStakingCallback } = useAddStaking()
 
     const isValid = !error
-
+    // approving staking contract
     const [depositApprovalState, approveDeposit] = useTokenApproval(
         parsedAmounts.stakingAmount,
         geb?.contracts.stakingToken.address,

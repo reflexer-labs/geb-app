@@ -1,11 +1,11 @@
 import { Contract } from '@ethersproject/contracts'
 import { useMemo } from 'react'
 import { useActiveWeb3React } from '.'
-import { Multicall2 } from '../abis/Multicall2'
+import { Multicall } from '../abis/Multicall'
 import { Erc20 } from '../abis/Erc20'
 import ERC20_ABI from '../abis/erc20.json'
 import ERC20_BYTES32_ABI from '../abis/erc20_bytes32.json'
-import MULTICALL_ABI from '../abis/multicall2.json'
+import MULTICALL_ABI from '../abis/multicall.json'
 import { EMPTY_ADDRESS, MULTICALL2_ADDRESSES } from '../utils/constants'
 import { isAddress } from '../utils/helper'
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
@@ -95,9 +95,9 @@ export function useBytes32TokenContract(
 }
 
 export function useMulticall2Contract() {
-    return useContract<Multicall2>(
+    return useContract<Multicall>(
         MULTICALL2_ADDRESSES,
         MULTICALL_ABI,
         false
-    ) as Multicall2
+    ) as Multicall
 }

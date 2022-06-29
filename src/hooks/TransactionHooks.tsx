@@ -11,6 +11,7 @@ import { ITransaction } from '../utils/interfaces'
 import { BigNumber } from 'ethers'
 import { newTransactionsFirst } from '../utils/helper'
 
+// adding transaction to store
 export function useTransactionAdder(): (
     response: TransactionResponse,
     summary?: string,
@@ -63,6 +64,8 @@ export function useIsTransactionPending(transactionHash?: string): boolean {
 
     return !transactions[transactionHash].receipt
 }
+
+// handking transactions gas limit as well as error messages
 
 export async function handlePreTxGasEstimate(
     signer: JsonRpcSigner,

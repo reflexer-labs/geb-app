@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import { Geb } from 'geb.js'
 import { css } from 'styled-components'
 import { injected, walletconnect, walletlink } from '../connectors'
-import { constructSameAddressMap } from './constructSameAddressMap'
+import { SupportedChainId } from './chains'
 import { ChainId, WalletInfo } from './interfaces'
 
 type AddressMap = { [chainId: number]: string }
@@ -18,10 +18,8 @@ const {
 } = process.env
 
 export const MULTICALL2_ADDRESSES: AddressMap = {
-    ...constructSameAddressMap(
-        '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
-        false
-    ),
+    [SupportedChainId.MAINNET]: '0x51812e07497586ce025D798Bb44b6d11bBEe3a01',
+    [SupportedChainId.KOVAN]: '0x551283ecB1257B5aE0A4b2DFe42e06E5F29b8068',
 }
 
 export enum Network {

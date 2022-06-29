@@ -12,7 +12,7 @@ describe('App Page - No Proxy', () => {
         cy.visit('/', {
             qs: { type: 'no_proxy' },
         })
-        cy.wait(2000)
+        cy.wait(5000)
         cy.get('body').then((body) => {
             if (body.find('[data-test-id="waiting-modal"]').length > 0) {
                 cy.get('[data-test-id="waiting-modal"]').then((e) => {
@@ -47,7 +47,7 @@ describe('App Page - No Proxy', () => {
         cy.get('#step1 > div').contains('Create Account')
         cy.contains('✓ Accept').click()
         cy.get('[data-test-id="steps-btn"]').contains('Create Account').click()
-        cy.wait(2000)
+        cy.wait(5000)
         cy.contains('Transaction Failed').should('be.visible')
         cy.contains('Dismiss').should('be.visible')
     })

@@ -84,9 +84,16 @@ const connectWalletModel: ConnectWalletModel = {
     fetchFiatPrice: thunk(async (actions, payload) => {
         const res = await api.fetchFiatPrice()
         const flxRes = await api.fetchFiatPrice('reflexer-ungovernance-token')
-        actions.setFiatPrice(res.usd)
-        actions.setFlxPrice(flxRes.usd)
-        actions.setEthPriceChange(res.usd_24h_change)
+        if (res && res.used) {
+            actions.setFiatPrice(res.usd)
+        }
+        if (flxRes && flxRes.usd) {
+            actions.setFlxPrice(flxRes.usd)
+        }
+
+        if (res && res.usd_24h_change) {
+            actions.setEthPriceChange(res.usd_24h_change)
+        }
     }),
 
     fetchUser: thunk(async (actions, payload) => {

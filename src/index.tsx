@@ -1,6 +1,7 @@
 import React from 'react'
 import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core'
 import ReactDOM from 'react-dom'
+import { HashRouter } from 'react-router-dom'
 import { StoreProvider } from 'easy-peasy'
 import './index.css'
 import App from './App'
@@ -18,13 +19,15 @@ if ('ethereum' in window) {
 ReactDOM.render(
     <React.StrictMode>
         <HelmetProvider>
-            <Web3ReactProvider getLibrary={getLibrary}>
-                <Web3ProviderNetwork getLibrary={getLibrary}>
-                    <StoreProvider store={store}>
-                        <App />
-                    </StoreProvider>
-                </Web3ProviderNetwork>
-            </Web3ReactProvider>
+            <HashRouter>
+                <Web3ReactProvider getLibrary={getLibrary}>
+                    <Web3ProviderNetwork getLibrary={getLibrary}>
+                        <StoreProvider store={store}>
+                            <App />
+                        </StoreProvider>
+                    </Web3ProviderNetwork>
+                </Web3ReactProvider>
+            </HashRouter>
         </HelmetProvider>
     </React.StrictMode>,
     document.getElementById('root')

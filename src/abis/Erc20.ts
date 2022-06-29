@@ -16,7 +16,7 @@ import {
 } from 'ethers'
 import { FunctionFragment, Result, EventFragment } from '@ethersproject/abi'
 import { Listener, Provider } from '@ethersproject/providers'
-import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from './common'
+import { TypedEventFilter, TypedEvent, TypedListener } from './common'
 
 export interface Erc20Interface extends utils.Interface {
     functions: {
@@ -81,45 +81,56 @@ export interface Erc20Interface extends utils.Interface {
     getEvent(nameOrSignatureOrTopic: 'Transfer'): EventFragment
 }
 
-export type ApprovalEvent = TypedEvent<
-    [string, string, BigNumber],
-    { owner: string; spender: string; value: BigNumber }
->
-
-export type ApprovalEventFilter = TypedEventFilter<ApprovalEvent>
-
-export type TransferEvent = TypedEvent<
+export type ApprovalEventFilter = TypedEventFilter<
     [string, string, BigNumber],
     { from: string; to: string; value: BigNumber }
 >
 
-export type TransferEventFilter = TypedEventFilter<TransferEvent>
+export type TransferEventFilter = TypedEventFilter<
+    [string, string, BigNumber],
+    { from: string; to: string; value: BigNumber }
+>
 
 export interface Erc20 extends BaseContract {
     connect(signerOrProvider: Signer | Provider | string): this
     attach(addressOrName: string): this
     deployed(): Promise<this>
 
-    interface: Erc20Interface
+    listeners<EventArgsArray extends Array<any>, EventArgsObject>(
+        eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
+    ): Array<TypedListener<EventArgsArray, EventArgsObject>>
+    off<EventArgsArray extends Array<any>, EventArgsObject>(
+        eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
+        listener: TypedListener<EventArgsArray, EventArgsObject>
+    ): this
+    on<EventArgsArray extends Array<any>, EventArgsObject>(
+        eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
+        listener: TypedListener<EventArgsArray, EventArgsObject>
+    ): this
+    once<EventArgsArray extends Array<any>, EventArgsObject>(
+        eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
+        listener: TypedListener<EventArgsArray, EventArgsObject>
+    ): this
+    removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
+        eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
+        listener: TypedListener<EventArgsArray, EventArgsObject>
+    ): this
+    removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
+        eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
+    ): this
 
-    queryFilter<TEvent extends TypedEvent>(
-        event: TypedEventFilter<TEvent>,
+    listeners(eventName?: string): Array<Listener>
+    off(eventName: string, listener: Listener): this
+    on(eventName: string, listener: Listener): this
+    once(eventName: string, listener: Listener): this
+    removeListener(eventName: string, listener: Listener): this
+    removeAllListeners(eventName?: string): this
+
+    queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
+        event: TypedEventFilter<EventArgsArray, EventArgsObject>,
         fromBlockOrBlockhash?: string | number | undefined,
         toBlock?: string | number | undefined
-    ): Promise<Array<TEvent>>
-
-    listeners<TEvent extends TypedEvent>(
-        eventFilter?: TypedEventFilter<TEvent>
-    ): Array<TypedListener<TEvent>>
-    listeners(eventName?: string): Array<Listener>
-    removeAllListeners<TEvent extends TypedEvent>(
-        eventFilter: TypedEventFilter<TEvent>
-    ): this
-    removeAllListeners(eventName?: string): this
-    off: OnEvent<this>
-    on: OnEvent<this>
-    once: OnEvent<this>
-    removeListener: OnEvent<this>
+    ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
     functions: {
         name(overrides?: CallOverrides): Promise<[string]>

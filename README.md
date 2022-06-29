@@ -13,6 +13,7 @@ Deposit your crypto assets, generate RAI and lever up your position.
 - Website: [reflexer.finance](https://reflexer.finance/)
 - App: [app.reflexer.finance](https://app.reflexer.finance)
 - Analytics: [stats.reflexer.finance](https://stats.reflexer.finance/)
+- Tokenomics: [tokenomics.reflexer.finance](https://tokenomics.reflexer.finance/)
 - Docs: [docs.reflexer.finance](https://docs.reflexer.finance/)
 - Twitter: [@reflexerfinance](https://twitter.com/reflexerfinance)
 - Discord: [Reflexer](https://discord.com/invite/83t3xKT)
@@ -20,7 +21,7 @@ Deposit your crypto assets, generate RAI and lever up your position.
 
 ## Accessing the Uniswap Interface
 
-To access the Uniswap Interface, use an IPFS gateway link from the
+To access the Reflexer Interface, use an IPFS gateway link from the
 [latest release](https://github.com/reflexer-labs/geb-app/releases/latest),
 or visit [https://app.reflexer.finance](https://app.reflexer.finance).
 
@@ -47,6 +48,7 @@ To have the app default to a different network when a wallet is not connected:
 2. Change `REACT_APP_NETWORK_ID` to `"42"`
 3. Change `REACT_APP_NETWORK_URL` to e.g. `"https://kovan.infura.io/v3/{YOUR_INFURA_KEY}"`
 4. Change `REACT_APP_COIN_TICKER_STAGING` to `"RAI"`
+4. Change `REACT_APP_SHOW_AUCTIONS` to `"1"`
 
 ## Testing
 

@@ -21,10 +21,15 @@ const AuctionsList = ({ type }: Props) => {
         connectWalletModel: connectWalletState,
     } = useStoreState((state) => state)
     const { popupsModel: popupsActions } = useStoreActions((state) => state)
+    // internalbalance = user's RAI balance in the protocol
+    // protInternalBalance = user's FLX balance in the protocol
     const { internalBalance, protInternalBalance } = auctionsState
     const { proxyAddress } = connectWalletState
+
+    // auctions list
     const auctions = useAuctions()
 
+    // handle clicking to claim
     const handleClick = (modalType: string) => {
         if (!account) {
             popupsActions.setIsConnectorsWalletOpen(true)

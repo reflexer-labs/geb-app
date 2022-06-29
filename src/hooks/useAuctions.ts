@@ -3,6 +3,7 @@ import { useStoreState } from '../store'
 import { IAuction } from '../utils/interfaces'
 import _ from '../utils/lodash'
 
+// list auctions data
 export default function useAuctions() {
     const [state, setState] = useState<Array<IAuction>>()
     const {
@@ -15,6 +16,7 @@ export default function useAuctions() {
 
     useEffect(() => {
         const oneMonthOld = new Date().setMonth(new Date().getMonth() - 1)
+        // show auctions less than one month old only
         const filteredAuctions = autctionsData
             .filter((auction: IAuction) => {
                 return (

@@ -8,6 +8,8 @@ import { formatNumber } from '../utils/helper'
 
 type TokenType = 'ETH' | 'RAI'
 
+// connect to geb.js
+
 export default function useGeb(): Geb {
     const { library } = useActiveWeb3React()
     const [state, setState] = useState<Geb>()
@@ -22,6 +24,7 @@ export default function useGeb(): Geb {
     return state as Geb
 }
 
+// check if is owner of the safe
 export function useIsOwner(safeId: string): boolean {
     const [state, setState] = useState(true)
     const geb = useGeb()
@@ -52,6 +55,7 @@ export function useIsOwner(safeId: string): boolean {
     return state
 }
 
+// Returns proxy address from geb.js
 export function useProxyAddress() {
     const geb = useGeb()
     const { account } = useActiveWeb3React()
@@ -86,10 +90,12 @@ export function useProxyAddress() {
     return useMemo(() => proxyAddress, [proxyAddress])
 }
 
+// fetches latest blocknumber from store
 export function useBlockNumber() {
     return store.getState().connectWalletModel.blockNumber[NETWORK_ID]
 }
 
+// returns safe handler from geb.js
 export function useSafeHandler(safeId: string): string {
     const [state, setState] = useState('')
     const geb = useGeb()
@@ -105,6 +111,7 @@ export function useSafeHandler(safeId: string): string {
     return state
 }
 
+// returns amount of currency in USD
 export function useTokenBalanceInUSD(token: TokenType, balance: string) {
     const ethPrice = store.getState().connectWalletModel.fiatPrice
     const raiPrice =

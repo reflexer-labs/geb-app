@@ -11,7 +11,7 @@ describe('App Page - No Safes', () => {
         cy.visit('/', {
             qs: { type: 'no_safes' },
         })
-        cy.wait(2000)
+        cy.wait(5000)
         cy.get('body').then((body) => {
             if (body.find('[data-test-id="waiting-modal"]').length > 0) {
                 cy.get('[data-test-id="waiting-modal"]').then((e) => {
@@ -41,14 +41,14 @@ describe('App Page - No Safes', () => {
         cy.contains('✓ Accept').click()
         cy.get('#step2 > div').contains('Create a Safe')
         cy.get('[data-test-id="steps-btn"]').contains('Create a Safe').click()
-        cy.wait(2000)
+        cy.wait(5000)
         cy.url().should('include', 'create')
     })
 
     it('creates a new safe', () => {
         cy.contains('✓ Accept').click()
         cy.get('[data-test-id="steps-btn"]').contains('Create a Safe').click()
-        cy.wait(2000)
+        cy.wait(5000)
         cy.url().should('include', 'create')
         cy.get('[data-test-id="deposit_borrow"]').type('4')
         cy.get('[data-test-id="repay_withdraw"]').type('1000')

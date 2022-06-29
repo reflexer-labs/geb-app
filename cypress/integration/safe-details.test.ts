@@ -10,7 +10,7 @@ describe('App Page - Safe Details', () => {
 
     beforeEach(() => {
         cy.visit('/')
-        cy.wait(2000)
+        cy.wait(5000)
         cy.get('body').then((body) => {
             if (body.find('[data-test-id="waiting-modal"]').length > 0) {
                 cy.get('[data-test-id="waiting-modal"]').then((e) => {
@@ -24,7 +24,7 @@ describe('App Page - Safe Details', () => {
         })
         cy.contains('✓ Accept').click()
         cy.get('.safeBlock').first().click()
-        cy.wait(2000)
+        cy.wait(5000)
         cy.get('body').then((body) => {
             if (body.find('[data-test-id="waiting-modal"]').length > 0) {
                 cy.get('[data-test-id="waiting-modal"]').then((e) => {
@@ -61,7 +61,7 @@ describe('App Page - Safe Details', () => {
                 cy.get('[data-test-id="deposit_borrow_right"]').type(
                     getValue(tx)
                 )
-                cy.wait(2000)
+                cy.wait(5000)
                 cy.contains('140.00%')
             })
     })
@@ -131,7 +131,7 @@ describe('App Page - Safe Details', () => {
                     () => Cypress.$(e).text() === 'Transaction Submitted',
                     {
                         timeout: 100000,
-                        interval: 2000,
+                        interval: 5000,
                     }
                 )
             )
@@ -154,7 +154,7 @@ describe('App Page - Safe Details', () => {
                     () => Cypress.$(e).text() === 'Transaction Submitted',
                     {
                         timeout: 100000,
-                        interval: 2000,
+                        interval: 5000,
                     }
                 )
             )

@@ -1,21 +1,6 @@
-// Copyright (C) 2020  Uniswap
-// https://github.com/Uniswap/uniswap-interface
-
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import { ConnectorUpdate } from '@web3-react/types'
-import { AbstractConnector } from '@web3-react/abstract-connector'
 import invariant from 'tiny-invariant'
+import { AbstractConnector } from '@web3-react/abstract-connector'
+import { ConnectorUpdate } from 'web3-react-types'
 
 interface NetworkConnectorArguments {
     urls: { [chainId: number]: string }
@@ -54,11 +39,19 @@ class MiniRpcProvider implements AsyncSendable {
     public readonly path: string
     public readonly batchWaitTimeMs: number
 
+    private readonly connector: NetworkConnector
+
     private nextId = 1
     private batchTimeoutId: ReturnType<typeof setTimeout> | null = null
     private batch: BatchItem[] = []
 
-    constructor(chainId: number, url: string, batchWaitTimeMs?: number) {
+    constructor(
+        connector: NetworkConnector,
+        chainId: number,
+        url: string,
+        batchWaitTimeMs?: number
+    ) {
+        this.connector = connector
         this.chainId = chainId
         this.url = url
         const parsed = new URL(url)
@@ -70,7 +63,26 @@ class MiniRpcProvider implements AsyncSendable {
 
     public readonly clearBatch = async () => {
         console.debug('Clearing batch', this.batch)
-        const batch = this.batch
+        let batch = this.batch
+
+        batch = batch.filter((b) => {
+            if (b.request.method === 'wallet_switchEthereumChain') {
+                try {
+                    this.connector.changeChainId(
+                        parseInt(
+                            (b.request.params as [{ chainId: string }])[0]
+                                .chainId
+                        )
+                    )
+                    b.resolve({ id: b.request.id })
+                } catch (error) {
+                    b.reject(error)
+                }
+                return false
+            }
+            return true
+        })
+
         this.batch = []
         this.batchTimeoutId = null
         let response: Response
@@ -124,26 +136,24 @@ class MiniRpcProvider implements AsyncSendable {
                 reject,
                 request: { method },
             } = byKey[result.id]
-            if (resolve && reject) {
-                if ('error' in result) {
-                    reject(
-                        new RequestError(
-                            result?.error?.message,
-                            result?.error?.code,
-                            result?.error?.data
-                        )
+            if ('error' in result) {
+                reject(
+                    new RequestError(
+                        result?.error?.message,
+                        result?.error?.code,
+                        result?.error?.data
                     )
-                } else if ('result' in result) {
-                    resolve(result.result)
-                } else {
-                    reject(
-                        new RequestError(
-                            `Received unexpected JSON-RPC response to ${method} request.`,
-                            -32000,
-                            result
-                        )
+                )
+            } else if ('result' in result && resolve) {
+                resolve(result.result)
+            } else {
+                reject(
+                    new RequestError(
+                        `Received unexpected JSON-RPC response to ${method} request.`,
+                        -32000,
+                        result
                     )
-                }
+                )
             }
         }
     }
@@ -153,7 +163,7 @@ class MiniRpcProvider implements AsyncSendable {
             jsonrpc: '2.0'
             id: number | string | null
             method: string
-            params?: unknown[] | object
+            params?: unknown[] | Record<string, unknown>
         },
         callback: (error: any, response: any) => void
     ): void => {
@@ -166,7 +176,7 @@ class MiniRpcProvider implements AsyncSendable {
 
     public readonly request = async (
         method: string | { method: string; params: unknown[] },
-        params?: unknown[] | object
+        params?: unknown[] | Record<string, unknown>
     ): Promise<unknown> => {
         if (typeof method !== 'string') {
             return this.request(method.method, method.params)
@@ -206,11 +216,12 @@ export class NetworkConnector extends AbstractConnector {
             supportedChainIds: Object.keys(urls).map((k): number => Number(k)),
         })
 
-        this.currentChainId = defaultChainId || Number(Object.keys(urls)[0])
+        this.currentChainId = defaultChainId ?? Number(Object.keys(urls)[0])
         this.providers = Object.keys(urls).reduce<{
             [chainId: number]: MiniRpcProvider
         }>((accumulator, chainId) => {
             accumulator[Number(chainId)] = new MiniRpcProvider(
+                this,
                 Number(chainId),
                 urls[Number(chainId)]
             )
@@ -244,5 +255,22 @@ export class NetworkConnector extends AbstractConnector {
 
     public deactivate() {
         return
+    }
+
+    /**
+     * Meant to be called only by MiniRpcProvider
+     * @param chainId the new chain id
+     */
+    public changeChainId(chainId: number) {
+        if (chainId in this.providers) {
+            this.currentChainId = chainId
+            this.emitUpdate({
+                chainId,
+                account: null,
+                provider: this.providers[chainId],
+            })
+        } else {
+            throw new Error(`Unsupported chain ID: ${chainId}`)
+        }
     }
 }
