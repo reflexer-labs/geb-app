@@ -1,7 +1,6 @@
 import React from 'react'
 
 const INITIAL_STATE = [
-    require('../assets/brand.svg'),
     require('../assets/brand-white.svg'),
     require('../assets/dark-arrow.svg'),
     require('../assets/connectors/walletConnectIcon.svg'),
@@ -16,7 +15,6 @@ const INITIAL_STATE = [
     require('../assets/logo192.png'),
     require('../assets/connectors/metamask.png'),
     require('../assets/saviour.svg'),
-    require('../assets/flx_uni_rai.svg'),
     require('../assets/account-img.png'),
     require('../assets/wallet-img.png'),
     require('../assets/safe-img.png'),
