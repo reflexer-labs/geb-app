@@ -15,7 +15,6 @@ import Web3ReactManager from './components/Web3ReactManager'
 import SafeDetails from './containers/Safes/SafeDetails'
 
 import Privacy from './containers/Privacy'
-import CustomToast from './components/CustomToast'
 import Auctions from './containers/Auctions'
 import GoogleTagManager from './components/Analytics/GoogleTagManager'
 import { SHOW_AUCTIONS } from './utils/constants'
@@ -43,7 +42,6 @@ const App = () => {
         <I18nextProvider i18n={i18next}>
             <ThemeProvider theme={darkTheme}>
                 <GlobalStyle bodyOverflow={bodyOverflow} />
-                <CustomToast />
                 <ErrorBoundary>
                     <Shared>
                         <Suspense fallback={null}>

@@ -7,8 +7,6 @@ export type TokenName =
     | 'uniswapv2'
     | 'curve'
     | 'flx_lp'
-    | 'aqua'
-    | 'vcon'
 
 export type Tokens = {
     [key in TokenName]: {
@@ -75,19 +73,5 @@ export const TOKENS: Tokens = {
         gebName: '',
         balance: '',
         address: '0x3a6FAA9b05c09252432EbffaAaE111e7bFa269a7',
-    },
-    aqua: {
-        name: 'AQUA',
-        icon: require('../assets/aqua.svg'),
-        gebName: '',
-        balance: '',
-        address: '0xAed38bCFbAAEc97448B21bbF2F8e3e33eADf95Ae',
-    },
-    vcon: {
-        name: 'VCON',
-        icon: require('../assets/vcon.svg'),
-        gebName: '',
-        balance: '',
-        address: '0x409052A2d826C31EeE8185E7e55e8b8413BC301D',
     },
 }
