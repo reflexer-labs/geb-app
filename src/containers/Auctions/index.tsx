@@ -20,7 +20,7 @@ const Auctions = ({
     const { auctionsModel: auctionsActions, popupsModel: popupsActions } =
         useStoreActions((state) => state)
     const [showFaqs, setShowFaqs] = useState(false)
-    const [type, setType] = useState<AuctionEventType>('DEBT')
+    const [type, setType] = useState<AuctionEventType>('SURPLUS')
     const [error, setError] = useState('')
 
     useEffect(() => {
