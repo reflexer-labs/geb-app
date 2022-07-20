@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react'
 import { useStoreState } from '../store'
 import { IAuction } from '../utils/interfaces'
 import _ from '../utils/lodash'
+import useGeb from './useGeb'
+
+export function useRPCAuctions() {
+    const geb = useGeb()
+    const surplusAuction = geb.contracts.surplusAuctionHouse.address
+}
 
 // list auctions data
 export default function useAuctions() {
