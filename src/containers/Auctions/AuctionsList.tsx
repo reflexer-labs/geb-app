@@ -27,7 +27,7 @@ const AuctionsList = ({ type }: Props) => {
     const { proxyAddress } = connectWalletState
 
     // auctions list
-    const auctions = useAuctions()
+    const auctions = useAuctions(type)
 
     // handle clicking to claim
     const handleClick = (modalType: string) => {
