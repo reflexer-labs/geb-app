@@ -305,8 +305,7 @@ export default function useAuctions(
 ) {
     const graphAuctions = useGraphAuctions()
     const rpcAuction = useRPCAuctions(type, id ? Number(id) : undefined)
-    console.log(rpcAuction)
 
-    const auctions = graphAuctions
+    const auctions = rpcAuction ? [rpcAuction] : graphAuctions
     return auctions
 }
