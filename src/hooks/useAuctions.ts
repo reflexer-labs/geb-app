@@ -69,7 +69,12 @@ export function useRPCAuctions(
                 isClaimed: bidAmount.isZero(),
                 sellAmount: ethers.utils.formatEther(amountToSell),
                 sellInitialAmount: ethers.utils.formatEther(amountToSell),
-                sellToken: type === 'SURPLUS' ? 'COIN' : 'PROTOCOL_TOKEN',
+                sellToken:
+                    type === 'SURPLUS'
+                        ? 'COIN'
+                        : type === 'DEBT'
+                        ? 'PROTOCOL_TOKEN'
+                        : 'PROTOCOL_TOKEN_LP',
                 startedBy: highBidder,
                 winner:
                     auctionDeadline > 0 && auctionDeadline * 1000 > Date.now()
@@ -156,6 +161,46 @@ export function useRPCAuctions(
                                     amountSoldIncrease,
                                     totalLength,
                                     auctionId,
+                                    type,
+                                })
+                            }
+                        )
+                        .catch((e) => console.log(e))
+                })
+        }
+
+        if (type === 'STAKED_TOKEN') {
+            geb.contracts.stakingAuctionHouse
+                .auctionsStarted()
+                .then((totalLength) => {
+                    const auctionId = id ? id : totalLength
+                    geb.multiCall([
+                        geb.contracts.stakingAuctionHouse.bids(auctionId, true),
+                        geb.contracts.stakingAuctionHouse.bidIncrease(true),
+                        geb.contracts.stakingAuctionHouse.bidDuration(true),
+                        geb.contracts.debtAuctionHouse.amountSoldIncrease(true),
+                    ])
+                        .then(
+                            ([
+                                bids,
+                                bidIncrease,
+                                bidDuration,
+                                amountSoldIncrease,
+                            ]) => {
+                                const modBids = {
+                                    ...bids,
+                                    bidAmount: gebUtils.decimalShift(
+                                        bids.bidAmount.div(gebUtils.WAD),
+                                        -9
+                                    ),
+                                }
+                                fetchRPCAuctions({
+                                    bids: modBids,
+                                    bidIncrease,
+                                    bidDuration,
+                                    totalLength,
+                                    auctionId,
+                                    amountSoldIncrease,
                                     type,
                                 })
                             }
