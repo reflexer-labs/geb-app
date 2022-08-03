@@ -264,6 +264,10 @@ export default function useAuctions(
 ) {
     const graphAuctions = useGraphAuctions()
     const rpcAuction = useRPCAuctions(type, id ? Number(id) : undefined)
-    const auctions = rpcAuction ? [rpcAuction] : graphAuctions
+    const auctions = rpcAuction
+        ? [rpcAuction].filter((auction: IAuction) => {
+              return Number(auction.auctionDeadline) * 1000 > Date.now()
+          })
+        : graphAuctions
     return auctions
 }
