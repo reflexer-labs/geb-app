@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { AlertCircle, Circle, X } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import _ from '../utils/lodash'
-import { useStoreState } from '../store'
 import Button from './Button'
 import { formatNumber } from '../utils/helper'
 import { useActiveWeb3React } from '../hooks'
 import { utils } from 'geb.js'
 import { parseRad } from '../utils/gebManager'
-import { geb } from '../utils/constants'
+import { geb as gebNode } from '../utils/constants'
 import Loader from './Loader'
+import useGeb from 'src/hooks/useGeb'
 
 interface Props {
     title: string
@@ -33,28 +32,26 @@ const StepsContent = ({
     isLoading,
     id,
 }: Props) => {
+    const geb = useGeb()
     const { t } = useTranslation()
     const { account } = useActiveWeb3React()
     const [debtFloor, setDebtFloor] = useState('')
-    const { safeModel: safeState } = useStoreState((state) => state)
-
     const [isOpen, setIsOpen] = useState(true)
 
-    const debtFloorVal = _.get(safeState, 'liquidationData.debtFloor', '0')
+    const gebCall = useMemo(() => {
+        if (account) {
+            return geb
+        }
+        return gebNode
+    }, [account, geb])
 
     useEffect(() => {
-        async function getDebtFloor() {
-            const res = await geb.contracts.safeEngine.collateralTypes(
-                utils.ETH_A
-            )
-            setDebtFloor(parseRad(res.debtFloor))
-        }
-        if (account) {
-            setDebtFloor(debtFloorVal)
-        } else {
-            getDebtFloor()
-        }
-    }, [account, debtFloorVal])
+        if (!gebCall) return
+        gebCall.contracts.safeEngine
+            .collateralTypes(utils.ETH_A)
+            .then((res) => setDebtFloor(parseRad(res.debtFloor)))
+            .catch((e) => console.log(e))
+    }, [gebCall])
 
     const handleOpenState = () => setIsOpen(!isOpen)
 
