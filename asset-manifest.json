@@ -3,8 +3,8 @@
     "static/js/0.a4f9742f.chunk.js": "./static/js/0.a4f9742f.chunk.js",
     "static/js/0.a4f9742f.chunk.js.map": "./static/js/0.a4f9742f.chunk.js.map",
     "main.css": "./static/css/main.58a0c9c2.chunk.css",
-    "main.js": "./static/js/main.37388da9.chunk.js",
-    "main.js.map": "./static/js/main.37388da9.chunk.js.map",
+    "main.js": "./static/js/main.65f6a06d.chunk.js",
+    "main.js.map": "./static/js/main.65f6a06d.chunk.js.map",
     "runtime-main.js": "./static/js/runtime-main.9f90127c.js",
     "runtime-main.js.map": "./static/js/runtime-main.9f90127c.js.map",
     "static/js/3.bd8afd48.chunk.js": "./static/js/3.bd8afd48.chunk.js",
@@ -18,14 +18,14 @@
     "static/js/7.33379362.chunk.js": "./static/js/7.33379362.chunk.js",
     "static/js/7.33379362.chunk.js.map": "./static/js/7.33379362.chunk.js.map",
     "index.html": "./index.html",
-    "precache-manifest.fd46021d2381f60c0dc3f53f1fba77e3.js": "./precache-manifest.fd46021d2381f60c0dc3f53f1fba77e3.js",
+    "precache-manifest.4f82d2d9725934fc5f705f533e2eb32f.js": "./precache-manifest.4f82d2d9725934fc5f705f533e2eb32f.js",
     "service-worker.js": "./service-worker.js",
     "static/css/main.58a0c9c2.chunk.css.map": "./static/css/main.58a0c9c2.chunk.css.map",
     "static/js/0.a4f9742f.chunk.js.LICENSE.txt": "./static/js/0.a4f9742f.chunk.js.LICENSE.txt",
     "static/js/3.bd8afd48.chunk.js.LICENSE.txt": "./static/js/3.bd8afd48.chunk.js.LICENSE.txt",
     "static/js/4.dedbcf70.chunk.js.LICENSE.txt": "./static/js/4.dedbcf70.chunk.js.LICENSE.txt",
     "static/js/5.9c5b5b7c.chunk.js.LICENSE.txt": "./static/js/5.9c5b5b7c.chunk.js.LICENSE.txt",
-    "static/js/main.37388da9.chunk.js.LICENSE.txt": "./static/js/main.37388da9.chunk.js.LICENSE.txt",
+    "static/js/main.65f6a06d.chunk.js.LICENSE.txt": "./static/js/main.65f6a06d.chunk.js.LICENSE.txt",
     "static/media/LogoIcon.png": "./static/media/LogoIcon.9eb40d45.png",
     "static/media/account-img.png": "./static/media/account-img.3bb11c49.png",
     "static/media/arrow-right.svg": "./static/media/arrow-right.d285b6cf.svg",
@@ -70,6 +70,6 @@
     "static/js/runtime-main.9f90127c.js",
     "static/js/3.bd8afd48.chunk.js",
     "static/css/main.58a0c9c2.chunk.css",
-    "static/js/main.37388da9.chunk.js"
+    "static/js/main.65f6a06d.chunk.js"
   ]
 }
