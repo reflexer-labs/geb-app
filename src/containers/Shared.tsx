@@ -37,6 +37,8 @@ import DistributionsModal from '../components/Modals/DistributionsModal'
 import { ChainId } from '../utils/interfaces'
 import { ethers } from 'ethers'
 import MulticallUpdater from '../services/MulticallUpdater'
+import BlockedAddress from 'src/components/BlockedAddress'
+import { blockedAddresses } from 'src/utils/blockedAddresses'
 
 interface Props {
     children: ReactNode
@@ -228,7 +230,11 @@ const Shared = ({ children, ...rest }: Props) => {
                     <AlertLabel type="danger" text={t('shutdown_text')} />
                 </AlertContainer>
             ) : null}
-            <Content>{children}</Content>
+            {account && blockedAddresses.includes(account.toLowerCase()) ? (
+                <BlockedAddress />
+            ) : (
+                <Content>{children}</Content>
+            )}
             <EmptyDiv>
                 <CookieBanner />
             </EmptyDiv>
