@@ -199,7 +199,7 @@ const InfoBox = styled.div`
 
 const LeftSide = styled.div`
     flex: 0 0 56%;
-    background: url(${require('../../assets/blueish-bg.png')});
+    background: url(${require('../../assets/blueish-bg.png').default});
     background-repeat: no-repeat;
     background-size: cover;
     padding: 20px;
@@ -207,7 +207,7 @@ const LeftSide = styled.div`
 `
 const RightSide = styled.div`
     flex: 0 0 42%;
-    background: url(${require('../../assets/greenish-bg.png')});
+    background: url(${require('../../assets/greenish-bg.png').default});
     background-repeat: no-repeat;
     background-size: cover;
     padding: 20px;

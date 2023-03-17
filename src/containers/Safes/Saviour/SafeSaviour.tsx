@@ -44,14 +44,14 @@ const SafeSaviour = ({ ...props }) => {
         () => [
             {
                 item: 'Uniswap v2 RAI/ETH',
-                img: require('../../../assets/uniswap-icon.svg'),
+                img: require('../../../assets/uniswap-icon.svg').default,
                 href: `https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`,
                 isExternal: true,
                 shortName: 'uniswap',
             },
             {
                 item: 'Curve RAI/3Pool',
-                img: require('../../../assets/curve.svg'),
+                img: require('../../../assets/curve.svg').default,
                 href: `https://app.uniswap.org/#/add/v2/${saviourData?.coinAddress}/ETH`,
                 isExternal: true,
                 shortName: 'curve',

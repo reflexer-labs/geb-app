@@ -27,51 +27,51 @@ const AuctionsFAQ = ({ type }: Props) => {
             {
                 title: t('debt_auction_minting_flx_header'),
                 desc: t('debt_auction_minting_flx_desc'),
-                image: require('../assets/mine.svg'),
+                image: require('../assets/mine.svg').default,
             },
             {
                 title: t('debt_auction_how_to_bid'),
                 desc: t('debt_auction_how_to_bid_desc'),
-                image: require('../assets/bid.svg'),
+                image: require('../assets/bid.svg').default,
             },
             {
                 title: t('debt_auction_claim_tokens'),
                 desc: t('debt_auction_claim_tokens_desc'),
-                image: require('../assets/claim.svg'),
+                image: require('../assets/claim.svg').default,
             },
         ],
         surplus: [
             {
                 title: t('surplus_auction_minting_flx_header'),
                 desc: t('surplus_auction_minting_flx_desc'),
-                image: require('../assets/sell-rai.svg'),
+                image: require('../assets/sell-rai.svg').default,
             },
             {
                 title: t('surplus_auction_how_to_bid'),
                 desc: t('surplus_auction_how_to_bid_desc'),
-                image: require('../assets/bid.svg'),
+                image: require('../assets/bid.svg').default,
             },
             {
                 title: t('surplus_auction_claim_tokens'),
                 desc: t('surplus_auction_claim_tokens_desc'),
-                image: require('../assets/claim.svg'),
+                image: require('../assets/claim.svg').default,
             },
         ],
         staked_token: [
             {
                 title: t('staked_auction_minting_flx_header'),
                 desc: t('staked_auction_minting_flx_desc'),
-                image: require('../assets/sell-rai.svg'),
+                image: require('../assets/sell-rai.svg').default,
             },
             {
                 title: t('staked_auction_how_to_bid'),
                 desc: t('staked_auction_how_to_bid_desc'),
-                image: require('../assets/bid.svg'),
+                image: require('../assets/bid.svg').default,
             },
             {
                 title: t('staked_auction_claim_tokens'),
                 desc: t('staked_auction_claim_tokens_desc'),
-                image: require('../assets/claim.svg'),
+                image: require('../assets/claim.svg').default,
             },
         ],
     }
