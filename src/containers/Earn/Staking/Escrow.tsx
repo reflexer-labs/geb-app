@@ -51,7 +51,9 @@ const Escrow = () => {
                     <Value>
                         {total}{' '}
                         <img
-                            src={require('../../../assets/flx-logo.svg')}
+                            src={
+                                require('../../../assets/flx-logo.svg').default
+                            }
                             alt=""
                         />
                     </Value>
@@ -67,7 +69,9 @@ const Escrow = () => {
                     <Value>
                         {tokens}{' '}
                         <img
-                            src={require('../../../assets/flx-logo.svg')}
+                            src={
+                                require('../../../assets/flx-logo.svg').default
+                            }
                             alt=""
                         />
                     </Value>

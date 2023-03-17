@@ -50,7 +50,10 @@ const SafeSaviour = ({
                     saviourData && saviourData.hasSaviour ? null : (
                         <ImageContainer>
                             <img
-                                src={require('../../../assets/saviour.svg')}
+                                src={
+                                    require('../../../assets/saviour.svg')
+                                        .default
+                                }
                                 alt="saviour"
                             />
                         </ImageContainer>

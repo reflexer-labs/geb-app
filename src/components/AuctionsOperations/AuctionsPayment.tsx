@@ -296,9 +296,6 @@ const AuctionsPayment = () => {
     }
 
     const returnClaimValues = () => {
-        if (Number(internalBalance) > 0) {
-            return { amount: internalBalance, symbol: 'RAI' }
-        }
         if (Number(protInternalBalance) > 0) {
             return { amount: protInternalBalance, symbol: 'FLX' }
         }

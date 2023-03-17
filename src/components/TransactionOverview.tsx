@@ -17,10 +17,12 @@ const TransactionOverview = ({ title, description, isChecked }: Props) => {
                     <>
                         <img
                             className="sep"
-                            src={require('../assets/arrow.svg')}
+                            src={require('../assets/arrow.svg').default}
                             alt=""
                         />
-                        <LogoIcon src={require('../assets/uniswap-icon.svg')} />{' '}
+                        <LogoIcon
+                            src={require('../assets/uniswap-icon.svg').default}
+                        />{' '}
                     </>
                 ) : null}
             </IconsHolder>

@@ -19,7 +19,10 @@ const Accounts = () => {
         switch (step) {
             case 1:
                 return isMobile ? (
-                    <img src={require('../../assets/account-img.png')} alt="" />
+                    <img
+                        src={require('../../assets/account-img.png').default}
+                        alt=""
+                    />
                 ) : (
                     <Lottie
                         loop
@@ -30,7 +33,10 @@ const Accounts = () => {
                 )
             case 2:
                 return isMobile ? (
-                    <img src={require('../../assets/safe-img.png')} alt="" />
+                    <img
+                        src={require('../../assets/safe-img.png').default}
+                        alt=""
+                    />
                 ) : (
                     <Lottie
                         loop
@@ -41,7 +47,10 @@ const Accounts = () => {
                 )
             default:
                 return isMobile ? (
-                    <img src={require('../../assets/wallet-img.png')} alt="" />
+                    <img
+                        src={require('../../assets/wallet-img.png').default}
+                        alt=""
+                    />
                 ) : (
                     <Lottie
                         loop

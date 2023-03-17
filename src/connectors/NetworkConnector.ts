@@ -76,7 +76,7 @@ class MiniRpcProvider implements AsyncSendable {
                     )
                     b.resolve({ id: b.request.id })
                 } catch (error) {
-                    b.reject(error)
+                    b.reject(error as Error)
                 }
                 return false
             }

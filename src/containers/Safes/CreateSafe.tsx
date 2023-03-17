@@ -19,7 +19,7 @@ import { formatNumber } from '../../utils/helper'
 import Review from './Review'
 
 const CollateralTypes = [
-    { item: 'ETH-A', img: require('../../assets/eth-img.svg') },
+    { item: 'ETH-A', img: require('../../assets/eth-img.svg').default },
 ]
 
 const CreateSafe = () => {
