@@ -296,11 +296,15 @@ const AuctionsPayment = () => {
     }
 
     const returnClaimValues = () => {
-        if (Number(protInternalBalance) > 0) {
-            return { amount: protInternalBalance, symbol: 'FLX' }
-        }
-
-        return { amount: internalBalance, symbol: 'RAI' }
+        const amount =
+            Number(protInternalBalance) > Number(internalBalance)
+                ? Number(protInternalBalance)
+                : Number(internalBalance)
+        const symbol =
+            Number(protInternalBalance) > Number(internalBalance)
+                ? 'FLX'
+                : 'RAI'
+        return { amount, symbol }
     }
 
     const handleCancel = () => {

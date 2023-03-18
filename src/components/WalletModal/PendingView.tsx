@@ -78,7 +78,10 @@ export default function PendingView({
                             color={option.color}
                             header={option.name}
                             subheader={option.description}
-                            icon={require(`../../assets/connectors/${option.iconName}`)}
+                            icon={
+                                require(`../../assets/connectors/${option.iconName}`)
+                                    .default
+                            }
                         />
                     )
                 }
