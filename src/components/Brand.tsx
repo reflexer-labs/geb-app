@@ -6,7 +6,7 @@ interface Props {
 }
 
 const Brand = ({ height }: Props) => {
-    const imgUrl = require(`../assets/brand-white.png`)
+    const imgUrl = require(`../assets/brand-white.png`).default
     return (
         <Container>
             <a href={'/'}>
