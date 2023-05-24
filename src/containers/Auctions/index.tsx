@@ -8,6 +8,9 @@ import Modal from '../../components/Modals/Modal'
 import { useActiveWeb3React } from '../../hooks'
 import { useStoreActions } from '../../store'
 import AuctionsList from './AuctionsList'
+import { useStartSurplusAuction } from 'src/hooks/useAuctions'
+import { handleTransactionError } from 'src/hooks/TransactionHooks'
+import { formatNumber } from 'src/utils/helper'
 
 export type AuctionEventType = 'DEBT' | 'SURPLUS' | 'STAKED_TOKEN'
 
@@ -22,6 +25,26 @@ const Auctions = ({
     const [showFaqs, setShowFaqs] = useState(false)
     const [type, setType] = useState<AuctionEventType>('SURPLUS')
     const [error, setError] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
+    const { startSurplusAcution, surplusAmountToSell } =
+        useStartSurplusAuction()
+
+    const handleStartSurplusAuction = async () => {
+        setIsLoading(true)
+        try {
+            popupsActions.setIsWaitingModalOpen(true)
+            popupsActions.setWaitingPayload({
+                title: 'Waiting For Confirmation',
+                hint: 'Confirm this transaction in your wallet',
+                status: 'loading',
+            })
+            await startSurplusAcution()
+        } catch (e) {
+            handleTransactionError(e)
+        } finally {
+            setIsLoading(false)
+        }
+    }
 
     useEffect(() => {
         async function init() {
@@ -118,6 +141,26 @@ const Auctions = ({
                         </Tab>
                     </Switcher>
                 )}
+                {type === 'SURPLUS' && account ? (
+                    <StartAuctionContainer>
+                        <Box style={{ justifyContent: 'space-between' }}>
+                            <Box>
+                                <SurplusTitle>
+                                    Surplus Amount to Sell:{' '}
+                                </SurplusTitle>
+                                <span>
+                                    {formatNumber(surplusAmountToSell, 2)} RAI
+                                </span>
+                            </Box>
+                            <Button
+                                text={'Start Surplus Auction'}
+                                onClick={handleStartSurplusAuction}
+                                isLoading={isLoading}
+                                disabled={isLoading}
+                            />
+                        </Box>
+                    </StartAuctionContainer>
+                ) : null}
 
                 <AuctionsList type={type} />
             </Container>
@@ -186,4 +229,23 @@ const ReviewContainer = styled.div`
 const BtnContainer = styled.div`
     padding-top: 20px;
     text-align: center;
+`
+
+const Box = styled.div`
+    display: flex;
+    align-items: center;
+    span {
+        font-weight: bold;
+    }
+`
+const SurplusTitle = styled.h3`
+    font-size: 16px;
+    margin-right: 10px;
+    font-weight: normal;
+`
+
+const StartAuctionContainer = styled.div`
+    padding: 10px 20px;
+    border-radius: 15px;
+    background: ${(props) => props.theme.colors.colorSecondary};
 `
