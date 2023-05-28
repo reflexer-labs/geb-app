@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useStoreActions, useStoreState } from '../store'
 import { IAuction } from '../utils/interfaces'
 import _ from '../utils/lodash'
@@ -7,6 +7,8 @@ import { useActiveWeb3React } from '.'
 import { ETH_NETWORK } from 'src/utils/constants'
 import { handlePreTxGasEstimate } from './TransactionHooks'
 import { parseRad } from 'src/utils/gebManager'
+import { BigNumber } from 'ethers'
+import { toFixedString } from 'src/utils/helper'
 
 // list auctions data
 export default function useAuctions() {
@@ -97,25 +99,55 @@ export function useStartSurplusAuction() {
     } = useStoreActions((store) => store)
 
     const { account, library } = useActiveWeb3React()
-    const [surplusAmountToSell, setSurplusAmountToSell] = useState<any>()
+    const [surplusAmountToSell, setSurplusAmountToSell] = useState<string>()
+    const [accountingEngineSurplus, setAccountingEngineSurplus] =
+        useState<string>()
+
     useEffect(() => {
         if (!library || !account) return
         const signer = library.getSigner(account)
         const geb = new Geb(ETH_NETWORK, signer.provider)
-        geb.contracts.accountingEngine
-            .surplusAuctionAmountToSell()
-            .then((res) => setSurplusAmountToSell(parseRad(res)))
+        geb.multiCall([
+            geb.contracts.accountingEngine.surplusAuctionAmountToSell(true),
+            geb.contracts.safeEngine.coinBalance(
+                geb.contracts.accountingEngine.address,
+                true
+            ),
+        ]).then((res) => {
+            setSurplusAmountToSell(parseRad(res[0]))
+            setAccountingEngineSurplus(parseRad(res[1]))
+        })
     }, [account, library])
+
+    const allowStartSurplusAuction = useMemo(() => {
+        if (!surplusAmountToSell || !accountingEngineSurplus) return false
+        const surplusBuffer = 500_000
+        const surplusAmountToSellWithBuffer = BigNumber.from(
+            toFixedString(
+                String(Number(surplusAmountToSell) + surplusBuffer),
+                'RAD'
+            )
+        )
+        const accountingEngineSurplusBN = BigNumber.from(
+            toFixedString(accountingEngineSurplus, 'RAD')
+        )
+        return surplusAmountToSellWithBuffer.lte(accountingEngineSurplusBN)
+    }, [surplusAmountToSell, accountingEngineSurplus])
+
+    const deltaToStartSurplusAuction = useMemo(() => {
+        if (!surplusAmountToSell || !accountingEngineSurplus) return 0
+        const surplusBuffer = 500_000
+        const surplusAmountToSellWithBuffer =
+            Number(surplusAmountToSell) + surplusBuffer
+        const accountingEngineSurplusN = Number(accountingEngineSurplus)
+        return surplusAmountToSellWithBuffer - accountingEngineSurplusN
+    }, [surplusAmountToSell, accountingEngineSurplus])
 
     const startSurplusAcution = async function () {
         if (!library || !account) throw new Error('No library or account')
         const signer = library.getSigner(account)
         const geb = new Geb(ETH_NETWORK, signer.provider)
-        const accountingEngineSurplus =
-            await geb.contracts.safeEngine.coinBalance(
-                geb.contracts.accountingEngine.address
-            )
-        console.log(accountingEngineSurplus.lte(surplusAmountToSell))
+
         const txData = geb.contracts.accountingEngine.auctionSurplus()
 
         if (!txData) throw new Error('No transaction request!')
@@ -141,5 +173,11 @@ export function useStartSurplusAuction() {
         }
     }
 
-    return { startSurplusAcution, surplusAmountToSell }
+    return {
+        startSurplusAcution,
+        surplusAmountToSell,
+        accountingEngineSurplus,
+        allowStartSurplusAuction,
+        deltaToStartSurplusAuction,
+    }
 }

@@ -26,8 +26,13 @@ const Auctions = ({
     const [type, setType] = useState<AuctionEventType>('SURPLUS')
     const [error, setError] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    const { startSurplusAcution, surplusAmountToSell } =
-        useStartSurplusAuction()
+    const {
+        startSurplusAcution,
+        surplusAmountToSell,
+        accountingEngineSurplus,
+        allowStartSurplusAuction,
+        deltaToStartSurplusAuction,
+    } = useStartSurplusAuction()
 
     const handleStartSurplusAuction = async () => {
         setIsLoading(true)
@@ -144,19 +149,50 @@ const Auctions = ({
                 {type === 'SURPLUS' && account ? (
                     <StartAuctionContainer>
                         <Box style={{ justifyContent: 'space-between' }}>
-                            <Box>
-                                <SurplusTitle>
-                                    Surplus Amount to Sell:{' '}
-                                </SurplusTitle>
-                                <span>
-                                    {formatNumber(surplusAmountToSell, 2)} RAI
-                                </span>
-                            </Box>
+                            <div>
+                                <Box>
+                                    <SurplusTitle>
+                                        System Surplus:{' '}
+                                    </SurplusTitle>
+                                    <span>
+                                        {formatNumber(
+                                            accountingEngineSurplus as string,
+                                            2
+                                        )}{' '}
+                                        RAI
+                                    </span>
+                                </Box>
+                                <Box>
+                                    <SurplusTitle>
+                                        Surplus Amount to Sell:{' '}
+                                    </SurplusTitle>
+                                    <span>
+                                        {formatNumber(
+                                            surplusAmountToSell as string,
+                                            2
+                                        )}{' '}
+                                        RAI
+                                    </span>
+                                </Box>
+
+                                {allowStartSurplusAuction ? null : (
+                                    <Box>
+                                        (
+                                        {formatNumber(
+                                            String(deltaToStartSurplusAuction),
+                                            2
+                                        )}{' '}
+                                        RAI) to start an auction
+                                    </Box>
+                                )}
+                            </div>
                             <Button
                                 text={'Start Surplus Auction'}
                                 onClick={handleStartSurplusAuction}
                                 isLoading={isLoading}
-                                disabled={isLoading}
+                                disabled={
+                                    isLoading || !allowStartSurplusAuction
+                                }
                             />
                         </Box>
                     </StartAuctionContainer>
@@ -236,6 +272,10 @@ const Box = styled.div`
     align-items: center;
     span {
         font-weight: bold;
+    }
+    @media (max-width: 767px) {
+        flex-direction: column;
+        margin-bottom: 15px;
     }
 `
 const SurplusTitle = styled.h3`
