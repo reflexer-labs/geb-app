@@ -176,14 +176,16 @@ const Shared = ({ children, ...rest }: Props) => {
                 { autoClose: false, type: 'warning', toastId }
             )
         } else if (blockedCountriesTz.includes(tz)) {
-            const countryName = tz.includes('London') ? 'UK' : 'USA'
             settingsActions.setBlockBody(true)
             toast(
                 <ToastPayload
                     icon={'AlertTriangle'}
                     iconSize={40}
                     iconColor={'orange'}
-                    text={`You are prohibited from accessing this UI from ${countryName}`}
+                    text={`You are prohibited from accessing this UI from the UK`}
+                    readMoreLink={
+                        'https://www.fca.org.uk/publication/correspondence/final-warning-cryptoasset-firms-marketing-consumers.pdf'
+                    }
                 />,
                 { type: 'warning', toastId: 'countryChecker', autoClose: false }
             )
