@@ -1,1 +1,1 @@
-export const blockedCountriesTz = ['Europe/London', 'Africa/Cairo']
+export const blockedCountriesTz = ['Europe/London']
