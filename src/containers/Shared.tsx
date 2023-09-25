@@ -10,6 +10,8 @@ import ApplicationUpdater from '../services/ApplicationUpdater'
 import BalanceUpdater from '../services/BalanceUpdater'
 import { capitalizeName, timeout } from '../utils/helper'
 import WalletModal from '../components/WalletModal'
+import 'react-toastify/dist/ReactToastify.css'
+
 import {
     EMPTY_ADDRESS,
     ETHERSCAN_PREFIXES,
@@ -21,7 +23,7 @@ import styled from 'styled-components'
 import { NETWORK_ID } from '../connectors'
 import CookieBanner from '../components/CookieBanner'
 import BlockBodyContainer from '../components/BlockBodyContainer'
-import { toast } from 'react-toastify'
+import { ToastContainer, toast } from 'react-toastify'
 import ToastPayload from '../components/ToastPayload'
 import WaitingModal from '../components/Modals/WaitingModal'
 import TransactionUpdater from '../services/TransactionUpdater'
@@ -39,7 +41,7 @@ import { ethers } from 'ethers'
 import MulticallUpdater from '../services/MulticallUpdater'
 import BlockedAddress from 'src/components/BlockedAddress'
 import { blockedAddresses } from 'src/utils/blockedAddresses'
-
+import { blockedCountriesTz } from 'src/utils/blockedCountriesTz'
 interface Props {
     children: ReactNode
 }
@@ -155,6 +157,7 @@ const Shared = ({ children, ...rest }: Props) => {
     function networkChecker() {
         accountChange()
         const id: ChainId = NETWORK_ID
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
         connectWalletActions.fetchFiatPrice()
         popupsActions.setIsSafeManagerOpen(false)
         if (chainId && chainId !== id) {
@@ -166,12 +169,23 @@ const Shared = ({ children, ...rest }: Props) => {
                     icon={'AlertTriangle'}
                     iconSize={40}
                     iconColor={'orange'}
-                    textColor={'#272727'}
                     text={`${t('wrong_network')} ${capitalizeName(
                         chainName === '' ? 'Mainnet' : chainName
                     )}`}
                 />,
                 { autoClose: false, type: 'warning', toastId }
+            )
+        } else if (blockedCountriesTz.includes(tz)) {
+            const countryName = tz.includes('London') ? 'UK' : 'USA'
+            settingsActions.setBlockBody(true)
+            toast(
+                <ToastPayload
+                    icon={'AlertTriangle'}
+                    iconSize={40}
+                    iconColor={'orange'}
+                    text={`You are prohibited from accessing this UI from ${countryName}`}
+                />,
+                { type: 'warning', toastId: 'countryChecker', autoClose: false }
             )
         } else {
             toast.update(toastId, { autoClose: 1 })
@@ -239,6 +253,7 @@ const Shared = ({ children, ...rest }: Props) => {
                 <CookieBanner />
             </EmptyDiv>
             <ImagePreloader />
+            <ToastContainer position="top-right" hideProgressBar />
         </Container>
     )
 }
