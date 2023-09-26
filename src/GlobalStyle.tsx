@@ -67,8 +67,7 @@ const GlobalStyle = createGlobalStyle`
       border-right-color:${(props) => props.theme.colors.foreground} !important
     }
   }
-.__react_component_tooltip {
-    max-width: 250px;
+.Toastify__toast{
     padding-top: 20px;
     padding-bottom: 20px;
     border-radius: 5px;

@@ -10,6 +10,8 @@ import ApplicationUpdater from '../services/ApplicationUpdater'
 import BalanceUpdater from '../services/BalanceUpdater'
 import { capitalizeName, timeout } from '../utils/helper'
 import WalletModal from '../components/WalletModal'
+import 'react-toastify/dist/ReactToastify.css'
+
 import {
     EMPTY_ADDRESS,
     ETHERSCAN_PREFIXES,
@@ -21,7 +23,7 @@ import styled from 'styled-components'
 import { NETWORK_ID } from '../connectors'
 import CookieBanner from '../components/CookieBanner'
 import BlockBodyContainer from '../components/BlockBodyContainer'
-import { toast } from 'react-toastify'
+import { ToastContainer, toast } from 'react-toastify'
 import ToastPayload from '../components/ToastPayload'
 import WaitingModal from '../components/Modals/WaitingModal'
 import TransactionUpdater from '../services/TransactionUpdater'
@@ -39,7 +41,8 @@ import { ethers } from 'ethers'
 import MulticallUpdater from '../services/MulticallUpdater'
 import BlockedAddress from 'src/components/BlockedAddress'
 import { blockedAddresses } from 'src/utils/blockedAddresses'
-
+import BlockedCountriesModal from 'src/components/Modals/BlockedCountriesModal'
+import BlcokedCountriesDetector from 'src/services/BlockedCountriesDetector'
 interface Props {
     children: ReactNode
 }
@@ -166,7 +169,6 @@ const Shared = ({ children, ...rest }: Props) => {
                     icon={'AlertTriangle'}
                     iconSize={40}
                     iconColor={'orange'}
-                    textColor={'#272727'}
                     text={`${t('wrong_network')} ${capitalizeName(
                         chainName === '' ? 'Mainnet' : chainName
                     )}`}
@@ -209,6 +211,8 @@ const Shared = ({ children, ...rest }: Props) => {
         <Container>
             {settingsState.blockBody ? <BlockBodyContainer /> : null}
             <SideMenu />
+            <BlockedCountriesModal />
+            <BlcokedCountriesDetector />
             <WalletModal />
             <MulticallUpdater />
             <ApplicationUpdater />
@@ -239,6 +243,7 @@ const Shared = ({ children, ...rest }: Props) => {
                 <CookieBanner />
             </EmptyDiv>
             <ImagePreloader />
+            <ToastContainer position="top-right" hideProgressBar />
         </Container>
     )
 }
