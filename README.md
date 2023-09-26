@@ -8,7 +8,7 @@
   Reflexer App
 </h1>
 
-Deposit your crypto assets, generate RAI and lever up your position.
+Deposit your crypto assets and generate RAI.
 
 - Website: [reflexer.finance](https://reflexer.finance/)
 - App: [app.reflexer.finance](https://app.reflexer.finance)
@@ -18,13 +18,6 @@ Deposit your crypto assets, generate RAI and lever up your position.
 - Twitter: [@reflexerfinance](https://twitter.com/reflexerfinance)
 - Discord: [Reflexer](https://discord.com/invite/83t3xKT)
 - Whitepaper: [Link](https://github.com/reflexer-labs/whitepapers/blob/master/English/rai-english.pdf)
-
-## Accessing the Reflexer Interface
-
-To access the Reflexer Interface, use an IPFS gateway link from the
-[latest release](https://github.com/reflexer-labs/geb-app/releases/latest),
-or visit [https://app.reflexer.finance](https://app.reflexer.finance).
-
 
 ## Development
 

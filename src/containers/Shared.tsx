@@ -41,7 +41,8 @@ import { ethers } from 'ethers'
 import MulticallUpdater from '../services/MulticallUpdater'
 import BlockedAddress from 'src/components/BlockedAddress'
 import { blockedAddresses } from 'src/utils/blockedAddresses'
-import { blockedCountriesTz } from 'src/utils/blockedCountriesTz'
+import BlockedCountriesModal from 'src/components/Modals/BlockedCountriesModal'
+import BlcokedCountriesDetector from 'src/services/BlockedCountriesDetector'
 interface Props {
     children: ReactNode
 }
@@ -157,7 +158,6 @@ const Shared = ({ children, ...rest }: Props) => {
     function networkChecker() {
         accountChange()
         const id: ChainId = NETWORK_ID
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
         connectWalletActions.fetchFiatPrice()
         popupsActions.setIsSafeManagerOpen(false)
         if (chainId && chainId !== id) {
@@ -174,20 +174,6 @@ const Shared = ({ children, ...rest }: Props) => {
                     )}`}
                 />,
                 { autoClose: false, type: 'warning', toastId }
-            )
-        } else if (blockedCountriesTz.includes(tz)) {
-            settingsActions.setBlockBody(true)
-            toast(
-                <ToastPayload
-                    icon={'AlertTriangle'}
-                    iconSize={40}
-                    iconColor={'orange'}
-                    text={`You are prohibited from accessing this UI from the UK`}
-                    readMoreLink={
-                        'https://www.fca.org.uk/publication/correspondence/final-warning-cryptoasset-firms-marketing-consumers.pdf'
-                    }
-                />,
-                { type: 'warning', toastId: 'countryChecker', autoClose: false }
             )
         } else {
             toast.update(toastId, { autoClose: 1 })
@@ -225,6 +211,8 @@ const Shared = ({ children, ...rest }: Props) => {
         <Container>
             {settingsState.blockBody ? <BlockBodyContainer /> : null}
             <SideMenu />
+            <BlockedCountriesModal />
+            <BlcokedCountriesDetector />
             <WalletModal />
             <MulticallUpdater />
             <ApplicationUpdater />
