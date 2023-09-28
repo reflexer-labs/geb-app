@@ -17,6 +17,7 @@ import {
     useSaviourInfo,
 } from '../../hooks/useSaviour'
 import { useStoreActions, useStoreState } from '../../store'
+import { IS_BLOCKED_COUNTRY } from 'src/utils/constants'
 
 const SafeHeader = ({
     safeId,
@@ -169,12 +170,14 @@ const SafeHeader = ({
                     ) : null}
                 </LeftSide>
                 <RightSide>
-                    <LinkButton
-                        id="deposit_borrow"
-                        text={'Deposit & Borrow'}
-                        url={`/safes/${safeId}/deposit`}
-                        color={'colorPrimary'}
-                    />
+                    {IS_BLOCKED_COUNTRY ? null : (
+                        <LinkButton
+                            id="deposit_borrow"
+                            text={'Deposit & Borrow'}
+                            url={`/safes/${safeId}/deposit`}
+                            color={'colorPrimary'}
+                        />
+                    )}
                     <LinkButton
                         id="repay_withdraw"
                         text={'Repay & Withdraw'}

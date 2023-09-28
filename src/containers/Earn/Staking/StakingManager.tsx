@@ -1,21 +1,29 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Escrow from './Escrow'
 import Stake from './Stake'
 import UnStake from './UnStake'
+import { IS_BLOCKED_COUNTRY } from 'src/utils/constants'
 
 const StakingManager = () => {
     const [type, setType] = useState<'stake' | 'unstake' | 'escrow'>('stake')
+    useEffect(() => {
+        if (IS_BLOCKED_COUNTRY) {
+            setType('unstake')
+        }
+    }, [])
 
     return (
         <StakingPayment>
             <Header>
-                <Tab
-                    className={type === 'stake' ? 'active' : ''}
-                    onClick={() => setType('stake')}
-                >
-                    Stake
-                </Tab>
+                {IS_BLOCKED_COUNTRY ? null : (
+                    <Tab
+                        className={type === 'stake' ? 'active' : ''}
+                        onClick={() => setType('stake')}
+                    >
+                        Stake
+                    </Tab>
+                )}
                 <Tab
                     className={type === 'unstake' ? 'active' : ''}
                     onClick={() => setType('unstake')}
@@ -33,7 +41,7 @@ const StakingManager = () => {
                 <Escrow />
             ) : type === 'unstake' ? (
                 <UnStake />
-            ) : (
+            ) : IS_BLOCKED_COUNTRY ? null : (
                 <Stake />
             )}
         </StakingPayment>

@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components'
 import { NETWORK_ID } from '../connectors'
 import useSwap from '../hooks/useSwap'
 import { useStoreActions } from '../store'
-import { SHOW_AUCTIONS } from '../utils/constants'
+import { IS_BLOCKED_COUNTRY, SHOW_AUCTIONS } from '../utils/constants'
 import { timeout } from '../utils/helper'
 import AnalyticsIcon from './Icons/AnalyticsIcon'
 import AuctionIcon from './Icons/AuctionIcon'
@@ -78,7 +78,7 @@ const NavLinks = () => {
             >
                 <SafeIcon className="opacity fill" /> {t('app')}
             </NavBarLink>
-            {SHOW_AUCTIONS && SHOW_AUCTIONS !== '1' ? null : (
+            {!SHOW_AUCTIONS || IS_BLOCKED_COUNTRY ? null : (
                 <NavBarLink
                     to="/auctions"
                     onClick={(e) => handleLinkClick(e, false)}
@@ -121,21 +121,29 @@ const NavLinks = () => {
                             alt="arrow"
                         />
                     </IntLink> */}
-                    <IntLink
-                        to="/earn/incentives"
-                        onClick={() => popupsActions.setShowSideMenu(false)}
-                    >
-                        Incentives{' '}
-                        <img
-                            src={require('../assets/dark-arrow.svg').default}
-                            alt="arrow"
-                        />
-                    </IntLink>
+                    {IS_BLOCKED_COUNTRY ? null : (
+                        <IntLink
+                            to="/earn/incentives"
+                            onClick={() => popupsActions.setShowSideMenu(false)}
+                        >
+                            Incentives{' '}
+                            <img
+                                src={
+                                    require('../assets/dark-arrow.svg').default
+                                }
+                                alt="arrow"
+                            />
+                        </IntLink>
+                    )}
                 </MenuBox>
             </Box>
-            <NavExtLink onClick={(e) => handleLinkClick(e, false, '', true)}>
-                <Repeat /> {t('swap')}
-            </NavExtLink>
+            {IS_BLOCKED_COUNTRY ? null : (
+                <NavExtLink
+                    onClick={(e) => handleLinkClick(e, false, '', true)}
+                >
+                    <Repeat /> {t('swap')}
+                </NavExtLink>
+            )}
             <Box className="has-menu">
                 <LinkItem>
                     <Shield /> {t('insurance')}

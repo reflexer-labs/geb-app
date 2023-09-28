@@ -9,6 +9,7 @@ import StakingManager from './StakingManager'
 import Statistics from './Statistics'
 import LinkButton from '../../../components/LinkButton'
 import { AlertCircle, BarChart2 } from 'react-feather'
+import { IS_BLOCKED_COUNTRY } from 'src/utils/constants'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
@@ -22,46 +23,49 @@ const Staking = () => {
         <Container>
             <Header>
                 <Title>Staking</Title>
-                <LinkButton
-                    url="/auctions/staked_token"
-                    text={'Staked Token Auctions'}
-                    color={'colorPrimary'}
-                />
+                {IS_BLOCKED_COUNTRY ? null : (
+                    <LinkButton
+                        url="/auctions/staked_token"
+                        text={'Staked Token Auctions'}
+                        color={'colorPrimary'}
+                    />
+                )}
             </Header>
-
-            <InfoBox>
-                <LeftSide>
-                    <InfoTitle>
-                        <BarChart2 size="16" /> FLX/ETH LP Staking
-                    </InfoTitle>
-                    <InfoText>
-                        {t('staking_description')}{' '}
-                        {
-                            <a
-                                rel="noopener noreferrer"
-                                href="https://docs.reflexer.finance/incentives/flx-staking"
-                                target="_blank"
-                            >
-                                Read More
-                            </a>
-                        }
-                    </InfoText>
-                </LeftSide>
-                <RightSide>
-                    <InfoTitle>
-                        <AlertCircle size="16" /> Important Note
-                    </InfoTitle>
-                    <InfoText className="bigFont">
-                        {`Unstaking is subject to a thawing period of ${
-                            exitDelay
-                                ? dayjs
-                                      .duration(exitDelay, 'seconds')
-                                      .humanize()
-                                : '-'
-                        }`}
-                    </InfoText>
-                </RightSide>
-            </InfoBox>
+            {IS_BLOCKED_COUNTRY ? null : (
+                <InfoBox>
+                    <LeftSide>
+                        <InfoTitle>
+                            <BarChart2 size="16" /> FLX/ETH LP Staking
+                        </InfoTitle>
+                        <InfoText>
+                            {t('staking_description')}{' '}
+                            {
+                                <a
+                                    rel="noopener noreferrer"
+                                    href="https://docs.reflexer.finance/incentives/flx-staking"
+                                    target="_blank"
+                                >
+                                    Read More
+                                </a>
+                            }
+                        </InfoText>
+                    </LeftSide>
+                    <RightSide>
+                        <InfoTitle>
+                            <AlertCircle size="16" /> Important Note
+                        </InfoTitle>
+                        <InfoText className="bigFont">
+                            {`Unstaking is subject to a thawing period of ${
+                                exitDelay
+                                    ? dayjs
+                                          .duration(exitDelay, 'seconds')
+                                          .humanize()
+                                    : '-'
+                            }`}
+                        </InfoText>
+                    </RightSide>
+                </InfoBox>
+            )}
 
             <Content>
                 <Header>
