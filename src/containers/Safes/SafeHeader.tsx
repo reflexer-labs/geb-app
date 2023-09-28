@@ -85,6 +85,8 @@ const SafeHeader = ({
             } finally {
                 setIsLoading(false)
             }
+        } else if (!hasSaviour && IS_BLOCKED_COUNTRY) {
+            return
         } else {
             history.push(`/safes/${safeId}/saviour`)
         }
@@ -116,6 +118,8 @@ const SafeHeader = ({
     const returnSaviourBtnText = () => {
         if (leftOver && leftOver.status) {
             return t('Collect Saviour Balance')
+        } else if (!hasSaviour && IS_BLOCKED_COUNTRY) {
+            return null
         } else {
             return (
                 <BtnInner>
