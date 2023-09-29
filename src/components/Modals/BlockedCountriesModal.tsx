@@ -35,9 +35,14 @@ const BlockedCountriesModal = () => {
                         rel="noopener noreferrer"
                     >
                         {'Read more'}
-                    </a>
+                    </a>{' '}
+                    or{' '}
+                    <Button
+                        withArrow
+                        text="Withdraw your funds"
+                        onClick={handleClick}
+                    />
                 </Text>
-                <Button onClick={handleClick}>Ok!, Withdraw My Funds</Button>
             </Container>
         </Modal>
     )
