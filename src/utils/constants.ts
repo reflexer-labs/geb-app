@@ -15,6 +15,7 @@ const {
     REACT_APP_SHOW_AUCTIONS,
     REACT_APP_NETWORK_URL,
     REACT_APP_WYRE_WORKER,
+    REACT_APP_IS_BLOCKED_COUNTRY,
 } = process.env
 
 export const MULTICALL2_ADDRESSES: AddressMap = {
@@ -35,7 +36,12 @@ export const COIN_TICKER = 'RAI'
 export const COLLATERAL_TYPE_ID = 'ETH-A'
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000'
 export const SYSTEM_STATUS = REACT_APP_SYSTEM_STATUS || ''
-export const SHOW_AUCTIONS = REACT_APP_SHOW_AUCTIONS || ''
+export const SHOW_AUCTIONS = Boolean(
+    REACT_APP_SHOW_AUCTIONS && REACT_APP_SHOW_AUCTIONS === '1'
+)
+export const IS_BLOCKED_COUNTRY = Boolean(
+    REACT_APP_IS_BLOCKED_COUNTRY && REACT_APP_IS_BLOCKED_COUNTRY === '1'
+)
 export const WYRE_WORKER = REACT_APP_WYRE_WORKER || ''
 
 // 'https://api.thegraph.com/subgraphs/name/guifel/kovan_1_3_0'

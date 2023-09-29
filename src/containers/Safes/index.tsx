@@ -8,6 +8,8 @@ import Button from '../../components/Button'
 import useGeb from '../../hooks/useGeb'
 import { useActiveWeb3React } from '../../hooks'
 import { isAddress } from '@ethersproject/address'
+import { IS_BLOCKED_COUNTRY } from 'src/utils/constants'
+import BlcokedCountriesDetector from 'src/services/BlockedCountriesDetector'
 
 const OnBoarding = ({ ...props }) => {
     const { t } = useTranslation()
@@ -58,8 +60,9 @@ const OnBoarding = ({ ...props }) => {
     return (
         <Container id="app-page">
             <Content>
-                {(account && !safeState.safeCreated) ||
-                (!isOwner && !safeState.list.length) ? (
+                {((account && !safeState.safeCreated) ||
+                    (!isOwner && !safeState.list.length)) &&
+                !IS_BLOCKED_COUNTRY ? (
                     <BtnContainer className="top-up">
                         <Button
                             data-test-id="topup-btn"
@@ -74,7 +77,9 @@ const OnBoarding = ({ ...props }) => {
                 ) : null}
                 {safeState.safeCreated ? (
                     <SafeList address={address} />
-                ) : popupsState.isWaitingModalOpen ? null : (
+                ) : popupsState.isWaitingModalOpen ? null : IS_BLOCKED_COUNTRY ? (
+                    <BlcokedCountriesDetector />
+                ) : (
                     <Accounts />
                 )}
             </Content>

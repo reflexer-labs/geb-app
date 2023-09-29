@@ -1,12 +1,17 @@
 import styled from 'styled-components'
-import { useStoreState } from '../../store'
+import { useStoreActions, useStoreState } from '../../store'
 import Modal from './Modal'
 import { AlertTriangle } from 'react-feather'
 import { ExternalLinkArrow } from 'src/GlobalStyle'
+import Button from '../Button'
 
 const BlockedCountriesModal = () => {
     const { popupsModel: popupsState } = useStoreState((state) => state)
-
+    const { popupsModel: popupsActions } = useStoreActions((state) => state)
+    const handleClick = () => {
+        popupsActions.setIsConnectorsWalletOpen(true)
+        popupsActions.setIsBlockedCountriesModalOpen(false)
+    }
     return (
         <Modal
             width={'350px'}
@@ -32,6 +37,7 @@ const BlockedCountriesModal = () => {
                         {'Read more'}
                     </a>
                 </Text>
+                <Button onClick={handleClick}>Ok!, Withdraw My Funds</Button>
             </Container>
         </Modal>
     )
@@ -55,4 +61,5 @@ const Container = styled.div`
 const Text = styled.div`
     font-size: ${(props) => props.theme.font.default};
     margin-top: 20px;
+    margin-bottom: 20px;
 `
