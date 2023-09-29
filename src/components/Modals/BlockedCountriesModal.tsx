@@ -18,7 +18,7 @@ const BlockedCountriesModal = () => {
     }
     return (
         <Modal
-            width={'450px'}
+            maxWidth={'450px'}
             backDropClose={false}
             isModalOpen={popupsState.isBlockedCountriesModalOpen}
             closeModal={handleClose}
@@ -30,7 +30,7 @@ const BlockedCountriesModal = () => {
                 <AlertTriangle size={40} color={'orange'} />
                 <Text>
                     You cannot interact with the Reflexer app from the{' '}
-                    <b>United Kingdom</b>{' '}
+                    <b>United Kingdom.</b>{' '}
                     <a
                         href={
                             'https://www.fca.org.uk/publication/correspondence/final-warning-cryptoasset-firms-marketing-consumers.pdf'
