@@ -12,20 +12,24 @@ const BlockedCountriesModal = () => {
         popupsActions.setIsConnectorsWalletOpen(true)
         popupsActions.setIsBlockedCountriesModalOpen(false)
     }
+
+    const handleClose = () => {
+        popupsActions.setIsBlockedCountriesModalOpen(false)
+    }
     return (
         <Modal
-            width={'350px'}
+            width={'450px'}
             backDropClose={false}
             isModalOpen={popupsState.isBlockedCountriesModalOpen}
+            closeModal={handleClose}
             borderRadius={'20px'}
-            handleModalContent
-            showXButton={false}
+            showXButton
             id="blocked-countries"
         >
             <Container>
                 <AlertTriangle size={40} color={'orange'} />
                 <Text>
-                    You are prohibited from accessing this UI from the{' '}
+                    You cannot interact with the Reflexer app from the{' '}
                     <b>United Kingdom</b>{' '}
                     <a
                         href={
@@ -34,14 +38,16 @@ const BlockedCountriesModal = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        {'Read more'}
-                    </a>{' '}
-                    or{' '}
+                        {'Read more here.'}
+                    </a>
+                    <br />
+                    You can use this UI to{' '}
                     <Button
                         withArrow
-                        text="Withdraw your funds"
+                        text="withdraw"
                         onClick={handleClick}
-                    />
+                    />{' '}
+                    your assets from the RAI protocol.{' '}
                 </Text>
             </Container>
         </Modal>
@@ -51,11 +57,6 @@ const BlockedCountriesModal = () => {
 export default BlockedCountriesModal
 
 const Container = styled.div`
-    background: ${(props) => props.theme.colors.background};
-    border-radius: ${(props) => props.theme.global.borderRadius};
-    border: 1px solid ${(props) => props.theme.colors.border};
-
-    padding: 40px;
     text-align: center;
     a {
         ${ExternalLinkArrow}
@@ -67,4 +68,13 @@ const Text = styled.div`
     font-size: ${(props) => props.theme.font.default};
     margin-top: 20px;
     margin-bottom: 20px;
+    img {
+        display: none !important;
+    }
+
+    button {
+        span {
+            text-transform: lowercase !important;
+        }
+    }
 `
