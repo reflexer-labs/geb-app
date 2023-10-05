@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-interface Props {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
     type: string
     text: string
     padding?: string
