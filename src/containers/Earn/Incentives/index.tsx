@@ -10,6 +10,7 @@ const Incentives = () => {
     const [isFetching, setIsFetching] = useState(true)
     const [error, setError] = useState('')
 
+    // Using static data for now
     // fetching incentives rounds
     useEffect(() => {
         async function fetchIncentives() {
