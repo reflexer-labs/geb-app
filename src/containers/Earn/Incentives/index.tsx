@@ -16,7 +16,7 @@ const Incentives = () => {
             try {
                 setIsFetching(true)
                 const res = await Axios.get(
-                    `https://raw.githubusercontent.com/piesrtasty/incentive-dashboard-api/static-incentives/data/static.json`
+                    `https://raw.githubusercontent.com/reflexer-labs/incentive-dashboard-api/master/data/static.json`
                 )
                 setIncentives(res.data.data.rounds)
                 setIsFetching(false)
