@@ -10,13 +10,14 @@ const Incentives = () => {
     const [isFetching, setIsFetching] = useState(true)
     const [error, setError] = useState('')
 
+    // Using static data for now
     // fetching incentives rounds
     useEffect(() => {
         async function fetchIncentives() {
             try {
                 setIsFetching(true)
                 const res = await Axios.get(
-                    `https://raw.githubusercontent.com/piesrtasty/incentive-dashboard-api/static-incentives/data/static.json`
+                    `https://raw.githubusercontent.com/reflexer-labs/incentive-dashboard-api/master/data/static.json`
                 )
                 setIncentives(res.data.data.rounds)
                 setIsFetching(false)
