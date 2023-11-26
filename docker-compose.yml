@@ -1,0 +1,10 @@
+version: '3'
+services:
+    reflexer-app:
+        container_name: reflexer-app
+        restart: always
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - '8080:80'

@@ -20,6 +20,7 @@ export interface PopupsModel {
     blockBackdrop: boolean
     hasFLXClaim: boolean
     isProxyModalOpen: boolean
+    isBlockedCountriesModalOpen: boolean
     isScreenModalOpen: boolean
     isVotingModalOpen: boolean
     auctionOperationPayload: IAuctionOperation
@@ -37,6 +38,7 @@ export interface PopupsModel {
     setIsScreenModalOpen: Action<PopupsModel, boolean>
     setIsConnectorsWalletOpen: Action<PopupsModel, boolean>
     setIsLoadingModalOpen: Action<PopupsModel, LoadingPayload>
+    setIsBlockedCountriesModalOpen: Action<PopupsModel, boolean>
     setSafeOperationPayload: Action<
         PopupsModel,
         IOperation & { isCreate: boolean }
@@ -94,6 +96,7 @@ const popupsModel: PopupsModel = {
         isOpen: false,
         type: '',
     },
+    isBlockedCountriesModalOpen: false,
     isVotingModalOpen: false,
     isConnectorsWalletOpen: false,
     showSideMenu: false,
@@ -181,6 +184,9 @@ const popupsModel: PopupsModel = {
     }),
     setIsSaviourModalOpen: action((state, payload) => {
         state.isSaviourModalOpen = payload
+    }),
+    setIsBlockedCountriesModalOpen: action((state, payload) => {
+        state.isBlockedCountriesModalOpen = payload
     }),
 }
 

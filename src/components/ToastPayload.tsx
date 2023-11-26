@@ -16,6 +16,7 @@ interface Props {
         value: string
         chainId: number
     }
+    readMoreLink?: string
 }
 const ToastPayload = ({
     icon,
@@ -24,6 +25,7 @@ const ToastPayload = ({
     textColor,
     iconSize,
     payload,
+    readMoreLink,
 }: Props) => {
     const { t } = useTranslation()
     return (
@@ -35,17 +37,21 @@ const ToastPayload = ({
             />
             <div>
                 <Text color={textColor}>{text}</Text>
-                {payload ? (
+                {payload || readMoreLink ? (
                     <a
-                        href={getEtherscanLink(
-                            payload.chainId,
-                            payload.value,
-                            payload.type
-                        )}
+                        href={
+                            payload
+                                ? getEtherscanLink(
+                                      payload.chainId,
+                                      payload.value,
+                                      payload.type
+                                  )
+                                : readMoreLink
+                        }
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        {t('view_etherscan')}
+                        {payload ? t('view_etherscan') : 'Read more'}
                     </a>
                 ) : null}
             </div>

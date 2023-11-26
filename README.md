@@ -8,7 +8,7 @@
   Reflexer App
 </h1>
 
-Deposit your crypto assets, generate RAI and lever up your position.
+Deposit your crypto assets and generate RAI.
 
 - Website: [reflexer.finance](https://reflexer.finance/)
 - App: [app.reflexer.finance](https://app.reflexer.finance)
@@ -19,14 +19,18 @@ Deposit your crypto assets, generate RAI and lever up your position.
 - Discord: [Reflexer](https://discord.com/invite/83t3xKT)
 - Whitepaper: [Link](https://github.com/reflexer-labs/whitepapers/blob/master/English/rai-english.pdf)
 
-## Accessing the Uniswap Interface
-
-To access the Reflexer Interface, use an IPFS gateway link from the
-[latest release](https://github.com/reflexer-labs/geb-app/releases/latest),
-or visit [https://app.reflexer.finance](https://app.reflexer.finance).
-
-
 ## Development
+
+
+### Configure env. variables
+
+To have the app default to a different network when a wallet is not connected:
+
+1. Create a file and name it `.env.development.local`
+2. Change `REACT_APP_NETWORK_ID` to `"42"`
+3. Change `REACT_APP_NETWORK_URL` to e.g. `"https://mainnet.infura.io/v3/{YOUR_INFURA_KEY}"`
+4. Change `REACT_APP_COIN_TICKER_STAGING` to `"RAI"`
+4. Change `REACT_APP_SHOW_AUCTIONS` to `"1"`
 
 ### Install Dependencies
 
@@ -40,15 +44,12 @@ yarn
 yarn start
 ```
 
-### Configuring the environment
+### Docker Deployment
 
-To have the app default to a different network when a wallet is not connected:
+```bash
+docker-compose up --build -d
+```
 
-1. Create a file and name it `.env.development.local`
-2. Change `REACT_APP_NETWORK_ID` to `"42"`
-3. Change `REACT_APP_NETWORK_URL` to e.g. `"https://kovan.infura.io/v3/{YOUR_INFURA_KEY}"`
-4. Change `REACT_APP_COIN_TICKER_STAGING` to `"RAI"`
-4. Change `REACT_APP_SHOW_AUCTIONS` to `"1"`
 
 ## Testing
 

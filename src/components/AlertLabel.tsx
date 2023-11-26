@@ -25,6 +25,7 @@ const AlertLabel = ({ text, type, padding, isBlock = true }: Props) => {
 }
 
 export default AlertLabel
+
 const Flex = styled.div`
     display: flex;
     align-items: center;

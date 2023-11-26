@@ -17,6 +17,7 @@ import {
     useSaviourInfo,
 } from '../../hooks/useSaviour'
 import { useStoreActions, useStoreState } from '../../store'
+import { IS_BLOCKED_COUNTRY } from 'src/utils/constants'
 
 const SafeHeader = ({
     safeId,
@@ -84,6 +85,8 @@ const SafeHeader = ({
             } finally {
                 setIsLoading(false)
             }
+        } else if (!hasSaviour && IS_BLOCKED_COUNTRY) {
+            return
         } else {
             history.push(`/safes/${safeId}/saviour`)
         }
@@ -115,6 +118,8 @@ const SafeHeader = ({
     const returnSaviourBtnText = () => {
         if (leftOver && leftOver.status) {
             return t('Collect Saviour Balance')
+        } else if (!hasSaviour && IS_BLOCKED_COUNTRY) {
+            return null
         } else {
             return (
                 <BtnInner>
@@ -169,12 +174,14 @@ const SafeHeader = ({
                     ) : null}
                 </LeftSide>
                 <RightSide>
-                    <LinkButton
-                        id="deposit_borrow"
-                        text={'Deposit & Borrow'}
-                        url={`/safes/${safeId}/deposit`}
-                        color={'colorPrimary'}
-                    />
+                    {IS_BLOCKED_COUNTRY ? null : (
+                        <LinkButton
+                            id="deposit_borrow"
+                            text={'Deposit & Borrow'}
+                            url={`/safes/${safeId}/deposit`}
+                            color={'colorPrimary'}
+                        />
+                    )}
                     <LinkButton
                         id="repay_withdraw"
                         text={'Repay & Withdraw'}

@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components'
 import { NETWORK_ID } from '../connectors'
 import useSwap from '../hooks/useSwap'
 import { useStoreActions } from '../store'
-import { SHOW_AUCTIONS } from '../utils/constants'
+import { IS_BLOCKED_COUNTRY, SHOW_AUCTIONS } from '../utils/constants'
 import { timeout } from '../utils/helper'
 import AnalyticsIcon from './Icons/AnalyticsIcon'
 import AuctionIcon from './Icons/AuctionIcon'
@@ -62,7 +62,6 @@ const NavLinks = () => {
             }
         }
     }
-
     return (
         <Nav>
             <NavBarLink
@@ -78,7 +77,7 @@ const NavLinks = () => {
             >
                 <SafeIcon className="opacity fill" /> {t('app')}
             </NavBarLink>
-            {SHOW_AUCTIONS && SHOW_AUCTIONS !== '1' ? null : (
+            {!SHOW_AUCTIONS || IS_BLOCKED_COUNTRY ? null : (
                 <NavBarLink
                     to="/auctions"
                     onClick={(e) => handleLinkClick(e, false)}
@@ -90,28 +89,44 @@ const NavLinks = () => {
                 </NavBarLink>
             )}
 
-            <Box className="has-menu">
-                <LinkItem
+            {IS_BLOCKED_COUNTRY ? (
+                <NavBarLink
+                    to="/earn/staking"
+                    onClick={(e) => handleLinkClick(e, false)}
                     className={
-                        location.pathname.startsWith('/earn')
+                        location.pathname.startsWith('/earn/staking')
                             ? 'activeLink'
                             : ''
                     }
                 >
-                    <DollarSign /> {t('earn')}
-                </LinkItem>
-                <MenuBox className="menu-box">
-                    <IntLink
-                        to="/earn/staking"
-                        onClick={() => popupsActions.setShowSideMenu(false)}
+                    Staking
+                </NavBarLink>
+            ) : null}
+            {IS_BLOCKED_COUNTRY ? null : (
+                <Box className="has-menu">
+                    <LinkItem
+                        className={
+                            location.pathname.startsWith('/earn')
+                                ? 'activeLink'
+                                : ''
+                        }
                     >
-                        Staking{' '}
-                        <img
-                            src={require('../assets/dark-arrow.svg').default}
-                            alt="arrow"
-                        />
-                    </IntLink>
-                    {/* <IntLink
+                        <DollarSign /> {t('earn')}
+                    </LinkItem>
+                    <MenuBox className="menu-box">
+                        <IntLink
+                            to="/earn/staking"
+                            onClick={() => popupsActions.setShowSideMenu(false)}
+                        >
+                            Staking{' '}
+                            <img
+                                src={
+                                    require('../assets/dark-arrow.svg').default
+                                }
+                                alt="arrow"
+                            />
+                        </IntLink>
+                        {/* <IntLink
                         to="/earn/moneygod"
                         onClick={() => popupsActions.setShowSideMenu(false)}
                     >
@@ -121,61 +136,78 @@ const NavLinks = () => {
                             alt="arrow"
                         />
                     </IntLink> */}
-                    <IntLink
-                        to="/earn/incentives"
-                        onClick={() => popupsActions.setShowSideMenu(false)}
-                    >
-                        Incentives{' '}
-                        <img
-                            src={require('../assets/dark-arrow.svg').default}
-                            alt="arrow"
-                        />
-                    </IntLink>
-                </MenuBox>
-            </Box>
-            <NavExtLink onClick={(e) => handleLinkClick(e, false, '', true)}>
-                <Repeat /> {t('swap')}
-            </NavExtLink>
-            <Box className="has-menu">
-                <LinkItem>
-                    <Shield /> {t('insurance')}
-                </LinkItem>
-                <MenuBox className="menu-box">
-                    <ExtLink
-                        href="https://app.nexusmutual.io/cover/buy/get-quote?address=0xCC88a9d330da1133Df3A7bD823B95e52511A6962"
-                        target="_blank"
-                    >
-                        Nexus Mutual{' '}
-                        <img
-                            src={require('../assets/dark-arrow.svg').default}
-                            alt="arrow"
-                        />
-                    </ExtLink>
-                    <ExtLink
-                        href="https://app.insurace.io/Insurance/BuyCovers?referrer=1429350351089631541390481795260252294441502731750"
-                        target="_blank"
-                    >
-                        InsurAce{' '}
-                        <img
-                            src={require('../assets/dark-arrow.svg').default}
-                            alt="arrow"
-                        />
-                    </ExtLink>
-                </MenuBox>
-            </Box>
-            <NavExtLink
-                onClick={(e) =>
-                    handleLinkClick(
-                        e,
-                        false,
-                        NETWORK_ID === 1
-                            ? 'https://stats.reflexer.finance/'
-                            : 'https://stats-kovan.reflexer.finance/'
-                    )
-                }
-            >
-                <AnalyticsIcon className="fill" /> {t('analytics')}
-            </NavExtLink>
+
+                        <IntLink
+                            to="/earn/incentives"
+                            onClick={() => popupsActions.setShowSideMenu(false)}
+                        >
+                            Incentives{' '}
+                            <img
+                                src={
+                                    require('../assets/dark-arrow.svg').default
+                                }
+                                alt="arrow"
+                            />
+                        </IntLink>
+                    </MenuBox>
+                </Box>
+            )}
+            {IS_BLOCKED_COUNTRY ? null : (
+                <NavExtLink
+                    onClick={(e) => handleLinkClick(e, false, '', true)}
+                >
+                    <Repeat /> {t('swap')}
+                </NavExtLink>
+            )}
+
+            {IS_BLOCKED_COUNTRY ? null : (
+                <Box className="has-menu">
+                    <LinkItem>
+                        <Shield /> {t('insurance')}
+                    </LinkItem>
+                    <MenuBox className="menu-box">
+                        <ExtLink
+                            href="https://app.nexusmutual.io/cover/buy/get-quote?address=0xCC88a9d330da1133Df3A7bD823B95e52511A6962"
+                            target="_blank"
+                        >
+                            Nexus Mutual{' '}
+                            <img
+                                src={
+                                    require('../assets/dark-arrow.svg').default
+                                }
+                                alt="arrow"
+                            />
+                        </ExtLink>
+                        <ExtLink
+                            href="https://app.insurace.io/Insurance/BuyCovers?referrer=1429350351089631541390481795260252294441502731750"
+                            target="_blank"
+                        >
+                            InsurAce{' '}
+                            <img
+                                src={
+                                    require('../assets/dark-arrow.svg').default
+                                }
+                                alt="arrow"
+                            />
+                        </ExtLink>
+                    </MenuBox>
+                </Box>
+            )}
+            {IS_BLOCKED_COUNTRY ? null : (
+                <NavExtLink
+                    onClick={(e) =>
+                        handleLinkClick(
+                            e,
+                            false,
+                            NETWORK_ID === 1
+                                ? 'https://stats.reflexer.finance/'
+                                : 'https://stats-kovan.reflexer.finance/'
+                        )
+                    }
+                >
+                    <AnalyticsIcon className="fill" /> {t('analytics')}
+                </NavExtLink>
+            )}
         </Nav>
     )
 }

@@ -130,7 +130,7 @@
     "debt_auction_claim_tokens": "What does the Claim Tokens button do?",
     "debt_auction_claim_tokens_desc": "In case someone outbids you in a debt auction, your RAI bid will be reimbursed to your Reflexer Account.Claim Tokens can be used to get back RAI (and FLX) that is kept in your Account.",
     "surplus_auction_minting_flx_header": "Selling Surplus RAI",
-    "surplus_auction_minting_flx_desc": "Surplus auctions are meant to sell RAI that accrued inside the protocol in exchange for FLX. The FLX that is received by an auction will be burned.",
+    "surplus_auction_minting_flx_desc": "Surplus auctions are meant to sell RAI that accrued inside the protocol in exchange for FLX. The FLX that is received by an auction will be burned. Auction will start when the surplus amount plus 500k (fixed surplus buffer) be less than or equal to System Surplus ",
     "surplus_auction_how_to_bid": "How do I bid?",
     "surplus_auction_how_to_bid_desc": "During a surplus auction, you will bid an increasing amount of FLX for a fixed amount of RAI. A practical example: if the current FLX bid is 100 for 20K RAI (resulting in a price of 200 RAI/FLX), the next bidder must bid more FLX for the same amount of RAI. The auction also makes sure that each bid must be at least a certain percentage higher than the previous one (e.g the next bid must be at least 3% higher).",
     "surplus_auction_claim_tokens": "What does the Claim Tokens button do?",

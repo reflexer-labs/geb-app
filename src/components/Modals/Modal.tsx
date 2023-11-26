@@ -23,6 +23,7 @@ interface Props {
     hideFooter?: boolean
     backDropColor?: string
     startConfetti?: boolean
+    id?: string
 }
 const Modal = ({
     title,
@@ -40,6 +41,7 @@ const Modal = ({
     hideHeader,
     startConfetti = false,
     backDropColor,
+    id,
 }: Props) => {
     const { t } = useTranslation()
     const nodeRef = React.useRef(null)
@@ -73,7 +75,7 @@ const Modal = ({
             unmountOnExit
             mountOnEnter
         >
-            <Container ref={nodeRef}>
+            <Container ref={nodeRef} id={id}>
                 <Confetti start={startConfetti} />
                 <InnerContent>
                     <BackDrop bg={backDropColor} onClick={handleBackdrop} />
