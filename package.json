@@ -108,7 +108,8 @@
         "start-server-and-test": "^1.11.0"
     },
     "peerDependencies": {
-        "@babel/runtime": "^7.17.12"
+        "@babel/runtime": "^7.17.12",
+        "@babel/core": "^7.17.12"
     },
     "resolutions": {
         "react-error-overlay": "6.0.9",
