@@ -1,5 +1,6 @@
 import React from 'react'
-import { DollarSign, Repeat, Shield } from 'react-feather'
+// import { DollarSign, Repeat, Shield } from 'react-feather'
+import { DollarSign } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import styled, { css } from 'styled-components'
@@ -152,14 +153,14 @@ const NavLinks = () => {
                     </MenuBox>
                 </Box>
             )}
-            {IS_BLOCKED_COUNTRY ? null : (
+            {/* {IS_BLOCKED_COUNTRY ? null : (
                 <NavExtLink
                     onClick={(e) => handleLinkClick(e, false, '', true)}
                 >
                     <Repeat /> {t('swap')}
                 </NavExtLink>
-            )}
-
+            )} */}
+            {/* 
             {IS_BLOCKED_COUNTRY ? null : (
                 <Box className="has-menu">
                     <LinkItem>
@@ -178,7 +179,8 @@ const NavLinks = () => {
                                 alt="arrow"
                             />
                         </ExtLink>
-                        <ExtLink
+                         */}
+            {/* <ExtLink
                             href="https://app.insurace.io/Insurance/BuyCovers?referrer=1429350351089631541390481795260252294441502731750"
                             target="_blank"
                         >
@@ -189,10 +191,11 @@ const NavLinks = () => {
                                 }
                                 alt="arrow"
                             />
-                        </ExtLink>
+                        </ExtLink> */}
+            {/*                         
                     </MenuBox>
                 </Box>
-            )}
+            )} */}
             {IS_BLOCKED_COUNTRY ? null : (
                 <NavExtLink
                     onClick={(e) =>
@@ -386,39 +389,39 @@ const MenuBox = styled.div`
   `}
 `
 
-const ExtLink = styled.a`
-    color: ${(props) => props.theme.colors.secondary};
-    font-size: 15px;
-    line-height: 24px;
-    letter-spacing: -0.18px;
-    transition: all 0.3s ease;
-    display: block;
-    margin: 5px 0;
-    cursor: pointer;
-    &:last-child {
-        margin-bottom: 0;
-    }
+// const ExtLink = styled.a`
+//     color: ${(props) => props.theme.colors.secondary};
+//     font-size: 15px;
+//     line-height: 24px;
+//     letter-spacing: -0.18px;
+//     transition: all 0.3s ease;
+//     display: block;
+//     margin: 5px 0;
+//     cursor: pointer;
+//     &:last-child {
+//         margin-bottom: 0;
+//     }
 
-    &:hover {
-        text-decoration: none;
-        transform: translateX(5px);
-        color: ${(props) => props.theme.colors.neutral};
-    }
+//     &:hover {
+//         text-decoration: none;
+//         transform: translateX(5px);
+//         color: ${(props) => props.theme.colors.neutral};
+//     }
 
-    img {
-        display: none;
-    }
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-        color: ${(props) => props.theme.colors.neutral};
-        transform: translateX(0px) !important;
-        img {
-            display:inline;
-            transform:rotate(180deg);
-            margin-left:5px;
-        }
+//     img {
+//         display: none;
+//     }
+//     ${({ theme }) => theme.mediaWidth.upToSmall`
+//         color: ${(props) => props.theme.colors.neutral};
+//         transform: translateX(0px) !important;
+//         img {
+//             display:inline;
+//             transform:rotate(180deg);
+//             margin-left:5px;
+//         }
 
-    `}
-`
+//     `}
+// `
 
 const IntLink = styled(NavLink)`
     color: ${(props) => props.theme.colors.secondary};
