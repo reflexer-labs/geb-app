@@ -50,7 +50,9 @@ const StepsContent = ({
         gebCall.contracts.safeEngine
             .collateralTypes(utils.ETH_A)
             .then((res) => setDebtFloor(parseRad(res.debtFloor)))
-            .catch((e) => console.log(e))
+            .catch((e) => {
+                console.log(e)
+            })
     }, [gebCall])
 
     const handleOpenState = () => setIsOpen(!isOpen)
