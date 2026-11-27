@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import { Geb } from 'geb.js'
 import { css } from 'styled-components'
-import { injected, walletconnect, walletlink } from '../connectors'
+import { BROWSER_RPC_URL, injected, walletconnect, walletlink } from '../connectors'
 import { SupportedChainId } from './chains'
 import { ChainId, WalletInfo } from './interfaces'
 
@@ -13,7 +13,6 @@ const {
     REACT_APP_SYSTEM_STATUS,
     REACT_APP_MAILCHIMP_URL,
     REACT_APP_SHOW_AUCTIONS,
-    REACT_APP_NETWORK_URL,
     REACT_APP_WYRE_WORKER,
     REACT_APP_IS_BLOCKED_COUNTRY,
 } = process.env
@@ -204,5 +203,5 @@ export const INITIAL_INCENTIVE_ASSETS_STATE = {
 export const network_name =
     process.env.REACT_APP_NETWORK_ID === '1' ? 'mainnet' : 'kovan'
 
-const provider = new ethers.providers.JsonRpcProvider(REACT_APP_NETWORK_URL)
+const provider = new ethers.providers.JsonRpcProvider(BROWSER_RPC_URL)
 export const geb = new Geb(network_name, provider)
