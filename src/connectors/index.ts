@@ -22,11 +22,12 @@ import { NetworkConnector } from './NetworkConnector'
 const { REACT_APP_NETWORK_ID, REACT_APP_NETWORK_URL } = process.env
 
 export const NETWORK_URL = REACT_APP_NETWORK_URL as string
+export const BROWSER_RPC_URL = process.env.REACT_APP_BROWSER_RPC_URL || NETWORK_URL
 
 export const NETWORK_ID = parseInt(REACT_APP_NETWORK_ID ?? '1')
 
 export const network = new NetworkConnector({
-    urls: { [NETWORK_ID]: NETWORK_URL },
+    urls: { [NETWORK_ID]: BROWSER_RPC_URL },
     defaultChainId: NETWORK_ID,
 })
 
